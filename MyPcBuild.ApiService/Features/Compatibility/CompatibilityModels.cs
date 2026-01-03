@@ -1,4 +1,4 @@
-namespace MyPcBuild.ApiService.Services;
+namespace MyPcBuild.ApiService.Features.Compatibility;
 
 public record CompatibilityIssue(
     string Message,

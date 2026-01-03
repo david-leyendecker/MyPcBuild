@@ -1,14 +1,14 @@
 using Marten;
 using MyPcBuild.ApiService.Domain.Models;
 
-namespace MyPcBuild.ApiService.Data;
+namespace MyPcBuild.ApiService.Infrastructure;
 
 public static class ProductSeeder
 {
     public static async Task SeedProducts(IDocumentStore documentStore)
     {
         await using IDocumentSession session = documentStore.LightweightSession();
-        
+
         // Check if products already exist
         int existingCount = await session.Query<Product>().CountAsync();
         if (existingCount > 0)

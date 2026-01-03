@@ -1,6 +1,6 @@
 using MyPcBuild.ApiService.Domain.Models;
 
-namespace MyPcBuild.ApiService.Services;
+namespace MyPcBuild.ApiService.Features.Compatibility;
 
 public interface ICompatibilityValidator
 {

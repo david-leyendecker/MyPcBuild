@@ -1,5 +1,5 @@
 using MyPcBuild.ApiService.Domain.Models;
-using MyPcBuild.ApiService.Services;
+using MyPcBuild.ApiService.Features.Compatibility;
 
 namespace MyPcBuild.Tests.Services;
 
