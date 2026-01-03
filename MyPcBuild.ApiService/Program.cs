@@ -9,7 +9,7 @@ using MyPcBuild.ApiService.Domain.Models;
 using MyPcBuild.ApiService.Services;
 using MyPcBuild.ApiService.Mappers;
 
-var builder = WebApplication.CreateBuilder(args);
+WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 // Add service defaults & Aspire client integrations.
 builder.AddServiceDefaults();
@@ -26,7 +26,7 @@ builder.Services.AddScoped<IResponseMapper, ResponseMapper>();
 builder.Services.AddOpenApi();
 
 // Add Marten for Event Sourcing
-var connectionString = builder.Configuration.GetConnectionString("postgres") 
+string connectionString = builder.Configuration.GetConnectionString("postgres") 
     ?? "Host=localhost;Database=mypcbuild;Username=postgres;Password=postgres";
 
 builder.Services.AddMarten(opts =>
@@ -45,12 +45,12 @@ builder.Services.AddMarten(opts =>
     opts.Projections.Snapshot<Build>(Marten.Events.Projections.SnapshotLifecycle.Inline);
 }).UseLightweightSessions();
 
-var app = builder.Build();
+WebApplication app = builder.Build();
 
 // Seed product catalog on startup
-using (var scope = app.Services.CreateScope())
+using (IServiceScope scope = app.Services.CreateScope())
 {
-    var documentStore = scope.ServiceProvider.GetRequiredService<IDocumentStore>();
+    IDocumentStore documentStore = scope.ServiceProvider.GetRequiredService<IDocumentStore>();
     await ProductSeeder.SeedProducts(documentStore);
 }
 
@@ -68,13 +68,13 @@ app.MapPost("/api/builds", async (
     IDocumentSession session,
     IResponseMapper mapper) =>
 {
-    var buildId = Guid.NewGuid();
-    var @event = new BuildCreated { BuildId = buildId, Name = request.Name, UserId = request.UserId };
+    Guid buildId = Guid.NewGuid();
+    BuildCreated @event = new() { BuildId = buildId, Name = request.Name, UserId = request.UserId };
     
     session.Events.StartStream<Build>(buildId, @event);
     await session.SaveChangesAsync();
     
-    var response = mapper.MapBuildCreated(buildId, request.Name, request.UserId);
+    object response = mapper.MapBuildCreated(buildId, request.Name, request.UserId);
     return Results.Created($"/api/builds/{buildId}", response);
 })
 .WithName("CreateBuild");
@@ -84,7 +84,7 @@ app.MapPost("/api/builds/{buildId:guid}/parts", async (
     AddPartRequest request,
     IDocumentSession session) =>
 {
-    var @event = new PartAdded { BuildId = buildId, ProductId = request.ProductId, PricePaid = request.PricePaid };
+    PartAdded @event = new() { BuildId = buildId, ProductId = request.ProductId, PricePaid = request.PricePaid };
     
     session.Events.Append(buildId, @event);
     await session.SaveChangesAsync();
@@ -98,7 +98,7 @@ app.MapDelete("/api/builds/{buildId:guid}/parts/{productId:guid}", async (
     Guid productId,
     IDocumentSession session) =>
 {
-    var @event = new PartRemoved { BuildId = buildId, ProductId = productId };
+    PartRemoved @event = new() { BuildId = buildId, ProductId = productId };
     
     session.Events.Append(buildId, @event);
     await session.SaveChangesAsync();
@@ -113,17 +113,17 @@ app.MapGet("/api/builds/{buildId:guid}", async (
     IResponseMapper mapper,
     ICompatibilityValidator validator) =>
 {
-    var build = await session.Events.AggregateStreamAsync<Build>(buildId);
+    Build? build = await session.Events.AggregateStreamAsync<Build>(buildId);
     if (build is null)
     {
         return Results.NotFound();
     }
     
     // Load products for the build
-    var products = new List<Product>();
-    foreach (var part in build.Parts)
+    List<Product> products = [];
+    foreach (BuildPart part in build.Parts)
     {
-        var product = await session.LoadAsync<Product>(part.ProductId);
+        Product? product = await session.LoadAsync<Product>(part.ProductId);
         if (product != null)
         {
             products.Add(product);
@@ -137,7 +137,7 @@ app.MapGet("/api/builds/{buildId:guid}", async (
         compatibilityResult = await validator.ValidateBuild(products);
     }
     
-    var response = mapper.MapBuild(build, products, compatibilityResult);
+    object response = mapper.MapBuild(build, products, compatibilityResult);
     return Results.Ok(response);
 })
 .WithName("GetBuild");

@@ -8,7 +8,7 @@ public class Build
     public Guid Id { get; set; }
     public string Name { get; set; } = string.Empty;
     public Guid UserId { get; set; }
-    public List<BuildPart> Parts { get; set; } = new();
+    public List<BuildPart> Parts { get; set; } = [];
     public int Version { get; set; }
 
     public void Apply(BuildCreated @event)

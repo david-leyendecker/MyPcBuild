@@ -7,17 +7,17 @@ public static class ProductSeeder
 {
     public static async Task SeedProducts(IDocumentStore documentStore)
     {
-        await using var session = documentStore.LightweightSession();
+        await using IDocumentSession session = documentStore.LightweightSession();
         
         // Check if products already exist
-        var existingCount = await session.Query<Product>().CountAsync();
+        int existingCount = await session.Query<Product>().CountAsync();
         if (existingCount > 0)
         {
             return; // Already seeded
         }
 
-        var products = new List<Product>
-        {
+        List<Product> products =
+        [
             // CPUs - AMD
             new Product(
                 Guid.NewGuid(),
@@ -511,9 +511,9 @@ public static class ProductSeeder
                     ["NoiseLevel"] = 36.0
                 }
             )
-        };
+        ];
 
-        foreach (var product in products)
+        foreach (Product product in products)
         {
             session.Store(product);
         }

@@ -11,16 +11,16 @@ public class CompatibilityValidator : ICompatibilityValidator
 {
     public async Task<CompatibilityResult> ValidateBuild(List<Product> products)
     {
-        var issues = new List<CompatibilityIssue>();
+        List<CompatibilityIssue> issues = [];
 
         // Extract products by category
-        var cpu = products.FirstOrDefault(p => p.Category == ProductCategory.CPU);
-        var motherboard = products.FirstOrDefault(p => p.Category == ProductCategory.Motherboard);
-        var gpu = products.FirstOrDefault(p => p.Category == ProductCategory.GPU);
-        var rams = products.Where(p => p.Category == ProductCategory.RAM).ToList();
-        var pcCase = products.FirstOrDefault(p => p.Category == ProductCategory.PCCase);
-        var psu = products.FirstOrDefault(p => p.Category == ProductCategory.PSU);
-        var cooler = products.FirstOrDefault(p => p.Category == ProductCategory.Cooler);
+        Product? cpu = products.FirstOrDefault(p => p.Category == ProductCategory.CPU);
+        Product? motherboard = products.FirstOrDefault(p => p.Category == ProductCategory.Motherboard);
+        Product? gpu = products.FirstOrDefault(p => p.Category == ProductCategory.GPU);
+        List<Product> rams = products.Where(p => p.Category == ProductCategory.RAM).ToList();
+        Product? pcCase = products.FirstOrDefault(p => p.Category == ProductCategory.PCCase);
+        Product? psu = products.FirstOrDefault(p => p.Category == ProductCategory.PSU);
+        Product? cooler = products.FirstOrDefault(p => p.Category == ProductCategory.Cooler);
 
         // Run all validation checks
         ValidateCpuMotherboardCompatibility(cpu, motherboard, issues);
@@ -40,8 +40,8 @@ public class CompatibilityValidator : ICompatibilityValidator
     {
         if (cpu == null || motherboard == null) return;
 
-        var cpuSocket = GetStringSpec(cpu, "Socket");
-        var mbSocket = GetStringSpec(motherboard, "Socket");
+        string cpuSocket = GetStringSpec(cpu, "Socket");
+        string mbSocket = GetStringSpec(motherboard, "Socket");
 
         if (!string.IsNullOrEmpty(cpuSocket) && !string.IsNullOrEmpty(mbSocket) && cpuSocket != mbSocket)
         {
@@ -57,13 +57,13 @@ public class CompatibilityValidator : ICompatibilityValidator
     {
         if (!rams.Any() || motherboard == null) return;
 
-        var mbMemoryType = GetStringSpec(motherboard, "MemoryType");
-        var mbMemorySlots = GetIntSpec(motherboard, "MemorySlots");
-        var mbMaxMemory = GetIntSpec(motherboard, "MaxMemory");
+        string mbMemoryType = GetStringSpec(motherboard, "MemoryType");
+        int mbMemorySlots = GetIntSpec(motherboard, "MemorySlots");
+        int mbMaxMemory = GetIntSpec(motherboard, "MaxMemory");
 
-        foreach (var ram in rams)
+        foreach (Product ram in rams)
         {
-            var ramType = GetStringSpec(ram, "Type");
+            string ramType = GetStringSpec(ram, "Type");
 
             // Check DDR type compatibility
             if (!string.IsNullOrEmpty(mbMemoryType) && !string.IsNullOrEmpty(ramType) && ramType != mbMemoryType)
@@ -77,7 +77,7 @@ public class CompatibilityValidator : ICompatibilityValidator
         }
 
         // Check total RAM capacity
-        var totalRamCapacity = rams.Sum(r => GetIntSpec(r, "Capacity"));
+        int totalRamCapacity = rams.Sum(r => GetIntSpec(r, "Capacity"));
         if (mbMaxMemory > 0 && totalRamCapacity > mbMaxMemory)
         {
             issues.Add(new CompatibilityIssue(
@@ -88,7 +88,7 @@ public class CompatibilityValidator : ICompatibilityValidator
         }
 
         // Check number of RAM sticks vs slots
-        var totalRamSticks = rams.Sum(r => ParseRamConfiguration(r));
+        int totalRamSticks = rams.Sum(r => ParseRamConfiguration(r));
         if (mbMemorySlots > 0 && totalRamSticks > mbMemorySlots)
         {
             issues.Add(new CompatibilityIssue(
@@ -103,14 +103,14 @@ public class CompatibilityValidator : ICompatibilityValidator
     {
         if (gpu == null) return;
 
-        var gpuLength = GetIntSpec(gpu, "Length");
-        var gpuTdp = GetIntSpec(gpu, "TDP");
-        var gpuSlots = GetIntSpec(gpu, "Slots");
+        int gpuLength = GetIntSpec(gpu, "Length");
+        int gpuTdp = GetIntSpec(gpu, "TDP");
+        int gpuSlots = GetIntSpec(gpu, "Slots");
 
         // Check GPU length vs case
         if (pcCase != null && gpuLength > 0)
         {
-            var maxGpuLength = GetIntSpec(pcCase, "MaxGPULength");
+            int maxGpuLength = GetIntSpec(pcCase, "MaxGPULength");
             if (maxGpuLength > 0)
             {
                 if (gpuLength > maxGpuLength)
@@ -135,10 +135,10 @@ public class CompatibilityValidator : ICompatibilityValidator
         // Check GPU power requirements
         if (psu != null && gpuTdp > 0)
         {
-            var powerConnectors = GetStringSpec(gpu, "PowerConnectors");
+            string powerConnectors = GetStringSpec(gpu, "PowerConnectors");
             if (!string.IsNullOrEmpty(powerConnectors))
             {
-                var psuPcie8Pin = GetIntSpec(psu, "PCIe8Pin");
+                int psuPcie8Pin = GetIntSpec(psu, "PCIe8Pin");
                 
                 // Check if GPU needs 16-pin connector
                 if (powerConnectors.Contains("16-pin") && psuPcie8Pin < 2)
@@ -169,15 +169,15 @@ public class CompatibilityValidator : ICompatibilityValidator
     {
         if (pcCase == null) return;
 
-        var caseFormFactor = GetStringSpec(pcCase, "FormFactor");
+        string caseFormFactor = GetStringSpec(pcCase, "FormFactor");
 
         // Check motherboard form factor
         if (motherboard != null)
         {
-            var mbFormFactor = GetStringSpec(motherboard, "FormFactor");
+            string mbFormFactor = GetStringSpec(motherboard, "FormFactor");
             if (!string.IsNullOrEmpty(caseFormFactor) && !string.IsNullOrEmpty(mbFormFactor))
             {
-                var isCompatible = IsFormFactorCompatible(caseFormFactor, mbFormFactor);
+                bool isCompatible = IsFormFactorCompatible(caseFormFactor, mbFormFactor);
                 if (!isCompatible)
                 {
                     issues.Add(new CompatibilityIssue(
@@ -192,8 +192,8 @@ public class CompatibilityValidator : ICompatibilityValidator
         // Check cooler clearance
         if (cooler != null)
         {
-            var coolerHeight = GetIntSpec(cooler, "Height");
-            var maxCoolerHeight = GetIntSpec(pcCase, "MaxCPUCoolerHeight");
+            int coolerHeight = GetIntSpec(cooler, "Height");
+            int maxCoolerHeight = GetIntSpec(pcCase, "MaxCPUCoolerHeight");
             
             if (coolerHeight > 0 && maxCoolerHeight > 0)
             {
@@ -219,8 +219,8 @@ public class CompatibilityValidator : ICompatibilityValidator
         // Check PSU clearance
         if (psu != null)
         {
-            var psuLength = GetIntSpec(psu, "Length");
-            var maxPsuLength = GetIntSpec(pcCase, "MaxPSULength");
+            int psuLength = GetIntSpec(psu, "Length");
+            int maxPsuLength = GetIntSpec(pcCase, "MaxPSULength");
             
             if (psuLength > 0 && maxPsuLength > 0 && psuLength > maxPsuLength)
             {
@@ -237,19 +237,19 @@ public class CompatibilityValidator : ICompatibilityValidator
     {
         if (psu == null) return;
 
-        var psuWattage = GetIntSpec(psu, "Wattage");
+        int psuWattage = GetIntSpec(psu, "Wattage");
         if (psuWattage == 0) return;
 
         // Calculate total TDP
-        var cpuTdp = cpu != null ? GetIntSpec(cpu, "TDP") : 0;
-        var gpuTdp = gpu != null ? GetIntSpec(gpu, "TDP") : 0;
+        int cpuTdp = cpu != null ? GetIntSpec(cpu, "TDP") : 0;
+        int gpuTdp = gpu != null ? GetIntSpec(gpu, "TDP") : 0;
         
         // Add overhead for other components (motherboard, RAM, storage, fans, etc.)
-        var systemOverhead = 150; // Approximate 150W for other components
-        var totalEstimatedPower = cpuTdp + gpuTdp + systemOverhead;
+        int systemOverhead = 150; // Approximate 150W for other components
+        int totalEstimatedPower = cpuTdp + gpuTdp + systemOverhead;
 
         // PSU should be at least 20% more than estimated power for efficiency
-        var recommendedWattage = (int)(totalEstimatedPower * 1.2);
+        int recommendedWattage = (int)(totalEstimatedPower * 1.2);
 
         if (psuWattage < totalEstimatedPower)
         {
@@ -273,8 +273,8 @@ public class CompatibilityValidator : ICompatibilityValidator
     {
         if (cooler == null || cpu == null) return;
 
-        var cpuSocket = GetStringSpec(cpu, "Socket");
-        var coolerSockets = GetArraySpec(cooler, "Sockets");
+        string cpuSocket = GetStringSpec(cpu, "Socket");
+        List<string> coolerSockets = GetArraySpec(cooler, "Sockets");
 
         // Check socket compatibility
         if (!string.IsNullOrEmpty(cpuSocket) && coolerSockets.Any())
@@ -290,8 +290,8 @@ public class CompatibilityValidator : ICompatibilityValidator
         }
 
         // Check TDP coverage
-        var cpuTdp = GetIntSpec(cpu, "TDP");
-        var coolerTdp = GetIntSpec(cooler, "TDP");
+        int cpuTdp = GetIntSpec(cpu, "TDP");
+        int coolerTdp = GetIntSpec(cooler, "TDP");
 
         if (cpuTdp > 0 && coolerTdp > 0)
         {
@@ -314,10 +314,10 @@ public class CompatibilityValidator : ICompatibilityValidator
         }
 
         // Check if it's an AIO and validate radiator size
-        var coolerType = GetStringSpec(cooler, "Type");
+        string coolerType = GetStringSpec(cooler, "Type");
         if (coolerType == "AIO" && pcCase != null)
         {
-            var radiatorSize = GetIntSpec(cooler, "RadiatorSize");
+            int radiatorSize = GetIntSpec(cooler, "RadiatorSize");
             if (radiatorSize > 0)
             {
                 // This is a simplified check - in reality you'd check case specs for radiator support
@@ -355,12 +355,12 @@ public class CompatibilityValidator : ICompatibilityValidator
 
     private int ParseRamConfiguration(Product ram)
     {
-        var config = GetStringSpec(ram, "Configuration");
+        string config = GetStringSpec(ram, "Configuration");
         if (string.IsNullOrEmpty(config)) return 1;
 
         // Parse "2x16GB" format - return the first number
-        var parts = config.Split('x');
-        if (parts.Length > 0 && int.TryParse(parts[0], out var count))
+        string[] parts = config.Split('x');
+        if (parts.Length > 0 && int.TryParse(parts[0], out int count))
         {
             return count;
         }

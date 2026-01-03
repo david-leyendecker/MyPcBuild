@@ -18,14 +18,14 @@ public class CompatibilityValidatorTests
     public async Task ValidateBuild_MatchingCpuAndMotherboardSockets_ReturnsCompatible()
     {
         // Arrange
-        var products = new List<Product>
-        {
+        List<Product> products =
+        [
             CreateCpu("AMD Ryzen 9 7950X", "AM5"),
             CreateMotherboard("ASUS X670E", "AM5", "DDR5", "ATX")
-        };
+        ];
 
         // Act
-        var result = await _validator.ValidateBuild(products);
+        CompatibilityResult result = await _validator.ValidateBuild(products);
 
         // Assert
         Assert.True(result.IsCompatible);
@@ -37,14 +37,14 @@ public class CompatibilityValidatorTests
     public async Task ValidateBuild_MismatchedCpuAndMotherboardSockets_ReturnsError()
     {
         // Arrange
-        var products = new List<Product>
-        {
+        List<Product> products =
+        [
             CreateCpu("Intel i9-14900K", "LGA1700"),
             CreateMotherboard("ASUS X670E", "AM5", "DDR5", "ATX")
-        };
+        ];
 
         // Act
-        var result = await _validator.ValidateBuild(products);
+        CompatibilityResult result = await _validator.ValidateBuild(products);
 
         // Assert
         Assert.False(result.IsCompatible);
@@ -64,14 +64,14 @@ public class CompatibilityValidatorTests
     public async Task ValidateBuild_MatchingRamAndMotherboardDdrType_ReturnsCompatible()
     {
         // Arrange
-        var products = new List<Product>
-        {
+        List<Product> products =
+        [
             CreateMotherboard("ASUS X670E", "AM5", "DDR5", "ATX"),
             CreateRam("G.Skill Trident", "DDR5", 32, "2x16GB")
-        };
+        ];
 
         // Act
-        var result = await _validator.ValidateBuild(products);
+        CompatibilityResult result = await _validator.ValidateBuild(products);
 
         // Assert
         Assert.True(result.IsCompatible);
@@ -82,14 +82,14 @@ public class CompatibilityValidatorTests
     public async Task ValidateBuild_MismatchedRamAndMotherboardDdrType_ReturnsError()
     {
         // Arrange
-        var products = new List<Product>
-        {
+        List<Product> products =
+        [
             CreateMotherboard("ASUS X670E", "AM5", "DDR5", "ATX"),
             CreateRam("Corsair LPX", "DDR4", 16, "2x8GB")
-        };
+        ];
 
         // Act
-        var result = await _validator.ValidateBuild(products);
+        CompatibilityResult result = await _validator.ValidateBuild(products);
 
         // Assert
         Assert.False(result.IsCompatible);
@@ -101,15 +101,15 @@ public class CompatibilityValidatorTests
     public async Task ValidateBuild_RamExceedsMotherboardCapacity_ReturnsError()
     {
         // Arrange
-        var products = new List<Product>
-        {
+        List<Product> products =
+        [
             CreateMotherboard("Budget Board", "AM5", "DDR5", "ATX", maxMemory: 64),
             CreateRam("G.Skill 64GB", "DDR5", 64, "2x32GB"),
             CreateRam("G.Skill 32GB", "DDR5", 32, "2x16GB") // Total 96GB
-        };
+        ];
 
         // Act
-        var result = await _validator.ValidateBuild(products);
+        CompatibilityResult result = await _validator.ValidateBuild(products);
 
         // Assert
         Assert.False(result.IsCompatible);
@@ -121,16 +121,16 @@ public class CompatibilityValidatorTests
     public async Task ValidateBuild_TooManyRamSticks_ReturnsError()
     {
         // Arrange
-        var products = new List<Product>
-        {
+        List<Product> products =
+        [
             CreateMotherboard("Board with 4 slots", "AM5", "DDR5", "ATX", memorySlots: 4),
             CreateRam("RAM Kit 1", "DDR5", 32, "2x16GB"),
             CreateRam("RAM Kit 2", "DDR5", 32, "2x16GB"),
             CreateRam("RAM Kit 3", "DDR5", 16, "2x8GB") // 6 sticks total
-        };
+        ];
 
         // Act
-        var result = await _validator.ValidateBuild(products);
+        CompatibilityResult result = await _validator.ValidateBuild(products);
 
         // Assert
         Assert.False(result.IsCompatible);
@@ -146,14 +146,14 @@ public class CompatibilityValidatorTests
     public async Task ValidateBuild_GpuFitsInCase_ReturnsCompatible()
     {
         // Arrange
-        var products = new List<Product>
-        {
+        List<Product> products =
+        [
             CreateGpu("RTX 4070", 285, 285),
             CreateCase("Lian Li O11", "ATX", maxGpuLength: 420)
-        };
+        ];
 
         // Act
-        var result = await _validator.ValidateBuild(products);
+        CompatibilityResult result = await _validator.ValidateBuild(products);
 
         // Assert
         Assert.True(result.IsCompatible);
@@ -164,14 +164,14 @@ public class CompatibilityValidatorTests
     public async Task ValidateBuild_GpuTooLongForCase_ReturnsError()
     {
         // Arrange
-        var products = new List<Product>
-        {
+        List<Product> products =
+        [
             CreateGpu("RTX 4090", 304, 450),
             CreateCase("Small Case", "MicroATX", maxGpuLength: 280)
-        };
+        ];
 
         // Act
-        var result = await _validator.ValidateBuild(products);
+        CompatibilityResult result = await _validator.ValidateBuild(products);
 
         // Assert
         Assert.False(result.IsCompatible);
@@ -183,14 +183,14 @@ public class CompatibilityValidatorTests
     public async Task ValidateBuild_GpuCloseToLimit_ReturnsWarning()
     {
         // Arrange
-        var products = new List<Product>
-        {
+        List<Product> products =
+        [
             CreateGpu("RTX 4090", 304, 450),
             CreateCase("Fractal Meshify", "ATX", maxGpuLength: 315) // Only 11mm clearance
-        };
+        ];
 
         // Act
-        var result = await _validator.ValidateBuild(products);
+        CompatibilityResult result = await _validator.ValidateBuild(products);
 
         // Assert
         Assert.True(result.IsCompatible);
@@ -207,14 +207,14 @@ public class CompatibilityValidatorTests
     public async Task ValidateBuild_AtxMotherboardInAtxCase_ReturnsCompatible()
     {
         // Arrange
-        var products = new List<Product>
-        {
+        List<Product> products =
+        [
             CreateMotherboard("ATX Board", "AM5", "DDR5", "ATX"),
             CreateCase("ATX Case", "ATX", maxGpuLength: 350)
-        };
+        ];
 
         // Act
-        var result = await _validator.ValidateBuild(products);
+        CompatibilityResult result = await _validator.ValidateBuild(products);
 
         // Assert
         Assert.True(result.IsCompatible);
@@ -225,14 +225,14 @@ public class CompatibilityValidatorTests
     public async Task ValidateBuild_AtxMotherboardInMicroAtxCase_ReturnsError()
     {
         // Arrange
-        var products = new List<Product>
-        {
+        List<Product> products =
+        [
             CreateMotherboard("ATX Board", "AM5", "DDR5", "ATX"),
             CreateCase("MicroATX Case", "MicroATX", maxGpuLength: 350)
-        };
+        ];
 
         // Act
-        var result = await _validator.ValidateBuild(products);
+        CompatibilityResult result = await _validator.ValidateBuild(products);
 
         // Assert
         Assert.False(result.IsCompatible);
@@ -244,14 +244,14 @@ public class CompatibilityValidatorTests
     public async Task ValidateBuild_MicroAtxMotherboardInAtxCase_ReturnsCompatible()
     {
         // Arrange
-        var products = new List<Product>
-        {
+        List<Product> products =
+        [
             CreateMotherboard("MicroATX Board", "AM5", "DDR5", "MicroATX"),
             CreateCase("ATX Case", "ATX", maxGpuLength: 350)
-        };
+        ];
 
         // Act
-        var result = await _validator.ValidateBuild(products);
+        CompatibilityResult result = await _validator.ValidateBuild(products);
 
         // Assert
         Assert.True(result.IsCompatible);
@@ -266,15 +266,15 @@ public class CompatibilityValidatorTests
     public async Task ValidateBuild_SufficientPsuWattage_ReturnsCompatible()
     {
         // Arrange
-        var products = new List<Product>
-        {
+        List<Product> products =
+        [
             CreateCpu("Ryzen 7 7800X3D", "AM5", tdp: 120),
             CreateGpu("RTX 4070 Ti", 285, tdp: 285),
             CreatePsu("Corsair RM850x", 850)
-        };
+        ];
 
         // Act
-        var result = await _validator.ValidateBuild(products);
+        CompatibilityResult result = await _validator.ValidateBuild(products);
 
         // Assert
         Assert.True(result.IsCompatible);
@@ -285,15 +285,15 @@ public class CompatibilityValidatorTests
     public async Task ValidateBuild_InsufficientPsuWattage_ReturnsError()
     {
         // Arrange
-        var products = new List<Product>
-        {
+        List<Product> products =
+        [
             CreateCpu("Ryzen 9 7950X", "AM5", tdp: 170),
             CreateGpu("RTX 4090", 304, tdp: 450),
             CreatePsu("Seasonic 650W", 650) // Total need: 170+450+150 = 770W
-        };
+        ];
 
         // Act
-        var result = await _validator.ValidateBuild(products);
+        CompatibilityResult result = await _validator.ValidateBuild(products);
 
         // Assert
         Assert.False(result.IsCompatible);
@@ -305,15 +305,15 @@ public class CompatibilityValidatorTests
     public async Task ValidateBuild_BelowRecommendedPsuWattage_ReturnsWarning()
     {
         // Arrange
-        var products = new List<Product>
-        {
+        List<Product> products =
+        [
             CreateCpu("Ryzen 9 7950X", "AM5", tdp: 170),
             CreateGpu("RTX 4090", 304, tdp: 450),
             CreatePsu("Corsair RM850x", 850) // Sufficient but below 924W recommended
-        };
+        ];
 
         // Act
-        var result = await _validator.ValidateBuild(products);
+        CompatibilityResult result = await _validator.ValidateBuild(products);
 
         // Assert
         Assert.True(result.IsCompatible);
@@ -330,14 +330,14 @@ public class CompatibilityValidatorTests
     public async Task ValidateBuild_CoolerSupportsSocketAndTdp_ReturnsCompatible()
     {
         // Arrange
-        var products = new List<Product>
-        {
+        List<Product> products =
+        [
             CreateCpu("Ryzen 7 7800X3D", "AM5", tdp: 120),
-            CreateCooler("Noctua NH-D15", "Air", 165, tdp: 250, sockets: new[] { "AM5", "AM4", "LGA1700" })
-        };
+            CreateCooler("Noctua NH-D15", "Air", 165, tdp: 250, sockets: ["AM5", "AM4", "LGA1700"])
+        ];
 
         // Act
-        var result = await _validator.ValidateBuild(products);
+        CompatibilityResult result = await _validator.ValidateBuild(products);
 
         // Assert
         Assert.True(result.IsCompatible);
@@ -348,14 +348,14 @@ public class CompatibilityValidatorTests
     public async Task ValidateBuild_CoolerDoesNotSupportSocket_ReturnsError()
     {
         // Arrange
-        var products = new List<Product>
-        {
+        List<Product> products =
+        [
             CreateCpu("Ryzen 7 7800X3D", "AM5", tdp: 120),
-            CreateCooler("Old Cooler", "Air", 155, tdp: 200, sockets: new[] { "AM4", "LGA1200" })
-        };
+            CreateCooler("Old Cooler", "Air", 155, tdp: 200, sockets: ["AM4", "LGA1200"])
+        ];
 
         // Act
-        var result = await _validator.ValidateBuild(products);
+        CompatibilityResult result = await _validator.ValidateBuild(products);
 
         // Assert
         Assert.False(result.IsCompatible);
@@ -367,14 +367,14 @@ public class CompatibilityValidatorTests
     public async Task ValidateBuild_CoolerInsufficientTdp_ReturnsError()
     {
         // Arrange
-        var products = new List<Product>
-        {
+        List<Product> products =
+        [
             CreateCpu("Ryzen 9 7950X", "AM5", tdp: 170),
-            CreateCooler("Weak Cooler", "Air", 120, tdp: 95, sockets: new[] { "AM5" })
-        };
+            CreateCooler("Weak Cooler", "Air", 120, tdp: 95, sockets: ["AM5"])
+        ];
 
         // Act
-        var result = await _validator.ValidateBuild(products);
+        CompatibilityResult result = await _validator.ValidateBuild(products);
 
         // Assert
         Assert.False(result.IsCompatible);
@@ -386,14 +386,14 @@ public class CompatibilityValidatorTests
     public async Task ValidateBuild_CoolerTooTallForCase_ReturnsError()
     {
         // Arrange
-        var products = new List<Product>
-        {
-            CreateCooler("Tall Cooler", "Air", 170, tdp: 250, sockets: new[] { "AM5" }),
+        List<Product> products =
+        [
+            CreateCooler("Tall Cooler", "Air", 170, tdp: 250, sockets: ["AM5"]),
             CreateCase("Compact Case", "ATX", maxGpuLength: 350, maxCoolerHeight: 160)
-        };
+        ];
 
         // Act
-        var result = await _validator.ValidateBuild(products);
+        CompatibilityResult result = await _validator.ValidateBuild(products);
 
         // Assert
         Assert.False(result.IsCompatible);
@@ -409,18 +409,18 @@ public class CompatibilityValidatorTests
     public async Task ValidateBuild_MultipleIncompatibilities_ReturnsAllErrors()
     {
         // Arrange
-        var products = new List<Product>
-        {
+        List<Product> products =
+        [
             CreateCpu("Intel i9-14900K", "LGA1700", tdp: 125),
             CreateMotherboard("AMD Board", "AM5", "DDR5", "ATX"),
             CreateRam("DDR4 RAM", "DDR4", 32, "2x16GB"),
             CreateGpu("RTX 4090", 304, tdp: 450),
             CreateCase("Tiny Case", "MicroATX", maxGpuLength: 250),
             CreatePsu("Weak PSU", 500)
-        };
+        ];
 
         // Act
-        var result = await _validator.ValidateBuild(products);
+        CompatibilityResult result = await _validator.ValidateBuild(products);
 
         // Assert
         Assert.False(result.IsCompatible);
@@ -436,19 +436,19 @@ public class CompatibilityValidatorTests
     public async Task ValidateBuild_PerfectBuild_ReturnsNoIssues()
     {
         // Arrange - A perfectly compatible build
-        var products = new List<Product>
-        {
+        List<Product> products =
+        [
             CreateCpu("AMD Ryzen 7 7800X3D", "AM5", tdp: 120),
             CreateMotherboard("MSI B650", "AM5", "DDR5", "ATX", maxMemory: 128, memorySlots: 4),
             CreateRam("G.Skill DDR5", "DDR5", 32, "2x16GB"),
             CreateGpu("RX 7900 XTX", 287, tdp: 355),
             CreateCase("Lian Li O11", "ATX", maxGpuLength: 420, maxCoolerHeight: 175),
             CreatePsu("Corsair RM1000x", 1000),
-            CreateCooler("Noctua NH-D15", "Air", 165, tdp: 250, sockets: new[] { "AM5", "AM4" })
-        };
+            CreateCooler("Noctua NH-D15", "Air", 165, tdp: 250, sockets: ["AM5", "AM4"])
+        ];
 
         // Act
-        var result = await _validator.ValidateBuild(products);
+        CompatibilityResult result = await _validator.ValidateBuild(products);
 
         // Assert
         Assert.True(result.IsCompatible);
