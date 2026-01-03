@@ -1,0 +1,24 @@
+<Project>
+  <PropertyGroup>
+    <!-- Use latest C# language features -->
+    <LangVersion>latest</LangVersion>
+
+    <!-- Enable nullable reference types -->
+    <Nullable>enable</Nullable>
+
+    <!-- Deterministic builds -->
+    <Deterministic>true</Deterministic>
+
+    <!-- Enable built-in .NET analyzers and enforce code style in build -->
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+
+    <!-- CI-friendly warnings policy:
+         - On CI (detect via CI environment variable) treat warnings as errors.
+         - Locally (no CI env), do not treat warnings as errors so devs don't break frequently.
+    -->
+    <TreatWarningsAsErrors Condition="'$(CI)' == 'true'">true</TreatWarningsAsErrors>
+    <TreatWarningsAsErrors Condition="'$(CI)' != 'true'">false</TreatWarningsAsErrors>
+  </PropertyGroup>
+</Project>
+

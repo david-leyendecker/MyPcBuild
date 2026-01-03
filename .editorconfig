@@ -1,0 +1,22 @@
+root = true
+
+[*]
+end_of_line = lf
+insert_final_newline = true
+charset = utf-8
+indent_style = space
+indent_size = 4
+trim_trailing_whitespace = true
+
+[*.cs]
+# C# specific rules
+dotnet_sort_system_directives_first = true
+csharp_style_var_for_built_in_types = true:suggestion
+csharp_style_var_when_type_is_apparent = true:suggestion
+csharp_style_var_elsewhere = false:silent
+csharp_new_line_before_open_brace = all
+dotnet_diagnostic.IDE0005.severity = none
+
+# Treat code-style as warnings or suggestions; build enforcement is configured in Directory.Build.props
+dotnet_analyzer_diagnostic.severity = suggestion
+

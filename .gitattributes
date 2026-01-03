@@ -1,0 +1,14 @@
+# Auto detect text files and normalize them in repository
+* text=auto
+
+# Prefer LF for shell scripts and code; preserve CRLF for solution/project files on Windows if needed
+*.sh eol=lf
+*.ps1 eol=crlf
+
+# C# and project files
+*.cs text eol=lf diff=csharp
+*.sln text eol=crlf
+*.csproj text eol=lf
+*.props text eol=lf
+*.targets text eol=lf
+
