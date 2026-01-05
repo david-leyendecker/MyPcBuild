@@ -8,6 +8,7 @@
   - ✅ `List<Product> products = new();`
   - ❌ `var name = "example";`
   - ❌ `var products = new List<Product>();`
+  - Exception: `var` is allowed within the MyPcBuild.AppHost (Aspire AppHost) project for host-specific code.
 
 ### Object Creation
 - **Use target-typed `new()` expressions (IDE0090)**

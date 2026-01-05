@@ -1,3 +1,4 @@
+using System;
 using Marten;
 using Marten.Events.Projections;
 using MyPcBuild.ApiService.Domain.Events;

@@ -1,3 +1,5 @@
+using Aspire.Hosting.JavaScript;
+
 var builder = DistributedApplication.CreateBuilder(args);
 
 var postgres = builder.AddPostgres("postgres")
@@ -7,7 +9,7 @@ var postgres = builder.AddPostgres("postgres")
 
 var postgresDb = postgres.AddDatabase("mypcbuild");
 
-var apiService = builder.AddProject<Projects.MyPcBuild_ApiService>("apiservice")
+IResourceBuilder<ProjectResource> apiService = builder.AddProject<Projects.MyPcBuild_ApiService>("apiservice")
     .WithReference(postgresDb)
     .WithHttpHealthCheck("/health")
     .WaitFor(postgres);
@@ -24,8 +26,24 @@ var client = builder.AddViteApp("client", "../MyPcBuild.Client")
 // Configure API service with allowed CORS origins from client
 apiService.WithEnvironment(context =>
 {
-    string? httpEndpoint = client.GetEndpoint("http")?.Url ?? null;
-    context.EnvironmentVariables["AllowedOrigins"] = httpEndpoint;
+    List<string> allowedOrigins = [];
+    AddAllowedOrigins(allowedOrigins, client.GetEndpoint("http"));
+    AddAllowedOrigins(allowedOrigins, client.GetEndpoint("https"));
+    if (allowedOrigins.Count == 0)
+    {
+        throw new InvalidOperationException("No client endpoints discovered to configure AllowedOrigins.");
+    }
+    context.EnvironmentVariables["AllowedOrigins"] = string.Join(';', allowedOrigins);
 });
 
 builder.Build().Run();
+
+ static void AddAllowedOrigins(List<string> origins, EndpointReference endpoint)
+{
+    if (endpoint == null || !endpoint.Exists || string.IsNullOrWhiteSpace(endpoint.Url))
+    {
+        return;
+    }
+
+    origins.Add(endpoint.Url.TrimEnd('/'));
+}
