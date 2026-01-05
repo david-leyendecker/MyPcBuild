@@ -1,18 +1,29 @@
 using Marten;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using MyPcBuild.ApiService.Domain.Models;
 
 namespace MyPcBuild.ApiService.Infrastructure;
 
-public static class ProductSeeder
+public sealed class ProductSeeder(IDocumentStore documentStore, ILogger<ProductSeeder> logger) : BackgroundService
 {
-    public static async Task SeedProducts(IDocumentStore documentStore)
+    private readonly IDocumentStore _documentStore = documentStore;
+    private readonly ILogger<ProductSeeder> _logger = logger;
+
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        await using IDocumentSession session = documentStore.LightweightSession();
+        await SeedProducts(stoppingToken);
+    }
+
+    private async Task SeedProducts(CancellationToken cancellationToken)
+    {
+        await using IDocumentSession session = _documentStore.LightweightSession();
 
         // Check if products already exist
         int existingCount = await session.Query<Product>().CountAsync();
         if (existingCount > 0)
         {
+            _logger.LogInformation("Product catalog already seeded; skipping.");
             return; // Already seeded
         }
 
@@ -518,6 +529,7 @@ public static class ProductSeeder
             session.Store(product);
         }
 
-        await session.SaveChangesAsync();
+        await session.SaveChangesAsync(cancellationToken);
+        _logger.LogInformation("Seeded {ProductCount} products into catalog.", products.Count);
     }
 }

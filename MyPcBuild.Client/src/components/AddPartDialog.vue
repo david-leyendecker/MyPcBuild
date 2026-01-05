@@ -1,6 +1,6 @@
 <template>
   <div class="flex flex-column gap-3">
-    <p class="text-sm text-500 m-0 pb-2">Search and select a component to add to your build</p>
+    <p class="text-sm p-text-secondary m-0 pb-2">Search and select a component to add to your build</p>
 
     <div class="flex flex-column gap-3">
       <InputText 
@@ -25,7 +25,7 @@
     </div>
 
     <div v-else-if="filteredProducts.length === 0" class="text-center py-4">
-      <p class="text-500 m-0">No components found</p>
+      <p class="p-text-secondary m-0">No components found</p>
     </div>
 
     <div 
@@ -42,7 +42,7 @@
         <div class="flex justify-content-between align-items-center">
           <div>
             <h4 class="mt-0 mb-1 text-base">{{ product.name }}</h4>
-            <p class="my-0 text-green-500 font-semibold text-sm">${{ product.price.toFixed(2) }}</p>
+            <p class="my-0 p-text-success font-semibold text-sm">${{ product.price.toFixed(2) }}</p>
           </div>
           <i class="pi pi-arrow-right text-500"></i>
         </div>

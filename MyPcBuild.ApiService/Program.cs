@@ -12,6 +12,7 @@ WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 // Add service defaults & Aspire client integrations
 builder.AddServiceDefaults();
+builder.Services.AddLogging();
 
 // Add services to the container
 builder.Services.AddProblemDetails();
@@ -59,14 +60,9 @@ builder.Services.AddMarten(opts =>
     opts.Projections.Snapshot<Build>(SnapshotLifecycle.Inline);
 }).UseLightweightSessions();
 
-WebApplication app = builder.Build();
+builder.Services.AddHostedService<ProductSeeder>();
 
-// Seed product catalog on startup
-using (IServiceScope scope = app.Services.CreateScope())
-{
-    IDocumentStore documentStore = scope.ServiceProvider.GetRequiredService<IDocumentStore>();
-    await ProductSeeder.SeedProducts(documentStore);
-}
+WebApplication app = builder.Build();
 
 // Configure the HTTP request pipeline
 app.UseExceptionHandler();

@@ -12,7 +12,7 @@
       <!-- Header -->
       <div class="flex justify-content-between align-items-start">
         <div>
-          <h2 class="m-0 text-primary" style="text-shadow: 0 0 20px rgba(0, 212, 255, 0.3);">{{ buildStore.currentBuild.name }}</h2>
+          <h2 class="m-0 text-primary">{{ buildStore.currentBuild.name }}</h2>
           <p class="mt-2 mb-0 text-500 text-sm">
             Created: {{ new Date(buildStore.currentBuild.createdAt).toLocaleDateString() }}
           </p>
@@ -48,25 +48,24 @@
           <div v-else class="flex flex-column gap-3">
             <div 
               v-for="part in buildStore.currentBuild.parts"
-              :key="part.productId"
-              class="flex justify-content-between align-items-center p-3 border-round surface-border"
-              style="border: 1px solid var(--surface-border); background: rgba(255, 255, 255, 0.02);"
+              :key="part.id"
+              class="flex justify-content-between align-items-center p-3 border-round surface-section border-1 surface-border"
             >
               <div>
-                <h4 class="mt-0 mb-1">{{ part.productName }}</h4>
+                <h4 class="mt-0 mb-1">{{ part.name }}</h4>
                 <p class="my-1 text-primary text-sm">{{ part.category }}</p>
-                <p class="mt-2 mb-0 text-500 font-medium">${{ part.price.toFixed(2) }}</p>
+                <p class="mt-2 mb-0 text-500 font-medium">${{ part.pricePaid.toFixed(2) }}</p>
               </div>
               <Button 
                 icon="pi pi-trash"
                 size="small"
                 severity="danger"
                 text
-                @click="removePart(part.productId)"
+                @click="removePart(part.id)"
               />
             </div>
 
-            <div class="pt-3 border-top-1 surface-border">
+            <div class="pt-3 border-top-1 border-surface-border">
               <p class="m-0 text-lg"><strong>Total Cost:</strong> ${{ totalCost.toFixed(2) }}</p>
             </div>
           </div>
@@ -119,7 +118,7 @@ const buildStore = useBuildStore();
 const showAddPartDialog = ref(false);
 
 const totalCost = computed(() => {
-  return buildStore.currentBuild?.parts.reduce((sum, part) => sum + part.price, 0) ?? 0;
+  return buildStore.currentBuild?.parts.reduce((sum, part) => sum + part.pricePaid, 0) ?? 0;
 });
 
 onMounted(() => {

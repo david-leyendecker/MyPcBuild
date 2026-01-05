@@ -18,7 +18,7 @@ public static class GetBuild
             {
                 return Results.NotFound();
             }
-            
+
             // Load products for the build
             List<ProductDetails> productDetails = [];
             foreach (BuildPart part in build.Parts)
@@ -35,7 +35,7 @@ public static class GetBuild
                     ));
                 }
             }
-            
+
             // Run compatibility validation
             List<Product> products = [];
             foreach (BuildPart part in build.Parts)
@@ -52,7 +52,7 @@ public static class GetBuild
             {
                 compatibilityResult = await validator.ValidateBuild(products);
             }
-            
+
             GetBuildResponse response = new(
                 build.Id,
                 build.Name,
@@ -63,7 +63,8 @@ public static class GetBuild
                     i.Message,
                     i.Severity.ToString(),
                     i.Category
-                )).ToList() ?? []
+                )).ToList() ?? [],
+                DateTimeOffset.UtcNow
             );
 
             return Results.Ok(response);
@@ -76,16 +77,17 @@ public static class GetBuild
 }
 
 public record GetBuildResponse(
-    Guid BuildId,
+    Guid Id,
     string Name,
     Guid UserId,
-    List<ProductDetails> Products,
+    List<ProductDetails> Parts,
     bool IsCompatible,
-    List<CompatibilityIssueDto> CompatibilityIssues
+    List<CompatibilityIssueDto> CompatibilityIssues,
+    DateTimeOffset CreatedAt
 );
 
 public record ProductDetails(
-    Guid ProductId,
+    Guid Id,
     string Name,
     ProductCategory Category,
     string Manufacturer,

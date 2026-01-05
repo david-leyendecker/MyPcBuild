@@ -1,8 +1,8 @@
 <template>
-  <header class="sticky top-0 z-5 px-4 md:px-6 py-3 border-bottom-1 surface-border" style="background: rgba(26, 26, 46, 0.95); backdrop-filter: blur(10px);">
-    <div class="flex justify-content-between align-items-center mx-auto" style="max-width: 1200px">
+  <header class="sticky top-0 z-5 px-4 md:px-6 py-3 border-bottom-1 surface-border surface-section">
+    <div class="flex justify-content-between align-items-center mx-auto max-w-full" style="max-width: 1200px;">
       <router-link to="/" class="no-underline text-primary">
-        <h1 class="m-0 text-2xl md:text-3xl font-bold" style="text-shadow: 0 0 20px rgba(0, 212, 255, 0.5);">MyPCBuild</h1>
+        <h1 class="m-0 text-2xl md:text-3xl font-bold text-primary">MyPCBuild</h1>
       </router-link>
       
       <nav class="flex gap-4 md:gap-6 align-items-center">
@@ -19,16 +19,17 @@ import { RouterLink } from 'vue-router';
 
 <style scoped>
 .nav-link {
-  color: #eee;
+  color: var(--text-color);
+  transition: color 0.3s ease;
 }
 
 .nav-link:hover {
-  color: #00d4ff;
+  color: var(--primary-color);
 }
 
 .nav-link.router-link-active {
-  color: #00d4ff;
-  border-bottom: 2px solid #00d4ff;
+  color: var(--primary-color);
+  border-bottom: 2px solid var(--primary-color);
   padding-bottom: 0.25rem;
 }
 </style>

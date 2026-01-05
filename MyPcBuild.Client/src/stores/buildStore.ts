@@ -1,11 +1,11 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
-import { type Build, type BuildValidation, type CompatibilityIssue } from '@/api/builds';
+import { type Build, type GetBuildResponse, type BuildValidation, type CompatibilityIssue } from '@/api/builds';
 import { buildsApi } from '@/api/builds';
 
 export const useBuildStore = defineStore('builds', () => {
   const builds = ref<Build[]>([]);
-  const currentBuild = ref<Build | null>(null);
+  const currentBuild = ref<GetBuildResponse | null>(null);
   const validationIssues = ref<CompatibilityIssue[]>([]);
   const isLoading = ref(false);
   const error = ref<string | null>(null);
@@ -18,7 +18,14 @@ export const useBuildStore = defineStore('builds', () => {
     isLoading.value = true;
     error.value = null;
     try {
-      builds.value = await buildsApi.getBuilds();
+      const response = await buildsApi.getBuilds();
+      builds.value = response.map(b => ({
+        id: b.id,
+        name: b.name,
+        parts: [],
+        createdAt: '',
+        updatedAt: ''
+      }));
     } catch (err) {
       error.value = err instanceof Error ? err.message : 'Failed to load builds';
     } finally {
@@ -44,8 +51,14 @@ export const useBuildStore = defineStore('builds', () => {
     error.value = null;
     try {
       const newBuild = await buildsApi.createBuild(name);
-      builds.value.push(newBuild);
-      currentBuild.value = newBuild;
+      builds.value.push({
+        id: newBuild.id,
+        name: newBuild.name,
+        parts: [],
+        createdAt: '',
+        updatedAt: ''
+      });
+      await loadBuild(newBuild.id);
       return newBuild;
     } catch (err) {
       error.value = err instanceof Error ? err.message : 'Failed to create build';
@@ -59,15 +72,17 @@ export const useBuildStore = defineStore('builds', () => {
     isLoading.value = true;
     error.value = null;
     try {
-      const updated = await buildsApi.updateBuild(id, name);
+      await buildsApi.updateBuild(id, name);
       const index = builds.value.findIndex(b => b.id === id);
       if (index !== -1) {
-        builds.value[index] = updated;
+        const build = builds.value[index];
+        if (build) {
+          build.name = name;
+        }
       }
       if (currentBuild.value?.id === id) {
-        currentBuild.value = updated;
+        currentBuild.value.name = name;
       }
-      return updated;
     } catch (err) {
       error.value = err instanceof Error ? err.message : 'Failed to update build';
       throw err;
@@ -76,18 +91,10 @@ export const useBuildStore = defineStore('builds', () => {
     }
   }
 
-  async function addPart(buildId: string, productId: string) {
+  async function addPart(buildId: string, productId: string, pricePaid: number = 0) {
     try {
-      const updated = await buildsApi.addPart(buildId, productId);
-      if (currentBuild.value?.id === buildId) {
-        currentBuild.value = updated;
-      }
-      const index = builds.value.findIndex(b => b.id === buildId);
-      if (index !== -1) {
-        builds.value[index] = updated;
-      }
-      await validateBuild(buildId);
-      return updated;
+      await buildsApi.addPart(buildId, productId, pricePaid);
+      await loadBuild(buildId);
     } catch (err) {
       error.value = err instanceof Error ? err.message : 'Failed to add part';
       throw err;
@@ -96,16 +103,8 @@ export const useBuildStore = defineStore('builds', () => {
 
   async function removePart(buildId: string, productId: string) {
     try {
-      const updated = await buildsApi.removePart(buildId, productId);
-      if (currentBuild.value?.id === buildId) {
-        currentBuild.value = updated;
-      }
-      const index = builds.value.findIndex(b => b.id === buildId);
-      if (index !== -1) {
-        builds.value[index] = updated;
-      }
-      await validateBuild(buildId);
-      return updated;
+      await buildsApi.removePart(buildId, productId);
+      await loadBuild(buildId);
     } catch (err) {
       error.value = err instanceof Error ? err.message : 'Failed to remove part';
       throw err;

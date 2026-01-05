@@ -1,7 +1,7 @@
 <template>
   <div class="fadein animation-duration-300">
     <div class="mb-4">
-      <h2 class="mt-0 mb-3 text-primary" style="text-shadow: 0 0 20px rgba(0, 212, 255, 0.3);">Product Catalog</h2>
+      <h2 class="mt-0 mb-3 text-primary">Product Catalog</h2>
       <div class="flex gap-2">
         <InputText 
           v-model="catalogStore.searchQuery"
@@ -44,7 +44,7 @@
         </div>
 
         <div v-else-if="catalogStore.products.length === 0" class="text-center py-8">
-          <p class="text-xl text-500">No products found. Try a different search.</p>
+          <p class="text-xl p-text-secondary">No products found. Try a different search.</p>
         </div>
 
         <div v-else class="grid">
@@ -57,7 +57,7 @@
               <template #content>
                 <h4 class="mt-0 mb-2">{{ product.name }}</h4>
                 <p class="my-1 text-primary text-sm">{{ product.category }}</p>
-                <p class="my-2 text-green-500 font-semibold text-lg">${{ product.price.toFixed(2) }}</p>
+                <p class="my-2 p-text-success font-semibold text-lg">${{ product.price.toFixed(2) }}</p>
                 
                 <div class="pt-3 mt-3 border-top-1 surface-border">
                   <div 
@@ -124,6 +124,7 @@ async function handleCategorySelect(category: string) {
 
 .product-card:hover {
   border-color: var(--primary-color);
-  box-shadow: 0 0 20px rgba(0, 212, 255, 0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
 }
 </style>

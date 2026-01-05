@@ -1,7 +1,7 @@
 <template>
   <div class="fadein animation-duration-300">
     <div class="flex justify-content-between align-items-center mb-4">
-      <h2 class="m-0 text-primary" style="text-shadow: 0 0 20px rgba(0, 212, 255, 0.3);">My PC Builds</h2>
+      <h2 class="m-0 text-primary">My PC Builds</h2>
       <Button 
         icon="pi pi-plus"
         label="New Build"
@@ -20,7 +20,7 @@
     </div>
 
     <div v-else-if="buildStore.builds.length === 0" class="text-center py-8">
-      <p class="text-xl text-500">No builds yet. Create your first PC build!</p>
+      <p class="text-xl p-text-secondary">No builds yet. Create your first PC build!</p>
     </div>
 
     <div v-else class="grid">
@@ -34,9 +34,9 @@
             <router-link :to="`/builds/${build.id}`" class="build-link no-underline">
               <h3 class="mt-0 mb-3 text-xl">{{ build.name }}</h3>
             </router-link>
-            <div class="text-sm text-400">
+            <div class="text-sm p-text-secondary">
               <p class="my-2"><strong>Parts:</strong> {{ build.parts.length }}</p>
-              <p class="my-2"><strong>Total Cost:</strong> ${{ build.parts.reduce((sum, p) => sum + p.price, 0).toFixed(2) }}</p>
+              <p class="my-2"><strong>Total Cost:</strong> ${{ build.parts.reduce((sum, p) => sum + p.pricePaid, 0).toFixed(2) }}</p>
             </div>
           </template>
           <template #footer>
@@ -149,7 +149,8 @@ async function deleteBuild(id: string) {
 
 .build-card:hover {
   border-color: var(--primary-color);
-  box-shadow: 0 0 20px rgba(0, 212, 255, 0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
 }
 
 .build-link {
@@ -158,6 +159,6 @@ async function deleteBuild(id: string) {
 }
 
 .build-link:hover {
-  color: #00ffff;
+  color: var(--primary-400);
 }
 </style>

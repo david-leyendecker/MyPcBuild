@@ -38,7 +38,7 @@ apiService.WithEnvironment(context =>
 
 builder.Build().Run();
 
- static void AddAllowedOrigins(List<string> origins, EndpointReference endpoint)
+static void AddAllowedOrigins(List<string> origins, EndpointReference endpoint)
 {
     if (endpoint == null || !endpoint.Exists || string.IsNullOrWhiteSpace(endpoint.Url))
     {

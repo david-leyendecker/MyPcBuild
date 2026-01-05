@@ -19,7 +19,7 @@ public static class RemovePartFromBuild
                 ProductId = productId
             };
 
-            session.Events.Append(buildId, @event);
+            _ = session.Events.Append(buildId, @event);
             await session.SaveChangesAsync();
 
             return Results.Ok(new { Message = "Part removed successfully" });

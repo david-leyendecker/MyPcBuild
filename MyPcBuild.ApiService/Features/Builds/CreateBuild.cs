@@ -13,16 +13,16 @@ public static class CreateBuild
             IDocumentSession session) =>
         {
             Guid buildId = Guid.NewGuid();
-            BuildCreated @event = new() 
-            { 
-                BuildId = buildId, 
-                Name = request.Name, 
-                UserId = request.UserId 
+            BuildCreated @event = new()
+            {
+                BuildId = buildId,
+                Name = request.Name,
+                UserId = request.UserId
             };
-            
+
             session.Events.StartStream<Build>(buildId, @event);
             await session.SaveChangesAsync();
-            
+
             CreateBuildResponse response = new(buildId, request.Name, request.UserId);
             return Results.Created($"/api/builds/{buildId}", response);
         })
@@ -35,4 +35,4 @@ public static class CreateBuild
 
 public record CreateBuildRequest(string Name, Guid UserId);
 
-public record CreateBuildResponse(Guid BuildId, string Name, Guid UserId);
+public record CreateBuildResponse(Guid Id, string Name, Guid UserId);

@@ -1,6 +1,6 @@
 namespace MyPcBuild.ApiService.Features.Compatibility;
 
-public static class CompatibilityEndpoints
+public static class Endpoints
 {
     public static IEndpointRouteBuilder MapCompatibilityEndpoints(this IEndpointRouteBuilder app)
     {

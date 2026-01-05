@@ -19,10 +19,10 @@ public static class AddPartToBuild
                 ProductId = request.ProductId,
                 PricePaid = request.PricePaid
             };
-                  
+
             session.Events.Append(buildId, @event);
             await session.SaveChangesAsync();
-            
+
             return Results.Ok(new { Message = "Part added successfully" });
         })
         .WithName("AddPartToBuild")
