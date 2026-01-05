@@ -1,0 +1,11 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="MyPcBuild.ApiService/MyPcBuild.ApiService.csproj" />
+  <Project Path="MyPcBuild.AppHost/MyPcBuild.AppHost.csproj" />
+  <Project Path="MyPcBuild.ServiceDefaults/MyPcBuild.ServiceDefaults.csproj" />
+  <Project Path="MyPcBuild.Tests/MyPcBuild.Tests.csproj" />
+</Solution>
