@@ -12,10 +12,20 @@ var apiService = builder.AddProject<Projects.MyPcBuild_ApiService>("apiservice")
     .WithHttpHealthCheck("/health")
     .WaitFor(postgres);
 
-builder.AddProject<Projects.MyPcBuild_Web>("webfrontend")
+// Add Vue.js client (Vite dev server)
+var client = builder.AddViteApp("client", "../MyPcBuild.Client")
     .WithExternalHttpEndpoints()
-    .WithHttpHealthCheck("/health")
+    .WithHttpsEndpoint(port: null, env: "PORT")
     .WithReference(apiService)
-    .WaitFor(apiService);
+    .WithDeveloperCertificateTrust(true)
+    .WithHttpsDeveloperCertificate()
+    .PublishAsDockerFile();
+
+// Configure API service with allowed CORS origins from client
+apiService.WithEnvironment(context =>
+{
+    string? httpEndpoint = client.GetEndpoint("http")?.Url ?? null;
+    context.EnvironmentVariables["AllowedOrigins"] = httpEndpoint;
+});
 
 builder.Build().Run();

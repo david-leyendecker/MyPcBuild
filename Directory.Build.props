@@ -13,12 +13,17 @@
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
 
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <NoWarn>$(NoWarn);ASPIRECERTIFICATES001</NoWarn>
+
     <!-- CI-friendly warnings policy:
          - On CI (detect via CI environment variable) treat warnings as errors.
          - Locally (no CI env), do not treat warnings as errors so devs don't break frequently.
     -->
     <TreatWarningsAsErrors Condition="'$(CI)' == 'true'">true</TreatWarningsAsErrors>
     <TreatWarningsAsErrors Condition="'$(CI)' != 'true'">false</TreatWarningsAsErrors>
-  </PropertyGroup>
+    </PropertyGroup>
 </Project>
 

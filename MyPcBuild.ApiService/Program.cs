@@ -16,6 +16,23 @@ builder.AddServiceDefaults();
 builder.Services.AddProblemDetails();
 builder.Services.AddHttpContextAccessor();
 
+// Add CORS for Vue.js client
+string allowedOrigins = builder.Configuration["AllowedOrigins"] 
+    ?? throw new InvalidOperationException("AllowedOrigins configuration not found. Please set the AllowedOrigins environment variable.");
+
+string[] origins = allowedOrigins.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy =>
+    {
+        policy.WithOrigins(origins)
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials();
+    });
+});
+
 // Register compatibility validator
 builder.Services.AddScoped<ICompatibilityValidator, CompatibilityValidator>();
 
@@ -23,8 +40,7 @@ builder.Services.AddScoped<ICompatibilityValidator, CompatibilityValidator>();
 builder.Services.AddOpenApi();
 
 // Add Marten for Event Sourcing
-string connectionString = builder.Configuration.GetConnectionString("postgres") 
-    ?? "Host=localhost;Database=mypcbuild;Username=postgres;Password=postgres";
+string connectionString = builder.Configuration.GetConnectionString("mypcbuild") ?? throw new InvalidOperationException("Connection string 'mypcbuild' not found.");
 
 builder.Services.AddMarten(opts =>
 {
@@ -53,6 +69,9 @@ using (IServiceScope scope = app.Services.CreateScope())
 
 // Configure the HTTP request pipeline
 app.UseExceptionHandler();
+
+// Enable CORS
+app.UseCors();
 
 if (app.Environment.IsDevelopment())
 {

@@ -12,13 +12,17 @@
 * **Mobile-First PWA:** Priority on touch-friendly UI and offline capabilities.  
 * **Utility-First UI:** Shift from Radzen to a more flexible Tailwind-driven architecture.
 
-## **3\. Tech Stack (Updated)**
+## **3. Tech Stack (Current)**
 
-* **Orchestration:** .NET Aspire (.NET 10\)  
-* **Backend:** ASP.NET Core Minimal APIs  
-* **Frontend:** Blazor WebAssembly \+ **PrimeBlazor** (PrimeVue equivalent for Blazor)  
-* **Styling:** **Tailwind CSS** for custom layouts and Glassmorphism effects.  
-* **Database:** FerretDB (Postgres backend)
+* **Orchestration:** .NET Aspire (orchestrates API, PostgreSQL, and Vite dev server)  
+* **Backend:** ASP.NET Core 10 Minimal APIs  
+* **Frontend:** Vue.js 3 (TypeScript, Composition API)
+* **UI Framework:** PrimeVue 4 component library
+* **Styling:** PrimeFlex utility-first CSS
+* **State Management:** Pinia
+* **Routing:** Vue Router
+* **Build Tool:** Vite
+* **Database & Event Store:** PostgreSQL with Marten for event sourcing and projections
 
 ## **4\. System Architecture**
 
@@ -27,19 +31,19 @@
 The system records "Commands" which result in "Events":
 
 1. **Command:** AddPart(BuildId, ProductId, Price)  
-2. **Event Store:** Stores immutable records.  
-3. **Projections:** Background service updates the "Read Model" in FerretDB.
+2. **Event Store:** Immutable events persisted via Marten in PostgreSQL.  
+3. **Projections:** Background projections update the read model in PostgreSQL.
 
 ## **5\. Data Model & Categories**
 
 * **Product Categories:** CPU, Motherboard, GPU, RAM, **PC Case**, PSU.  
-* **Read Projection:** Materialized view including compatibilityIssues with Error or Warning severities.
+* **Read Projection:** Materialized view (PostgreSQL/Marten) including compatibilityIssues with Error or Warning severities.
 
-## **6\. Visual Design & UX Strategy (Tailwind \+ PrimeBlazor)**
+## **6\. Visual Design & UX Strategy (PrimeFlex + PrimeVue)**
 
-* **Component-Based:** Using PrimeBlazor for high-level components (Dialogs, Auto-complete, Toast).  
-* **Utility-Driven:** Using Tailwind CSS for the specific "Midnight" and "Glassmorphism" aesthetics that Radzen struggled to support natively.  
-* **Mobile-First UX:** Custom bottom-pill navigation built with Tailwind flexbox/grid.
+* **Component-Based:** Using PrimeVue for UI components (Dialogs, Buttons, Cards, Forms).  
+* **Utility-Driven:** Using PrimeFlex utility classes for layouts, spacing, and responsive design.  
+* **Mobile-First UX:** Responsive grid layouts using PrimeFlex grid system and breakpoint utilities.
 
 ## **7\. Visual Reference & Component Mockup**
 
@@ -59,12 +63,14 @@ The system records "Commands" which result in "Events":
 ### **8.2 Consistency & Concurrency**
 
 * **Version Tracking:** Every event/projection includes a version number.  
-* **Transactional Outbox:** Atomic writes via FerretDB/PostgreSQL.
+* **Transactional Outbox:** Atomic writes via PostgreSQL.
 
 ## **9\. PWA & Frontend Strategy**
 
-* **Optimistic UI:** Local updates via Blazor state, followed by background event sync.  
-* **Notification System:** PrimeBlazor ToastService for real-time compatibility alerts.
+* **Reactive State:** Pinia stores manage application state with Vue reactivity.
+* **Optimistic UI:** Local updates via Pinia stores, followed by API sync.  
+* **Type Safety:** Full TypeScript support for compile-time safety.
+* **Component Composition:** Vue 3 Composition API for better code reusability.
 
 ## **10\. API Design (Event-Centric)**
 
@@ -75,4 +81,4 @@ The system records "Commands" which result in "Events":
 ## **11\. Deployment (Aspire)**
 
 * **Infrastructure:** .NET Aspire managing containerized services.  
-* **Storage:** PostgreSQL/FerretDB for hybrid JSON/Relational storage.
+* **Storage:** PostgreSQL (JSON and relational) via Marten.
