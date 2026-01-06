@@ -30,7 +30,7 @@ public sealed class ProductSeeder(IDocumentStore documentStore, ILogger<ProductS
         List<Product> products =
         [
             // CPUs - AMD
-            new Product(
+            new StandardProduct(
                 Guid.NewGuid(),
                 "AMD Ryzen 9 7950X",
                 ProductCategory.CPU,
@@ -47,7 +47,7 @@ public sealed class ProductSeeder(IDocumentStore documentStore, ILogger<ProductS
                     ["IntegratedGraphics"] = false
                 }
             ),
-            new Product(
+            new StandardProduct(
                 Guid.NewGuid(),
                 "AMD Ryzen 7 7800X3D",
                 ProductCategory.CPU,
@@ -67,7 +67,7 @@ public sealed class ProductSeeder(IDocumentStore documentStore, ILogger<ProductS
             ),
             
             // CPUs - Intel
-            new Product(
+            new StandardProduct(
                 Guid.NewGuid(),
                 "Intel Core i9-14900K",
                 ProductCategory.CPU,
@@ -84,7 +84,7 @@ public sealed class ProductSeeder(IDocumentStore documentStore, ILogger<ProductS
                     ["IntegratedGraphics"] = true
                 }
             ),
-            new Product(
+            new StandardProduct(
                 Guid.NewGuid(),
                 "Intel Core i5-14600K",
                 ProductCategory.CPU,
@@ -103,7 +103,7 @@ public sealed class ProductSeeder(IDocumentStore documentStore, ILogger<ProductS
             ),
 
             // Motherboards - AMD
-            new Product(
+            new StandardProduct(
                 Guid.NewGuid(),
                 "ASUS ROG Strix X670E-E Gaming WiFi",
                 ProductCategory.Motherboard,
@@ -123,7 +123,7 @@ public sealed class ProductSeeder(IDocumentStore documentStore, ILogger<ProductS
                     ["RGB"] = true
                 }
             ),
-            new Product(
+            new StandardProduct(
                 Guid.NewGuid(),
                 "MSI MAG B650 TOMAHAWK WiFi",
                 ProductCategory.Motherboard,
@@ -145,7 +145,7 @@ public sealed class ProductSeeder(IDocumentStore documentStore, ILogger<ProductS
             ),
 
             // Motherboards - Intel
-            new Product(
+            new StandardProduct(
                 Guid.NewGuid(),
                 "ASUS ROG Maximus Z790 Hero",
                 ProductCategory.Motherboard,
@@ -165,7 +165,7 @@ public sealed class ProductSeeder(IDocumentStore documentStore, ILogger<ProductS
                     ["RGB"] = true
                 }
             ),
-            new Product(
+            new StandardProduct(
                 Guid.NewGuid(),
                 "Gigabyte B760M DS3H",
                 ProductCategory.Motherboard,
@@ -187,7 +187,7 @@ public sealed class ProductSeeder(IDocumentStore documentStore, ILogger<ProductS
             ),
 
             // GPUs - NVIDIA
-            new Product(
+            new StandardProduct(
                 Guid.NewGuid(),
                 "NVIDIA GeForce RTX 4090",
                 ProductCategory.GPU,
@@ -209,7 +209,7 @@ public sealed class ProductSeeder(IDocumentStore documentStore, ILogger<ProductS
                     ["DLSS"] = true
                 }
             ),
-            new Product(
+            new StandardProduct(
                 Guid.NewGuid(),
                 "NVIDIA GeForce RTX 4070 Ti",
                 ProductCategory.GPU,
@@ -233,7 +233,7 @@ public sealed class ProductSeeder(IDocumentStore documentStore, ILogger<ProductS
             ),
 
             // GPUs - AMD
-            new Product(
+            new StandardProduct(
                 Guid.NewGuid(),
                 "AMD Radeon RX 7900 XTX",
                 ProductCategory.GPU,
@@ -257,7 +257,7 @@ public sealed class ProductSeeder(IDocumentStore documentStore, ILogger<ProductS
             ),
 
             // RAM - DDR5
-            new Product(
+            new StandardProduct(
                 Guid.NewGuid(),
                 "G.Skill Trident Z5 RGB 32GB (2x16GB) DDR5-6000",
                 ProductCategory.RAM,
@@ -275,7 +275,7 @@ public sealed class ProductSeeder(IDocumentStore documentStore, ILogger<ProductS
                     ["HeatSpreader"] = true
                 }
             ),
-            new Product(
+            new StandardProduct(
                 Guid.NewGuid(),
                 "Corsair Vengeance 64GB (2x32GB) DDR5-5600",
                 ProductCategory.RAM,
@@ -295,7 +295,7 @@ public sealed class ProductSeeder(IDocumentStore documentStore, ILogger<ProductS
             ),
 
             // RAM - DDR4
-            new Product(
+            new StandardProduct(
                 Guid.NewGuid(),
                 "Corsair Vengeance LPX 16GB (2x8GB) DDR4-3200",
                 ProductCategory.RAM,
@@ -315,7 +315,7 @@ public sealed class ProductSeeder(IDocumentStore documentStore, ILogger<ProductS
             ),
 
             // PC Cases
-            new Product(
+            new StandardProduct(
                 Guid.NewGuid(),
                 "Lian Li O11 Dynamic EVO",
                 ProductCategory.PCCase,
@@ -337,7 +337,7 @@ public sealed class ProductSeeder(IDocumentStore documentStore, ILogger<ProductS
                     ["USBPorts"] = "2x USB 3.0, 1x USB-C"
                 }
             ),
-            new Product(
+            new StandardProduct(
                 Guid.NewGuid(),
                 "Fractal Design Meshify C",
                 ProductCategory.PCCase,
@@ -359,7 +359,7 @@ public sealed class ProductSeeder(IDocumentStore documentStore, ILogger<ProductS
                     ["USBPorts"] = "2x USB 3.0"
                 }
             ),
-            new Product(
+            new StandardProduct(
                 Guid.NewGuid(),
                 "NZXT H510i",
                 ProductCategory.PCCase,
@@ -383,7 +383,7 @@ public sealed class ProductSeeder(IDocumentStore documentStore, ILogger<ProductS
             ),
 
             // PSUs
-            new Product(
+            new StandardProduct(
                 Guid.NewGuid(),
                 "Corsair RM850x (2021)",
                 ProductCategory.PSU,
@@ -403,7 +403,7 @@ public sealed class ProductSeeder(IDocumentStore documentStore, ILogger<ProductS
                     ["ATX12V"] = "2x 4+4 pin"
                 }
             ),
-            new Product(
+            new StandardProduct(
                 Guid.NewGuid(),
                 "EVGA SuperNOVA 1000 G6",
                 ProductCategory.PSU,
@@ -423,7 +423,7 @@ public sealed class ProductSeeder(IDocumentStore documentStore, ILogger<ProductS
                     ["ATX12V"] = "2x 4+4 pin"
                 }
             ),
-            new Product(
+            new StandardProduct(
                 Guid.NewGuid(),
                 "Seasonic Focus GX-650",
                 ProductCategory.PSU,
@@ -445,7 +445,7 @@ public sealed class ProductSeeder(IDocumentStore documentStore, ILogger<ProductS
             ),
 
             // Storage - NVMe
-            new Product(
+            new StandardProduct(
                 Guid.NewGuid(),
                 "Samsung 990 Pro 2TB",
                 ProductCategory.Storage,
@@ -464,7 +464,7 @@ public sealed class ProductSeeder(IDocumentStore documentStore, ILogger<ProductS
                     ["PCIeGen"] = 4
                 }
             ),
-            new Product(
+            new StandardProduct(
                 Guid.NewGuid(),
                 "WD Black SN850X 1TB",
                 ProductCategory.Storage,
@@ -485,7 +485,7 @@ public sealed class ProductSeeder(IDocumentStore documentStore, ILogger<ProductS
             ),
 
             // Coolers
-            new Product(
+            new StandardProduct(
                 Guid.NewGuid(),
                 "Noctua NH-D15",
                 ProductCategory.Cooler,
@@ -503,7 +503,7 @@ public sealed class ProductSeeder(IDocumentStore documentStore, ILogger<ProductS
                     ["NoiseLevel"] = 24.6
                 }
             ),
-            new Product(
+            new StandardProduct(
                 Guid.NewGuid(),
                 "Corsair iCUE H150i Elite LCD XT",
                 ProductCategory.Cooler,

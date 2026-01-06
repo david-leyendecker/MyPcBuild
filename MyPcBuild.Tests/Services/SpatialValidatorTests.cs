@@ -151,7 +151,8 @@ public class SpatialValidatorTests
         Product motherboard = CreateMotherboard();
         products.Add(motherboard);
         
-        Guid mbSlotId = products[0].Chambers![0].Slots[0].Id;
+        ChamberedProduct pcCase = (ChamberedProduct)products[0];
+        Guid mbSlotId = pcCase.Chambers[0].Slots[0].Id;
         Vector3 position = new(10, 10, 0);
 
         // Act
@@ -177,7 +178,8 @@ public class SpatialValidatorTests
         Product oversizedBoard = CreateOversizedMotherboard();
         products.Add(oversizedBoard);
         
-        Guid mbSlotId = products[0].Chambers![0].Slots[0].Id;
+        ChamberedProduct pcCase = (ChamberedProduct)products[0];
+        Guid mbSlotId = pcCase.Chambers[0].Slots[0].Id;
         Vector3 position = new(10, 10, 0);
 
         // Act
@@ -201,7 +203,8 @@ public class SpatialValidatorTests
         // Arrange
         (Build build, List<Product> products) = CreateTestBuildWithCase();
         Guid invalidProductId = Guid.NewGuid();
-        Guid mbSlotId = products[0].Chambers![0].Slots[0].Id;
+        ChamberedProduct pcCase = (ChamberedProduct)products[0];
+        Guid mbSlotId = pcCase.Chambers[0].Slots[0].Id;
         Vector3 position = new(10, 10, 0);
 
         // Act
@@ -269,7 +272,7 @@ public class SpatialValidatorTests
     {
         Guid mbSlotId = Guid.NewGuid();
         
-        return new Product(
+        return new ChamberedProduct(
             Guid.NewGuid(),
             "Test PC Case",
             ProductCategory.PCCase,
@@ -279,7 +282,7 @@ public class SpatialValidatorTests
             {
                 ["FormFactor"] = "ATX"
             },
-            Chambers:
+            new Dimensions(450, 220, 500),
             [
                 new Chamber(
                     Guid.NewGuid(),
@@ -295,15 +298,13 @@ public class SpatialValidatorTests
                         )
                     ]
                 )
-            ],
-            Slots: null,
-            Dimensions: new Dimensions(450, 220, 500)
+            ]
         );
     }
 
     private Product CreateMotherboard()
     {
-        return new Product(
+        return new SpatialProduct(
             Guid.NewGuid(),
             "ASUS X670E",
             ProductCategory.Motherboard,
@@ -314,15 +315,13 @@ public class SpatialValidatorTests
                 ["Socket"] = "AM5",
                 ["FormFactor"] = "ATX"
             },
-            Chambers: null,
-            Slots: null,
-            Dimensions: new Dimensions(305, 244, 50)
+            new Dimensions(305, 244, 50)
         );
     }
 
     private Product CreateOversizedMotherboard()
     {
-        return new Product(
+        return new SpatialProduct(
             Guid.NewGuid(),
             "Oversized Board",
             ProductCategory.Motherboard,
@@ -333,9 +332,7 @@ public class SpatialValidatorTests
                 ["Socket"] = "AM5",
                 ["FormFactor"] = "EATX"
             },
-            Chambers: null,
-            Slots: null,
-            Dimensions: new Dimensions(400, 300, 100) // Too large
+            new Dimensions(400, 300, 100) // Too large
         );
     }
 

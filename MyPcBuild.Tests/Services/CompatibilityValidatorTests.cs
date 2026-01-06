@@ -463,7 +463,7 @@ public class CompatibilityValidatorTests
 
     private Product CreateCpu(string name, string socket, int tdp = 0)
     {
-        return new Product(
+        return new StandardProduct(
             Guid.NewGuid(),
             name,
             ProductCategory.CPU,
@@ -479,7 +479,7 @@ public class CompatibilityValidatorTests
 
     private Product CreateMotherboard(string name, string socket, string memoryType, string formFactor, int maxMemory = 128, int memorySlots = 4)
     {
-        return new Product(
+        return new StandardProduct(
             Guid.NewGuid(),
             name,
             ProductCategory.Motherboard,
@@ -498,7 +498,7 @@ public class CompatibilityValidatorTests
 
     private Product CreateRam(string name, string type, int capacity, string configuration)
     {
-        return new Product(
+        return new StandardProduct(
             Guid.NewGuid(),
             name,
             ProductCategory.RAM,
@@ -515,7 +515,7 @@ public class CompatibilityValidatorTests
 
     private Product CreateGpu(string name, int length, int tdp = 0)
     {
-        return new Product(
+        return new StandardProduct(
             Guid.NewGuid(),
             name,
             ProductCategory.GPU,
@@ -532,7 +532,7 @@ public class CompatibilityValidatorTests
 
     private Product CreateCase(string name, string formFactor, int maxGpuLength, int maxCoolerHeight = 175, int maxPsuLength = 200)
     {
-        return new Product(
+        return new StandardProduct(
             Guid.NewGuid(),
             name,
             ProductCategory.PCCase,
@@ -550,7 +550,7 @@ public class CompatibilityValidatorTests
 
     private Product CreatePsu(string name, int wattage)
     {
-        return new Product(
+        return new StandardProduct(
             Guid.NewGuid(),
             name,
             ProductCategory.PSU,
@@ -566,7 +566,7 @@ public class CompatibilityValidatorTests
 
     private Product CreateCooler(string name, string type, int height, int tdp, string[] sockets)
     {
-        return new Product(
+        return new StandardProduct(
             Guid.NewGuid(),
             name,
             ProductCategory.Cooler,
