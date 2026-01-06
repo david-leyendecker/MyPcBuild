@@ -462,20 +462,19 @@ public class CompatibilityValidatorTests
 
     #region Helper Methods
 
-    private Product CreateCpu(string name, string socket, int tdp = 0)
+    private CpuProduct CreateCpu(string name, string socket, int tdp = 0)
     {
         return new CpuProduct(
             Guid.NewGuid(),
             name,
             399.99m,
             "AMD",
-            new Dictionary<string, object>(),
             socket,
             8,
             16,
-            "4.2 GHz",
-            "5.0 GHz",
-            tdp > 0 ? tdp : 120,
+            Frequency.FromGHz(4.2m),
+            Frequency.FromGHz(5.0m),
+            Power.FromWatts(tdp > 0 ? tdp : 120),
             false
         );
     }
@@ -487,109 +486,103 @@ public class CompatibilityValidatorTests
             name,
             299.99m,
             "ASUS",
-            new Dictionary<string, object>(),
             new Dimensions(305, 244, 50), // Standard ATX dimensions
             [], // No sub-slots for compatibility tests
             socket,
             "X670E",
             formFactor,
             memoryType,
-            maxMemory,
+            StorageCapacity.FromGB(maxMemory),
             memorySlots,
             3,
             4
         );
     }
 
-    private Product CreateRam(string name, string type, int capacity, string configuration)
+    private RamProduct CreateRam(string name, string type, int capacity, string configuration)
     {
         return new RamProduct(
             Guid.NewGuid(),
             name,
             129.99m,
             "G.Skill",
-            new Dictionary<string, object>(),
             type,
-            capacity,
+            StorageCapacity.FromGB(capacity),
             configuration,
-            6000,
+            Frequency.FromMHz(6000),
             "CL30",
-            1.35
+            Voltage.FromVolts(1.35m)
         );
     }
 
-    private Product CreateGpu(string name, int length, int tdp = 0)
+    private GpuProduct CreateGpu(string name, int length, int tdp = 0)
     {
         return new GpuProduct(
             Guid.NewGuid(),
             name,
             999.99m,
             "NVIDIA",
-            new Dictionary<string, object>(),
             new Dimensions(length, 140, 61), // Typical GPU dimensions
             [], // No sub-slots for compatibility tests
             "NVIDIA",
             "RTX 4070",
-            12,
+            StorageCapacity.FromGB(12),
             "GDDR6X",
-            2310,
-            2610,
-            tdp > 0 ? tdp : 300,
-            length,
+            Frequency.FromMHz(2310),
+            Frequency.FromMHz(2610),
+            Power.FromWatts(tdp > 0 ? tdp : 300),
+            Length.FromMm(length),
             2,
             "2x 8-pin",
             true
         );
     }
 
-    private Product CreateCase(string name, string formFactor, int maxGpuLength, int maxCoolerHeight = 175, int maxPsuLength = 200)
+    private PcCaseProduct CreateCase(string name, string formFactor, int maxGpuLength, int maxCoolerHeight = 175, int maxPsuLength = 200)
     {
         return new PcCaseProduct(
             Guid.NewGuid(),
             name,
             169.99m,
             "Lian Li",
-            new Dictionary<string, object>(),
             new Dimensions(450, 220, 500), // Typical case dimensions
             [], // No chambers for compatibility tests
             formFactor,
             "Black",
             "Tempered Glass",
-            maxGpuLength,
-            maxCoolerHeight,
-            maxPsuLength
+            Length.FromMm(maxGpuLength),
+            Length.FromMm(maxCoolerHeight),
+            Length.FromMm(maxPsuLength)
         );
     }
 
-    private Product CreatePsu(string name, int wattage)
+    private PsuProduct CreatePsu(string name, int wattage)
     {
         return new PsuProduct(
             Guid.NewGuid(),
             name,
             129.99m,
             "Corsair",
-            new Dictionary<string, object>(),
-            wattage,
+            Power.FromWatts(wattage),
             "80+ Gold",
             "Fully Modular",
             "ATX",
-            160,
+            Length.FromMm(160),
             6
         );
     }
 
-    private Product CreateCooler(string name, string type, int height, int tdp, string[] sockets)
+    private CoolerProduct CreateCooler(string name, string type, int height, int tdp, string[] sockets)
     {
         return new CoolerProduct(
             Guid.NewGuid(),
             name,
             109.99m,
             "Noctua",
-            new Dictionary<string, object>(),
             new Dimensions(140, 150, height), // Typical cooler dimensions
             type,
-            height,
-            tdp,
+            Length.FromMm(height),
+            Power.FromWatts(tdp),
             sockets
         );
     }

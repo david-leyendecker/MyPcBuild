@@ -8,11 +8,15 @@ namespace MyPcBuild.ApiService.Domain.Models;
 public abstract record Product(
     Guid Id,
     string Name,
-    ProductCategory Category,
     decimal Price,
-    string Manufacturer,
-    Dictionary<string, object> Specifications
-);
+    string Manufacturer
+)
+{
+    /// <summary>
+    /// Gets the category name for this product type.
+    /// </summary>
+    public abstract string CategoryName { get; }
+};
 
 /// <summary>
 /// Marker interface for products with physical dimensions.
@@ -45,23 +49,24 @@ public record CpuProduct(
     string Name,
     decimal Price,
     string Manufacturer,
-    Dictionary<string, object> Specifications,
     // CPU-specific properties
     string Socket,
     int Cores,
     int Threads,
-    string BaseClock,
-    string BoostClock,
-    int TDP,
+    Frequency BaseClock,
+    Frequency BoostClock,
+    Power TDP,
     bool IntegratedGraphics
-) : Product(Id, Name, ProductCategory.CPU, Price, Manufacturer, Specifications);
+) : Product(Id, Name, Price, Manufacturer)
+{
+    public override string CategoryName => "CPU";
+};
 
 public record MotherboardProduct(
     Guid Id,
     string Name,
     decimal Price,
     string Manufacturer,
-    Dictionary<string, object> Specifications,
     Dimensions Dimensions,
     List<Slot> Slots,
     // Motherboard-specific properties
@@ -69,118 +74,122 @@ public record MotherboardProduct(
     string Chipset,
     string FormFactor,
     string MemoryType,
-    int MaxMemory,
+    StorageCapacity MaxMemory,
     int MemorySlots,
     int PCIeSlots,
     int M2Slots
-) : Product(Id, Name, ProductCategory.Motherboard, Price, Manufacturer, Specifications), ISlottedProduct;
+) : Product(Id, Name, Price, Manufacturer), ISlottedProduct
+{
+    public override string CategoryName => "Motherboard";
+};
 
 public record GpuProduct(
     Guid Id,
     string Name,
     decimal Price,
     string Manufacturer,
-    Dictionary<string, object> Specifications,
     Dimensions Dimensions,
     List<Slot> Slots,
     // GPU-specific properties
     string ChipsetManufacturer,
     string Series,
-    int VRAM,
+    StorageCapacity VRAM,
     string MemoryType,
-    int CoreClock,
-    int BoostClock,
-    int TDP,
-    int Length,
+    Frequency CoreClock,
+    Frequency BoostClock,
+    Power TDP,
+    Length Length,
     int PCIeSlots,
     string PowerConnectors,
     bool RayTracing
-) : Product(Id, Name, ProductCategory.GPU, Price, Manufacturer, Specifications), ISlottedProduct;
+) : Product(Id, Name, Price, Manufacturer), ISlottedProduct
+{
+    public override string CategoryName => "GPU";
+};
 
 public record RamProduct(
     Guid Id,
     string Name,
     decimal Price,
     string Manufacturer,
-    Dictionary<string, object> Specifications,
     // RAM-specific properties
     string Type,
-    int Capacity,
+    StorageCapacity Capacity,
     string Configuration,
-    int Speed,
+    Frequency Speed,
     string CASLatency,
-    double Voltage
-) : Product(Id, Name, ProductCategory.RAM, Price, Manufacturer, Specifications);
+    Voltage Voltage
+) : Product(Id, Name, Price, Manufacturer)
+{
+    public override string CategoryName => "RAM";
+};
 
 public record PcCaseProduct(
     Guid Id,
     string Name,
     decimal Price,
     string Manufacturer,
-    Dictionary<string, object> Specifications,
     Dimensions Dimensions,
     List<Chamber> Chambers,
     // PC Case-specific properties
     string FormFactor,
     string Color,
     string SidePanelWindow,
-    int MaxGPULength,
-    int MaxCPUCoolerHeight,
-    int MaxPSULength
-) : Product(Id, Name, ProductCategory.PCCase, Price, Manufacturer, Specifications), IChamberedProduct;
+    Length MaxGPULength,
+    Length MaxCPUCoolerHeight,
+    Length MaxPSULength
+) : Product(Id, Name, Price, Manufacturer), IChamberedProduct
+{
+    public override string CategoryName => "PCCase";
+};
 
 public record PsuProduct(
     Guid Id,
     string Name,
     decimal Price,
     string Manufacturer,
-    Dictionary<string, object> Specifications,
     // PSU-specific properties
-    int Wattage,
+    Power Wattage,
     string Efficiency,
     string Modular,
     string FormFactor,
-    int Length,
+    Length Length,
     int PCIe8Pin
-) : Product(Id, Name, ProductCategory.PSU, Price, Manufacturer, Specifications);
+) : Product(Id, Name, Price, Manufacturer)
+{
+    public override string CategoryName => "PSU";
+};
 
 public record StorageProduct(
     Guid Id,
     string Name,
     decimal Price,
     string Manufacturer,
-    Dictionary<string, object> Specifications,
     // Storage-specific properties
     string Type,
     string Interface,
     string StorageFormFactor,
-    int Capacity,
-    int ReadSpeed,
-    int WriteSpeed
-) : Product(Id, Name, ProductCategory.Storage, Price, Manufacturer, Specifications);
+    StorageCapacity Capacity,
+    DataSpeed ReadSpeed,
+    DataSpeed WriteSpeed
+) : Product(Id, Name, Price, Manufacturer)
+{
+    public override string CategoryName => "Storage";
+};
 
 public record CoolerProduct(
     Guid Id,
     string Name,
     decimal Price,
     string Manufacturer,
-    Dictionary<string, object> Specifications,
     Dimensions Dimensions,
     // Cooler-specific properties
     string CoolerType,
-    int Height,
-    int TDP,
+    Length Height,
+    Power TDP,
     string[] Sockets
-) : Product(Id, Name, ProductCategory.Cooler, Price, Manufacturer, Specifications), ISpatialProduct;
-
-public enum ProductCategory
+) : Product(Id, Name, Price, Manufacturer), ISpatialProduct
 {
-    CPU,
-    Motherboard,
-    GPU,
-    RAM,
-    PCCase,
-    PSU,
-    Storage,
-    Cooler
-}
+    public override string CategoryName => "Cooler";
+};
+

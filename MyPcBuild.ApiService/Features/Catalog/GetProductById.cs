@@ -17,16 +17,8 @@ public static class GetProductById
                 return Results.NotFound();
             }
             
-            GetProductByIdResponse response = new(
-                product.Id,
-                product.Name,
-                product.Category,
-                product.Price,
-                product.Manufacturer,
-                product.Specifications
-            );
-
-            return Results.Ok(response);
+            // Return the full product object which will include all category-specific properties
+            return Results.Ok(product);
         })
         .WithName("GetProductById")
         .WithTags("Catalog");
@@ -34,12 +26,3 @@ public static class GetProductById
         return app;
     }
 }
-
-public record GetProductByIdResponse(
-    Guid Id,
-    string Name,
-    ProductCategory Category,
-    decimal Price,
-    string Manufacturer,
-    Dictionary<string, object> Specifications
-);

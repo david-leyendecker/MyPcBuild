@@ -11,14 +11,13 @@ public static class GetCategories
         {
             // Get product counts per category
             IReadOnlyList<Product> allProducts = await session.Query<Product>().ToListAsync();
-            Dictionary<ProductCategory, int> productCounts = allProducts
-                .GroupBy(p => p.Category)
+            Dictionary<string, int> productCounts = allProducts
+                .GroupBy(p => p.CategoryName)
                 .ToDictionary(g => g.Key, g => g.Count());
             
             GetCategoriesResponse response = new(
                 productCounts.Select(kvp => new CategoryInfo(
                     kvp.Key,
-                    kvp.Key.ToString(),
                     kvp.Value
                 )).ToList()
             );
@@ -35,7 +34,6 @@ public static class GetCategories
 public record GetCategoriesResponse(List<CategoryInfo> Categories);
 
 public record CategoryInfo(
-    ProductCategory Category,
     string Name,
     int ProductCount
 );

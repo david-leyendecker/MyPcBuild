@@ -10,7 +10,7 @@ namespace MyPcBuild.ApiService.Domain.Models.Spatial;
 public record Slot(
     Guid Id,
     string Name,
-    ProductCategory AllowedCategory,
+    string AllowedCategoryName,
     Vector3 RelativePosition,
     Dimensions MaxDimensions,
     List<Slot>? SubSlots = null

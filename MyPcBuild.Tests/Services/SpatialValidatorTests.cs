@@ -268,7 +268,7 @@ public class SpatialValidatorTests
         return (build, [pcCase]);
     }
 
-    private Product CreatePCCase()
+    private PcCaseProduct CreatePCCase()
     {
         Guid mbSlotId = Guid.NewGuid();
         
@@ -277,7 +277,6 @@ public class SpatialValidatorTests
             "Test PC Case",
             169.99m,
             "Test Mfg",
-            new Dictionary<string, object>(),
             new Dimensions(450, 220, 500),
             [
                 new Chamber(
@@ -288,7 +287,7 @@ public class SpatialValidatorTests
                         new Slot(
                             mbSlotId,
                             "Motherboard Slot",
-                            ProductCategory.Motherboard,
+                            "Motherboard",
                             new Vector3(10, 10, 0),
                             new Dimensions(305, 244, 50)
                         )
@@ -298,48 +297,46 @@ public class SpatialValidatorTests
             "ATX",
             "Black",
             "Tempered Glass",
-            420,
-            167,
-            225
+            Length.FromMm(420),
+            Length.FromMm(167),
+            Length.FromMm(225)
         );
     }
 
-    private Product CreateMotherboard()
+    private MotherboardProduct CreateMotherboard()
     {
         return new MotherboardProduct(
             Guid.NewGuid(),
             "ASUS X670E",
             299.99m,
             "ASUS",
-            new Dictionary<string, object>(),
             new Dimensions(305, 244, 50),
             [], // No sub-slots for this test
             "AM5",
             "X670E",
             "ATX",
             "DDR5",
-            128,
+            StorageCapacity.FromGB(128),
             4,
             3,
             4
         );
     }
 
-    private Product CreateOversizedMotherboard()
+    private MotherboardProduct CreateOversizedMotherboard()
     {
         return new MotherboardProduct(
             Guid.NewGuid(),
             "Oversized Board",
             399.99m,
             "Test",
-            new Dictionary<string, object>(),
             new Dimensions(400, 300, 100), // Too large
             [], // No sub-slots for this test
             "AM5",
             "X670E",
             "EATX",
             "DDR5",
-            128,
+            StorageCapacity.FromGB(128),
             4,
             3,
             4
