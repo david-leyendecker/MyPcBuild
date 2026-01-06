@@ -151,7 +151,7 @@ public class SpatialValidatorTests
         Product motherboard = CreateMotherboard();
         products.Add(motherboard);
         
-        ChamberedProduct pcCase = (ChamberedProduct)products[0];
+        PcCaseProduct pcCase = (PcCaseProduct)products[0];
         Guid mbSlotId = pcCase.Chambers[0].Slots[0].Id;
         Vector3 position = new(10, 10, 0);
 
@@ -178,7 +178,7 @@ public class SpatialValidatorTests
         Product oversizedBoard = CreateOversizedMotherboard();
         products.Add(oversizedBoard);
         
-        ChamberedProduct pcCase = (ChamberedProduct)products[0];
+        PcCaseProduct pcCase = (PcCaseProduct)products[0];
         Guid mbSlotId = pcCase.Chambers[0].Slots[0].Id;
         Vector3 position = new(10, 10, 0);
 
@@ -203,7 +203,7 @@ public class SpatialValidatorTests
         // Arrange
         (Build build, List<Product> products) = CreateTestBuildWithCase();
         Guid invalidProductId = Guid.NewGuid();
-        ChamberedProduct pcCase = (ChamberedProduct)products[0];
+        PcCaseProduct pcCase = (PcCaseProduct)products[0];
         Guid mbSlotId = pcCase.Chambers[0].Slots[0].Id;
         Vector3 position = new(10, 10, 0);
 
@@ -272,10 +272,9 @@ public class SpatialValidatorTests
     {
         Guid mbSlotId = Guid.NewGuid();
         
-        return new ChamberedProduct(
+        return new PcCaseProduct(
             Guid.NewGuid(),
             "Test PC Case",
-            ProductCategory.PCCase,
             169.99m,
             "Test Mfg",
             new Dictionary<string, object>
@@ -304,10 +303,9 @@ public class SpatialValidatorTests
 
     private Product CreateMotherboard()
     {
-        return new SpatialProduct(
+        return new MotherboardProduct(
             Guid.NewGuid(),
             "ASUS X670E",
-            ProductCategory.Motherboard,
             299.99m,
             "ASUS",
             new Dictionary<string, object>
@@ -315,16 +313,16 @@ public class SpatialValidatorTests
                 ["Socket"] = "AM5",
                 ["FormFactor"] = "ATX"
             },
-            new Dimensions(305, 244, 50)
+            new Dimensions(305, 244, 50),
+            [] // No sub-slots for this test
         );
     }
 
     private Product CreateOversizedMotherboard()
     {
-        return new SpatialProduct(
+        return new MotherboardProduct(
             Guid.NewGuid(),
             "Oversized Board",
-            ProductCategory.Motherboard,
             399.99m,
             "Test",
             new Dictionary<string, object>
@@ -332,7 +330,8 @@ public class SpatialValidatorTests
                 ["Socket"] = "AM5",
                 ["FormFactor"] = "EATX"
             },
-            new Dimensions(400, 300, 100) // Too large
+            new Dimensions(400, 300, 100), // Too large
+            [] // No sub-slots for this test
         );
     }
 

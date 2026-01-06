@@ -1,4 +1,5 @@
 using MyPcBuild.ApiService.Domain.Models;
+using MyPcBuild.ApiService.Domain.Models.Spatial;
 using MyPcBuild.ApiService.Features.Compatibility;
 
 namespace MyPcBuild.Tests.Services;
@@ -463,10 +464,9 @@ public class CompatibilityValidatorTests
 
     private Product CreateCpu(string name, string socket, int tdp = 0)
     {
-        return new StandardProduct(
+        return new CpuProduct(
             Guid.NewGuid(),
             name,
-            ProductCategory.CPU,
             399.99m,
             "AMD",
             new Dictionary<string, object>
@@ -479,10 +479,9 @@ public class CompatibilityValidatorTests
 
     private Product CreateMotherboard(string name, string socket, string memoryType, string formFactor, int maxMemory = 128, int memorySlots = 4)
     {
-        return new StandardProduct(
+        return new MotherboardProduct(
             Guid.NewGuid(),
             name,
-            ProductCategory.Motherboard,
             299.99m,
             "ASUS",
             new Dictionary<string, object>
@@ -492,16 +491,17 @@ public class CompatibilityValidatorTests
                 ["FormFactor"] = formFactor,
                 ["MaxMemory"] = maxMemory,
                 ["MemorySlots"] = memorySlots
-            }
+            },
+            new Dimensions(305, 244, 50), // Standard ATX dimensions
+            [] // No sub-slots for compatibility tests
         );
     }
 
     private Product CreateRam(string name, string type, int capacity, string configuration)
     {
-        return new StandardProduct(
+        return new RamProduct(
             Guid.NewGuid(),
             name,
-            ProductCategory.RAM,
             129.99m,
             "G.Skill",
             new Dictionary<string, object>
@@ -515,10 +515,9 @@ public class CompatibilityValidatorTests
 
     private Product CreateGpu(string name, int length, int tdp = 0)
     {
-        return new StandardProduct(
+        return new GpuProduct(
             Guid.NewGuid(),
             name,
-            ProductCategory.GPU,
             999.99m,
             "NVIDIA",
             new Dictionary<string, object>
@@ -526,16 +525,17 @@ public class CompatibilityValidatorTests
                 ["Length"] = length,
                 ["TDP"] = tdp > 0 ? tdp : 300,
                 ["PowerConnectors"] = "2x 8-pin"
-            }
+            },
+            new Dimensions(length, 140, 61), // Typical GPU dimensions
+            [] // No sub-slots for compatibility tests
         );
     }
 
     private Product CreateCase(string name, string formFactor, int maxGpuLength, int maxCoolerHeight = 175, int maxPsuLength = 200)
     {
-        return new StandardProduct(
+        return new PcCaseProduct(
             Guid.NewGuid(),
             name,
-            ProductCategory.PCCase,
             169.99m,
             "Lian Li",
             new Dictionary<string, object>
@@ -544,16 +544,17 @@ public class CompatibilityValidatorTests
                 ["MaxGPULength"] = maxGpuLength,
                 ["MaxCPUCoolerHeight"] = maxCoolerHeight,
                 ["MaxPSULength"] = maxPsuLength
-            }
+            },
+            new Dimensions(450, 220, 500), // Typical case dimensions
+            [] // No chambers for compatibility tests
         );
     }
 
     private Product CreatePsu(string name, int wattage)
     {
-        return new StandardProduct(
+        return new PsuProduct(
             Guid.NewGuid(),
             name,
-            ProductCategory.PSU,
             129.99m,
             "Corsair",
             new Dictionary<string, object>
@@ -566,10 +567,9 @@ public class CompatibilityValidatorTests
 
     private Product CreateCooler(string name, string type, int height, int tdp, string[] sockets)
     {
-        return new StandardProduct(
+        return new CoolerProduct(
             Guid.NewGuid(),
             name,
-            ProductCategory.Cooler,
             109.99m,
             "Noctua",
             new Dictionary<string, object>
@@ -578,7 +578,8 @@ public class CompatibilityValidatorTests
                 ["Height"] = height,
                 ["TDP"] = tdp,
                 ["Sockets"] = sockets
-            }
+            },
+            new Dimensions(140, 150, height) // Typical cooler dimensions
         );
     }
 

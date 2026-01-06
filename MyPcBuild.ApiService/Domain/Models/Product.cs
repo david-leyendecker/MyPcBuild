@@ -15,57 +15,101 @@ public abstract record Product(
 );
 
 /// <summary>
-/// Standard product without spatial properties (CPU, RAM, PSU, Storage).
+/// Marker interface for products with physical dimensions.
 /// </summary>
-public record StandardProduct(
+public interface ISpatialProduct
+{
+    Dimensions Dimensions { get; }
+}
+
+/// <summary>
+/// Marker interface for products that provide installation slots.
+/// </summary>
+public interface ISlottedProduct : ISpatialProduct
+{
+    List<Slot> Slots { get; }
+}
+
+/// <summary>
+/// Marker interface for products with internal chambers.
+/// </summary>
+public interface IChamberedProduct : ISpatialProduct
+{
+    List<Chamber> Chambers { get; }
+}
+
+// Concrete product types by category
+
+public record CpuProduct(
     Guid Id,
     string Name,
-    ProductCategory Category,
     decimal Price,
     string Manufacturer,
     Dictionary<string, object> Specifications
-) : Product(Id, Name, Category, Price, Manufacturer, Specifications);
+) : Product(Id, Name, ProductCategory.CPU, Price, Manufacturer, Specifications);
 
-/// <summary>
-/// Product with physical dimensions (all products that need spatial validation).
-/// </summary>
-public record SpatialProduct(
+public record MotherboardProduct(
     Guid Id,
     string Name,
-    ProductCategory Category,
-    decimal Price,
-    string Manufacturer,
-    Dictionary<string, object> Specifications,
-    Dimensions Dimensions
-) : Product(Id, Name, Category, Price, Manufacturer, Specifications);
-
-/// <summary>
-/// Product that provides slots for other components (Motherboard, GPU).
-/// </summary>
-public record SlottedProduct(
-    Guid Id,
-    string Name,
-    ProductCategory Category,
     decimal Price,
     string Manufacturer,
     Dictionary<string, object> Specifications,
     Dimensions Dimensions,
     List<Slot> Slots
-) : SpatialProduct(Id, Name, Category, Price, Manufacturer, Specifications, Dimensions);
+) : Product(Id, Name, ProductCategory.Motherboard, Price, Manufacturer, Specifications), ISlottedProduct;
 
-/// <summary>
-/// Product that provides chambers with slots (PC Case).
-/// </summary>
-public record ChamberedProduct(
+public record GpuProduct(
     Guid Id,
     string Name,
-    ProductCategory Category,
+    decimal Price,
+    string Manufacturer,
+    Dictionary<string, object> Specifications,
+    Dimensions Dimensions,
+    List<Slot> Slots
+) : Product(Id, Name, ProductCategory.GPU, Price, Manufacturer, Specifications), ISlottedProduct;
+
+public record RamProduct(
+    Guid Id,
+    string Name,
+    decimal Price,
+    string Manufacturer,
+    Dictionary<string, object> Specifications
+) : Product(Id, Name, ProductCategory.RAM, Price, Manufacturer, Specifications);
+
+public record PcCaseProduct(
+    Guid Id,
+    string Name,
     decimal Price,
     string Manufacturer,
     Dictionary<string, object> Specifications,
     Dimensions Dimensions,
     List<Chamber> Chambers
-) : SpatialProduct(Id, Name, Category, Price, Manufacturer, Specifications, Dimensions);
+) : Product(Id, Name, ProductCategory.PCCase, Price, Manufacturer, Specifications), IChamberedProduct;
+
+public record PsuProduct(
+    Guid Id,
+    string Name,
+    decimal Price,
+    string Manufacturer,
+    Dictionary<string, object> Specifications
+) : Product(Id, Name, ProductCategory.PSU, Price, Manufacturer, Specifications);
+
+public record StorageProduct(
+    Guid Id,
+    string Name,
+    decimal Price,
+    string Manufacturer,
+    Dictionary<string, object> Specifications
+) : Product(Id, Name, ProductCategory.Storage, Price, Manufacturer, Specifications);
+
+public record CoolerProduct(
+    Guid Id,
+    string Name,
+    decimal Price,
+    string Manufacturer,
+    Dictionary<string, object> Specifications,
+    Dimensions Dimensions
+) : Product(Id, Name, ProductCategory.Cooler, Price, Manufacturer, Specifications), ISpatialProduct;
 
 public enum ProductCategory
 {

@@ -45,7 +45,7 @@ public class SpatialValidator : ISpatialValidator
         }
         
         // Check if product has spatial properties
-        if (product is not SpatialProduct spatialProduct)
+        if (product is not ISpatialProduct spatialProduct)
         {
             issues.Add(new SpatialIssue(
                 $"Product {product.Name} has no dimensions defined",
@@ -112,7 +112,7 @@ public class SpatialValidator : ISpatialValidator
             if (existingPart.Position == null) continue; // Skip parts without spatial position
             
             Product? existingProduct = allProducts.FirstOrDefault(p => p.Id == existingPart.ProductId);
-            if (existingProduct is not SpatialProduct existingSpatial) continue;
+            if (existingProduct is not ISpatialProduct existingSpatial) continue;
             
             BoundingBox existingBox = new(existingPart.Position, existingSpatial.Dimensions);
             if (partBox.Intersects(existingBox))
@@ -141,7 +141,7 @@ public class SpatialValidator : ISpatialValidator
             if (buildPart.Position == null) continue;
             
             Product? product = allProducts.FirstOrDefault(p => p.Id == buildPart.ProductId);
-            if (product is not SpatialProduct spatialProduct) continue;
+            if (product is not ISpatialProduct spatialProduct) continue;
             
             BoundingBox box = new(buildPart.Position, spatialProduct.Dimensions);
             spatialParts.Add((buildPart, product, box));
@@ -203,8 +203,8 @@ public class SpatialValidator : ISpatialValidator
             Product? product = allProducts.FirstOrDefault(p => p.Id == buildPart.ProductId);
             if (product == null) continue;
             
-            // Check chambers (ChamberedProduct)
-            if (product is ChamberedProduct chamberedProduct)
+            // Check chambers (IChamberedProduct)
+            if (product is IChamberedProduct chamberedProduct)
             {
                 foreach (Chamber chamber in chamberedProduct.Chambers)
                 {
@@ -218,8 +218,8 @@ public class SpatialValidator : ISpatialValidator
                 }
             }
             
-            // Check direct slots on product (SlottedProduct)
-            if (product is SlottedProduct slottedProduct)
+            // Check direct slots on product (ISlottedProduct)
+            if (product is ISlottedProduct slottedProduct)
             {
                 foreach (Slot slot in slottedProduct.Slots)
                 {
@@ -242,7 +242,7 @@ public class SpatialValidator : ISpatialValidator
             if (build.Parts.Any(bp => bp.ProductId == product.Id)) continue;
             
             // Check chambers
-            if (product is ChamberedProduct chamberedProduct)
+            if (product is IChamberedProduct chamberedProduct)
             {
                 foreach (Chamber chamber in chamberedProduct.Chambers)
                 {
@@ -257,7 +257,7 @@ public class SpatialValidator : ISpatialValidator
             }
             
             // Check direct slots on product
-            if (product is SlottedProduct slottedProduct)
+            if (product is ISlottedProduct slottedProduct)
             {
                 foreach (Slot slot in slottedProduct.Slots)
                 {
