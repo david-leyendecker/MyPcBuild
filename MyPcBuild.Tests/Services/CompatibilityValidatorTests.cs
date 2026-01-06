@@ -469,11 +469,14 @@ public class CompatibilityValidatorTests
             name,
             399.99m,
             "AMD",
-            new Dictionary<string, object>
-            {
-                ["Socket"] = socket,
-                ["TDP"] = tdp > 0 ? tdp : 120
-            }
+            new Dictionary<string, object>(),
+            socket,
+            8,
+            16,
+            "4.2 GHz",
+            "5.0 GHz",
+            tdp > 0 ? tdp : 120,
+            false
         );
     }
 
@@ -484,16 +487,17 @@ public class CompatibilityValidatorTests
             name,
             299.99m,
             "ASUS",
-            new Dictionary<string, object>
-            {
-                ["Socket"] = socket,
-                ["MemoryType"] = memoryType,
-                ["FormFactor"] = formFactor,
-                ["MaxMemory"] = maxMemory,
-                ["MemorySlots"] = memorySlots
-            },
+            new Dictionary<string, object>(),
             new Dimensions(305, 244, 50), // Standard ATX dimensions
-            [] // No sub-slots for compatibility tests
+            [], // No sub-slots for compatibility tests
+            socket,
+            "X670E",
+            formFactor,
+            memoryType,
+            maxMemory,
+            memorySlots,
+            3,
+            4
         );
     }
 
@@ -504,12 +508,13 @@ public class CompatibilityValidatorTests
             name,
             129.99m,
             "G.Skill",
-            new Dictionary<string, object>
-            {
-                ["Type"] = type,
-                ["Capacity"] = capacity,
-                ["Configuration"] = configuration
-            }
+            new Dictionary<string, object>(),
+            type,
+            capacity,
+            configuration,
+            6000,
+            "CL30",
+            1.35
         );
     }
 
@@ -520,14 +525,20 @@ public class CompatibilityValidatorTests
             name,
             999.99m,
             "NVIDIA",
-            new Dictionary<string, object>
-            {
-                ["Length"] = length,
-                ["TDP"] = tdp > 0 ? tdp : 300,
-                ["PowerConnectors"] = "2x 8-pin"
-            },
+            new Dictionary<string, object>(),
             new Dimensions(length, 140, 61), // Typical GPU dimensions
-            [] // No sub-slots for compatibility tests
+            [], // No sub-slots for compatibility tests
+            "NVIDIA",
+            "RTX 4070",
+            12,
+            "GDDR6X",
+            2310,
+            2610,
+            tdp > 0 ? tdp : 300,
+            length,
+            2,
+            "2x 8-pin",
+            true
         );
     }
 
@@ -538,15 +549,15 @@ public class CompatibilityValidatorTests
             name,
             169.99m,
             "Lian Li",
-            new Dictionary<string, object>
-            {
-                ["FormFactor"] = formFactor,
-                ["MaxGPULength"] = maxGpuLength,
-                ["MaxCPUCoolerHeight"] = maxCoolerHeight,
-                ["MaxPSULength"] = maxPsuLength
-            },
+            new Dictionary<string, object>(),
             new Dimensions(450, 220, 500), // Typical case dimensions
-            [] // No chambers for compatibility tests
+            [], // No chambers for compatibility tests
+            formFactor,
+            "Black",
+            "Tempered Glass",
+            maxGpuLength,
+            maxCoolerHeight,
+            maxPsuLength
         );
     }
 
@@ -557,11 +568,13 @@ public class CompatibilityValidatorTests
             name,
             129.99m,
             "Corsair",
-            new Dictionary<string, object>
-            {
-                ["Wattage"] = wattage,
-                ["PCIe8Pin"] = 6
-            }
+            new Dictionary<string, object>(),
+            wattage,
+            "80+ Gold",
+            "Fully Modular",
+            "ATX",
+            160,
+            6
         );
     }
 
@@ -572,14 +585,12 @@ public class CompatibilityValidatorTests
             name,
             109.99m,
             "Noctua",
-            new Dictionary<string, object>
-            {
-                ["Type"] = type,
-                ["Height"] = height,
-                ["TDP"] = tdp,
-                ["Sockets"] = sockets
-            },
-            new Dimensions(140, 150, height) // Typical cooler dimensions
+            new Dictionary<string, object>(),
+            new Dimensions(140, 150, height), // Typical cooler dimensions
+            type,
+            height,
+            tdp,
+            sockets
         );
     }
 

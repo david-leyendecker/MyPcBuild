@@ -45,7 +45,15 @@ public record CpuProduct(
     string Name,
     decimal Price,
     string Manufacturer,
-    Dictionary<string, object> Specifications
+    Dictionary<string, object> Specifications,
+    // CPU-specific properties
+    string Socket,
+    int Cores,
+    int Threads,
+    string BaseClock,
+    string BoostClock,
+    int TDP,
+    bool IntegratedGraphics
 ) : Product(Id, Name, ProductCategory.CPU, Price, Manufacturer, Specifications);
 
 public record MotherboardProduct(
@@ -55,7 +63,16 @@ public record MotherboardProduct(
     string Manufacturer,
     Dictionary<string, object> Specifications,
     Dimensions Dimensions,
-    List<Slot> Slots
+    List<Slot> Slots,
+    // Motherboard-specific properties
+    string Socket,
+    string Chipset,
+    string FormFactor,
+    string MemoryType,
+    int MaxMemory,
+    int MemorySlots,
+    int PCIeSlots,
+    int M2Slots
 ) : Product(Id, Name, ProductCategory.Motherboard, Price, Manufacturer, Specifications), ISlottedProduct;
 
 public record GpuProduct(
@@ -65,7 +82,19 @@ public record GpuProduct(
     string Manufacturer,
     Dictionary<string, object> Specifications,
     Dimensions Dimensions,
-    List<Slot> Slots
+    List<Slot> Slots,
+    // GPU-specific properties
+    string ChipsetManufacturer,
+    string Series,
+    int VRAM,
+    string MemoryType,
+    int CoreClock,
+    int BoostClock,
+    int TDP,
+    int Length,
+    int PCIeSlots,
+    string PowerConnectors,
+    bool RayTracing
 ) : Product(Id, Name, ProductCategory.GPU, Price, Manufacturer, Specifications), ISlottedProduct;
 
 public record RamProduct(
@@ -73,7 +102,14 @@ public record RamProduct(
     string Name,
     decimal Price,
     string Manufacturer,
-    Dictionary<string, object> Specifications
+    Dictionary<string, object> Specifications,
+    // RAM-specific properties
+    string Type,
+    int Capacity,
+    string Configuration,
+    int Speed,
+    string CASLatency,
+    double Voltage
 ) : Product(Id, Name, ProductCategory.RAM, Price, Manufacturer, Specifications);
 
 public record PcCaseProduct(
@@ -83,7 +119,14 @@ public record PcCaseProduct(
     string Manufacturer,
     Dictionary<string, object> Specifications,
     Dimensions Dimensions,
-    List<Chamber> Chambers
+    List<Chamber> Chambers,
+    // PC Case-specific properties
+    string FormFactor,
+    string Color,
+    string SidePanelWindow,
+    int MaxGPULength,
+    int MaxCPUCoolerHeight,
+    int MaxPSULength
 ) : Product(Id, Name, ProductCategory.PCCase, Price, Manufacturer, Specifications), IChamberedProduct;
 
 public record PsuProduct(
@@ -91,7 +134,14 @@ public record PsuProduct(
     string Name,
     decimal Price,
     string Manufacturer,
-    Dictionary<string, object> Specifications
+    Dictionary<string, object> Specifications,
+    // PSU-specific properties
+    int Wattage,
+    string Efficiency,
+    string Modular,
+    string FormFactor,
+    int Length,
+    int PCIe8Pin
 ) : Product(Id, Name, ProductCategory.PSU, Price, Manufacturer, Specifications);
 
 public record StorageProduct(
@@ -99,7 +149,14 @@ public record StorageProduct(
     string Name,
     decimal Price,
     string Manufacturer,
-    Dictionary<string, object> Specifications
+    Dictionary<string, object> Specifications,
+    // Storage-specific properties
+    string Type,
+    string Interface,
+    string StorageFormFactor,
+    int Capacity,
+    int ReadSpeed,
+    int WriteSpeed
 ) : Product(Id, Name, ProductCategory.Storage, Price, Manufacturer, Specifications);
 
 public record CoolerProduct(
@@ -108,7 +165,12 @@ public record CoolerProduct(
     decimal Price,
     string Manufacturer,
     Dictionary<string, object> Specifications,
-    Dimensions Dimensions
+    Dimensions Dimensions,
+    // Cooler-specific properties
+    string CoolerType,
+    int Height,
+    int TDP,
+    string[] Sockets
 ) : Product(Id, Name, ProductCategory.Cooler, Price, Manufacturer, Specifications), ISpatialProduct;
 
 public enum ProductCategory

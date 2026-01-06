@@ -277,10 +277,7 @@ public class SpatialValidatorTests
             "Test PC Case",
             169.99m,
             "Test Mfg",
-            new Dictionary<string, object>
-            {
-                ["FormFactor"] = "ATX"
-            },
+            new Dictionary<string, object>(),
             new Dimensions(450, 220, 500),
             [
                 new Chamber(
@@ -297,7 +294,13 @@ public class SpatialValidatorTests
                         )
                     ]
                 )
-            ]
+            ],
+            "ATX",
+            "Black",
+            "Tempered Glass",
+            420,
+            167,
+            225
         );
     }
 
@@ -308,13 +311,17 @@ public class SpatialValidatorTests
             "ASUS X670E",
             299.99m,
             "ASUS",
-            new Dictionary<string, object>
-            {
-                ["Socket"] = "AM5",
-                ["FormFactor"] = "ATX"
-            },
+            new Dictionary<string, object>(),
             new Dimensions(305, 244, 50),
-            [] // No sub-slots for this test
+            [], // No sub-slots for this test
+            "AM5",
+            "X670E",
+            "ATX",
+            "DDR5",
+            128,
+            4,
+            3,
+            4
         );
     }
 
@@ -325,13 +332,17 @@ public class SpatialValidatorTests
             "Oversized Board",
             399.99m,
             "Test",
-            new Dictionary<string, object>
-            {
-                ["Socket"] = "AM5",
-                ["FormFactor"] = "EATX"
-            },
+            new Dictionary<string, object>(),
             new Dimensions(400, 300, 100), // Too large
-            [] // No sub-slots for this test
+            [], // No sub-slots for this test
+            "AM5",
+            "X670E",
+            "EATX",
+            "DDR5",
+            128,
+            4,
+            3,
+            4
         );
     }
 
