@@ -1,5 +1,4 @@
 using MyPcBuild.ApiService.Domain.Models;
-using MyPcBuild.ApiService.Domain.Models.Spatial;
 
 namespace MyPcBuild.ApiService.Domain.Models.Spatial;
 
