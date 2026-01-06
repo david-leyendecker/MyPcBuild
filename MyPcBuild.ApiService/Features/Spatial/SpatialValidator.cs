@@ -196,7 +196,7 @@ public class SpatialValidator : ISpatialValidator
         List<Product> allProducts,
         Guid slotId)
     {
-        // Search in all installed products for chambers and slots
+        // First search in products installed in the build
         foreach (BuildPart buildPart in build.Parts)
         {
             Product? product = allProducts.FirstOrDefault(p => p.Id == buildPart.ProductId);
@@ -224,6 +224,43 @@ public class SpatialValidator : ISpatialValidator
                 {
                     Vector3 basePosition = buildPart.Position ?? Vector3.Zero;
                     List<(Slot Slot, Vector3 GlobalPosition)> slots = slot.FlattenSlots(basePosition);
+                    (Slot Slot, Vector3 GlobalPosition) found = slots.FirstOrDefault(s => s.Slot.Id == slotId);
+                    
+                    if (found.Slot != null)
+                    {
+                        return (product, null, found.Slot, found.GlobalPosition);
+                    }
+                }
+            }
+        }
+        
+        // If not found in build, search all products in catalog (for validation before installation)
+        foreach (Product product in allProducts)
+        {
+            // Skip if already checked (in build)
+            if (build.Parts.Any(bp => bp.ProductId == product.Id)) continue;
+            
+            // Check chambers
+            if (product.Chambers != null)
+            {
+                foreach (Chamber chamber in product.Chambers)
+                {
+                    List<(Slot Slot, Vector3 GlobalPosition)> slots = chamber.GetAllSlots();
+                    (Slot Slot, Vector3 GlobalPosition) found = slots.FirstOrDefault(s => s.Slot.Id == slotId);
+                    
+                    if (found.Slot != null)
+                    {
+                        return (product, chamber, found.Slot, found.GlobalPosition);
+                    }
+                }
+            }
+            
+            // Check direct slots on product
+            if (product.Slots != null)
+            {
+                foreach (Slot slot in product.Slots)
+                {
+                    List<(Slot Slot, Vector3 GlobalPosition)> slots = slot.FlattenSlots(Vector3.Zero);
                     (Slot Slot, Vector3 GlobalPosition) found = slots.FirstOrDefault(s => s.Slot.Id == slotId);
                     
                     if (found.Slot != null)
