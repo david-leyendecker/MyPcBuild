@@ -1,3 +1,5 @@
+using MyPcBuild.ApiService.Domain.Models.Spatial;
+
 namespace MyPcBuild.ApiService.Domain.Events;
 
 public abstract record BuildEvent
@@ -16,6 +18,14 @@ public record PartAdded : BuildEvent
 {
     public required Guid ProductId { get; init; }
     public required decimal PricePaid { get; init; }
+}
+
+public record PartAddedToSlot : BuildEvent
+{
+    public required Guid ProductId { get; init; }
+    public required decimal PricePaid { get; init; }
+    public required Guid SlotId { get; init; }
+    public required Vector3 Position { get; init; }
 }
 
 public record PartRemoved : BuildEvent

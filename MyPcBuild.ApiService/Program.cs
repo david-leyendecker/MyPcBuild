@@ -56,12 +56,9 @@ builder.Services.AddMarten(opts =>
     opts.Events.AddEventTypes([
         typeof(BuildCreated),
         typeof(PartAdded),
+        typeof(PartAddedToSlot),
         typeof(PartRemoved),
-        typeof(BuildRenamed),
-        typeof(ChamberConfigured),
-        typeof(PartInstalledInSlot),
-        typeof(PartRemovedFromSlot),
-        typeof(SlotAddedToChamber)
+        typeof(BuildRenamed)
     ]);
     
     // Use Build as the aggregate with inline projection

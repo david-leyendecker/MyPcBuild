@@ -1,3 +1,5 @@
+using MyPcBuild.ApiService.Domain.Models.Spatial;
+
 namespace MyPcBuild.ApiService.Domain.Models;
 
 public record Product(
@@ -6,7 +8,10 @@ public record Product(
     ProductCategory Category,
     decimal Price,
     string Manufacturer,
-    Dictionary<string, object> Specifications
+    Dictionary<string, object> Specifications,
+    List<Chamber>? Chambers = null,
+    List<Slot>? Slots = null,
+    Dimensions? Dimensions = null
 );
 
 public enum ProductCategory

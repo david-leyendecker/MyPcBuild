@@ -1,3 +1,4 @@
+using MyPcBuild.ApiService.Domain.Models;
 using MyPcBuild.ApiService.Domain.Models.Spatial;
 
 namespace MyPcBuild.ApiService.Features.Spatial;
@@ -5,80 +6,118 @@ namespace MyPcBuild.ApiService.Features.Spatial;
 public interface ISpatialValidator
 {
     /// <summary>
-    /// Validates that a part can be installed in a specific slot within a chamber.
+    /// Validates that a part can be installed in a specific slot within a build.
     /// </summary>
     SpatialValidationResult ValidatePartInstallation(
-        Chamber chamber,
+        Build build,
+        List<Product> allProducts,
+        Guid productId,
         Guid slotId,
-        Dimensions partDimensions,
-        Vector3 partPosition);
+        Vector3 position);
     
     /// <summary>
-    /// Validates the entire chamber configuration.
+    /// Validates the entire build spatial configuration.
     /// </summary>
-    SpatialValidationResult ValidateChamber(Chamber chamber);
+    SpatialValidationResult ValidateBuild(Build build, List<Product> allProducts);
 }
 
 public class SpatialValidator : ISpatialValidator
 {
     public SpatialValidationResult ValidatePartInstallation(
-        Chamber chamber,
+        Build build,
+        List<Product> allProducts,
+        Guid productId,
         Guid slotId,
-        Dimensions partDimensions,
-        Vector3 partPosition)
+        Vector3 position)
     {
         List<SpatialIssue> issues = [];
         
-        // Find the slot
-        List<(Slot Slot, Vector3 GlobalPosition)> allSlots = chamber.GetAllSlots();
-        (Slot Slot, Vector3 GlobalPosition) slotInfo = allSlots.FirstOrDefault(s => s.Slot.Id == slotId);
-        
-        if (slotInfo.Slot == null)
+        // Find the product to install
+        Product? product = allProducts.FirstOrDefault(p => p.Id == productId);
+        if (product == null)
         {
             issues.Add(new SpatialIssue(
-                $"Slot {slotId} not found in chamber",
+                $"Product {productId} not found",
+                SpatialIssueSeverity.Error,
+                "Product/NotFound"
+            ));
+            return new SpatialValidationResult(false, issues);
+        }
+        
+        if (product.Dimensions == null)
+        {
+            issues.Add(new SpatialIssue(
+                $"Product {product.Name} has no dimensions defined",
+                SpatialIssueSeverity.Error,
+                "Product/NoDimensions"
+            ));
+            return new SpatialValidationResult(false, issues);
+        }
+        
+        // Find the slot in any product's chambers or slots
+        (Product? slotOwner, Chamber? chamber, Slot? slot, Vector3 slotGlobalPosition) = FindSlot(build, allProducts, slotId);
+        
+        if (slot == null)
+        {
+            issues.Add(new SpatialIssue(
+                $"Slot {slotId} not found in build",
                 SpatialIssueSeverity.Error,
                 "Slot/NotFound"
             ));
             return new SpatialValidationResult(false, issues);
         }
         
-        Slot slot = slotInfo.Slot;
-        Vector3 slotGlobalPosition = slotInfo.GlobalPosition;
-        
         // Validate dimensions fit in slot
-        if (!partDimensions.FitsWithin(slot.MaxDimensions))
+        if (!product.Dimensions.FitsWithin(slot.MaxDimensions))
         {
             issues.Add(new SpatialIssue(
-                $"Part dimensions ({partDimensions.Length}x{partDimensions.Width}x{partDimensions.Height}mm) " +
+                $"Part dimensions ({product.Dimensions.Length}x{product.Dimensions.Width}x{product.Dimensions.Height}mm) " +
                 $"exceed slot maximum ({slot.MaxDimensions.Length}x{slot.MaxDimensions.Width}x{slot.MaxDimensions.Height}mm)",
                 SpatialIssueSeverity.Error,
                 "Dimensions/Exceeded"
             ));
         }
         
-        // Create bounding box for the part at the given position
-        BoundingBox partBox = new(partPosition, partDimensions);
-        
-        // Validate part fits within chamber boundaries
-        BoundingBox chamberBox = chamber.GetBoundingBox();
-        if (!partBox.IsContainedWithin(chamberBox))
+        // Validate part category matches slot
+        if (slot.AllowedCategory != product.Category)
         {
             issues.Add(new SpatialIssue(
-                $"Part extends beyond chamber boundaries. Chamber: {chamber.Dimensions.Length}x{chamber.Dimensions.Width}x{chamber.Dimensions.Height}mm",
+                $"Product category {product.Category} does not match slot allowed category {slot.AllowedCategory}",
                 SpatialIssueSeverity.Error,
-                "Boundary/Exceeded"
+                "Category/Mismatch"
             ));
         }
         
-        // Check for collisions with existing parts
-        foreach (InstalledPart existingPart in chamber.InstalledParts)
+        // Create bounding box for the part at the given position
+        BoundingBox partBox = new(position, product.Dimensions);
+        
+        // If in a chamber, validate part fits within chamber boundaries
+        if (chamber != null)
         {
-            BoundingBox existingBox = existingPart.GetBoundingBox();
+            BoundingBox chamberBox = chamber.GetBoundingBox();
+            if (!partBox.IsContainedWithin(chamberBox))
+            {
+                issues.Add(new SpatialIssue(
+                    $"Part extends beyond chamber boundaries. Chamber: {chamber.Dimensions.Length}x{chamber.Dimensions.Width}x{chamber.Dimensions.Height}mm",
+                    SpatialIssueSeverity.Error,
+                    "Boundary/Exceeded"
+                ));
+            }
+        }
+        
+        // Check for collisions with existing parts
+        foreach (BuildPart existingPart in build.Parts)
+        {
+            if (existingPart.Position == null) continue; // Skip parts without spatial position
+            
+            Product? existingProduct = allProducts.FirstOrDefault(p => p.Id == existingPart.ProductId);
+            if (existingProduct?.Dimensions == null) continue;
+            
+            BoundingBox existingBox = new(existingPart.Position, existingProduct.Dimensions);
             if (partBox.Intersects(existingBox))
             {
                 issues.Add(new SpatialIssue(
-                    $"Part collides with existing part (ProductId: {existingPart.ProductId}) at position " +
+                    $"Part collides with existing part '{existingProduct.Name}' at position " +
                     $"({existingPart.Position.X}, {existingPart.Position.Y}, {existingPart.Position.Z})",
                     SpatialIssueSeverity.Error,
                     "Collision/PartConflict"
@@ -89,42 +128,37 @@ public class SpatialValidator : ISpatialValidator
         return new SpatialValidationResult(!issues.Any(i => i.Severity == SpatialIssueSeverity.Error), issues);
     }
     
-    public SpatialValidationResult ValidateChamber(Chamber chamber)
+    public SpatialValidationResult ValidateBuild(Build build, List<Product> allProducts)
     {
         List<SpatialIssue> issues = [];
         
-        // Validate all installed parts
-        foreach (InstalledPart part in chamber.InstalledParts)
+        // Get all parts with positions
+        List<(BuildPart BuildPart, Product Product, BoundingBox BoundingBox)> spatialParts = [];
+        
+        foreach (BuildPart buildPart in build.Parts)
         {
-            BoundingBox partBox = part.GetBoundingBox();
-            BoundingBox chamberBox = chamber.GetBoundingBox();
+            if (buildPart.Position == null) continue;
             
-            // Check boundary
-            if (!partBox.IsContainedWithin(chamberBox))
-            {
-                issues.Add(new SpatialIssue(
-                    $"Part {part.ProductId} extends beyond chamber boundaries",
-                    SpatialIssueSeverity.Error,
-                    "Boundary/Exceeded"
-                ));
-            }
+            Product? product = allProducts.FirstOrDefault(p => p.Id == buildPart.ProductId);
+            if (product?.Dimensions == null) continue;
+            
+            BoundingBox box = new(buildPart.Position, product.Dimensions);
+            spatialParts.Add((buildPart, product, box));
         }
         
         // Check for collisions between all parts
-        for (int i = 0; i < chamber.InstalledParts.Count; i++)
+        for (int i = 0; i < spatialParts.Count; i++)
         {
-            InstalledPart part1 = chamber.InstalledParts[i];
-            BoundingBox box1 = part1.GetBoundingBox();
+            (BuildPart part1, Product product1, BoundingBox box1) = spatialParts[i];
             
-            for (int j = i + 1; j < chamber.InstalledParts.Count; j++)
+            for (int j = i + 1; j < spatialParts.Count; j++)
             {
-                InstalledPart part2 = chamber.InstalledParts[j];
-                BoundingBox box2 = part2.GetBoundingBox();
+                (BuildPart part2, Product product2, BoundingBox box2) = spatialParts[j];
                 
                 if (box1.Intersects(box2))
                 {
                     issues.Add(new SpatialIssue(
-                        $"Collision detected between parts {part1.ProductId} and {part2.ProductId}",
+                        $"Collision detected between '{product1.Name}' and '{product2.Name}'",
                         SpatialIssueSeverity.Error,
                         "Collision/PartConflict"
                     ));
@@ -132,6 +166,74 @@ public class SpatialValidator : ISpatialValidator
             }
         }
         
+        // Validate parts are within their chamber boundaries
+        foreach ((BuildPart buildPart, Product product, BoundingBox box) in spatialParts)
+        {
+            if (buildPart.SlotId.HasValue)
+            {
+                (Product? slotOwner, Chamber? chamber, Slot? slot, Vector3 slotPos) = FindSlot(build, allProducts, buildPart.SlotId.Value);
+                
+                if (chamber != null)
+                {
+                    BoundingBox chamberBox = chamber.GetBoundingBox();
+                    if (!box.IsContainedWithin(chamberBox))
+                    {
+                        issues.Add(new SpatialIssue(
+                            $"Part '{product.Name}' extends beyond chamber boundaries",
+                            SpatialIssueSeverity.Error,
+                            "Boundary/Exceeded"
+                        ));
+                    }
+                }
+            }
+        }
+        
         return new SpatialValidationResult(!issues.Any(i => i.Severity == SpatialIssueSeverity.Error), issues);
+    }
+    
+    private (Product? SlotOwner, Chamber? Chamber, Slot? Slot, Vector3 GlobalPosition) FindSlot(
+        Build build,
+        List<Product> allProducts,
+        Guid slotId)
+    {
+        // Search in all installed products for chambers and slots
+        foreach (BuildPart buildPart in build.Parts)
+        {
+            Product? product = allProducts.FirstOrDefault(p => p.Id == buildPart.ProductId);
+            if (product == null) continue;
+            
+            // Check chambers
+            if (product.Chambers != null)
+            {
+                foreach (Chamber chamber in product.Chambers)
+                {
+                    List<(Slot Slot, Vector3 GlobalPosition)> slots = chamber.GetAllSlots();
+                    (Slot Slot, Vector3 GlobalPosition) found = slots.FirstOrDefault(s => s.Slot.Id == slotId);
+                    
+                    if (found.Slot != null)
+                    {
+                        return (product, chamber, found.Slot, found.GlobalPosition);
+                    }
+                }
+            }
+            
+            // Check direct slots on product
+            if (product.Slots != null)
+            {
+                foreach (Slot slot in product.Slots)
+                {
+                    Vector3 basePosition = buildPart.Position ?? Vector3.Zero;
+                    List<(Slot Slot, Vector3 GlobalPosition)> slots = slot.FlattenSlots(basePosition);
+                    (Slot Slot, Vector3 GlobalPosition) found = slots.FirstOrDefault(s => s.Slot.Id == slotId);
+                    
+                    if (found.Slot != null)
+                    {
+                        return (product, null, found.Slot, found.GlobalPosition);
+                    }
+                }
+            }
+        }
+        
+        return (null, null, null, Vector3.Zero);
     }
 }

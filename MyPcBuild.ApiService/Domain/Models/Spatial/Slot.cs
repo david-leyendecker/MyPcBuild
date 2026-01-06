@@ -5,16 +5,18 @@ namespace MyPcBuild.ApiService.Domain.Models.Spatial;
 /// <summary>
 /// Represents a slot where a part can be installed.
 /// Slots can contain sub-slots for recursive part installation (e.g., motherboard has CPU/RAM slots).
+/// Used as a value object within Product/Chamber definitions.
 /// </summary>
-public class Slot
+public record Slot(
+    Guid Id,
+    string Name,
+    ProductCategory AllowedCategory,
+    Vector3 RelativePosition,
+    Dimensions MaxDimensions,
+    List<Slot>? SubSlots = null
+)
 {
-    public Guid Id { get; set; }
-    public required string Name { get; set; }
-    public required ProductCategory AllowedCategory { get; set; }
-    public required Vector3 RelativePosition { get; set; }
-    public required Dimensions MaxDimensions { get; set; }
-    public Guid? InstalledPartId { get; set; }
-    public List<Slot> SubSlots { get; set; } = [];
+    public List<Slot> SubSlots { get; init; } = SubSlots ?? [];
     
     /// <summary>
     /// Gets the bounding box for this slot at the given position.
