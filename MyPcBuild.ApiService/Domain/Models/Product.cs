@@ -50,7 +50,7 @@ public record CpuProduct(
     decimal Price,
     string Manufacturer,
     // CPU-specific properties
-    string Socket,
+    CpuSocket Socket,
     int Cores,
     int Threads,
     Frequency BaseClock,
@@ -70,10 +70,10 @@ public record MotherboardProduct(
     Dimensions Dimensions,
     List<Slot> Slots,
     // Motherboard-specific properties
-    string Socket,
+    CpuSocket Socket,
     string Chipset,
     string FormFactor,
-    string MemoryType,
+    MemoryType MemoryType,
     StorageCapacity MaxMemory
 ) : Product(Id, Name, Price, Manufacturer), ISlottedProduct
 {
@@ -91,7 +91,7 @@ public record GpuProduct(
     string ChipsetManufacturer,
     string Series,
     StorageCapacity VRAM,
-    string MemoryType,
+    MemoryType MemoryType,
     Frequency CoreClock,
     Frequency BoostClock,
     Power TDP,
@@ -109,7 +109,7 @@ public record RamProduct(
     decimal Price,
     string Manufacturer,
     // RAM-specific properties
-    string Type,
+    MemoryType Type,
     StorageCapacity Capacity,
     string Configuration,
     Frequency Speed,
@@ -183,7 +183,7 @@ public record CoolerProduct(
     string CoolerType,
     Length Height,
     Power TDP,
-    string[] Sockets
+    CpuSocket[] Sockets
 ) : Product(Id, Name, Price, Manufacturer), ISpatialProduct
 {
     public override string CategoryName => "Cooler";

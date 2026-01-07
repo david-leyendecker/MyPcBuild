@@ -312,10 +312,10 @@ public class SpatialValidatorTests
             "ASUS",
             new Dimensions(305, 244, 50),
             [], // No sub-slots for this test
-            "AM5",
+            CpuSocket.AM5,
             "X670E",
             "ATX",
-            "DDR5",
+            MemoryType.DDR5,
             StorageCapacity.FromGB(128)
         );
     }
@@ -329,10 +329,10 @@ public class SpatialValidatorTests
             "Test",
             new Dimensions(400, 300, 100), // Too large
             [], // No sub-slots for this test
-            "AM5",
+            CpuSocket.AM5,
             "X670E",
             "EATX",
-            "DDR5",
+            MemoryType.DDR5,
             StorageCapacity.FromGB(128)
         );
     }

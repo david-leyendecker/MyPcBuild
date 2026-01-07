@@ -464,12 +464,13 @@ public class CompatibilityValidatorTests
 
     private CpuProduct CreateCpu(string name, string socket, int tdp = 0)
     {
+        CpuSocket socketEnum = CpuSocketExtensions.Parse(socket);
         return new CpuProduct(
             Guid.NewGuid(),
             name,
             399.99m,
             "AMD",
-            socket,
+            socketEnum,
             8,
             16,
             Frequency.FromGHz(4.2m),
@@ -481,6 +482,9 @@ public class CompatibilityValidatorTests
 
     private Product CreateMotherboard(string name, string socket, string memoryType, string formFactor, int maxMemory = 128, int memorySlots = 4)
     {
+        CpuSocket socketEnum = CpuSocketExtensions.Parse(socket);
+        MemoryType memoryTypeEnum = Enum.Parse<MemoryType>(memoryType, ignoreCase: true);
+        
         // Create RAM slots based on memorySlots parameter
         List<Slot> slots = [];
         for (int i = 0; i < memorySlots; i++)
@@ -502,22 +506,23 @@ public class CompatibilityValidatorTests
             "ASUS",
             new Dimensions(305, 244, 50), // Standard ATX dimensions
             slots,
-            socket,
+            socketEnum,
             "X670E",
             formFactor,
-            memoryType,
+            memoryTypeEnum,
             StorageCapacity.FromGB(maxMemory)
         );
     }
 
     private RamProduct CreateRam(string name, string type, int capacity, string configuration)
     {
+        MemoryType memoryTypeEnum = Enum.Parse<MemoryType>(type, ignoreCase: true);
         return new RamProduct(
             Guid.NewGuid(),
             name,
             129.99m,
             "G.Skill",
-            type,
+            memoryTypeEnum,
             StorageCapacity.FromGB(capacity),
             configuration,
             Frequency.FromMHz(6000),
@@ -538,7 +543,7 @@ public class CompatibilityValidatorTests
             "NVIDIA",
             "RTX 4070",
             StorageCapacity.FromGB(12),
-            "GDDR6X",
+            MemoryType.GDDR6X,
             Frequency.FromMHz(2310),
             Frequency.FromMHz(2610),
             Power.FromWatts(tdp > 0 ? tdp : 300),
@@ -584,6 +589,7 @@ public class CompatibilityValidatorTests
 
     private CoolerProduct CreateCooler(string name, string type, int height, int tdp, string[] sockets)
     {
+        CpuSocket[] socketEnums = sockets.Select(s => CpuSocketExtensions.Parse(s)).ToArray();
         return new CoolerProduct(
             Guid.NewGuid(),
             name,
@@ -593,7 +599,7 @@ public class CompatibilityValidatorTests
             type,
             Length.FromMm(height),
             Power.FromWatts(tdp),
-            sockets
+            socketEnums
         );
     }
 

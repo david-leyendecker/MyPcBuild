@@ -1,6 +1,80 @@
 namespace MyPcBuild.ApiService.Domain.Models;
 
 /// <summary>
+/// CPU socket types.
+/// </summary>
+public enum CpuSocket
+{
+    // Intel sockets
+    LGA1700,
+    LGA1200,
+    LGA1151,
+    LGA2066,
+    
+    // AMD sockets
+    AM5,
+    AM4,
+    sTRX4,
+    TR4
+}
+
+/// <summary>
+/// Extension methods for CpuSocket enum to allow custom socket definitions.
+/// </summary>
+public static class CpuSocketExtensions
+{
+    /// <summary>
+    /// Checks if a socket string matches this CpuSocket enum value.
+    /// </summary>
+    public static bool Matches(this CpuSocket socket, string socketString)
+    {
+        return socket.ToString().Equals(socketString, StringComparison.OrdinalIgnoreCase);
+    }
+    
+    /// <summary>
+    /// Parses a socket string to a CpuSocket enum value.
+    /// </summary>
+    public static CpuSocket Parse(string socketString)
+    {
+        if (Enum.TryParse<CpuSocket>(socketString, ignoreCase: true, out CpuSocket result))
+        {
+            return result;
+        }
+        throw new ArgumentException($"Unknown CPU socket: {socketString}", nameof(socketString));
+    }
+    
+    /// <summary>
+    /// Tries to parse a socket string to a CpuSocket enum value.
+    /// </summary>
+    public static bool TryParse(string socketString, out CpuSocket socket)
+    {
+        return Enum.TryParse(socketString, ignoreCase: true, out socket);
+    }
+}
+
+/// <summary>
+/// Memory types for RAM and VRAM.
+/// </summary>
+public enum MemoryType
+{
+    // DDR RAM types
+    DDR3,
+    DDR4,
+    DDR5,
+    
+    // GDDR VRAM types
+    GDDR5,
+    GDDR5X,
+    GDDR6,
+    GDDR6X,
+    
+    // HBM types
+    HBM2,
+    HBM2E,
+    HBM3
+}
+
+/// <summary>
 /// Represents a frequency in gigahertz (GHz).
 /// </summary>
 public record Frequency
