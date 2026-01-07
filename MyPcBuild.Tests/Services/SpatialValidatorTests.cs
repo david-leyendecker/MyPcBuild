@@ -296,10 +296,7 @@ public class SpatialValidatorTests
             ],
             "ATX",
             "Black",
-            "Tempered Glass",
-            Length.FromMm(420),
-            Length.FromMm(167),
-            Length.FromMm(225)
+            "Tempered Glass"
         );
     }
 
@@ -314,7 +311,7 @@ public class SpatialValidatorTests
             [], // No sub-slots for this test
             CpuSocket.AM5,
             "X670E",
-            "ATX",
+            FormFactor.ATX,
             MemoryType.DDR5,
             StorageCapacity.FromGB(128)
         );
@@ -331,7 +328,7 @@ public class SpatialValidatorTests
             [], // No sub-slots for this test
             CpuSocket.AM5,
             "X670E",
-            "EATX",
+            FormFactor.EATX,
             MemoryType.DDR5,
             StorageCapacity.FromGB(128)
         );

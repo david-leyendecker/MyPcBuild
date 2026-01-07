@@ -9,7 +9,7 @@ public static class SearchProducts
     {
         app.MapGet("/api/catalog/search", async (
             IDocumentSession session,
-            string query,
+            string? query = null,
             int maxResults = 10) =>
         {
             if (string.IsNullOrWhiteSpace(query))

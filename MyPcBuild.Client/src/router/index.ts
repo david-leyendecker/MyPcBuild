@@ -2,6 +2,7 @@ import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
 import BuildsListView from '@/views/BuildsListView.vue';
 import BuildDetailView from '@/views/BuildDetailView.vue';
 import CatalogView from '@/views/CatalogView.vue';
+import ProductCreateView from '@/views/ProductCreateView.vue';
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -19,6 +20,11 @@ const routes: Array<RouteRecordRaw> = [
     path: '/catalog',
     name: 'catalog',
     component: CatalogView
+  },
+  {
+    path: '/catalog/create',
+    name: 'product-create',
+    component: ProductCreateView
   }
 ];
 

@@ -8,6 +8,8 @@ public static class Endpoints
         app.MapGetProductByIdEndpoint();
         app.MapGetCategoriesEndpoint();
         app.MapSearchProductsEndpoint();
+        app.MapCreateProductEndpoint();
+        app.MapGetFieldDefinitionsEndpoint();
 
         return app;
     }

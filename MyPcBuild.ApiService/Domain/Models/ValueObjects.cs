@@ -75,10 +75,43 @@ public enum MemoryType
 }
 
 /// <summary>
+/// Motherboard form factors.
+/// </summary>
+public enum FormFactor
+{
+    ATX,
+    MicroATX,
+    MiniITX,
+    EATX
+}
+
+/// <summary>
+/// Cooler types
+/// </summary>
+public enum CoolerType
+{
+    Air,
+    AIO,
+    CustomLoop
+}
+
+/// <summary>
+/// GPU power connector configurations.
+/// </summary>
+public enum GpuPowerConnector
+{
+    Dual8Pin,
+    Triple8Pin,
+    One16Pin
+}
+
+
+/// <summary>
 /// Represents a frequency in gigahertz (GHz).
 /// </summary>
 public record Frequency
 {
+    public static readonly string Unit = "GHz";
     public decimal ValueInGHz { get; }
 
     private Frequency(decimal valueInGHz)
@@ -96,7 +129,7 @@ public record Frequency
 
     public decimal ToMHz() => ValueInGHz * 1000m;
 
-    public override string ToString() => $"{ValueInGHz} GHz";
+    public override string ToString() => $"{ValueInGHz} {Unit}";
 }
 
 /// <summary>
@@ -104,6 +137,8 @@ public record Frequency
 /// </summary>
 public record StorageCapacity
 {
+    public static readonly string Unit = "GB";
+
     public int ValueInGB { get; }
 
     private StorageCapacity(int valueInGB)
@@ -121,7 +156,7 @@ public record StorageCapacity
 
     public decimal ToTB() => ValueInGB / 1024m;
 
-    public override string ToString() => ValueInGB >= 1024 ? $"{ToTB():F2} TB" : $"{ValueInGB} GB";
+    public override string ToString() => ValueInGB >= 1024 ? $"{ToTB():F2} TB" : $"{ValueInGB} {Unit}";
 }
 
 /// <summary>
@@ -129,6 +164,7 @@ public record StorageCapacity
 /// </summary>
 public record Power
 {
+    public static readonly string Unit = "W";
     public int ValueInWatts { get; }
 
     private Power(int valueInWatts)
@@ -143,7 +179,7 @@ public record Power
 
     public static Power FromWatts(int watts) => new(watts);
 
-    public override string ToString() => $"{ValueInWatts}W";
+    public override string ToString() => $"{ValueInWatts}{Unit}";
 }
 
 /// <summary>
@@ -151,6 +187,7 @@ public record Power
 /// </summary>
 public record Voltage
 {
+    public static readonly string Unit = "V";
     public decimal ValueInVolts { get; }
 
     private Voltage(decimal valueInVolts)
@@ -165,7 +202,7 @@ public record Voltage
 
     public static Voltage FromVolts(decimal volts) => new(volts);
 
-    public override string ToString() => $"{ValueInVolts}V";
+    public override string ToString() => $"{ValueInVolts}{Unit}";
 }
 
 /// <summary>
@@ -173,6 +210,8 @@ public record Voltage
 /// </summary>
 public record Length
 {
+    public static readonly string Unit = "mm";
+
     public int ValueInMm { get; }
 
     private Length(int valueInMm)
@@ -190,7 +229,7 @@ public record Length
 
     public decimal ToCm() => ValueInMm / 10m;
 
-    public override string ToString() => $"{ValueInMm}mm";
+    public override string ToString() => $"{ValueInMm}{Unit}";
 }
 
 /// <summary>
@@ -198,6 +237,7 @@ public record Length
 /// </summary>
 public record DataSpeed
 {
+    public static readonly string Unit = "MB/s";
     public int ValueInMBps { get; }
 
     private DataSpeed(int valueInMBps)
@@ -215,5 +255,5 @@ public record DataSpeed
 
     public decimal ToGBps() => ValueInMBps / 1000m;
 
-    public override string ToString() => ValueInMBps >= 1000 ? $"{ToGBps():F2} GB/s" : $"{ValueInMBps} MB/s";
+    public override string ToString() => ValueInMBps >= 1000 ? $"{ToGBps():F2} GB/s" : $"{ValueInMBps} {Unit}";
 }

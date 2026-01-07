@@ -63,6 +63,17 @@ builder.Services.AddMarten(opts =>
     
     // Use Build as the aggregate with inline projection
     opts.Projections.Snapshot<Build>(SnapshotLifecycle.Inline);
+    
+    // Configure Product hierarchy for polymorphic storage
+    opts.Schema.For<Product>()
+        .AddSubClass<CpuProduct>()
+        .AddSubClass<MotherboardProduct>()
+        .AddSubClass<GpuProduct>()
+        .AddSubClass<RamProduct>()
+        .AddSubClass<PcCaseProduct>()
+        .AddSubClass<PsuProduct>()
+        .AddSubClass<StorageProduct>()
+        .AddSubClass<CoolerProduct>();
 }).UseLightweightSessions();
 
 builder.Services.AddHostedService<ProductSeeder>();

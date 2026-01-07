@@ -149,7 +149,7 @@ Each product includes a `Specifications` dictionary with category-specific field
 - Type (DDR4/DDR5), Capacity, Configuration, Speed, CASLatency, Voltage, RGB, HeatSpreader
 
 **PC Case:**
-- FormFactor, Color, MaxGPULength, MaxCPUCoolerHeight, MaxPSULength, DriveBays, FanMounts
+- FormFactor, Color, DriveBays, FanMounts
 
 **PSU:**
 - Wattage, Efficiency, Modular, FormFactor, PCIe8Pin, SATA, Molex

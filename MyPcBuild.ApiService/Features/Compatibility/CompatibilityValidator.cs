@@ -95,49 +95,46 @@ public class CompatibilityValidator : ICompatibilityValidator
     {
         if (gpu == null) return;
 
-        // Check GPU length vs case
-        if (pcCase != null)
-        {
-            if (gpu.Length.ValueInMm > pcCase.MaxGPULength.ValueInMm)
-            {
-                issues.Add(new CompatibilityIssue(
-                    $"GPU length ({gpu.Length.ValueInMm}mm) exceeds case maximum ({pcCase.MaxGPULength.ValueInMm}mm)",
-                    IssueSeverity.Error,
-                    "GPU/Case"
-                ));
-            }
-            else if (gpu.Length.ValueInMm > pcCase.MaxGPULength.ValueInMm * 0.9) // Within 10% warning
-            {
-                issues.Add(new CompatibilityIssue(
-                    $"GPU length ({gpu.Length.ValueInMm}mm) is close to case limit ({pcCase.MaxGPULength.ValueInMm}mm) - tight fit",
-                    IssueSeverity.Warning,
-                    "GPU/Case"
-                ));
-            }
-        }
-
         // Check GPU power requirements
         if (psu != null)
         {
-            // Check if GPU needs 16-pin connector
-            if (gpu.PowerConnectors.Contains("16-pin") && psu.PCIe8Pin < 2)
+            switch (gpu.PowerConnectors)
             {
-                issues.Add(new CompatibilityIssue(
-                    $"GPU requires 16-pin power connector (or adapter for 2x 8-pin), PSU has {psu.PCIe8Pin}x 8-pin connectors",
-                    psu.PCIe8Pin == 0 ? IssueSeverity.Error : IssueSeverity.Warning,
-                    "GPU/PSU"
-                ));
-            }
-            // Check if GPU needs multiple 8-pin
-            else if (gpu.PowerConnectors.Contains("2x 8-pin"))
-            {
-                if (psu.PCIe8Pin < 2)
+                case GpuPowerConnector.One16Pin:
                 {
-                    issues.Add(new CompatibilityIssue(
-                        $"GPU requires 2x 8-pin power connectors, PSU has only {psu.PCIe8Pin}",
-                        IssueSeverity.Error,
-                        "GPU/PSU"
-                    ));
+                    if (psu.PCIe8Pin < 2)
+                    {
+                        issues.Add(new CompatibilityIssue(
+                            $"GPU requires 16-pin power connector (adapter needs at least 2x 8-pin), PSU has {psu.PCIe8Pin}x 8-pin connectors",
+                            psu.PCIe8Pin == 0 ? IssueSeverity.Error : IssueSeverity.Warning,
+                            "GPU/PSU"
+                        ));
+                    }
+                    break;
+                }
+                case GpuPowerConnector.Dual8Pin:
+                {
+                    if (psu.PCIe8Pin < 2)
+                    {
+                        issues.Add(new CompatibilityIssue(
+                            $"GPU requires 2x 8-pin power connectors, PSU has {psu.PCIe8Pin}",
+                            IssueSeverity.Error,
+                            "GPU/PSU"
+                        ));
+                    }
+                    break;
+                }
+                case GpuPowerConnector.Triple8Pin:
+                {
+                    if (psu.PCIe8Pin < 3)
+                    {
+                        issues.Add(new CompatibilityIssue(
+                            $"GPU requires 3x 8-pin power connectors, PSU has {psu.PCIe8Pin}",
+                            IssueSeverity.Error,
+                            "GPU/PSU"
+                        ));
+                    }
+                    break;
                 }
             }
         }
@@ -157,40 +154,6 @@ public class CompatibilityValidator : ICompatibilityValidator
                     $"Case form factor ({pcCase.FormFactor}) is incompatible with motherboard form factor ({motherboard.FormFactor})",
                     IssueSeverity.Error,
                     "Case/Motherboard"
-                ));
-            }
-        }
-
-        // Check cooler clearance
-        if (cooler != null)
-        {
-            if (cooler.Height.ValueInMm > pcCase.MaxCPUCoolerHeight.ValueInMm)
-            {
-                issues.Add(new CompatibilityIssue(
-                    $"CPU cooler height ({cooler.Height.ValueInMm}mm) exceeds case maximum ({pcCase.MaxCPUCoolerHeight.ValueInMm}mm)",
-                    IssueSeverity.Error,
-                    "Cooler/Case"
-                ));
-            }
-            else if (cooler.Height.ValueInMm > pcCase.MaxCPUCoolerHeight.ValueInMm * 0.95) // Within 5% warning
-            {
-                issues.Add(new CompatibilityIssue(
-                    $"CPU cooler height ({cooler.Height.ValueInMm}mm) is very close to case limit ({pcCase.MaxCPUCoolerHeight.ValueInMm}mm)",
-                    IssueSeverity.Warning,
-                    "Cooler/Case"
-                ));
-            }
-        }
-
-        // Check PSU clearance
-        if (psu != null)
-        {
-            if (psu.Length.ValueInMm > pcCase.MaxPSULength.ValueInMm)
-            {
-                issues.Add(new CompatibilityIssue(
-                    $"PSU length ({psu.Length.ValueInMm}mm) exceeds case maximum ({pcCase.MaxPSULength.ValueInMm}mm)",
-                    IssueSeverity.Error,
-                    "PSU/Case"
                 ));
             }
         }
@@ -263,27 +226,27 @@ public class CompatibilityValidator : ICompatibilityValidator
 
     }
 
-    private bool IsFormFactorCompatible(string caseFormFactor, string mbFormFactor)
+    private bool IsFormFactorCompatible(string caseFormFactor, FormFactor motherboardFormFactor)
     {
-        // ATX cases support ATX, MicroATX, Mini-ITX
-        if (caseFormFactor == "ATX")
+        if (!TryParseFormFactor(caseFormFactor, out FormFactor parsedCase))
         {
-            return mbFormFactor is "ATX" or "MicroATX" or "Mini-ITX";
-        }
-        
-        // MicroATX cases support MicroATX and Mini-ITX
-        if (caseFormFactor == "MicroATX")
-        {
-            return mbFormFactor is "MicroATX" or "Mini-ITX";
-        }
-        
-        // Mini-ITX cases only support Mini-ITX
-        if (caseFormFactor == "Mini-ITX")
-        {
-            return mbFormFactor == "Mini-ITX";
+            return false;
         }
 
-        return false;
+        return parsedCase switch
+        {
+            FormFactor.EATX => motherboardFormFactor is FormFactor.EATX or FormFactor.ATX or FormFactor.MicroATX or FormFactor.MiniITX,
+            FormFactor.ATX => motherboardFormFactor is FormFactor.ATX or FormFactor.MicroATX or FormFactor.MiniITX,
+            FormFactor.MicroATX => motherboardFormFactor is FormFactor.MicroATX or FormFactor.MiniITX,
+            FormFactor.MiniITX => motherboardFormFactor == FormFactor.MiniITX,
+            _ => false
+        };
+    }
+
+    private static bool TryParseFormFactor(string value, out FormFactor formFactor)
+    {
+        string normalized = value.Replace("-", string.Empty).Replace(" ", string.Empty);
+        return Enum.TryParse(normalized, ignoreCase: true, out formFactor);
     }
 
     private int ParseRamConfiguration(RamProduct ram)
