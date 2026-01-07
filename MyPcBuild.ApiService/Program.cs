@@ -6,6 +6,7 @@ using MyPcBuild.ApiService.Domain.Models;
 using MyPcBuild.ApiService.Features.Builds;
 using MyPcBuild.ApiService.Features.Catalog;
 using MyPcBuild.ApiService.Features.Compatibility;
+using MyPcBuild.ApiService.Features.Spatial;
 using MyPcBuild.ApiService.Infrastructure;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
@@ -38,6 +39,9 @@ builder.Services.AddCors(options =>
 // Register compatibility validator
 builder.Services.AddScoped<ICompatibilityValidator, CompatibilityValidator>();
 
+// Register spatial validator
+builder.Services.AddScoped<ISpatialValidator, SpatialValidator>();
+
 // Add OpenAPI
 builder.Services.AddOpenApi();
 
@@ -52,6 +56,7 @@ builder.Services.AddMarten(opts =>
     opts.Events.AddEventTypes([
         typeof(BuildCreated),
         typeof(PartAdded),
+        typeof(PartAddedToSlot),
         typeof(PartRemoved),
         typeof(BuildRenamed)
     ]);
@@ -79,6 +84,7 @@ if (app.Environment.IsDevelopment())
 app.MapBuildEndpoints();
 app.MapCatalogEndpoints();
 app.MapCompatibilityEndpoints();
+app.MapSpatialEndpoints();
 
 app.MapDefaultEndpoints();
 

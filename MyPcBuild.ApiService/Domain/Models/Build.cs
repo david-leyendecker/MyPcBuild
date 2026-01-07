@@ -1,5 +1,6 @@
 using Marten;
 using MyPcBuild.ApiService.Domain.Events;
+using MyPcBuild.ApiService.Domain.Models.Spatial;
 
 namespace MyPcBuild.ApiService.Domain.Models;
 
@@ -20,7 +21,17 @@ public class Build
 
     public void Apply(PartAdded @event)
     {
-        Parts.Add(new BuildPart(@event.ProductId, @event.PricePaid));
+        Parts.Add(new BuildPart(@event.ProductId, @event.PricePaid, null, null));
+    }
+
+    public void Apply(PartAddedToSlot @event)
+    {
+        Parts.Add(new BuildPart(
+            @event.ProductId,
+            @event.PricePaid,
+            @event.SlotId,
+            @event.Position
+        ));
     }
 
     public void Apply(PartRemoved @event)
@@ -34,4 +45,9 @@ public class Build
     }
 }
 
-public record BuildPart(Guid ProductId, decimal PricePaid);
+public record BuildPart(
+    Guid ProductId,
+    decimal PricePaid,
+    Guid? SlotId = null,
+    Vector3? Position = null
+);

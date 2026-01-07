@@ -9,16 +9,16 @@ public static class GetProducts
     {
         app.MapGet("/api/catalog/products", async (
             IDocumentSession session,
-            ProductCategory? category = null,
+            string? category = null,
             string? search = null,
             int page = 1,
             int pageSize = 20) =>
         {
             IQueryable<Product> query = session.Query<Product>();
 
-            if (category.HasValue)
+            if (!string.IsNullOrWhiteSpace(category))
             {
-                query = query.Where(p => p.Category == category.Value);
+                query = query.Where(p => p.CategoryName == category);
             }
 
             if (!string.IsNullOrWhiteSpace(search))
@@ -28,7 +28,7 @@ public static class GetProducts
 
             int totalCount = await query.CountAsync();
             IReadOnlyList<Product> productResults = await query
-                .OrderBy(p => p.Category)
+                .OrderBy(p => p.CategoryName)
                 .ThenBy(p => p.Name)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
@@ -38,7 +38,7 @@ public static class GetProducts
                 productResults.Select(p => new ProductSummary(
                     p.Id,
                     p.Name,
-                    p.Category,
+                    p.CategoryName,
                     p.Price,
                     p.Manufacturer
                 )).ToList(),
@@ -63,14 +63,14 @@ public record GetProductsResponse(
     int TotalCount,
     int CurrentPage,
     int PageSize,
-    ProductCategory? FilteredCategory,
+    string? FilteredCategory,
     string? SearchTerm
 );
 
 public record ProductSummary(
     Guid Id,
     string Name,
-    ProductCategory Category,
+    string CategoryName,
     decimal Price,
     string Manufacturer
 );

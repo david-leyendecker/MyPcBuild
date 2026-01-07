@@ -29,7 +29,7 @@ public static class GetBuild
                     productDetails.Add(new ProductDetails(
                         product.Id,
                         product.Name,
-                        product.Category,
+                        product.CategoryName,
                         product.Manufacturer,
                         part.PricePaid
                     ));
@@ -89,7 +89,7 @@ public record GetBuildResponse(
 public record ProductDetails(
     Guid Id,
     string Name,
-    ProductCategory Category,
+    string CategoryName,
     string Manufacturer,
     decimal PricePaid
 );

@@ -1,0 +1,21 @@
+namespace MyPcBuild.ApiService.Domain.Models.Spatial;
+
+/// <summary>
+/// Represents 3D dimensions (Length, Width, Height) in millimeters.
+/// </summary>
+public record Dimensions(
+    decimal Length,
+    decimal Width,
+    decimal Height
+)
+{
+    public static Dimensions Zero { get; } = new(0, 0, 0);
+    
+    /// <summary>
+    /// Checks if these dimensions fit within the given container dimensions.
+    /// </summary>
+    public bool FitsWithin(Dimensions container) =>
+        Length <= container.Length &&
+        Width <= container.Width &&
+        Height <= container.Height;
+}

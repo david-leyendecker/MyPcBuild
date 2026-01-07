@@ -46,7 +46,7 @@ public static class ValidateCompatibility
                     i.Severity.ToString(),
                     i.Category
                 )).ToList(),
-                products.Select(p => new ProductInfo(p.Id, p.Name, p.Category.ToString())).ToList()
+                products.Select(p => new ProductInfo(p.Id, p.Name, p.CategoryName)).ToList()
             );
 
             return Results.Ok(response);
