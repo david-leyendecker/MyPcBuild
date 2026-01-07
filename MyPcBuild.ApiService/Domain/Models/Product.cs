@@ -72,7 +72,7 @@ public record MotherboardProduct(
     // Motherboard-specific properties
     CpuSocket Socket,
     string Chipset,
-    string FormFactor,
+    FormFactor FormFactor,
     MemoryType MemoryType,
     StorageCapacity MaxMemory
 ) : Product(Id, Name, Price, Manufacturer), ISlottedProduct
@@ -96,7 +96,7 @@ public record GpuProduct(
     Frequency BoostClock,
     Power TDP,
     Length Length,
-    string PowerConnectors,
+    GpuPowerConnector PowerConnectors,
     bool RayTracing
 ) : Product(Id, Name, Price, Manufacturer), ISlottedProduct
 {
@@ -130,10 +130,7 @@ public record PcCaseProduct(
     // PC Case-specific properties
     string FormFactor,
     string Color,
-    string SidePanelWindow,
-    Length MaxGPULength,
-    Length MaxCPUCoolerHeight,
-    Length MaxPSULength
+    string SidePanelWindow
 ) : Product(Id, Name, Price, Manufacturer), IChamberedProduct
 {
     public override string CategoryName => "PCCase";
@@ -180,7 +177,7 @@ public record CoolerProduct(
     string Manufacturer,
     Dimensions Dimensions,
     // Cooler-specific properties
-    string CoolerType,
+    CoolerType CoolerType,
     Length Height,
     Power TDP,
     CpuSocket[] Sockets

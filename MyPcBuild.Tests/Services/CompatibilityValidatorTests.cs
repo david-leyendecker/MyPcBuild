@@ -150,7 +150,7 @@ public class CompatibilityValidatorTests
         List<Product> products =
         [
             CreateGpu("RTX 4070", 285, 285),
-            CreateCase("Lian Li O11", "ATX", maxGpuLength: 420)
+            CreateCase("Lian Li O11", "ATX")
         ];
 
         // Act
@@ -161,44 +161,9 @@ public class CompatibilityValidatorTests
         Assert.False(result.HasErrors);
     }
 
-    [Fact]
-    public async Task ValidateBuild_GpuTooLongForCase_ReturnsError()
-    {
-        // Arrange
-        List<Product> products =
-        [
-            CreateGpu("RTX 4090", 304, 450),
-            CreateCase("Small Case", "MicroATX", maxGpuLength: 280)
-        ];
 
-        // Act
-        CompatibilityResult result = await _validator.ValidateBuild(products);
 
-        // Assert
-        Assert.False(result.IsCompatible);
-        Assert.True(result.HasErrors);
-        Assert.Contains(result.Issues, i => i.Category == "GPU/Case" && i.Severity == IssueSeverity.Error);
-    }
 
-    [Fact]
-    public async Task ValidateBuild_GpuCloseToLimit_ReturnsWarning()
-    {
-        // Arrange
-        List<Product> products =
-        [
-            CreateGpu("RTX 4090", 304, 450),
-            CreateCase("Fractal Meshify", "ATX", maxGpuLength: 315) // Only 11mm clearance
-        ];
-
-        // Act
-        CompatibilityResult result = await _validator.ValidateBuild(products);
-
-        // Assert
-        Assert.True(result.IsCompatible);
-        Assert.False(result.HasErrors);
-        Assert.True(result.HasWarnings);
-        Assert.Contains(result.Issues, i => i.Category == "GPU/Case" && i.Severity == IssueSeverity.Warning && i.Message.Contains("tight fit"));
-    }
 
     #endregion
 
@@ -211,7 +176,7 @@ public class CompatibilityValidatorTests
         List<Product> products =
         [
             CreateMotherboard("ATX Board", "AM5", "DDR5", "ATX"),
-            CreateCase("ATX Case", "ATX", maxGpuLength: 350)
+            CreateCase("ATX Case", "ATX")
         ];
 
         // Act
@@ -229,7 +194,7 @@ public class CompatibilityValidatorTests
         List<Product> products =
         [
             CreateMotherboard("ATX Board", "AM5", "DDR5", "ATX"),
-            CreateCase("MicroATX Case", "MicroATX", maxGpuLength: 350)
+            CreateCase("MicroATX Case", "MicroATX")
         ];
 
         // Act
@@ -248,7 +213,7 @@ public class CompatibilityValidatorTests
         List<Product> products =
         [
             CreateMotherboard("MicroATX Board", "AM5", "DDR5", "MicroATX"),
-            CreateCase("ATX Case", "ATX", maxGpuLength: 350)
+            CreateCase("ATX Case", "ATX")
         ];
 
         // Act
@@ -383,24 +348,7 @@ public class CompatibilityValidatorTests
         Assert.Contains(result.Issues, i => i.Category == "Cooler/CPU" && i.Message.Contains("95") && i.Message.Contains("170"));
     }
 
-    [Fact]
-    public async Task ValidateBuild_CoolerTooTallForCase_ReturnsError()
-    {
-        // Arrange
-        List<Product> products =
-        [
-            CreateCooler("Tall Cooler", "Air", 170, tdp: 250, sockets: ["AM5"]),
-            CreateCase("Compact Case", "ATX", maxGpuLength: 350, maxCoolerHeight: 160)
-        ];
 
-        // Act
-        CompatibilityResult result = await _validator.ValidateBuild(products);
-
-        // Assert
-        Assert.False(result.IsCompatible);
-        Assert.True(result.HasErrors);
-        Assert.Contains(result.Issues, i => i.Category == "Cooler/Case" && i.Message.Contains("170") && i.Message.Contains("160"));
-    }
 
     #endregion
 
@@ -416,7 +364,7 @@ public class CompatibilityValidatorTests
             CreateMotherboard("AMD Board", "AM5", "DDR5", "ATX"),
             CreateRam("DDR4 RAM", "DDR4", 32, "2x16GB"),
             CreateGpu("RTX 4090", 304, tdp: 450),
-            CreateCase("Tiny Case", "MicroATX", maxGpuLength: 250),
+            CreateCase("Tiny Case", "MicroATX"),
             CreatePsu("Weak PSU", 500)
         ];
 
@@ -426,10 +374,10 @@ public class CompatibilityValidatorTests
         // Assert
         Assert.False(result.IsCompatible);
         Assert.True(result.HasErrors);
-        Assert.True(result.Issues.Count >= 4); // Socket, DDR, GPU, PSU, Case issues
+        Assert.True(result.Issues.Count >= 4); // Socket, DDR, Case, PSU issues
         Assert.Contains(result.Issues, i => i.Category == "CPU/Motherboard");
         Assert.Contains(result.Issues, i => i.Category == "RAM/Motherboard");
-        Assert.Contains(result.Issues, i => i.Category == "GPU/Case");
+        Assert.Contains(result.Issues, i => i.Category == "Case/Motherboard");
         Assert.Contains(result.Issues, i => i.Category == "PSU");
     }
 
@@ -443,7 +391,7 @@ public class CompatibilityValidatorTests
             CreateMotherboard("MSI B650", "AM5", "DDR5", "ATX", maxMemory: 128, memorySlots: 4),
             CreateRam("G.Skill DDR5", "DDR5", 32, "2x16GB"),
             CreateGpu("RX 7900 XTX", 287, tdp: 355),
-            CreateCase("Lian Li O11", "ATX", maxGpuLength: 420, maxCoolerHeight: 175),
+            CreateCase("Lian Li O11", "ATX"),
             CreatePsu("Corsair RM1000x", 1000),
             CreateCooler("Noctua NH-D15", "Air", 165, tdp: 250, sockets: ["AM5", "AM4"])
         ];
@@ -484,6 +432,7 @@ public class CompatibilityValidatorTests
     {
         CpuSocket socketEnum = CpuSocketExtensions.Parse(socket);
         MemoryType memoryTypeEnum = Enum.Parse<MemoryType>(memoryType, ignoreCase: true);
+        FormFactor formFactorEnum = Enum.Parse<FormFactor>(formFactor, ignoreCase: true);
         
         // Create RAM slots based on memorySlots parameter
         List<Slot> slots = [];
@@ -508,7 +457,7 @@ public class CompatibilityValidatorTests
             slots,
             socketEnum,
             "X670E",
-            formFactor,
+            formFactorEnum,
             memoryTypeEnum,
             StorageCapacity.FromGB(maxMemory)
         );
@@ -548,12 +497,12 @@ public class CompatibilityValidatorTests
             Frequency.FromMHz(2610),
             Power.FromWatts(tdp > 0 ? tdp : 300),
             Length.FromMm(length),
-            "2x 8-pin",
+            GpuPowerConnector.Dual8Pin,
             true
         );
     }
 
-    private PcCaseProduct CreateCase(string name, string formFactor, int maxGpuLength, int maxCoolerHeight = 175, int maxPsuLength = 200)
+    private PcCaseProduct CreateCase(string name, string formFactor)
     {
         return new PcCaseProduct(
             Guid.NewGuid(),
@@ -564,10 +513,7 @@ public class CompatibilityValidatorTests
             [], // No chambers for compatibility tests
             formFactor,
             "Black",
-            "Tempered Glass",
-            Length.FromMm(maxGpuLength),
-            Length.FromMm(maxCoolerHeight),
-            Length.FromMm(maxPsuLength)
+            "Tempered Glass"
         );
     }
 
@@ -590,13 +536,14 @@ public class CompatibilityValidatorTests
     private CoolerProduct CreateCooler(string name, string type, int height, int tdp, string[] sockets)
     {
         CpuSocket[] socketEnums = sockets.Select(s => CpuSocketExtensions.Parse(s)).ToArray();
+        CoolerType coolerType = Enum.Parse<CoolerType>(type, ignoreCase: true);
         return new CoolerProduct(
             Guid.NewGuid(),
             name,
             109.99m,
             "Noctua",
             new Dimensions(140, 150, height), // Typical cooler dimensions
-            type,
+            coolerType,
             Length.FromMm(height),
             Power.FromWatts(tdp),
             socketEnums

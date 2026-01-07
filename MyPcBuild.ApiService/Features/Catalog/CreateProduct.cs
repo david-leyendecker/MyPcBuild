@@ -65,7 +65,7 @@ public static class CreateProduct
             ParseSlots(request.Fields.GetValueOrDefault("Slots", "[]")),
             ParseEnum<CpuSocket>(request.Fields.GetValueOrDefault("Socket", "AM5")),
             request.Fields.GetValueOrDefault("Chipset", "X670"),
-            request.Fields.GetValueOrDefault("FormFactor", "ATX"),
+            ParseEnum<FormFactor>(request.Fields.GetValueOrDefault("FormFactor", "ATX")),
             ParseEnum<MemoryType>(request.Fields.GetValueOrDefault("MemoryType", "DDR5")),
             StorageCapacity.FromGB(int.Parse(request.Fields.GetValueOrDefault("MaxMemory", "128")))
         );
@@ -88,7 +88,7 @@ public static class CreateProduct
             Frequency.FromMHz(int.Parse(request.Fields.GetValueOrDefault("BoostClock", "2535"))),
             Power.FromWatts(int.Parse(request.Fields.GetValueOrDefault("TDP", "320"))),
             Length.FromMm(int.Parse(request.Fields.GetValueOrDefault("Length", "304"))),
-            request.Fields.GetValueOrDefault("PowerConnectors", "1x16-pin"),
+            ParseGpuPowerConnector(request.Fields.GetValueOrDefault("PowerConnectors", "1x16-pin")),
             bool.Parse(request.Fields.GetValueOrDefault("RayTracing", "true"))
         );
     }
@@ -120,10 +120,7 @@ public static class CreateProduct
             ParseChambers(request.Fields.GetValueOrDefault("Chambers", "[]")),
             request.Fields.GetValueOrDefault("FormFactor", "ATX"),
             request.Fields.GetValueOrDefault("Color", "Black"),
-            request.Fields.GetValueOrDefault("SidePanelWindow", "Tempered Glass"),
-            Length.FromMm(int.Parse(request.Fields.GetValueOrDefault("MaxGPULength", "380"))),
-            Length.FromMm(int.Parse(request.Fields.GetValueOrDefault("MaxCPUCoolerHeight", "170"))),
-            Length.FromMm(int.Parse(request.Fields.GetValueOrDefault("MaxPSULength", "220")))
+            request.Fields.GetValueOrDefault("SidePanelWindow", "Tempered Glass")
         );
     }
 
@@ -171,7 +168,7 @@ public static class CreateProduct
             request.Price,
             request.Manufacturer,
             ParseDimensions(request.Fields.GetValueOrDefault("Dimensions", "140,140,160")),
-            request.Fields.GetValueOrDefault("CoolerType", "Air"),
+            Enum.Parse<CoolerType>(request.Fields.GetValueOrDefault("CoolerType", "Air")),
             Length.FromMm(int.Parse(request.Fields.GetValueOrDefault("Height", "160"))),
             Power.FromWatts(int.Parse(request.Fields.GetValueOrDefault("TDP", "220"))),
             sockets
@@ -258,6 +255,19 @@ public static class CreateProduct
             return result;
         }
         throw new ArgumentException($"Invalid enum value: {value} for type {typeof(T).Name}");
+    }
+
+    private static GpuPowerConnector ParseGpuPowerConnector(string value)
+    {
+        string normalized = value.Replace(" ", string.Empty).Replace("-", string.Empty).ToLowerInvariant();
+
+        return normalized switch
+        {
+            "1x16pin" or "16pin" => GpuPowerConnector.One16Pin,
+            "2x8pin" or "dual8pin" => GpuPowerConnector.Dual8Pin,
+            "3x8pin" or "triple8pin" => GpuPowerConnector.Triple8Pin,
+            _ => throw new ArgumentException($"Invalid GPU power connector: {value}")
+        };
     }
 }
 

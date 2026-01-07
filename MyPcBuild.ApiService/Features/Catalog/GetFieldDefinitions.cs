@@ -1,3 +1,5 @@
+using MyPcBuild.ApiService.Domain.Models;
+
 namespace MyPcBuild.ApiService.Features.Catalog;
 
 public static class GetFieldDefinitions
@@ -27,17 +29,42 @@ public static class GetFieldDefinitions
         return app;
     }
 
+    // Helper methods to create FieldDefinitions for each type
+    private static FieldDefinition TextField(string name, bool required = false)
+        => new(name, FieldDefinitionType.Text, required, null, null);
+
+    private static FieldDefinition NumberField(string name, string? unit = null, bool required = false)
+        => new(name, FieldDefinitionType.Number, required, unit, null);
+
+    private static FieldDefinition BooleanField(string name, bool required = false)
+        => new(name, FieldDefinitionType.Boolean, required, null, null);
+
+    private static FieldDefinition SelectField(string name, List<string> options, bool required = false)
+        => new(name, FieldDefinitionType.Select, required, null, options);
+
+    private static FieldDefinition MultiSelectField(string name, List<string> options, bool required = false)
+        => new(name, FieldDefinitionType.MultiSelect, required, null, options);
+
+    private static FieldDefinition DimensionsField(string name, string unit, bool required = false)
+        => new(name, FieldDefinitionType.Dimensions, required, unit, null);
+
+    private static FieldDefinition SlotsField(string name, bool required = false)
+        => new(name, FieldDefinitionType.Slots, required, null, null);
+
+    private static FieldDefinition ChambersField(string name, bool required = false)
+        => new(name, FieldDefinitionType.Chambers, required, null, null);
+
     private static List<FieldDefinition> GetCpuFields()
     {
         return
         [
-            new FieldDefinition("Socket", "select", true, null, ["AM5", "AM4", "LGA1700", "LGA1200", "LGA1151"]),
-            new FieldDefinition("Cores", "number", true, null, null),
-            new FieldDefinition("Threads", "number", true, null, null),
-            new FieldDefinition("BaseClock", "number", true, "GHz", null),
-            new FieldDefinition("BoostClock", "number", true, "GHz", null),
-            new FieldDefinition("TDP", "number", true, "W", null),
-            new FieldDefinition("IntegratedGraphics", "boolean", false, null, null)
+            SelectField(nameof(CpuProduct.Socket), ["AM5", "AM4", "LGA1700", "LGA1200", "LGA1151"], required: true),
+            NumberField(nameof(CpuProduct.Cores), required: true),
+            NumberField(nameof(CpuProduct.Threads), required: true),
+            NumberField(nameof(CpuProduct.BaseClock), Frequency.Unit, required: true),
+            NumberField(nameof(CpuProduct.BoostClock), Frequency.Unit, required: true),
+            NumberField(nameof(CpuProduct.TDP), Power.Unit, required: true),
+            BooleanField(nameof(CpuProduct.IntegratedGraphics))
         ];
     }
 
@@ -45,13 +72,13 @@ public static class GetFieldDefinitions
     {
         return
         [
-            new FieldDefinition("Socket", "select", true, null, ["AM5", "AM4", "LGA1700", "LGA1200", "LGA1151"]),
-            new FieldDefinition("Chipset", "text", true, null, null),
-            new FieldDefinition("FormFactor", "select", true, null, ["ATX", "Micro-ATX", "Mini-ITX", "E-ATX"]),
-            new FieldDefinition("MemoryType", "select", true, null, ["DDR5", "DDR4", "DDR3"]),
-            new FieldDefinition("MaxMemory", "number", true, "GB", null),
-            new FieldDefinition("Dimensions", "dimensions", true, "mm", null),
-            new FieldDefinition("Slots", "slots", false, null, null)
+            SelectField(nameof(MotherboardProduct.Socket), ["AM5", "AM4", "LGA1700", "LGA1200", "LGA1151"], required: true),
+            TextField(nameof(MotherboardProduct.Chipset), required: true),
+            SelectField(nameof(MotherboardProduct.FormFactor), ["ATX", "MicroATX", "MiniITX", "EATX"], required: true),
+            SelectField(nameof(MotherboardProduct.MemoryType), ["DDR5", "DDR4", "DDR3"], required: true),
+            NumberField(nameof(MotherboardProduct.MaxMemory), StorageCapacity.Unit, required: true),
+            DimensionsField(nameof(MotherboardProduct.Dimensions), Length.Unit, required: true),
+            SlotsField(nameof(MotherboardProduct.Slots))
         ];
     }
 
@@ -59,18 +86,17 @@ public static class GetFieldDefinitions
     {
         return
         [
-            new FieldDefinition("ChipsetManufacturer", "select", true, null, ["NVIDIA", "AMD", "Intel"]),
-            new FieldDefinition("Series", "text", true, null, null),
-            new FieldDefinition("VRAM", "number", true, "GB", null),
-            new FieldDefinition("MemoryType", "select", true, null, ["GDDR6X", "GDDR6", "GDDR5"]),
-            new FieldDefinition("CoreClock", "number", true, "MHz", null),
-            new FieldDefinition("BoostClock", "number", true, "MHz", null),
-            new FieldDefinition("TDP", "number", true, "W", null),
-            new FieldDefinition("Length", "number", true, "mm", null),
-            new FieldDefinition("PowerConnectors", "text", true, null, null),
-            new FieldDefinition("RayTracing", "boolean", false, null, null),
-            new FieldDefinition("Dimensions", "dimensions", true, "mm", null),
-            new FieldDefinition("Slots", "slots", false, null, null)
+            SelectField(nameof(GpuProduct.ChipsetManufacturer), ["NVIDIA", "AMD", "Intel"], required: true),
+            TextField(nameof(GpuProduct.Series), required: true),
+            NumberField(nameof(GpuProduct.VRAM), StorageCapacity.Unit, required: true),
+            SelectField(nameof(GpuProduct.MemoryType), ["GDDR6X", "GDDR6", "GDDR5"], required: true),
+            NumberField(nameof(GpuProduct.CoreClock), Frequency.Unit, required: true),
+            NumberField(nameof(GpuProduct.BoostClock), Frequency.Unit, required: true),
+            NumberField(nameof(GpuProduct.TDP), Power.Unit, required: true),
+                SelectField(nameof(GpuProduct.PowerConnectors), ["1x16-pin", "2x8-pin", "3x8-pin"], required: true),
+            BooleanField(nameof(GpuProduct.RayTracing)),
+            DimensionsField(nameof(GpuProduct.Dimensions), Length.Unit, required: true),
+            SlotsField(nameof(GpuProduct.Slots))
         ];
     }
 
@@ -78,12 +104,12 @@ public static class GetFieldDefinitions
     {
         return
         [
-            new FieldDefinition("Type", "select", true, null, ["DDR5", "DDR4", "DDR3"]),
-            new FieldDefinition("Capacity", "number", true, "GB", null),
-            new FieldDefinition("Configuration", "text", true, null, null),
-            new FieldDefinition("Speed", "number", true, "MHz", null),
-            new FieldDefinition("CASLatency", "text", true, null, null),
-            new FieldDefinition("Voltage", "number", true, "V", null)
+            SelectField(nameof(RamProduct.Type), ["DDR5", "DDR4", "DDR3"], required: true),
+            NumberField(nameof(RamProduct.Capacity), StorageCapacity.Unit, required: true),
+            TextField(nameof(RamProduct.Configuration), required: true),
+            NumberField(nameof(RamProduct.Speed), Frequency.Unit, required: true),
+            TextField(nameof(RamProduct.CASLatency), required: true),
+            NumberField(nameof(RamProduct.Voltage), Voltage.Unit, required: true)
         ];
     }
 
@@ -91,14 +117,11 @@ public static class GetFieldDefinitions
     {
         return
         [
-            new FieldDefinition("FormFactor", "select", true, null, ["ATX", "Micro-ATX", "Mini-ITX", "E-ATX"]),
-            new FieldDefinition("Color", "text", false, null, null),
-            new FieldDefinition("SidePanelWindow", "select", false, null, ["None", "Acrylic", "Tempered Glass"]),
-            new FieldDefinition("MaxGPULength", "number", true, "mm", null),
-            new FieldDefinition("MaxCPUCoolerHeight", "number", true, "mm", null),
-            new FieldDefinition("MaxPSULength", "number", true, "mm", null),
-            new FieldDefinition("Dimensions", "dimensions", true, "mm", null),
-            new FieldDefinition("Chambers", "chambers", false, null, null)
+            SelectField(nameof(PcCaseProduct.FormFactor), ["ATX", "MicroATX", "MiniITX", "EATX"], required: true),
+            TextField(nameof(PcCaseProduct.Color)),
+            SelectField(nameof(PcCaseProduct.SidePanelWindow), ["None", "Acrylic", "Tempered Glass"]),
+            DimensionsField(nameof(PcCaseProduct.Dimensions), Length.Unit, required: true),
+            ChambersField(nameof(PcCaseProduct.Chambers))
         ];
     }
 
@@ -106,12 +129,12 @@ public static class GetFieldDefinitions
     {
         return
         [
-            new FieldDefinition("Wattage", "number", true, "W", null),
-            new FieldDefinition("Efficiency", "select", true, null, ["80+ Bronze", "80+ Silver", "80+ Gold", "80+ Platinum", "80+ Titanium"]),
-            new FieldDefinition("Modular", "select", true, null, ["Non-Modular", "Semi-Modular", "Fully Modular"]),
-            new FieldDefinition("FormFactor", "select", true, null, ["ATX", "SFX", "SFX-L"]),
-            new FieldDefinition("Length", "number", true, "mm", null),
-            new FieldDefinition("PCIe8Pin", "number", true, null, null)
+            NumberField(nameof(PsuProduct.Wattage), Power.Unit, required: true),
+            SelectField(nameof(PsuProduct.Efficiency), ["80+ Bronze", "80+ Silver", "80+ Gold", "80+ Platinum", "80+ Titanium"], required: true),
+            SelectField(nameof(PsuProduct.Modular), ["Non-Modular", "Semi-Modular", "Fully Modular"], required: true),
+            SelectField(nameof(PsuProduct.FormFactor), ["ATX", "SFX", "SFX-L"], required: true),
+            NumberField(nameof(PsuProduct.Length), Length.Unit, required: true),
+            NumberField(nameof(PsuProduct.PCIe8Pin), required: true)
         ];
     }
 
@@ -119,12 +142,12 @@ public static class GetFieldDefinitions
     {
         return
         [
-            new FieldDefinition("Type", "select", true, null, ["SSD", "HDD"]),
-            new FieldDefinition("Interface", "select", true, null, ["NVMe", "SATA", "M.2"]),
-            new FieldDefinition("StorageFormFactor", "text", true, null, null),
-            new FieldDefinition("Capacity", "number", true, "GB", null),
-            new FieldDefinition("ReadSpeed", "number", true, "MB/s", null),
-            new FieldDefinition("WriteSpeed", "number", true, "MB/s", null)
+            SelectField(nameof(StorageProduct.Type), ["SSD", "HDD"], required: true),
+            SelectField(nameof(StorageProduct.Interface), ["NVMe", "SATA", "M.2"], required: true),
+            TextField(nameof(StorageProduct.StorageFormFactor), required: true),
+            NumberField(nameof(StorageProduct.Capacity), StorageCapacity.Unit, required: true),
+            NumberField(nameof(StorageProduct.ReadSpeed), DataSpeed.Unit, required: true),
+            NumberField(nameof(StorageProduct.WriteSpeed), DataSpeed.Unit, required: true)
         ];
     }
 
@@ -132,11 +155,11 @@ public static class GetFieldDefinitions
     {
         return
         [
-            new FieldDefinition("CoolerType", "select", true, null, ["Air", "AIO", "Custom Loop"]),
-            new FieldDefinition("Height", "number", true, "mm", null),
-            new FieldDefinition("TDP", "number", true, "W", null),
-            new FieldDefinition("Sockets", "multi-select", true, null, ["AM5", "AM4", "LGA1700", "LGA1200", "LGA1151"]),
-            new FieldDefinition("Dimensions", "dimensions", true, "mm", null)
+            SelectField(nameof(CoolerProduct.CoolerType), ["Air", "AIO", "CustomLoop"], required: true),
+            NumberField(nameof(CoolerProduct.Height), Length.Unit, required: true),
+            NumberField(nameof(CoolerProduct.TDP), Power.Unit, required: true),
+            MultiSelectField(nameof(CoolerProduct.Sockets), ["AM5", "AM4", "LGA1700", "LGA1200", "LGA1151"], required: true),
+            DimensionsField(nameof(CoolerProduct.Dimensions), Length.Unit, required: true)
         ];
     }
 }
@@ -148,8 +171,20 @@ public record GetFieldDefinitionsResponse(
 
 public record FieldDefinition(
     string Name,
-    string Type,
+    FieldDefinitionType Type,
     bool Required,
     string? Unit,
     List<string>? Options
 );
+
+public enum FieldDefinitionType
+{
+    Text,
+    Number,
+    Boolean,
+    Select,
+    MultiSelect,
+    Dimensions,
+    Slots,
+    Chambers
+}

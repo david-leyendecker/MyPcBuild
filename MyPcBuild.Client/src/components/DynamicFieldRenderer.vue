@@ -113,7 +113,29 @@ const emit = defineEmits<{
   'update:modelValue': [value: Record<string, string>]
 }>();
 
-const localValues = ref<Record<string, any>>({ ...props.modelValue });
+const localValues = ref<Record<string, any>>(convertToLocalValues(props.modelValue, props.fieldDefinitions));
+
+function convertToLocalValues(values: Record<string, string>, fields: FieldDefinition[]): Record<string, any> {
+  const converted: Record<string, any> = {};
+  
+  fields.forEach((field) => {
+    const value = values[field.name];
+    
+    if (field.type === 'boolean') {
+      // Convert string to boolean
+      converted[field.name] = value === 'true' || value === 'True';
+    } else if (field.type === 'number') {
+      converted[field.name] = value ? Number(value) : null;
+    } else if (field.type === 'multi-select') {
+      // Convert comma-separated string to array
+      converted[field.name] = value ? value.split(',') : [];
+    } else {
+      converted[field.name] = value || '';
+    }
+  });
+  
+  return converted;
+}
 
 // Watch for changes in local values and emit updates
 watch(localValues, (newValues) => {
@@ -139,7 +161,7 @@ watch(localValues, (newValues) => {
 
 // Watch for external changes to modelValue
 watch(() => props.modelValue, (newValue) => {
-  localValues.value = { ...newValue };
+  localValues.value = convertToLocalValues(newValue, props.fieldDefinitions);
 }, { deep: true });
 
 function formatFieldName(name: string): string {
