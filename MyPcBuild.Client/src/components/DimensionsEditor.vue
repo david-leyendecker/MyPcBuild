@@ -54,17 +54,22 @@ const dimensions = ref({
   height: 0
 });
 
-// Parse initial value
-if (props.modelValue) {
-  const parts = props.modelValue.split(',');
-  if (parts.length === 3) {
-    dimensions.value = {
-      length: parseFloat(parts[0] ?? '0') || 0,
-      width: parseFloat(parts[1] ?? '0') || 0,
-      height: parseFloat(parts[2] ?? '0') || 0
-    };
+// Initialize from modelValue
+function parseDimensionsValue(value?: string) {
+  if (value) {
+    const parts = value.split(',');
+    if (parts.length === 3) {
+      return {
+        length: parseFloat(parts[0] ?? '0') || 0,
+        width: parseFloat(parts[1] ?? '0') || 0,
+        height: parseFloat(parts[2] ?? '0') || 0
+      };
+    }
   }
+  return { length: 0, width: 0, height: 0 };
 }
+
+dimensions.value = parseDimensionsValue(props.modelValue);
 
 // Watch for changes and emit in format: "length,width,height"
 watch(dimensions, (newDimensions) => {
@@ -74,16 +79,7 @@ watch(dimensions, (newDimensions) => {
 
 // Watch for external changes
 watch(() => props.modelValue, (newValue) => {
-  if (newValue) {
-    const parts = newValue.split(',');
-    if (parts.length === 3) {
-      dimensions.value = {
-        length: parseFloat(parts[0] ?? '0') || 0,
-        width: parseFloat(parts[1] ?? '0') || 0,
-        height: parseFloat(parts[2] ?? '0') || 0
-      };
-    }
-  }
+  dimensions.value = parseDimensionsValue(newValue);
 });
 </script>
 

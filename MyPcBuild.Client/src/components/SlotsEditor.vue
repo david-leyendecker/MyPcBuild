@@ -82,17 +82,22 @@ const emit = defineEmits<{
 const categories = ref(['CPU', 'GPU', 'RAM', 'Storage', 'Cooler', 'PSU']);
 const slots = ref<SlotData[]>([]);
 
-// Parse initial value (simplified - just stores empty array for now)
-if (props.modelValue) {
-  try {
-    const parsed = JSON.parse(props.modelValue);
-    if (Array.isArray(parsed)) {
-      slots.value = parsed;
+// Parse slot data from JSON string
+function parseSlotsValue(value?: string): SlotData[] {
+  if (value) {
+    try {
+      const parsed = JSON.parse(value);
+      if (Array.isArray(parsed)) {
+        return parsed;
+      }
+    } catch {
+      // Invalid JSON, return empty array
     }
-  } catch {
-    // Invalid JSON, keep empty
   }
+  return [];
 }
+
+slots.value = parseSlotsValue(props.modelValue);
 
 function addSlot() {
   slots.value.push({
@@ -112,16 +117,7 @@ watch(slots, (newSlots) => {
 
 // Watch for external changes
 watch(() => props.modelValue, (newValue) => {
-  if (newValue) {
-    try {
-      const parsed = JSON.parse(newValue);
-      if (Array.isArray(parsed)) {
-        slots.value = parsed;
-      }
-    } catch {
-      // Invalid JSON, keep current value
-    }
-  }
+  slots.value = parseSlotsValue(newValue);
 });
 </script>
 

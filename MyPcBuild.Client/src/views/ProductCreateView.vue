@@ -76,16 +76,7 @@
 
           <!-- Step 2: Category-Specific Fields -->
           <div v-else-if="currentStep === 2">
-            <div class="flex justify-content-between align-items-center mb-3">
-              <h3 class="mt-0 mb-0">{{ formData.category }} Details</h3>
-              <Button 
-                label="Back"
-                icon="pi pi-arrow-left"
-                @click="currentStep = 1"
-                severity="secondary"
-                size="small"
-              />
-            </div>
+            <h3 class="mt-0 mb-3">{{ formData.category }} Details</h3>
 
             <div v-if="isLoadingFields" class="flex justify-content-center py-4">
               <ProgressSpinner />

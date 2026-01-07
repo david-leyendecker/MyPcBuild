@@ -104,7 +104,7 @@ import Message from 'primevue/message';
 import ProgressSpinner from 'primevue/progressspinner';
 
 const catalogStore = useCatalogStore();
-const categories = ref(['CPU', 'Motherboard', 'GPU', 'RAM', 'Storage', 'PSU', 'Case', 'Cooler']);
+const categories = ref(['CPU', 'Motherboard', 'GPU', 'RAM', 'Storage', 'PSU', 'PCCase', 'Cooler']);
 
 onMounted(() => {
   catalogStore.searchProducts();

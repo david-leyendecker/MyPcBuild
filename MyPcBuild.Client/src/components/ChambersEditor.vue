@@ -101,17 +101,22 @@ const emit = defineEmits<{
 
 const chambers = ref<ChamberData[]>([]);
 
-// Parse initial value
-if (props.modelValue) {
-  try {
-    const parsed = JSON.parse(props.modelValue);
-    if (Array.isArray(parsed)) {
-      chambers.value = parsed;
+// Parse chamber data from JSON string
+function parseChambersValue(value?: string): ChamberData[] {
+  if (value) {
+    try {
+      const parsed = JSON.parse(value);
+      if (Array.isArray(parsed)) {
+        return parsed;
+      }
+    } catch {
+      // Invalid JSON, return empty array
     }
-  } catch {
-    // Invalid JSON, keep empty
   }
+  return [];
 }
+
+chambers.value = parseChambersValue(props.modelValue);
 
 function addChamber() {
   chambers.value.push({
@@ -133,16 +138,7 @@ watch(chambers, (newChambers) => {
 
 // Watch for external changes
 watch(() => props.modelValue, (newValue) => {
-  if (newValue) {
-    try {
-      const parsed = JSON.parse(newValue);
-      if (Array.isArray(parsed)) {
-        chambers.value = parsed;
-      }
-    } catch {
-      // Invalid JSON, keep current value
-    }
-  }
+  chambers.value = parseChambersValue(newValue);
 });
 </script>
 

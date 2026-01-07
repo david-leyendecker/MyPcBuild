@@ -1,6 +1,7 @@
 using Marten;
 using MyPcBuild.ApiService.Domain.Models;
 using MyPcBuild.ApiService.Domain.Models.Spatial;
+using System.Text.Json;
 
 namespace MyPcBuild.ApiService.Features.Catalog;
 
@@ -194,14 +195,60 @@ public static class CreateProduct
 
     private static List<Slot> ParseSlots(string json)
     {
-        // For now, return empty list. In real implementation, parse JSON
-        return [];
+        if (string.IsNullOrWhiteSpace(json) || json == "[]")
+        {
+            return [];
+        }
+
+        try
+        {
+            List<SlotData>? slotDataList = JsonSerializer.Deserialize<List<SlotData>>(json);
+            if (slotDataList == null)
+            {
+                return [];
+            }
+
+            return slotDataList.Select(sd => new Slot(
+                Guid.NewGuid(),
+                sd.Name ?? "Unnamed Slot",
+                sd.AllowedCategory ?? "Unknown",
+                Vector3.Zero, // Position would need to be specified in a more advanced editor
+                new Dimensions(100, 100, 50), // Default dimensions
+                null // No sub-slots for now
+            )).ToList();
+        }
+        catch
+        {
+            return [];
+        }
     }
 
     private static List<Chamber> ParseChambers(string json)
     {
-        // For now, return empty list. In real implementation, parse JSON
-        return [];
+        if (string.IsNullOrWhiteSpace(json) || json == "[]")
+        {
+            return [];
+        }
+
+        try
+        {
+            List<ChamberData>? chamberDataList = JsonSerializer.Deserialize<List<ChamberData>>(json);
+            if (chamberDataList == null)
+            {
+                return [];
+            }
+
+            return chamberDataList.Select(cd => new Chamber(
+                Guid.NewGuid(),
+                cd.Name ?? "Unnamed Chamber",
+                new Dimensions(cd.Length, cd.Width, cd.Height),
+                [] // Chambers would have their own slots in a more advanced implementation
+            )).ToList();
+        }
+        catch
+        {
+            return [];
+        }
     }
 
     private static T ParseEnum<T>(string value) where T : struct, Enum
@@ -223,3 +270,7 @@ public record CreateProductRequest(
 );
 
 public record CreateProductResponse(Guid Id);
+
+// Helper records for JSON deserialization
+internal record SlotData(string? Name, string? AllowedCategory);
+internal record ChamberData(string? Name, decimal Length, decimal Width, decimal Height);
