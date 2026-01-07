@@ -17,7 +17,7 @@ public record Slot(
 )
 {
     public List<Slot> SubSlots { get; init; } = SubSlots ?? [];
-    
+
     /// <summary>
     /// Gets the bounding box for this slot at the given position.
     /// </summary>
@@ -25,19 +25,19 @@ public record Slot(
     {
         return new BoundingBox(absolutePosition + RelativePosition, MaxDimensions);
     }
-    
+
     /// <summary>
     /// Flattens all sub-slots to global coordinates relative to the given base position.
     /// </summary>
-    public List<(Slot Slot, Vector3 GlobalPosition)> FlattenSlots(Vector3 basePosition)
+    public List<SlotPlacement> FlattenSlots(Vector3 basePosition)
     {
-        List<(Slot, Vector3)> result = [(this, basePosition + RelativePosition)];
-        
+        List<SlotPlacement> result = [new SlotPlacement(this, basePosition + RelativePosition)];
+
         foreach (Slot subSlot in SubSlots)
         {
             result.AddRange(subSlot.FlattenSlots(basePosition + RelativePosition));
         }
-        
+
         return result;
     }
 }

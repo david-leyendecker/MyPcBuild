@@ -10,10 +10,10 @@ public record Vector3(
 )
 {
     public static Vector3 Zero { get; } = new(0, 0, 0);
-    
+
     public static Vector3 operator +(Vector3 a, Vector3 b) =>
         new(a.X + b.X, a.Y + b.Y, a.Z + b.Z);
-    
+
     public static Vector3 operator -(Vector3 a, Vector3 b) =>
         new(a.X - b.X, a.Y - b.Y, a.Z - b.Z);
 }

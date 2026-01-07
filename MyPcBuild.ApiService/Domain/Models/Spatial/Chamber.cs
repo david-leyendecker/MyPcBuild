@@ -20,19 +20,19 @@ public record Chamber(
     {
         return new BoundingBox(Vector3.Zero, Dimensions);
     }
-    
+
     /// <summary>
     /// Gets all slots flattened to global coordinates.
     /// </summary>
-    public List<(Slot Slot, Vector3 GlobalPosition)> GetAllSlots()
+    public List<SlotPlacement> GetAllSlots()
     {
-        List<(Slot, Vector3)> result = [];
-        
+        List<SlotPlacement> result = [];
+
         foreach (Slot slot in Slots)
         {
             result.AddRange(slot.FlattenSlots(Vector3.Zero));
         }
-        
+
         return result;
     }
 }

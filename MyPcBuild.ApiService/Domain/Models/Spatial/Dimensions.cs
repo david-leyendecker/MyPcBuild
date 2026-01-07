@@ -10,12 +10,12 @@ public record Dimensions(
 )
 {
     public static Dimensions Zero { get; } = new(0, 0, 0);
-    
+
     /// <summary>
     /// Checks if these dimensions fit within the given container dimensions.
     /// </summary>
-    public bool FitsWithin(Dimensions container) =>
-        Length <= container.Length &&
-        Width <= container.Width &&
-        Height <= container.Height;
+    public bool FitsWithin(Dimensions container)
+    {
+        return Length <= container.Length && Width <= container.Width && Height <= container.Height;
+    }
 }
