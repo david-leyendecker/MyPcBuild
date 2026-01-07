@@ -1,7 +1,14 @@
 <template>
   <div class="fadein animation-duration-300">
     <div class="mb-4">
-      <h2 class="mt-0 mb-3 text-primary">Product Catalog</h2>
+      <div class="flex justify-content-between align-items-center mb-3">
+        <h2 class="mt-0 mb-0 text-primary">Product Catalog</h2>
+        <Button 
+          label="Create Product"
+          icon="pi pi-plus"
+          @click="$router.push('/catalog/create')"
+        />
+      </div>
       <div class="flex gap-2">
         <InputText 
           v-model="catalogStore.searchQuery"
