@@ -80,10 +80,11 @@ public class CompatibilityValidator : ICompatibilityValidator
 
         // Check number of RAM sticks vs slots
         int totalRamSticks = rams.Sum(r => ParseRamConfiguration(r));
-        if (totalRamSticks > motherboard.MemorySlots)
+        int availableMemorySlots = motherboard.Slots.Count(s => s.AllowedCategoryName == "RAM");
+        if (totalRamSticks > availableMemorySlots)
         {
             issues.Add(new CompatibilityIssue(
-                $"Total RAM sticks ({totalRamSticks}) exceeds available memory slots ({motherboard.MemorySlots})",
+                $"Total RAM sticks ({totalRamSticks}) exceeds available memory slots ({availableMemorySlots})",
                 IssueSeverity.Error,
                 "RAM/Motherboard"
             ));

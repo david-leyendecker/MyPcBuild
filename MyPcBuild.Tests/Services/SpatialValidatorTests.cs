@@ -316,10 +316,7 @@ public class SpatialValidatorTests
             "X670E",
             "ATX",
             "DDR5",
-            StorageCapacity.FromGB(128),
-            4,
-            3,
-            4
+            StorageCapacity.FromGB(128)
         );
     }
 
@@ -336,10 +333,7 @@ public class SpatialValidatorTests
             "X670E",
             "EATX",
             "DDR5",
-            StorageCapacity.FromGB(128),
-            4,
-            3,
-            4
+            StorageCapacity.FromGB(128)
         );
     }
 

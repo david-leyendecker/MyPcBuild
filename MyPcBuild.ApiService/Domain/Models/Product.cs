@@ -74,10 +74,7 @@ public record MotherboardProduct(
     string Chipset,
     string FormFactor,
     string MemoryType,
-    StorageCapacity MaxMemory,
-    int MemorySlots,
-    int PCIeSlots,
-    int M2Slots
+    StorageCapacity MaxMemory
 ) : Product(Id, Name, Price, Manufacturer), ISlottedProduct
 {
     public override string CategoryName => "Motherboard";
@@ -99,7 +96,6 @@ public record GpuProduct(
     Frequency BoostClock,
     Power TDP,
     Length Length,
-    int PCIeSlots,
     string PowerConnectors,
     bool RayTracing
 ) : Product(Id, Name, Price, Manufacturer), ISlottedProduct

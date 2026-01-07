@@ -481,21 +481,32 @@ public class CompatibilityValidatorTests
 
     private Product CreateMotherboard(string name, string socket, string memoryType, string formFactor, int maxMemory = 128, int memorySlots = 4)
     {
+        // Create RAM slots based on memorySlots parameter
+        List<Slot> slots = [];
+        for (int i = 0; i < memorySlots; i++)
+        {
+            slots.Add(new Slot(
+                Guid.NewGuid(),
+                $"RAM Slot {i + 1}",
+                "RAM",
+                new Vector3(i * 20, 0, 0),
+                new Dimensions(150, 40, 10),
+                null
+            ));
+        }
+        
         return new MotherboardProduct(
             Guid.NewGuid(),
             name,
             299.99m,
             "ASUS",
             new Dimensions(305, 244, 50), // Standard ATX dimensions
-            [], // No sub-slots for compatibility tests
+            slots,
             socket,
             "X670E",
             formFactor,
             memoryType,
-            StorageCapacity.FromGB(maxMemory),
-            memorySlots,
-            3,
-            4
+            StorageCapacity.FromGB(maxMemory)
         );
     }
 
@@ -532,7 +543,6 @@ public class CompatibilityValidatorTests
             Frequency.FromMHz(2610),
             Power.FromWatts(tdp > 0 ? tdp : 300),
             Length.FromMm(length),
-            2,
             "2x 8-pin",
             true
         );
