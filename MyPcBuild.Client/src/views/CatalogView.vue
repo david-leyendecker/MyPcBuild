@@ -1,107 +1,106 @@
 <template>
-  <div class="fadein animation-duration-300">
-    <div class="mb-4">
-      <div class="flex justify-content-between align-items-center mb-3">
-        <h2 class="mt-0 mb-0 text-primary">Product Catalog</h2>
-        <Button 
-          label="Create Product"
-          icon="pi pi-plus"
-          @click="$router.push('/catalog/create')"
-        />
-      </div>
-      <div class="flex gap-2">
-        <InputText 
+  <div class="fade-in">
+    <ViewHeader
+      :title="PRODUCT_CATALOG.title"
+      :action-button="{
+        text: 'Create Product',
+        icon: 'mdi-plus',
+        onClick: () => $router.push('/catalog/create')
+      }"
+    >
+      <div class="d-flex ga-2">
+        <v-text-field 
           v-model="catalogStore.searchQuery"
           placeholder="Search products..."
           @keyup.enter="handleSearch"
-          class="flex-grow-1"
-        />
-        <Button 
-          icon="pi pi-search"
+        ></v-text-field>
+        <v-btn 
+          icon="mdi-magnify"
+          color="primary"
           @click="handleSearch"
-        />
+        ></v-btn>
       </div>
-    </div>
+    </ViewHeader>
 
-    <div class="grid">
+    <v-row>
       <!-- Category Filter -->
-      <div class="col-12 md:col-3 lg:col-2">
-        <h3 class="mt-0 mb-3 text-sm font-medium">Categories</h3>
-        <div class="flex flex-column gap-2">
-          <Button 
+      <v-col cols="12" md="3" lg="2">
+        <h3 class="text-subtitle-1 font-weight-medium mb-3">Categories</h3>
+        <div class="d-flex flex-column ga-2">
+          <v-btn 
             v-for="category in categories"
             :key="category"
-            :label="category"
-            @click="handleCategorySelect(category)"
-            :outlined="catalogStore.selectedCategory !== category"
+            :variant="catalogStore.selectedCategory === category ? 'elevated' : 'outlined'"
             size="small"
-            class="justify-content-start"
-          />
+            class="justify-start"
+            @click="handleCategorySelect(category)"
+          >
+            {{ category }}
+          </v-btn>
         </div>
-      </div>
+      </v-col>
 
       <!-- Products Grid -->
-      <div class="col-12 md:col-9 lg:col-10">
-        <div v-if="catalogStore.isLoading" class="flex justify-content-center py-8">
-          <ProgressSpinner />
+      <v-col cols="12" md="9" lg="10">
+        <div v-if="catalogStore.isLoading" class="d-flex justify-center py-8">
+          <v-progress-circular indeterminate color="primary"></v-progress-circular>
         </div>
 
-        <div v-else-if="catalogStore.error" class="mb-3">
-          <Message severity="error" :text="catalogStore.error" />
-        </div>
+        <v-alert v-else-if="catalogStore.error" type="error" class="mb-3">
+          {{ catalogStore.error }}
+        </v-alert>
 
         <div v-else-if="catalogStore.products.length === 0" class="text-center py-8">
-          <p class="text-xl p-text-secondary">No products found. Try a different search.</p>
+          <p class="text-h6 text-medium-emphasis">No products found. Try a different search.</p>
         </div>
 
-        <div v-else class="grid">
-          <div 
+        <v-row v-else>
+          <v-col 
             v-for="product in catalogStore.products"
             :key="product.id"
-            class="col-12 sm:col-6 lg:col-4 xl:col-3"
+            cols="12" sm="6" lg="4" xl="3"
           >
-            <Card class="product-card h-full">
-              <template #content>
-                <h4 class="mt-0 mb-2">{{ product.name }}</h4>
-                <p class="my-1 text-primary text-sm">{{ product.category }}</p>
-                <p class="my-2 p-text-success font-semibold text-lg">${{ product.price.toFixed(2) }}</p>
+            <v-card class="product-card h-100">
+              <v-card-text>
+                <h4 class="text-h6 mb-2">{{ product.name }}</h4>
+                <p class="text-primary text-body-2 my-1">{{ product.category }}</p>
+                <p class="text-success font-weight-semibold text-h6 my-2">${{ product.price.toFixed(2) }}</p>
                 
-                <div class="pt-3 mt-3 border-top-1 surface-border">
-                  <div 
-                    v-for="(value, key) in product.specifications"
-                    :key="key"
-                    class="flex justify-content-between text-xs text-500 mb-1"
-                  >
-                    <span class="font-medium">{{ key }}:</span>
-                    <span>{{ value }}</span>
-                  </div>
+                <v-divider class="my-3"></v-divider>
+                
+                <div 
+                  v-for="(value, key) in product.specifications"
+                  :key="key"
+                  class="d-flex justify-space-between text-caption text-medium-emphasis mb-1"
+                >
+                  <span class="font-weight-medium">{{ key }}:</span>
+                  <span>{{ value }}</span>
                 </div>
-              </template>
-              <template #footer>
-                <Button 
-                  label="Add to Build"
-                  icon="pi pi-plus"
-                  @click="$emit('product-selected', product)"
-                  class="w-full"
+              </v-card-text>
+              <v-card-actions>
+                <v-btn 
+                  prepend-icon="mdi-plus"
+                  color="primary"
                   size="small"
-                />
-              </template>
-            </Card>
-          </div>
-        </div>
-      </div>
-    </div>
+                  block
+                  @click="$emit('product-selected', product)"
+                >
+                  Add to Build
+                </v-btn>
+              </v-card-actions>
+            </v-card>
+          </v-col>
+        </v-row>
+      </v-col>
+    </v-row>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { useCatalogStore } from '@/stores/catalogStore';
-import Button from 'primevue/button';
-import Card from 'primevue/card';
-import InputText from 'primevue/inputtext';
-import Message from 'primevue/message';
-import ProgressSpinner from 'primevue/progressspinner';
+import ViewHeader from '@/components/ViewHeader.vue';
+import { PRODUCT_CATALOG } from '@/config/navigation';
 
 const catalogStore = useCatalogStore();
 const categories = ref(['CPU', 'Motherboard', 'GPU', 'RAM', 'Storage', 'PSU', 'PCCase', 'Cooler']);
@@ -125,12 +124,21 @@ async function handleCategorySelect(category: string) {
 </script>
 
 <style scoped>
+.fade-in {
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
 .product-card {
   transition: all 0.3s ease;
 }
 
 .product-card:hover {
-  border-color: var(--primary-color);
+  border-color: rgb(var(--v-theme-primary));
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   transform: translateY(-2px);
 }

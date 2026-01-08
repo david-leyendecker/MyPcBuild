@@ -1,4 +1,5 @@
 using System;
+using System.Text.Json.Serialization;
 using Marten;
 using Marten.Events.Projections;
 using MyPcBuild.ApiService.Domain.Events;
@@ -77,6 +78,11 @@ builder.Services.AddMarten(opts =>
 }).UseLightweightSessions();
 
 builder.Services.AddHostedService<ProductSeeder>();
+
+builder.Services.ConfigureHttpJsonOptions(options =>
+{
+    options.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
+});
 
 WebApplication app = builder.Build();
 

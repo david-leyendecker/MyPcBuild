@@ -1,61 +1,64 @@
 <template>
-  <div class="flex flex-column gap-3">
-    <p class="text-sm p-text-secondary m-0 pb-2">Search and select a component to add to your build</p>
+  <div class="d-flex flex-column ga-3">
+    <p class="text-body-2 text-medium-emphasis">Search and select a component to add to your build</p>
 
-    <div class="flex flex-column gap-3">
-      <InputText 
+    <div class="d-flex flex-column ga-3">
+      <v-text-field 
         v-model="searchQuery"
         placeholder="Search components..."
         @keyup.enter="handleSearch"
-      />
-      <div class="flex flex-wrap gap-2">
-        <Button 
+      ></v-text-field>
+      <div class="d-flex flex-wrap ga-2">
+        <v-btn 
           v-for="category in categories"
           :key="category"
-          :label="category"
-          :outlined="selectedCategory !== category"
-          @click="selectCategory(category)"
+          :variant="selectedCategory === category ? 'elevated' : 'outlined'"
           size="small"
-        />
+          @click="selectCategory(category)"
+        >
+          {{ category }}
+        </v-btn>
       </div>
     </div>
 
-    <div v-if="isLoading" class="flex justify-content-center py-4">
-      <ProgressSpinner />
+    <div v-if="isLoading" class="d-flex justify-center py-4">
+      <v-progress-circular indeterminate color="primary"></v-progress-circular>
     </div>
 
     <div v-else-if="filteredProducts.length === 0" class="text-center py-4">
-      <p class="p-text-secondary m-0">No components found</p>
+      <p class="text-medium-emphasis">No components found</p>
     </div>
 
     <div 
       v-else 
-      class="border-1 surface-border border-round overflow-y-auto"
-      style="max-height: 400px;"
+      class="overflow-y-auto"
+      style="max-height: 400px; border: 1px solid rgba(var(--v-border-color), var(--v-border-opacity)); border-radius: 4px;"
     >
       <div 
         v-for="product in filteredProducts"
         :key="product.id"
-        class="p-3 border-bottom-1 surface-border cursor-pointer hover:surface-hover transition-colors transition-duration-200"
+        class="pa-3 product-item"
+        style="border-bottom: 1px solid rgba(var(--v-border-color), var(--v-border-opacity)); cursor: pointer;"
         @click="selectProduct(product.id)"
       >
-        <div class="flex justify-content-between align-items-center">
+        <div class="d-flex justify-space-between align-center">
           <div>
-            <h4 class="mt-0 mb-1 text-base">{{ product.name }}</h4>
-            <p class="my-0 p-text-success font-semibold text-sm">${{ product.price.toFixed(2) }}</p>
+            <h4 class="text-subtitle-1 mb-1">{{ product.name }}</h4>
+            <p class="text-success font-weight-semibold text-body-2">${{ product.price.toFixed(2) }}</p>
           </div>
-          <i class="pi pi-arrow-right text-500"></i>
+          <v-icon>mdi-arrow-right</v-icon>
         </div>
       </div>
     </div>
 
-    <div class="flex justify-content-end gap-2 pt-3 border-top-1 surface-border">
-      <Button 
-        label="Cancel"
-        icon="pi pi-times"
+    <div class="d-flex justify-end ga-2 pt-3" style="border-top: 1px solid rgba(var(--v-border-color), var(--v-border-opacity));">
+      <v-btn 
+        prepend-icon="mdi-close"
+        variant="text"
         @click="$emit('close')"
-        text
-      />
+      >
+        Cancel
+      </v-btn>
     </div>
   </div>
 </template>
@@ -63,9 +66,6 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
 import { useCatalogStore } from '@/stores/catalogStore';
-import Button from 'primevue/button';
-import InputText from 'primevue/inputtext';
-import ProgressSpinner from 'primevue/progressspinner';
 
 const emit = defineEmits<{
   'part-selected': [productId: string];
@@ -106,11 +106,11 @@ function selectProduct(productId: string) {
 </script>
 
 <style scoped>
-.hover\:surface-hover:hover {
-  background-color: var(--surface-hover);
+.product-item {
+  transition: background-color 0.2s ease;
 }
 
-.cursor-pointer {
-  cursor: pointer;
+.product-item:hover {
+  background-color: rgba(var(--v-theme-on-surface), 0.05);
 }
 </style>

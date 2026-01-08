@@ -1,96 +1,97 @@
 <template>
-  <div class="fadein animation-duration-300">
-    <div class="flex justify-content-between align-items-center mb-4">
-      <h2 class="m-0 text-primary">My PC Builds</h2>
-      <Button 
-        icon="pi pi-plus"
-        label="New Build"
-        @click="showNewBuildDialog = true"
-        rounded
-        severity="success"
-      />
+  <div class="fade-in">
+    <ViewHeader
+      :title="MY_BUILDS.title"
+      :action-button="{
+        text: 'New Build',
+        icon: 'mdi-plus',
+        onClick: () => showNewBuildDialog = true
+      }"
+    />
+
+    <div v-if="buildStore.isLoading" class="d-flex justify-center py-8">
+      <v-progress-circular indeterminate color="primary"></v-progress-circular>
     </div>
 
-    <div v-if="buildStore.isLoading" class="flex justify-content-center py-8">
-      <ProgressSpinner />
-    </div>
-
-    <div v-else-if="buildStore.error" class="mb-3">
-      <Message severity="error" :text="buildStore.error" />
-    </div>
+    <v-alert v-else-if="buildStore.error" type="error" class="mb-3">
+      {{ buildStore.error }}
+    </v-alert>
 
     <div v-else-if="buildStore.builds.length === 0" class="text-center py-8">
-      <p class="text-xl p-text-secondary">No builds yet. Create your first PC build!</p>
+      <p class="text-h6 text-medium-emphasis">No builds yet. Create your first PC build!</p>
     </div>
 
-    <div v-else class="grid">
-      <div 
+    <v-row v-else>
+      <v-col 
         v-for="build in buildStore.builds" 
         :key="build.id"
-        class="col-12 md:col-6 lg:col-4"
+        cols="12" md="6" lg="4"
       >
-        <Card class="build-card">
-          <template #content>
-            <router-link :to="`/builds/${build.id}`" class="build-link no-underline">
-              <h3 class="mt-0 mb-3 text-xl">{{ build.name }}</h3>
+        <v-card class="build-card">
+          <v-card-text>
+            <router-link :to="`/builds/${build.id}`" class="build-link text-decoration-none">
+              <h3 class="text-h5 mb-3">{{ build.name }}</h3>
             </router-link>
-            <div class="text-sm p-text-secondary">
+            <div class="text-body-2 text-medium-emphasis">
               <p class="my-2"><strong>Parts:</strong> {{ build.parts.length }}</p>
               <p class="my-2"><strong>Total Cost:</strong> ${{ build.parts.reduce((sum, p) => sum + p.pricePaid, 0).toFixed(2) }}</p>
             </div>
-          </template>
-          <template #footer>
-            <div class="flex gap-2">
-              <Button 
-                label="View Details"
-                icon="pi pi-arrow-right"
-                @click="$router.push(`/builds/${build.id}`)"
-                size="small"
-                class="flex-grow-1"
-              />
-              <Button 
-                icon="pi pi-trash"
-                @click="deleteBuild(build.id)"
-                size="small"
-                severity="danger"
-                text
-              />
-            </div>
-          </template>
-        </Card>
-      </div>
-    </div>
+          </v-card-text>
+          <v-card-actions>
+            <v-btn 
+              prepend-icon="mdi-arrow-right"
+              size="small"
+              class="flex-grow-1"
+              @click="$router.push(`/builds/${build.id}`)"
+            >
+              View Details
+            </v-btn>
+            <v-btn 
+              icon="mdi-delete"
+              size="small"
+              color="error"
+              variant="text"
+              @click="deleteBuild(build.id)"
+            ></v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-col>
+    </v-row>
 
     <!-- New Build Dialog -->
-    <Dialog 
-      v-model:visible="showNewBuildDialog"
-      header="Create New Build"
-      modal
-      @update:visible="onDialogClose"
+    <v-dialog 
+      v-model="showNewBuildDialog"
+      max-width="500"
     >
-      <div class="flex flex-column gap-3 py-3">
-        <label for="build-name" class="font-medium">Build Name</label>
-        <InputText 
-          id="build-name"
-          v-model="newBuildName"
-          placeholder="My Gaming PC"
-        />
-      </div>
-      <template #footer>
-        <Button 
-          label="Cancel"
-          icon="pi pi-times"
-          @click="showNewBuildDialog = false"
-          text
-        />
-        <Button 
-          label="Create"
-          icon="pi pi-check"
-          @click="handleCreateBuild"
-          :loading="buildStore.isLoading"
-        />
-      </template>
-    </Dialog>
+      <v-card>
+        <v-card-title>Create New Build</v-card-title>
+        <v-card-text>
+          <v-text-field 
+            v-model="newBuildName"
+            label="Build Name"
+            placeholder="My Gaming PC"
+          ></v-text-field>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn 
+            prepend-icon="mdi-close"
+            variant="text"
+            @click="showNewBuildDialog = false"
+          >
+            Cancel
+          </v-btn>
+          <v-btn 
+            prepend-icon="mdi-check"
+            color="primary"
+            :loading="buildStore.isLoading"
+            @click="handleCreateBuild"
+          >
+            Create
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
@@ -98,12 +99,8 @@
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useBuildStore } from '@/stores/buildStore';
-import Button from 'primevue/button';
-import Card from 'primevue/card';
-import Dialog from 'primevue/dialog';
-import InputText from 'primevue/inputtext';
-import Message from 'primevue/message';
-import ProgressSpinner from 'primevue/progressspinner';
+import ViewHeader from '@/components/ViewHeader.vue';
+import { MY_BUILDS } from '@/config/navigation';
 
 const router = useRouter();
 const buildStore = useBuildStore();
@@ -114,12 +111,6 @@ const newBuildName = ref('');
 onMounted(() => {
   buildStore.loadBuilds();
 });
-
-function onDialogClose() {
-  if (!showNewBuildDialog.value) {
-    newBuildName.value = '';
-  }
-}
 
 async function handleCreateBuild() {
   if (!newBuildName.value.trim()) {
@@ -143,22 +134,31 @@ async function deleteBuild(id: string) {
 </script>
 
 <style scoped>
+.fade-in {
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
 .build-card {
   transition: all 0.3s ease;
 }
 
 .build-card:hover {
-  border-color: var(--primary-color);
+  border-color: rgb(var(--v-theme-primary));
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   transform: translateY(-2px);
 }
 
 .build-link {
-  color: var(--primary-color);
+  color: rgb(var(--v-theme-primary));
   transition: color 0.3s ease;
 }
 
 .build-link:hover {
-  color: var(--primary-400);
+  opacity: 0.8;
 }
 </style>

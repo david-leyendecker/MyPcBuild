@@ -1,92 +1,78 @@
 <template>
-  <div class="flex flex-column gap-3">
+  <div class="d-flex flex-column ga-3">
     <div 
       v-for="field in fieldDefinitions"
       :key="field.name"
-      class="field"
     >
-      <label :for="field.name" class="font-semibold">
+      <label class="text-subtitle-2 font-weight-semibold mb-2 d-block">
         {{ formatFieldName(field.name) }}
-        <span v-if="field.required" class="text-red-500">*</span>
-        <span v-if="field.unit" class="text-500 font-normal">({{ field.unit }})</span>
+        <span v-if="field.required" class="text-error">*</span>
+        <span v-if="field.unit" class="text-medium-emphasis font-weight-regular">({{ field.unit }})</span>
       </label>
 
       <!-- Text input -->
-      <InputText 
-        v-if="field.type === 'text'"
-        :id="field.name"
+      <v-text-field 
+        v-if="field.type?.toLowerCase() === 'text'"
         v-model="localValues[field.name]"
         :placeholder="`Enter ${formatFieldName(field.name).toLowerCase()}`"
-        class="w-full"
-      />
+      ></v-text-field>
 
       <!-- Number input -->
-      <InputNumber 
-        v-else-if="field.type === 'number'"
-        :id="field.name"
-        v-model="localValues[field.name]"
+      <v-text-field 
+        v-else-if="field.type?.toLowerCase() === 'number'"
+        v-model.number="localValues[field.name]"
+        type="number"
         :placeholder="`Enter ${formatFieldName(field.name).toLowerCase()}`"
-        class="w-full"
-        :min="0"
-      />
+      ></v-text-field>
 
       <!-- Boolean checkbox -->
-      <Checkbox 
-        v-else-if="field.type === 'boolean'"
-        :id="field.name"
+      <v-checkbox 
+        v-else-if="field.type?.toLowerCase() === 'boolean'"
         v-model="localValues[field.name]"
-        :binary="true"
-      />
+      ></v-checkbox>
 
       <!-- Select dropdown -->
-      <Select 
-        v-else-if="field.type === 'select' && field.options"
-        :id="field.name"
+      <v-select 
+        v-else-if="field.type?.toLowerCase() === 'select' && field.options"
         v-model="localValues[field.name]"
-        :options="field.options"
+        :items="field.options"
         :placeholder="`Select ${formatFieldName(field.name).toLowerCase()}`"
-        class="w-full"
-      />
+      ></v-select>
 
       <!-- Multi-select -->
-      <MultiSelect 
-        v-else-if="field.type === 'multi-select' && field.options"
-        :id="field.name"
+      <v-select 
+        v-else-if="field.type?.toLowerCase() === 'multi-select' && field.options"
         v-model="localValues[field.name]"
-        :options="field.options"
+        :items="field.options"
         :placeholder="`Select ${formatFieldName(field.name).toLowerCase()}`"
-        class="w-full"
-      />
+        multiple
+        chips
+      ></v-select>
 
       <!-- Dimensions editor -->
       <DimensionsEditor 
-        v-else-if="field.type === 'dimensions'"
-        :id="field.name"
+        v-else-if="field.type?.toLowerCase() === 'dimensions'"
         v-model="localValues[field.name]"
       />
 
       <!-- Slots editor -->
       <SlotsEditor 
-        v-else-if="field.type === 'slots'"
-        :id="field.name"
+        v-else-if="field.type?.toLowerCase() === 'slots'"
         v-model="localValues[field.name]"
       />
 
       <!-- Chambers editor -->
       <ChambersEditor 
-        v-else-if="field.type === 'chambers'"
-        :id="field.name"
+        v-else-if="field.type?.toLowerCase() === 'chambers'"
         v-model="localValues[field.name]"
       />
 
       <!-- Fallback for unknown types -->
-      <InputText 
+      <v-text-field 
         v-else
-        :id="field.name"
         v-model="localValues[field.name]"
         :placeholder="`Enter ${formatFieldName(field.name).toLowerCase()}`"
-        class="w-full"
-      />
+      ></v-text-field>
     </div>
   </div>
 </template>
@@ -94,11 +80,6 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue';
 import type { FieldDefinition } from '@/api/catalog';
-import InputText from 'primevue/inputtext';
-import InputNumber from 'primevue/inputnumber';
-import Checkbox from 'primevue/checkbox';
-import Select from 'primevue/select';
-import MultiSelect from 'primevue/multiselect';
 import DimensionsEditor from './DimensionsEditor.vue';
 import SlotsEditor from './SlotsEditor.vue';
 import ChambersEditor from './ChambersEditor.vue';
@@ -120,13 +101,14 @@ function convertToLocalValues(values: Record<string, string>, fields: FieldDefin
   
   fields.forEach((field) => {
     const value = values[field.name];
+    const fieldType = field.type?.toLowerCase();
     
-    if (field.type === 'boolean') {
+    if (fieldType === 'boolean') {
       // Convert string to boolean
       converted[field.name] = value === 'true' || value === 'True';
-    } else if (field.type === 'number') {
+    } else if (fieldType === 'number') {
       converted[field.name] = value ? Number(value) : null;
-    } else if (field.type === 'multi-select') {
+    } else if (fieldType === 'multi-select') {
       // Convert comma-separated string to array
       converted[field.name] = value ? value.split(',') : [];
     } else {
@@ -172,11 +154,3 @@ function formatFieldName(name: string): string {
     .trim();
 }
 </script>
-
-<style scoped>
-.field {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-</style>

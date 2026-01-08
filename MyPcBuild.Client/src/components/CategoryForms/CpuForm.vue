@@ -1,113 +1,94 @@
 <template>
-  <div class="flex flex-column gap-3">
+  <div class="d-flex flex-column ga-3">
     <!-- CPU Socket -->
-    <div class="field">
-      <label for="socket" class="font-semibold">
-        Socket <span class="text-red-500">*</span>
+    <div>
+      <label class="text-subtitle-2 font-weight-semibold mb-2 d-block">
+        Socket <span class="text-error">*</span>
       </label>
-      <Select 
-        id="socket"
+      <v-select 
         v-model="localFields.Socket"
-        :options="['AM5', 'AM4', 'LGA1700', 'LGA1200', 'LGA1151']"
+        :items="['AM5', 'AM4', 'LGA1700', 'LGA1200', 'LGA1151']"
         placeholder="Select CPU socket"
-        class="w-full"
-      />
+      ></v-select>
     </div>
 
     <!-- Cores -->
-    <div class="field">
-      <label for="cores" class="font-semibold">
-        Cores <span class="text-red-500">*</span>
+    <div>
+      <label class="text-subtitle-2 font-weight-semibold mb-2 d-block">
+        Cores <span class="text-error">*</span>
       </label>
-      <InputNumber 
-        id="cores"
-        v-model="localFields.Cores"
+      <v-text-field 
+        v-model.number="localFields.Cores"
+        type="number"
         placeholder="Number of cores"
-        class="w-full"
-        :min="1"
-      />
+      ></v-text-field>
     </div>
 
     <!-- Threads -->
-    <div class="field">
-      <label for="threads" class="font-semibold">
-        Threads <span class="text-red-500">*</span>
+    <div>
+      <label class="text-subtitle-2 font-weight-semibold mb-2 d-block">
+        Threads <span class="text-error">*</span>
       </label>
-      <InputNumber 
-        id="threads"
-        v-model="localFields.Threads"
+      <v-text-field 
+        v-model.number="localFields.Threads"
+        type="number"
         placeholder="Number of threads"
-        class="w-full"
-        :min="1"
-      />
+      ></v-text-field>
     </div>
 
     <!-- Base Clock -->
-    <div class="field">
-      <label for="baseClock" class="font-semibold">
-        Base Clock <span class="text-red-500">*</span>
-        <span class="text-500 font-normal">(GHz)</span>
+    <div>
+      <label class="text-subtitle-2 font-weight-semibold mb-2 d-block">
+        Base Clock <span class="text-error">*</span>
+        <span class="text-medium-emphasis font-weight-regular">(GHz)</span>
       </label>
-      <InputNumber 
-        id="baseClock"
-        v-model="localFields.BaseClock"
+      <v-text-field 
+        v-model.number="localFields.BaseClock"
+        type="number"
+        step="0.1"
         placeholder="Base clock frequency"
-        class="w-full"
-        :min="0"
-        :step="0.1"
-      />
+      ></v-text-field>
     </div>
 
     <!-- Boost Clock -->
-    <div class="field">
-      <label for="boostClock" class="font-semibold">
-        Boost Clock <span class="text-red-500">*</span>
-        <span class="text-500 font-normal">(GHz)</span>
+    <div>
+      <label class="text-subtitle-2 font-weight-semibold mb-2 d-block">
+        Boost Clock <span class="text-error">*</span>
+        <span class="text-medium-emphasis font-weight-regular">(GHz)</span>
       </label>
-      <InputNumber 
-        id="boostClock"
-        v-model="localFields.BoostClock"
+      <v-text-field 
+        v-model.number="localFields.BoostClock"
+        type="number"
+        step="0.1"
         placeholder="Boost clock frequency"
-        class="w-full"
-        :min="0"
-        :step="0.1"
-      />
+      ></v-text-field>
     </div>
 
     <!-- TDP -->
-    <div class="field">
-      <label for="tdp" class="font-semibold">
-        TDP <span class="text-red-500">*</span>
-        <span class="text-500 font-normal">(W)</span>
+    <div>
+      <label class="text-subtitle-2 font-weight-semibold mb-2 d-block">
+        TDP <span class="text-error">*</span>
+        <span class="text-medium-emphasis font-weight-regular">(W)</span>
       </label>
-      <InputNumber 
-        id="tdp"
-        v-model="localFields.TDP"
+      <v-text-field 
+        v-model.number="localFields.TDP"
+        type="number"
         placeholder="Thermal design power"
-        class="w-full"
-        :min="0"
-      />
+      ></v-text-field>
     </div>
 
     <!-- Integrated Graphics -->
-    <div class="field">
-      <label for="integratedGraphics" class="font-semibold flex align-items-center gap-2">
-        <Checkbox 
-          id="integratedGraphics"
-          v-model="localFields.IntegratedGraphics"
-          :binary="true"
-        />
-        Integrated Graphics
-      </label>
+    <div>
+      <v-checkbox 
+        v-model="localFields.IntegratedGraphics"
+        label="Integrated Graphics"
+      ></v-checkbox>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, watch } from 'vue';
-import InputNumber from 'primevue/inputnumber';
-import Select from 'primevue/select';
-import Checkbox from 'primevue/checkbox';
 
 interface Props {
   modelValue: Record<string, string>;
@@ -139,11 +120,3 @@ watch(localFields, (newFields) => {
   emit('update:modelValue', stringValues);
 }, { deep: true });
 </script>
-
-<style scoped>
-.field {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-</style>
