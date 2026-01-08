@@ -12,7 +12,7 @@
 
       <!-- Text input -->
       <v-text-field 
-        v-if="field.type === 'text'"
+        v-if="field.type?.toLowerCase() === 'text'"
         v-model="localValues[field.name]"
         :placeholder="`Enter ${formatFieldName(field.name).toLowerCase()}`"
         variant="outlined"
@@ -22,7 +22,7 @@
 
       <!-- Number input -->
       <v-text-field 
-        v-else-if="field.type === 'number'"
+        v-else-if="field.type?.toLowerCase() === 'number'"
         v-model.number="localValues[field.name]"
         type="number"
         :placeholder="`Enter ${formatFieldName(field.name).toLowerCase()}`"
@@ -33,14 +33,14 @@
 
       <!-- Boolean checkbox -->
       <v-checkbox 
-        v-else-if="field.type === 'boolean'"
+        v-else-if="field.type?.toLowerCase() === 'boolean'"
         v-model="localValues[field.name]"
         hide-details
       ></v-checkbox>
 
       <!-- Select dropdown -->
       <v-select 
-        v-else-if="field.type === 'select' && field.options"
+        v-else-if="field.type?.toLowerCase() === 'select' && field.options"
         v-model="localValues[field.name]"
         :items="field.options"
         :placeholder="`Select ${formatFieldName(field.name).toLowerCase()}`"
@@ -51,7 +51,7 @@
 
       <!-- Multi-select -->
       <v-select 
-        v-else-if="field.type === 'multi-select' && field.options"
+        v-else-if="field.type?.toLowerCase() === 'multi-select' && field.options"
         v-model="localValues[field.name]"
         :items="field.options"
         :placeholder="`Select ${formatFieldName(field.name).toLowerCase()}`"
@@ -64,19 +64,19 @@
 
       <!-- Dimensions editor -->
       <DimensionsEditor 
-        v-else-if="field.type === 'dimensions'"
+        v-else-if="field.type?.toLowerCase() === 'dimensions'"
         v-model="localValues[field.name]"
       />
 
       <!-- Slots editor -->
       <SlotsEditor 
-        v-else-if="field.type === 'slots'"
+        v-else-if="field.type?.toLowerCase() === 'slots'"
         v-model="localValues[field.name]"
       />
 
       <!-- Chambers editor -->
       <ChambersEditor 
-        v-else-if="field.type === 'chambers'"
+        v-else-if="field.type?.toLowerCase() === 'chambers'"
         v-model="localValues[field.name]"
       />
 
@@ -117,13 +117,14 @@ function convertToLocalValues(values: Record<string, string>, fields: FieldDefin
   
   fields.forEach((field) => {
     const value = values[field.name];
+    const fieldType = field.type?.toLowerCase();
     
-    if (field.type === 'boolean') {
+    if (fieldType === 'boolean') {
       // Convert string to boolean
       converted[field.name] = value === 'true' || value === 'True';
-    } else if (field.type === 'number') {
+    } else if (fieldType === 'number') {
       converted[field.name] = value ? Number(value) : null;
-    } else if (field.type === 'multi-select') {
+    } else if (fieldType === 'multi-select') {
       // Convert comma-separated string to array
       converted[field.name] = value ? value.split(',') : [];
     } else {
