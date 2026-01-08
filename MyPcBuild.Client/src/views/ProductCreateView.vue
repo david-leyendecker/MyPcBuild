@@ -1,85 +1,73 @@
 <template>
-  <div class="fadein animation-duration-300">
-    <div class="mb-4 flex justify-content-between align-items-center">
-      <h2 class="mt-0 mb-0 text-primary">Create New Product</h2>
-      <Button 
-        icon="pi pi-arrow-left"
-        label="Back to Catalog"
+  <div class="fade-in">
+    <div class="mb-4 d-flex justify-space-between align-center">
+      <h2 class="text-h4 text-primary">Create New Product</h2>
+      <v-btn 
+        prepend-icon="mdi-arrow-left"
+        variant="text"
         @click="$router.push('/catalog')"
-        severity="secondary"
-      />
+      >
+        Back to Catalog
+      </v-btn>
     </div>
 
-    <Card>
-      <template #content>
-        <div class="flex flex-column gap-4">
+    <v-card>
+      <v-card-text>
+        <div class="d-flex flex-column ga-4">
           <!-- Step 1: Basic Information -->
           <div v-if="currentStep === 1">
-            <h3 class="mt-0 mb-3">Basic Information</h3>
+            <h3 class="text-h5 mb-3">Basic Information</h3>
             
-            <div class="flex flex-column gap-3">
-              <div class="field">
-                <label for="category" class="font-semibold">Category *</label>
-                <Select 
-                  id="category"
-                  v-model="formData.category"
-                  :options="categories"
-                  placeholder="Select a category"
-                  class="w-full"
-                  @change="onCategoryChange"
-                />
-              </div>
+            <div class="d-flex flex-column ga-3">
+              <v-select 
+                v-model="formData.category"
+                :items="categories"
+                label="Category *"
+                variant="outlined"
+                @update:model-value="onCategoryChange"
+              ></v-select>
 
-              <div class="field">
-                <label for="name" class="font-semibold">Product Name *</label>
-                <InputText 
-                  id="name"
-                  v-model="formData.name"
-                  placeholder="e.g., AMD Ryzen 9 7950X"
-                  class="w-full"
-                />
-              </div>
+              <v-text-field 
+                v-model="formData.name"
+                label="Product Name *"
+                placeholder="e.g., AMD Ryzen 9 7950X"
+                variant="outlined"
+              ></v-text-field>
 
-              <div class="field">
-                <label for="manufacturer" class="font-semibold">Manufacturer *</label>
-                <InputText 
-                  id="manufacturer"
-                  v-model="formData.manufacturer"
-                  placeholder="e.g., AMD"
-                  class="w-full"
-                />
-              </div>
+              <v-text-field 
+                v-model="formData.manufacturer"
+                label="Manufacturer *"
+                placeholder="e.g., AMD"
+                variant="outlined"
+              ></v-text-field>
 
-              <div class="field">
-                <label for="price" class="font-semibold">Price *</label>
-                <InputNumber 
-                  id="price"
-                  v-model="formData.price"
-                  mode="currency"
-                  currency="USD"
-                  locale="en-US"
-                  class="w-full"
-                />
-              </div>
+              <v-text-field 
+                v-model.number="formData.price"
+                label="Price *"
+                type="number"
+                prefix="$"
+                variant="outlined"
+              ></v-text-field>
             </div>
 
-            <div class="flex justify-content-end mt-4">
-              <Button 
-                label="Next: Product Details"
-                icon="pi pi-arrow-right"
-                icon-pos="right"
-                @click="nextStep"
+            <div class="d-flex justify-end mt-4">
+              <v-btn 
+                append-icon="mdi-arrow-right"
+                color="primary"
                 :disabled="!canProceedToStep2"
-              />
+                @click="nextStep"
+              >
+                Next: Product Details
+              </v-btn>
             </div>
           </div>
 
           <!-- Step 2: Category-Specific Fields -->
           <div v-else-if="currentStep === 2">
-            <h3 class="mt-0 mb-3">{{ formData.category }} Details</h3>
+            <h3 class="text-h5 mb-3">{{ formData.category }} Details</h3>
 
-            <div v-if="isLoadingFields" class="flex justify-content-center py-4">
-              <ProgressSpinner />
+            <div v-if="isLoadingFields" class="d-flex justify-center py-4">
+              <v-progress-circular indeterminate color="primary"></v-progress-circular>
             </div>
 
             <div v-else-if="fieldDefinitions.length > 0">
@@ -90,28 +78,31 @@
               />
             </div>
 
-            <div v-if="error" class="mt-3">
-              <Message severity="error" :text="error" />
-            </div>
+            <v-alert v-if="error" type="error" class="mt-3">
+              {{ error }}
+            </v-alert>
 
-            <div class="flex justify-content-between mt-4">
-              <Button 
-                label="Back"
-                icon="pi pi-arrow-left"
+            <div class="d-flex justify-space-between mt-4">
+              <v-btn 
+                prepend-icon="mdi-arrow-left"
+                variant="text"
                 @click="currentStep = 1"
-                severity="secondary"
-              />
-              <Button 
-                label="Create Product"
-                icon="pi pi-check"
-                @click="createProduct"
+              >
+                Back
+              </v-btn>
+              <v-btn 
+                prepend-icon="mdi-check"
+                color="primary"
                 :loading="isCreating"
-              />
+                @click="createProduct"
+              >
+                Create Product
+              </v-btn>
             </div>
           </div>
         </div>
-      </template>
-    </Card>
+      </v-card-text>
+    </v-card>
   </div>
 </template>
 
@@ -119,13 +110,6 @@
 import { ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { catalogApi, type FieldDefinition } from '@/api/catalog';
-import Button from 'primevue/button';
-import Card from 'primevue/card';
-import InputText from 'primevue/inputtext';
-import InputNumber from 'primevue/inputnumber';
-import Select from 'primevue/select';
-import Message from 'primevue/message';
-import ProgressSpinner from 'primevue/progressspinner';
 import DynamicFieldRenderer from '@/components/DynamicFieldRenderer.vue';
 
 const router = useRouter();
@@ -198,9 +182,12 @@ async function createProduct() {
 </script>
 
 <style scoped>
-.field {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
+.fade-in {
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 </style>

@@ -1,96 +1,107 @@
 <template>
-  <div class="fadein animation-duration-300">
-    <div v-if="buildStore.isLoading" class="flex justify-content-center py-8">
-      <ProgressSpinner />
+  <div class="fade-in">
+    <div v-if="buildStore.isLoading" class="d-flex justify-center py-8">
+      <v-progress-circular indeterminate color="primary"></v-progress-circular>
     </div>
 
-    <div v-else-if="buildStore.error" class="mb-3">
-      <Message severity="error" :text="buildStore.error" />
-    </div>
+    <v-alert v-else-if="buildStore.error" type="error" class="mb-3">
+      {{ buildStore.error }}
+    </v-alert>
 
-    <div v-else-if="buildStore.currentBuild" class="flex flex-column gap-4">
+    <div v-else-if="buildStore.currentBuild" class="d-flex flex-column ga-4">
       <!-- Header -->
-      <div class="flex justify-content-between align-items-start">
+      <div class="d-flex justify-space-between align-start">
         <div>
-          <h2 class="m-0 text-primary">{{ buildStore.currentBuild.name }}</h2>
-          <p class="mt-2 mb-0 text-500 text-sm">
+          <h2 class="text-h4 text-primary">{{ buildStore.currentBuild.name }}</h2>
+          <p class="text-medium-emphasis text-body-2 mt-2">
             Created: {{ new Date(buildStore.currentBuild.createdAt).toLocaleDateString() }}
           </p>
         </div>
-        <Button 
-          icon="pi pi-arrow-left"
-          label="Back"
+        <v-btn 
+          prepend-icon="mdi-arrow-left"
+          variant="text"
           @click="$router.back()"
-          severity="secondary"
-        />
+        >
+          Back
+        </v-btn>
       </div>
 
       <!-- Compatibility Status -->
       <CompatibilityPanel />
 
       <!-- Parts List -->
-      <Card>
-        <template #header>
-          <div class="p-3">
-            <h3 class="m-0">PC Components</h3>
-          </div>
-        </template>
-        <template #content>
+      <v-card>
+        <v-card-title>PC Components</v-card-title>
+        <v-card-text>
           <div v-if="buildStore.currentBuild.parts.length === 0" class="text-center py-6">
-            <p class="text-500 mb-4">No components added yet.</p>
-            <Button 
-              label="Add Component"
-              icon="pi pi-plus"
+            <p class="text-medium-emphasis mb-4">No components added yet.</p>
+            <v-btn 
+              prepend-icon="mdi-plus"
+              color="primary"
               @click="showAddPartDialog = true"
-            />
+            >
+              Add Component
+            </v-btn>
           </div>
 
-          <div v-else class="flex flex-column gap-3">
-            <div 
+          <div v-else class="d-flex flex-column ga-3">
+            <v-card 
               v-for="part in buildStore.currentBuild.parts"
               :key="part.id"
-              class="flex justify-content-between align-items-center p-3 border-round surface-section border-1 surface-border"
+              variant="outlined"
             >
-              <div>
-                <h4 class="mt-0 mb-1">{{ part.name }}</h4>
-                <p class="my-1 text-primary text-sm">{{ part.category }}</p>
-                <p class="mt-2 mb-0 text-500 font-medium">${{ part.pricePaid.toFixed(2) }}</p>
-              </div>
-              <Button 
-                icon="pi pi-trash"
-                size="small"
-                severity="danger"
-                text
-                @click="removePart(part.id)"
-              />
-            </div>
+              <v-card-text>
+                <div class="d-flex justify-space-between align-center">
+                  <div>
+                    <h4 class="text-h6 mb-1">{{ part.name }}</h4>
+                    <p class="text-primary text-body-2 my-1">{{ part.category }}</p>
+                    <p class="text-medium-emphasis font-weight-medium mt-2">${{ part.pricePaid.toFixed(2) }}</p>
+                  </div>
+                  <v-btn 
+                    icon="mdi-delete"
+                    size="small"
+                    color="error"
+                    variant="text"
+                    @click="removePart(part.id)"
+                  ></v-btn>
+                </div>
+              </v-card-text>
+            </v-card>
 
-            <div class="pt-3 border-top-1 border-surface-border">
-              <p class="m-0 text-lg"><strong>Total Cost:</strong> ${{ totalCost.toFixed(2) }}</p>
+            <v-divider></v-divider>
+
+            <div class="pt-3">
+              <p class="text-h6"><strong>Total Cost:</strong> ${{ totalCost.toFixed(2) }}</p>
             </div>
           </div>
-        </template>
-        <template #footer>
-          <Button 
-            label="Add Component"
-            icon="pi pi-plus"
+        </v-card-text>
+        <v-card-actions>
+          <v-btn 
+            prepend-icon="mdi-plus"
+            color="primary"
+            block
             @click="showAddPartDialog = true"
-            class="w-full"
-          />
-        </template>
-      </Card>
+          >
+            Add Component
+          </v-btn>
+        </v-card-actions>
+      </v-card>
 
       <!-- Add Part Dialog -->
-      <Dialog 
-        v-model:visible="showAddPartDialog"
-        header="Add Component"
-        modal
+      <v-dialog 
+        v-model="showAddPartDialog"
+        max-width="600"
       >
-        <AddPartDialog 
-          @part-selected="handleAddPart"
-          @close="showAddPartDialog = false"
-        />
-      </Dialog>
+        <v-card>
+          <v-card-title>Add Component</v-card-title>
+          <v-card-text>
+            <AddPartDialog 
+              @part-selected="handleAddPart"
+              @close="showAddPartDialog = false"
+            />
+          </v-card-text>
+        </v-card>
+      </v-dialog>
     </div>
   </div>
 </template>
@@ -99,11 +110,6 @@
 import { ref, computed, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import { useBuildStore } from '@/stores/buildStore';
-import Button from 'primevue/button';
-import Card from 'primevue/card';
-import Dialog from 'primevue/dialog';
-import Message from 'primevue/message';
-import ProgressSpinner from 'primevue/progressspinner';
 import CompatibilityPanel from '@/components/CompatibilityPanel.vue';
 import AddPartDialog from '@/components/AddPartDialog.vue';
 
@@ -146,3 +152,14 @@ async function removePart(productId: string) {
   }
 }
 </script>
+
+<style scoped>
+.fade-in {
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+</style>

@@ -1,16 +1,18 @@
 <template>
-  <header class="sticky top-0 z-5 px-4 md:px-6 py-3 border-bottom-1 surface-border surface-section">
-    <div class="flex justify-content-between align-items-center mx-auto max-w-full" style="max-width: 1200px;">
-      <router-link to="/" class="no-underline text-primary">
-        <h1 class="m-0 text-2xl md:text-3xl font-bold text-primary">MyPCBuild</h1>
-      </router-link>
-      
-      <nav class="flex gap-4 md:gap-6 align-items-center">
-        <router-link to="/" class="nav-link no-underline font-medium transition-colors transition-duration-300">My Builds</router-link>
-        <router-link to="/catalog" class="nav-link no-underline font-medium transition-colors transition-duration-300">Catalog</router-link>
-      </nav>
-    </div>
-  </header>
+  <v-app-bar elevation="1" style="background-color: var(--v-theme-surface)">
+    <v-container style="max-width: 1200px">
+      <div class="d-flex justify-space-between align-center">
+        <router-link to="/" class="text-decoration-none">
+          <h1 class="text-h4 text-primary font-weight-bold">MyPCBuild</h1>
+        </router-link>
+        
+        <nav class="d-flex ga-6 align-center">
+          <router-link to="/" class="nav-link text-decoration-none font-weight-medium">My Builds</router-link>
+          <router-link to="/catalog" class="nav-link text-decoration-none font-weight-medium">Catalog</router-link>
+        </nav>
+      </div>
+    </v-container>
+  </v-app-bar>
 </template>
 
 <script setup lang="ts">
@@ -19,17 +21,17 @@ import { RouterLink } from 'vue-router';
 
 <style scoped>
 .nav-link {
-  color: var(--text-color);
+  color: rgb(var(--v-theme-on-surface));
   transition: color 0.3s ease;
 }
 
 .nav-link:hover {
-  color: var(--primary-color);
+  color: rgb(var(--v-theme-primary));
 }
 
 .nav-link.router-link-active {
-  color: var(--primary-color);
-  border-bottom: 2px solid var(--primary-color);
+  color: rgb(var(--v-theme-primary));
+  border-bottom: 2px solid rgb(var(--v-theme-primary));
   padding-bottom: 0.25rem;
 }
 </style>

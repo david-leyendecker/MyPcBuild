@@ -1,69 +1,69 @@
 <template>
   <div class="slots-editor">
-    <div class="flex justify-content-between align-items-center mb-2">
-      <p class="text-sm text-500 m-0">Define installation slots for this product</p>
-      <Button 
-        label="Add Slot"
-        icon="pi pi-plus"
-        @click="addSlot"
+    <div class="d-flex justify-space-between align-center mb-2">
+      <p class="text-body-2 text-medium-emphasis ma-0">Define installation slots for this product</p>
+      <v-btn 
+        prepend-icon="mdi-plus"
         size="small"
-      />
+        @click="addSlot"
+      >
+        Add Slot
+      </v-btn>
     </div>
 
-    <div v-if="slots.length === 0" class="text-center py-3 surface-ground border-round">
-      <p class="text-sm text-500 m-0">No slots defined. Click "Add Slot" to create one.</p>
+    <div v-if="slots.length === 0" class="text-center py-3" style="background-color: rgba(var(--v-theme-surface), 0.5); border-radius: 4px;">
+      <p class="text-body-2 text-medium-emphasis ma-0">No slots defined. Click "Add Slot" to create one.</p>
     </div>
 
-    <div v-else class="flex flex-column gap-2">
-      <Card 
+    <div v-else class="d-flex flex-column ga-2">
+      <v-card 
         v-for="(slot, index) in slots"
         :key="index"
-        class="p-2"
+        variant="outlined"
       >
-        <template #content>
-          <div class="flex justify-content-between align-items-start">
+        <v-card-text class="pa-2">
+          <div class="d-flex justify-space-between align-start">
             <div class="flex-grow-1">
-              <div class="grid">
-                <div class="col-6">
-                  <label class="text-xs font-semibold">Slot Name</label>
-                  <InputText 
+              <v-row dense>
+                <v-col cols="6">
+                  <label class="text-caption font-weight-semibold d-block mb-1">Slot Name</label>
+                  <v-text-field 
                     v-model="slot.name"
                     placeholder="e.g., PCIe x16"
-                    class="w-full"
-                    size="small"
-                  />
-                </div>
-                <div class="col-6">
-                  <label class="text-xs font-semibold">Allowed Category</label>
-                  <Select 
+                    variant="outlined"
+                    density="compact"
+                    hide-details
+                  ></v-text-field>
+                </v-col>
+                <v-col cols="6">
+                  <label class="text-caption font-weight-semibold d-block mb-1">Allowed Category</label>
+                  <v-select 
                     v-model="slot.allowedCategory"
-                    :options="categories"
+                    :items="categories"
                     placeholder="Select category"
-                    class="w-full"
-                  />
-                </div>
-              </div>
+                    variant="outlined"
+                    density="compact"
+                    hide-details
+                  ></v-select>
+                </v-col>
+              </v-row>
             </div>
-            <Button 
-              icon="pi pi-trash"
-              @click="removeSlot(index)"
-              severity="danger"
-              text
+            <v-btn 
+              icon="mdi-delete"
+              color="error"
+              variant="text"
               size="small"
-            />
+              @click="removeSlot(index)"
+            ></v-btn>
           </div>
-        </template>
-      </Card>
+        </v-card-text>
+      </v-card>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, watch } from 'vue';
-import Button from 'primevue/button';
-import Card from 'primevue/card';
-import InputText from 'primevue/inputtext';
-import Select from 'primevue/select';
 
 interface SlotData {
   name: string;
@@ -120,10 +120,3 @@ watch(() => props.modelValue, (newValue) => {
   slots.value = parseSlotsValue(newValue);
 });
 </script>
-
-<style scoped>
-.slots-editor label {
-  display: block;
-  margin-bottom: 0.25rem;
-}
-</style>

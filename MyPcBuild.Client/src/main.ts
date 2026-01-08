@@ -1,28 +1,42 @@
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
-import PrimeVue from 'primevue/config'
-import Aura from '@primevue/themes/aura'
-
-import 'primeflex/primeflex.css'
-import 'primeicons/primeicons.css'
+import { createVuetify } from 'vuetify'
+import * as components from 'vuetify/components'
+import * as directives from 'vuetify/directives'
+import '@mdi/font/css/materialdesignicons.css'
+import 'vuetify/dist/vuetify.min.css'
 import './style.css'
 
 import App from './App.vue'
 import { router } from './router'
 
+const vuetify = createVuetify({
+  components,
+  directives,
+  theme: {
+    defaultTheme: 'dark',
+    themes: {
+      dark: {
+        dark: true,
+        colors: {
+          primary: '#00d4ff',
+          secondary: '#16213e',
+          background: '#1a1a2e',
+          surface: '#16213e',
+          error: '#ff5252',
+          info: '#2196f3',
+          success: '#4caf50',
+          warning: '#fb8c00',
+        },
+      },
+    },
+  },
+})
+
 const app = createApp(App)
 
 app.use(createPinia())
 app.use(router)
-app.use(PrimeVue, {
-  theme: {
-    preset: Aura,
-    options: {
-      prefix: 'p',
-      darkModeSelector: '.p-dark',
-      cssLayer: false
-    }
-  }
-})
+app.use(vuetify)
 
 app.mount('#app')
