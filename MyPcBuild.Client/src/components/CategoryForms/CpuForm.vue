@@ -9,9 +9,6 @@
         v-model="localFields.Socket"
         :items="['AM5', 'AM4', 'LGA1700', 'LGA1200', 'LGA1151']"
         placeholder="Select CPU socket"
-        variant="outlined"
-        density="compact"
-        hide-details
       ></v-select>
     </div>
 
@@ -24,9 +21,6 @@
         v-model.number="localFields.Cores"
         type="number"
         placeholder="Number of cores"
-        variant="outlined"
-        density="compact"
-        hide-details
       ></v-text-field>
     </div>
 
@@ -39,9 +33,6 @@
         v-model.number="localFields.Threads"
         type="number"
         placeholder="Number of threads"
-        variant="outlined"
-        density="compact"
-        hide-details
       ></v-text-field>
     </div>
 
@@ -56,9 +47,6 @@
         type="number"
         step="0.1"
         placeholder="Base clock frequency"
-        variant="outlined"
-        density="compact"
-        hide-details
       ></v-text-field>
     </div>
 
@@ -73,9 +61,6 @@
         type="number"
         step="0.1"
         placeholder="Boost clock frequency"
-        variant="outlined"
-        density="compact"
-        hide-details
       ></v-text-field>
     </div>
 
@@ -89,9 +74,6 @@
         v-model.number="localFields.TDP"
         type="number"
         placeholder="Thermal design power"
-        variant="outlined"
-        density="compact"
-        hide-details
       ></v-text-field>
     </div>
 
@@ -100,7 +82,6 @@
       <v-checkbox 
         v-model="localFields.IntegratedGraphics"
         label="Integrated Graphics"
-        hide-details
       ></v-checkbox>
     </div>
   </div>

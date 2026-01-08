@@ -23,7 +23,6 @@
                 v-model="formData.category"
                 :items="categories"
                 label="Category *"
-                variant="outlined"
                 @update:model-value="onCategoryChange"
               ></v-select>
 
@@ -31,14 +30,12 @@
                 v-model="formData.name"
                 label="Product Name *"
                 placeholder="e.g., AMD Ryzen 9 7950X"
-                variant="outlined"
               ></v-text-field>
 
               <v-text-field 
                 v-model="formData.manufacturer"
                 label="Manufacturer *"
                 placeholder="e.g., AMD"
-                variant="outlined"
               ></v-text-field>
 
               <v-text-field 
@@ -46,7 +43,6 @@
                 label="Price *"
                 type="number"
                 prefix="$"
-                variant="outlined"
               ></v-text-field>
             </div>
 

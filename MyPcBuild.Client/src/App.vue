@@ -2,7 +2,7 @@
   <v-app>
     <AppHeader />
     <v-main>
-      <v-container style="max-width: 1200px">
+      <v-container>
         <RouterView />
       </v-container>
     </v-main>

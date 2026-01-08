@@ -1,16 +1,13 @@
 <template>
   <div class="fade-in">
-    <div class="d-flex justify-space-between align-center mb-4">
-      <h2 class="text-h4 text-primary">My PC Builds</h2>
-      <v-btn 
-        prepend-icon="mdi-plus"
-        color="success"
-        rounded
-        @click="showNewBuildDialog = true"
-      >
-        New Build
-      </v-btn>
-    </div>
+    <ViewHeader
+      :title="MY_BUILDS.title"
+      :action-button="{
+        text: 'New Build',
+        icon: 'mdi-plus',
+        onClick: () => showNewBuildDialog = true
+      }"
+    />
 
     <div v-if="buildStore.isLoading" class="d-flex justify-center py-8">
       <v-progress-circular indeterminate color="primary"></v-progress-circular>
@@ -73,7 +70,6 @@
             v-model="newBuildName"
             label="Build Name"
             placeholder="My Gaming PC"
-            variant="outlined"
           ></v-text-field>
         </v-card-text>
         <v-card-actions>
@@ -103,6 +99,8 @@
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useBuildStore } from '@/stores/buildStore';
+import ViewHeader from '@/components/ViewHeader.vue';
+import { MY_BUILDS } from '@/config/navigation';
 
 const router = useRouter();
 const buildStore = useBuildStore();

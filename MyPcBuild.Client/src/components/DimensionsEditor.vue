@@ -7,9 +7,6 @@
           label="Length"
           type="number"
           suffix="mm"
-          variant="outlined"
-          density="compact"
-          hide-details
         ></v-text-field>
       </v-col>
       <v-col cols="4">
@@ -18,9 +15,6 @@
           label="Width"
           type="number"
           suffix="mm"
-          variant="outlined"
-          density="compact"
-          hide-details
         ></v-text-field>
       </v-col>
       <v-col cols="4">
@@ -29,9 +23,6 @@
           label="Height"
           type="number"
           suffix="mm"
-          variant="outlined"
-          density="compact"
-          hide-details
         ></v-text-field>
       </v-col>
     </v-row>

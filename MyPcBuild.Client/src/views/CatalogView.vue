@@ -1,23 +1,17 @@
 <template>
   <div class="fade-in">
-    <div class="mb-4">
-      <div class="d-flex justify-space-between align-center mb-3">
-        <h2 class="text-h4 text-primary">Product Catalog</h2>
-        <v-btn 
-          prepend-icon="mdi-plus"
-          color="primary"
-          @click="$router.push('/catalog/create')"
-        >
-          Create Product
-        </v-btn>
-      </div>
+    <ViewHeader
+      :title="PRODUCT_CATALOG.title"
+      :action-button="{
+        text: 'Create Product',
+        icon: 'mdi-plus',
+        onClick: () => $router.push('/catalog/create')
+      }"
+    >
       <div class="d-flex ga-2">
         <v-text-field 
           v-model="catalogStore.searchQuery"
           placeholder="Search products..."
-          variant="outlined"
-          density="compact"
-          hide-details
           @keyup.enter="handleSearch"
         ></v-text-field>
         <v-btn 
@@ -26,7 +20,7 @@
           @click="handleSearch"
         ></v-btn>
       </div>
-    </div>
+    </ViewHeader>
 
     <v-row>
       <!-- Category Filter -->
@@ -105,6 +99,8 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { useCatalogStore } from '@/stores/catalogStore';
+import ViewHeader from '@/components/ViewHeader.vue';
+import { PRODUCT_CATALOG } from '@/config/navigation';
 
 const catalogStore = useCatalogStore();
 const categories = ref(['CPU', 'Motherboard', 'GPU', 'RAM', 'Storage', 'PSU', 'PCCase', 'Cooler']);

@@ -15,9 +15,6 @@
         v-if="field.type?.toLowerCase() === 'text'"
         v-model="localValues[field.name]"
         :placeholder="`Enter ${formatFieldName(field.name).toLowerCase()}`"
-        variant="outlined"
-        density="compact"
-        hide-details
       ></v-text-field>
 
       <!-- Number input -->
@@ -26,16 +23,12 @@
         v-model.number="localValues[field.name]"
         type="number"
         :placeholder="`Enter ${formatFieldName(field.name).toLowerCase()}`"
-        variant="outlined"
-        density="compact"
-        hide-details
       ></v-text-field>
 
       <!-- Boolean checkbox -->
       <v-checkbox 
         v-else-if="field.type?.toLowerCase() === 'boolean'"
         v-model="localValues[field.name]"
-        hide-details
       ></v-checkbox>
 
       <!-- Select dropdown -->
@@ -44,9 +37,6 @@
         v-model="localValues[field.name]"
         :items="field.options"
         :placeholder="`Select ${formatFieldName(field.name).toLowerCase()}`"
-        variant="outlined"
-        density="compact"
-        hide-details
       ></v-select>
 
       <!-- Multi-select -->
@@ -55,11 +45,8 @@
         v-model="localValues[field.name]"
         :items="field.options"
         :placeholder="`Select ${formatFieldName(field.name).toLowerCase()}`"
-        variant="outlined"
-        density="compact"
         multiple
         chips
-        hide-details
       ></v-select>
 
       <!-- Dimensions editor -->
@@ -85,9 +72,6 @@
         v-else
         v-model="localValues[field.name]"
         :placeholder="`Enter ${formatFieldName(field.name).toLowerCase()}`"
-        variant="outlined"
-        density="compact"
-        hide-details
       ></v-text-field>
     </div>
   </div>

@@ -39,9 +39,6 @@
               <v-text-field 
                 v-model="chamber.name"
                 placeholder="e.g., Main Compartment"
-                variant="outlined"
-                density="compact"
-                hide-details
               ></v-text-field>
             </v-col>
             <v-col cols="4">
@@ -50,9 +47,6 @@
                 v-model.number="chamber.length"
                 type="number"
                 placeholder="mm"
-                variant="outlined"
-                density="compact"
-                hide-details
               ></v-text-field>
             </v-col>
             <v-col cols="4">
@@ -61,9 +55,6 @@
                 v-model.number="chamber.width"
                 type="number"
                 placeholder="mm"
-                variant="outlined"
-                density="compact"
-                hide-details
               ></v-text-field>
             </v-col>
             <v-col cols="4">
@@ -72,9 +63,6 @@
                 v-model.number="chamber.height"
                 type="number"
                 placeholder="mm"
-                variant="outlined"
-                density="compact"
-                hide-details
               ></v-text-field>
             </v-col>
           </v-row>

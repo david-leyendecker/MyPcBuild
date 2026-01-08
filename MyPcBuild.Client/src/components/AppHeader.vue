@@ -1,44 +1,32 @@
 <template>
   <v-app-bar elevation="1" style="background-color: var(--v-theme-surface)">
-    <v-container style="max-width: 1200px">
-      <div class="d-flex justify-space-between align-center w-100">
-        <router-link to="/" class="text-decoration-none">
-          <h1 class="text-h4 text-primary font-weight-bold">MyPCBuild</h1>
-        </router-link>
-        
-        <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon>
-      </div>
-    </v-container>
+    
+    <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon>
+
+    <v-app-bar-title>MyPCBuild</v-app-bar-title>
+
   </v-app-bar>
 
-  <v-navigation-drawer
-    v-model="drawer"
-    location="right"
-    temporary
-  >
+  <v-navigation-drawer v-model="drawer" temporary>
     <v-list>
       <v-list-item
-        prepend-icon="mdi-hammer-wrench"
-        title="My Builds"
-        to="/"
+        v-for="item in navigationItems"
+        :key="item.path"
+        :prepend-icon="item.icon"
+        :title="item.title"
+        :to="item.path"
         @click="drawer = false"
-      ></v-list-item>
-      
-      <v-list-item
-        prepend-icon="mdi-package-variant"
-        title="Catalog"
-        to="/catalog"
-        @click="drawer = false"
-      ></v-list-item>
+      />
     </v-list>
   </v-navigation-drawer>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import { RouterLink } from 'vue-router';
+import { NAVIGATION_ITEMS } from '@/config/navigation';
 
 const drawer = ref(false);
+const navigationItems = NAVIGATION_ITEMS;
 </script>
 
 <style scoped>

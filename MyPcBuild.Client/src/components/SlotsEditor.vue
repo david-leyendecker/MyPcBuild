@@ -30,9 +30,6 @@
                   <v-text-field 
                     v-model="slot.name"
                     placeholder="e.g., PCIe x16"
-                    variant="outlined"
-                    density="compact"
-                    hide-details
                   ></v-text-field>
                 </v-col>
                 <v-col cols="6">
@@ -41,9 +38,6 @@
                     v-model="slot.allowedCategory"
                     :items="categories"
                     placeholder="Select category"
-                    variant="outlined"
-                    density="compact"
-                    hide-details
                   ></v-select>
                 </v-col>
               </v-row>

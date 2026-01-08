@@ -6,9 +6,6 @@
       <v-text-field 
         v-model="searchQuery"
         placeholder="Search components..."
-        variant="outlined"
-        density="compact"
-        hide-details
         @keyup.enter="handleSearch"
       ></v-text-field>
       <div class="d-flex flex-wrap ga-2">
