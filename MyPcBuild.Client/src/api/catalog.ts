@@ -8,6 +8,34 @@ export interface Product {
   specifications: Record<string, string | number>;
 }
 
+export interface ProductSummary {
+  id: string;
+  name: string;
+  categoryName: string;
+  price: number;
+  manufacturer: string;
+}
+
+export interface GetProductsParams {
+  category?: string;
+  search?: string;
+  page?: number;
+  itemsPerPage?: number;
+  sortBy?: string;
+  sortDesc?: boolean;
+}
+
+export interface GetProductsResponse {
+  items: ProductSummary[];
+  total: number;
+  page: number;
+  itemsPerPage: number;
+  sortBy: string;
+  sortDesc: boolean;
+  category?: string;
+  search?: string;
+}
+
 export interface CatalogSearchParams {
   category?: string;
   search?: string;
@@ -32,6 +60,11 @@ export interface CreateProductRequest {
 }
 
 export const catalogApi = {
+  async getProducts(params: GetProductsParams): Promise<GetProductsResponse> {
+    const response = await apiClient.get<GetProductsResponse>('/catalog/products', { params });
+    return response.data;
+  },
+
   async searchProducts(params: CatalogSearchParams): Promise<Product[]> {
     const response = await apiClient.get<Product[]>('/catalog/search', { params });
     return response.data;

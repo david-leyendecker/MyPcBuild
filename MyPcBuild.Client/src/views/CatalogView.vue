@@ -7,26 +7,21 @@
         icon: 'mdi-plus',
         onClick: () => $router.push('/catalog/create')
       }"
-    >
-      <div class="d-flex ga-2">
-        <v-text-field 
-          v-model="catalogStore.searchQuery"
-          placeholder="Search products..."
-          @keyup.enter="handleSearch"
-        ></v-text-field>
-        <v-btn 
-          icon="mdi-magnify"
-          color="primary"
-          @click="handleSearch"
-        ></v-btn>
-      </div>
-    </ViewHeader>
+    />
 
     <v-row>
       <!-- Category Filter -->
       <v-col cols="12" md="3" lg="2">
         <h3 class="text-subtitle-1 font-weight-medium mb-3">Categories</h3>
         <div class="d-flex flex-column ga-2">
+          <v-btn 
+            :variant="catalogStore.selectedCategory === null ? 'elevated' : 'outlined'"
+            size="small"
+            class="justify-start"
+            @click="handleCategorySelect(null)"
+          >
+            All Categories
+          </v-btn>
           <v-btn 
             v-for="category in categories"
             :key="category"
@@ -40,57 +35,82 @@
         </div>
       </v-col>
 
-      <!-- Products Grid -->
+      <!-- Products Data Table -->
       <v-col cols="12" md="9" lg="10">
-        <div v-if="catalogStore.isLoading" class="d-flex justify-center py-8">
-          <v-progress-circular indeterminate color="primary"></v-progress-circular>
-        </div>
+        <v-card>
+          <v-card-title>
+            <v-text-field 
+              v-model="searchText"
+              placeholder="Search products by name or manufacturer..."
+              prepend-inner-icon="mdi-magnify"
+              variant="outlined"
+              density="compact"
+              hide-details
+              clearable
+              @update:model-value="handleSearchDebounced"
+            ></v-text-field>
+          </v-card-title>
 
-        <v-alert v-else-if="catalogStore.error" type="error" class="mb-3">
+          <v-data-table
+            :headers="headers"
+            :items="catalogStore.products"
+            :items-length="catalogStore.totalProducts"
+            :loading="catalogStore.isLoading"
+            :items-per-page="catalogStore.itemsPerPage"
+            :page="catalogStore.currentPage"
+            :sort-by="[{ key: catalogStore.sortBy, order: catalogStore.sortDesc ? 'desc' : 'asc' }]"
+            class="elevation-0"
+            item-value="id"
+            @update:options="handleTableOptionsUpdate"
+          >
+            <template #item.name="{ item }">
+              <span class="font-weight-medium">{{ item.name }}</span>
+            </template>
+
+            <template #item.price="{ item }">
+              <span class="text-success font-weight-semibold">${{ item.price.toFixed(2) }}</span>
+            </template>
+
+            <template #item.categoryName="{ item }">
+              <v-chip size="small" color="primary" variant="tonal">
+                {{ item.categoryName }}
+              </v-chip>
+            </template>
+
+            <template #item.actions="{ item }">
+              <v-btn 
+                icon="mdi-plus"
+                size="small"
+                variant="text"
+                color="primary"
+                @click="$emit('product-selected', item)"
+              >
+                <v-icon>mdi-plus</v-icon>
+                <v-tooltip activator="parent" location="top">
+                  Add to Build
+                </v-tooltip>
+              </v-btn>
+            </template>
+
+            <template #no-data>
+              <div class="text-center py-8">
+                <v-icon size="64" color="grey-lighten-1">mdi-package-variant</v-icon>
+                <p class="text-h6 text-medium-emphasis mt-4">No products found</p>
+                <p class="text-body-2 text-medium-emphasis">Try adjusting your search or filters</p>
+              </div>
+            </template>
+
+            <template #loading>
+              <div class="text-center py-8">
+                <v-progress-circular indeterminate color="primary"></v-progress-circular>
+              </div>
+            </template>
+          </v-data-table>
+        </v-card>
+
+        <v-alert v-if="catalogStore.error" type="error" class="mt-3">
           {{ catalogStore.error }}
         </v-alert>
-
-        <div v-else-if="catalogStore.products.length === 0" class="text-center py-8">
-          <p class="text-h6 text-medium-emphasis">No products found. Try a different search.</p>
-        </div>
-
-        <v-row v-else>
-          <v-col 
-            v-for="product in catalogStore.products"
-            :key="product.id"
-            cols="12" sm="6" lg="4" xl="3"
-          >
-            <v-card class="product-card h-100">
-              <v-card-text>
-                <h4 class="text-h6 mb-2">{{ product.name }}</h4>
-                <p class="text-primary text-body-2 my-1">{{ product.category }}</p>
-                <p class="text-success font-weight-semibold text-h6 my-2">${{ product.price.toFixed(2) }}</p>
-                
-                <v-divider class="my-3"></v-divider>
-                
-                <div 
-                  v-for="(value, key) in product.specifications"
-                  :key="key"
-                  class="d-flex justify-space-between text-caption text-medium-emphasis mb-1"
-                >
-                  <span class="font-weight-medium">{{ key }}:</span>
-                  <span>{{ value }}</span>
-                </div>
-              </v-card-text>
-              <v-card-actions>
-                <v-btn 
-                  prepend-icon="mdi-plus"
-                  color="primary"
-                  size="small"
-                  block
-                  @click="$emit('product-selected', product)"
-                >
-                  Add to Build
-                </v-btn>
-              </v-card-actions>
-            </v-card>
-          </v-col>
-        </v-row>
       </v-col>
     </v-row>
   </div>
@@ -104,21 +124,62 @@ import { PRODUCT_CATALOG } from '@/config/navigation';
 
 const catalogStore = useCatalogStore();
 const categories = ref(['CPU', 'Motherboard', 'GPU', 'RAM', 'Storage', 'PSU', 'PCCase', 'Cooler']);
+const searchText = ref('');
+
+const headers = [
+  { title: 'Name', key: 'name', sortable: true },
+  { title: 'Category', key: 'categoryName', sortable: true },
+  { title: 'Manufacturer', key: 'manufacturer', sortable: true },
+  { title: 'Price', key: 'price', sortable: true },
+  { title: 'Actions', key: 'actions', sortable: false, align: 'center' as const }
+];
 
 onMounted(() => {
-  catalogStore.searchProducts();
+  catalogStore.loadProducts();
 });
 
-function handleSearch() {
-  catalogStore.searchProducts(catalogStore.searchQuery, catalogStore.selectedCategory || undefined);
+let searchTimeout: ReturnType<typeof setTimeout> | null = null;
+
+function handleSearchDebounced(value: string | null) {
+  if (searchTimeout) {
+    clearTimeout(searchTimeout);
+  }
+  searchTimeout = setTimeout(() => {
+    catalogStore.setSearch(value || '');
+  }, 300);
 }
 
-async function handleCategorySelect(category: string) {
-  if (catalogStore.selectedCategory === category) {
-    catalogStore.selectedCategory = null;
-    await catalogStore.searchProducts(catalogStore.searchQuery);
-  } else {
-    await catalogStore.getProductsByCategory(category);
+function handleCategorySelect(category: string | null) {
+  catalogStore.setCategory(category);
+}
+
+interface TableOptions {
+  page: number;
+  itemsPerPage: number;
+  sortBy?: Array<{ key: string; order: 'asc' | 'desc' }>;
+}
+
+function handleTableOptionsUpdate(options: TableOptions) {
+  const needsUpdate = 
+    options.page !== catalogStore.currentPage ||
+    options.itemsPerPage !== catalogStore.itemsPerPage ||
+    (options.sortBy && options.sortBy.length > 0 && options.sortBy[0] &&
+      (options.sortBy[0].key !== catalogStore.sortBy || 
+       (options.sortBy[0].order === 'desc') !== catalogStore.sortDesc));
+
+  if (!needsUpdate) {
+    return;
+  }
+
+  if (options.page !== catalogStore.currentPage) {
+    catalogStore.setPage(options.page);
+  } else if (options.itemsPerPage !== catalogStore.itemsPerPage) {
+    catalogStore.setItemsPerPage(options.itemsPerPage);
+  } else if (options.sortBy && options.sortBy.length > 0 && options.sortBy[0]) {
+    catalogStore.setSorting(
+      options.sortBy[0].key,
+      options.sortBy[0].order === 'desc'
+    );
   }
 }
 </script>
@@ -131,15 +192,5 @@ async function handleCategorySelect(category: string) {
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
-}
-
-.product-card {
-  transition: all 0.3s ease;
-}
-
-.product-card:hover {
-  border-color: rgb(var(--v-theme-primary));
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-  transform: translateY(-2px);
 }
 </style>
