@@ -96,6 +96,10 @@ const emit = defineEmits<{
 
 const localValues = ref<Record<string, any>>(convertToLocalValues(props.modelValue, props.fieldDefinitions));
 
+// Track if this update came from props to avoid circular updates
+let isExternalUpdate = false;
+let debounceTimer: ReturnType<typeof setTimeout> | null = null;
+
 function convertToLocalValues(values: Record<string, string>, fields: FieldDefinition[]): Record<string, any> {
   const converted: Record<string, any> = {};
   
@@ -119,8 +123,7 @@ function convertToLocalValues(values: Record<string, string>, fields: FieldDefin
   return converted;
 }
 
-// Watch for changes in local values and emit updates
-watch(localValues, (newValues) => {
+function emitChanges(newValues: Record<string, any>): void {
   const stringValues: Record<string, string> = {};
   
   Object.entries(newValues).forEach(([key, value]) => {
@@ -139,11 +142,27 @@ watch(localValues, (newValues) => {
   });
   
   emit('update:modelValue', stringValues);
-}, { deep: true });
+}
 
-// Watch for external changes to modelValue
+// Watch for external changes to modelValue prop
 watch(() => props.modelValue, (newValue) => {
+  isExternalUpdate = true;
   localValues.value = convertToLocalValues(newValue, props.fieldDefinitions);
+  isExternalUpdate = false;
+});
+
+// Watch for changes in local values with debouncing
+watch(localValues, (newValues) => {
+  if (isExternalUpdate) return;
+  
+  // Clear existing timer
+  if (debounceTimer) clearTimeout(debounceTimer);
+  
+  // Debounce emit by 100ms
+  debounceTimer = setTimeout(() => {
+    emitChanges(newValues);
+    debounceTimer = null;
+  }, 100);
 }, { deep: true });
 
 function formatFieldName(name: string): string {

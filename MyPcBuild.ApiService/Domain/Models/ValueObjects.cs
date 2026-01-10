@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace MyPcBuild.ApiService.Domain.Models;
 
 /// <summary>
@@ -114,7 +116,8 @@ public record Frequency
     public static readonly string Unit = "GHz";
     public decimal ValueInGHz { get; }
 
-    private Frequency(decimal valueInGHz)
+    [JsonConstructor]
+    public Frequency(decimal valueInGHz)
     {
         if (valueInGHz < 0)
         {
@@ -141,7 +144,8 @@ public record StorageCapacity
 
     public int ValueInGB { get; }
 
-    private StorageCapacity(int valueInGB)
+    [JsonConstructor]
+    public StorageCapacity(int valueInGB)
     {
         if (valueInGB < 0)
         {
@@ -167,7 +171,8 @@ public record Power
     public static readonly string Unit = "W";
     public int ValueInWatts { get; }
 
-    private Power(int valueInWatts)
+    [JsonConstructor]
+    public Power(int valueInWatts)
     {
         if (valueInWatts < 0)
         {
@@ -190,7 +195,8 @@ public record Voltage
     public static readonly string Unit = "V";
     public decimal ValueInVolts { get; }
 
-    private Voltage(decimal valueInVolts)
+    [JsonConstructor]
+    public Voltage(decimal valueInVolts)
     {
         if (valueInVolts < 0)
         {
@@ -214,7 +220,8 @@ public record Length
 
     public int ValueInMm { get; }
 
-    private Length(int valueInMm)
+    [JsonConstructor]
+    public Length(int valueInMm)
     {
         if (valueInMm < 0)
         {
@@ -240,7 +247,8 @@ public record DataSpeed
     public static readonly string Unit = "MB/s";
     public int ValueInMBps { get; }
 
-    private DataSpeed(int valueInMBps)
+    [JsonConstructor]
+    public DataSpeed(int valueInMBps)
     {
         if (valueInMBps < 0)
         {

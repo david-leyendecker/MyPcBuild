@@ -1,46 +1,77 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
-import { type Product } from '@/api/catalog';
+import { type ProductSummary, type GetProductsResponse } from '@/api/catalog';
 import { catalogApi } from '@/api/catalog';
 
 export const useCatalogStore = defineStore('catalog', () => {
-  const products = ref<Product[]>([]);
+  const products = ref<ProductSummary[]>([]);
+  const totalProducts = ref(0);
   const selectedCategory = ref<string | null>(null);
   const searchQuery = ref('');
+  const currentPage = ref(1);
+  const itemsPerPage = ref(10);
+  const sortBy = ref('name');
+  const sortDesc = ref(false);
   const isLoading = ref(false);
   const error = ref<string | null>(null);
 
-  async function searchProducts(query: string = '', category?: string) {
+  async function loadProducts() {
     isLoading.value = true;
     error.value = null;
     try {
-      products.value = await catalogApi.searchProducts({
-        search: query || undefined,
-        category: category || undefined,
-        limit: 50
+      const filters: string[] = [];
+      
+      if (selectedCategory.value) {
+        filters.push(`CategoryName=${selectedCategory.value}`);
+      }
+      
+      const response: GetProductsResponse = await catalogApi.getProducts({
+        filters: filters.length > 0 ? filters.join(',') : undefined,
+        search: searchQuery.value || undefined,
+        page: currentPage.value,
+        itemsPerPage: itemsPerPage.value,
+        sortBy: sortBy.value,
+        sortDesc: sortDesc.value
       });
-    } catch (err) {
-      error.value = err instanceof Error ? err.message : 'Failed to search products';
-    } finally {
-      isLoading.value = false;
-    }
-  }
-
-  async function getProductsByCategory(category: string) {
-    isLoading.value = true;
-    error.value = null;
-    selectedCategory.value = category;
-    try {
-      products.value = await catalogApi.getProductsByCategory(category);
+      
+      products.value = response.items;
+      totalProducts.value = response.pagination.total;
     } catch (err) {
       error.value = err instanceof Error ? err.message : 'Failed to load products';
+      products.value = [];
+      totalProducts.value = 0;
     } finally {
       isLoading.value = false;
     }
   }
 
-  function setSearchQuery(query: string) {
+  function setCategory(category: string | null) {
+    selectedCategory.value = category;
+    currentPage.value = 1; // Reset to first page when filtering
+    loadProducts();
+  }
+
+  function setSearch(query: string) {
     searchQuery.value = query;
+    currentPage.value = 1; // Reset to first page when searching
+    loadProducts();
+  }
+
+  function setPage(page: number) {
+    currentPage.value = page;
+    loadProducts();
+  }
+
+  function setItemsPerPage(count: number) {
+    itemsPerPage.value = count;
+    currentPage.value = 1; // Reset to first page when changing items per page
+    loadProducts();
+  }
+
+  function setSorting(column: string, descending: boolean) {
+    sortBy.value = column;
+    sortDesc.value = descending;
+    loadProducts();
   }
 
   function clearError() {
@@ -49,13 +80,21 @@ export const useCatalogStore = defineStore('catalog', () => {
 
   return {
     products,
+    totalProducts,
     selectedCategory,
     searchQuery,
+    currentPage,
+    itemsPerPage,
+    sortBy,
+    sortDesc,
     isLoading,
     error,
-    searchProducts,
-    getProductsByCategory,
-    setSearchQuery,
+    loadProducts,
+    setCategory,
+    setSearch,
+    setPage,
+    setItemsPerPage,
+    setSorting,
     clearError
   };
 });

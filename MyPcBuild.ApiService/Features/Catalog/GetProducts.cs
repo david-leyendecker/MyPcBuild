@@ -1,39 +1,63 @@
 using Marten;
 using MyPcBuild.ApiService.Domain.Models;
+using MyPcBuild.ApiService.Infrastructure;
+using System.Linq.Expressions;
 
 namespace MyPcBuild.ApiService.Features.Catalog;
 
 public static class GetProducts
 {
+    private static readonly Dictionary<string, Expression<Func<Product, object>>> _sortKeySelectors = new(StringComparer.OrdinalIgnoreCase)
+    {
+        [nameof(Product.Name)] = p => p.Name,
+        [nameof(Product.CategoryName)] = p => p.CategoryName,
+        [nameof(Product.Price)] = p => p.Price,
+        [nameof(Product.Manufacturer)] = p => p.Manufacturer
+    };
+
+    private static readonly Dictionary<string, Func<IQueryable<Product>, string, IQueryable<Product>>> _filterFunctions = new(StringComparer.OrdinalIgnoreCase)
+    {
+        [nameof(Product.CategoryName)] = (q, v) => q.Where(p => p.CategoryName.Contains(v, StringComparison.InvariantCultureIgnoreCase))
+    };
+
     public static IEndpointRouteBuilder MapGetProductsEndpoint(this IEndpointRouteBuilder app)
     {
         app.MapGet("/api/catalog/products", async (
             IDocumentSession session,
-            string? category = null,
-            string? search = null,
-            int page = 1,
-            int pageSize = 20) =>
+            [AsParameters] QueryParameters queryParams) =>
         {
             IQueryable<Product> query = session.Query<Product>();
 
-            if (!string.IsNullOrWhiteSpace(category))
+            // Apply generic filters
+            query = ApplyFilters(query, queryParams.Filters);
+
+            // Apply search filter
+            if (!string.IsNullOrWhiteSpace(queryParams.Search))
             {
-                query = query.Where(p => p.CategoryName == category);
+                query = query.Where(p => p.Name.Contains(queryParams.Search, StringComparison.InvariantCultureIgnoreCase)
+                    || p.Manufacturer.Contains(queryParams.Search, StringComparison.InvariantCultureIgnoreCase));
             }
 
-            if (!string.IsNullOrWhiteSpace(search))
-            {
-                query = query.Where(p => p.Name.Contains(search) || p.Manufacturer.Contains(search));
-            }
-
+            // Get total count before pagination
             int totalCount = await query.CountAsync();
+
+            // Apply sorting (always ensure ordering for pagination correctness)
+            string sortBy = queryParams.SortBy ?? "name";
+            query = ApplySorting(query, sortBy, queryParams.SortDesc);
+
+            // Apply pagination
             IReadOnlyList<Product> productResults = await query
-                .OrderBy(p => p.CategoryName)
-                .ThenBy(p => p.Name)
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
+                .Skip(queryParams.GetSkip())
+                .Take(queryParams.ItemsPerPage)
                 .ToListAsync();
-            
+
+            PaginationMetadata pagination = new()
+            {
+                Total = totalCount,
+                Page = queryParams.Page,
+                ItemsPerPage = queryParams.ItemsPerPage
+            };
+
             GetProductsResponse response = new(
                 productResults.Select(p => new ProductSummary(
                     p.Id,
@@ -42,11 +66,7 @@ public static class GetProducts
                     p.Price,
                     p.Manufacturer
                 )).ToList(),
-                totalCount,
-                page,
-                pageSize,
-                category,
-                search
+                pagination
             );
 
             return Results.Ok(response);
@@ -56,15 +76,53 @@ public static class GetProducts
 
         return app;
     }
+
+    private static IQueryable<Product> ApplyFilters(IQueryable<Product> query, string? filtersString)
+    {
+        if (string.IsNullOrWhiteSpace(filtersString))
+        {
+            return query;
+        }
+
+        string[] filterPairs = filtersString.Split(',', StringSplitOptions.RemoveEmptyEntries);
+
+        foreach (string filterPair in filterPairs)
+        {
+            string[] parts = filterPair.Split('=', StringSplitOptions.RemoveEmptyEntries);
+            if (parts.Length != 2)
+            {
+                continue;
+            }
+
+            string fieldName = parts[0].Trim();
+            string filterValue = parts[1].Trim();
+
+            if (!_filterFunctions.TryGetValue(fieldName, out Func<IQueryable<Product>, string, IQueryable<Product>>? filterFunction))
+            {
+                throw new InvalidOperationException($"Filter '{fieldName}' is not supported. Supported filters: {string.Join(", ", _filterFunctions.Keys)}.");
+            }
+
+            query = filterFunction(query, filterValue);
+        }
+
+        return query;
+    }
+
+    private static IQueryable<Product> ApplySorting(IQueryable<Product> query, string sortBy, bool sortDesc)
+    {
+        Expression<Func<Product, object>> keySelector = _sortKeySelectors.TryGetValue(sortBy, out Expression<Func<Product, object>>? selector)
+            ? selector
+            : _sortKeySelectors[nameof(Product.Name)];
+
+        return sortDesc
+            ? query.OrderByDescending(keySelector).ThenBy(p => p.Name)
+            : query.OrderBy(keySelector).ThenBy(p => p.Name);
+    }
 }
 
 public record GetProductsResponse(
-    List<ProductSummary> Products,
-    int TotalCount,
-    int CurrentPage,
-    int PageSize,
-    string? FilteredCategory,
-    string? SearchTerm
+    List<ProductSummary> Items,
+    PaginationMetadata Pagination
 );
 
 public record ProductSummary(

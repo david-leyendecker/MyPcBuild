@@ -50,24 +50,55 @@ The product catalog is automatically seeded on application startup with a compre
 ## API Endpoints
 
 ### GET /api/catalog/products
-Get paginated list of products with optional filtering
+Get paginated list of products with optional filtering, searching, and sorting.
 
 **Query Parameters:**
-- `category` (optional): Filter by ProductCategory enum (0-7)
+All query parameters are validated using DataAnnotations.
+- `category` (optional): Filter by category name (e.g., "CPU", "GPU", "Motherboard")
 - `search` (optional): Search in product name or manufacturer
-- `page` (default: 1): Page number
-- `pageSize` (default: 20): Items per page
+- `page` (default: 1, min: 1): Page number - validated with `[Range(1, int.MaxValue)]`
+- `itemsPerPage` (default: 10, min: 1, max: 100): Items per page - validated with `[Range(1, 100)]`
+- `sortBy` (default: "name"): Sort field - one of: "name", "category", "categoryName", "price", "manufacturer"
+- `sortDesc` (default: false): Sort in descending order
 
 **Response:**
 ```json
 {
-  "count": 24,
-  "pageCount": 2,
-  "pageNumber": 1,
-  "pageSize": 20,
-  "items": [...]
+  "items": [
+    {
+      "id": "guid",
+      "name": "AMD Ryzen 9 7950X",
+      "categoryName": "CPU",
+      "price": 549.99,
+      "manufacturer": "AMD"
+    }
+  ],
+  "pagination": {
+    "total": 24,
+    "page": 1,
+    "itemsPerPage": 10,
+    "totalPages": 3,
+    "hasNextPage": true,
+    "hasPreviousPage": false
+  }
 }
 ```
+
+**Pagination Metadata:**
+The response uses a reusable `PaginationMetadata` object that provides:
+- `total`: Total number of items matching the query
+- `page`: Current page number (1-based)
+- `itemsPerPage`: Number of items per page
+- `totalPages`: Total number of pages (calculated)
+- `hasNextPage`: Boolean indicating if there is a next page
+- `hasPreviousPage`: Boolean indicating if there is a previous page
+
+**Notes:**
+- Results are always ordered to ensure consistent pagination
+- Query parameters use the shared `QueryParameters` class with DataAnnotations validation
+- Invalid page numbers (< 1) return HTTP 400 with validation error message
+- Invalid itemsPerPage (< 1 or > 100) returns HTTP 400 with validation error message
+- The response does not echo back query parameters (category, search, sortBy, sortDesc) as the client already knows what it sent
 
 ### GET /api/catalog/products/{id}
 Get single product by GUID

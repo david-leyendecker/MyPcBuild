@@ -56,6 +56,7 @@ public static class GetFieldDefinitions
 
     private static List<FieldDefinition> GetCpuFields()
     {
+
         return
         [
             SelectField(nameof(CpuProduct.Socket), ["AM5", "AM4", "LGA1700", "LGA1200", "LGA1151"], required: true),

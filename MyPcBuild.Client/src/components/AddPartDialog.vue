@@ -82,22 +82,22 @@ const isLoading = ref(false);
 const filteredProducts = computed(() => {
   return catalogStore.products.filter(p => {
     const matchesSearch = p.name.toLowerCase().includes(searchQuery.value.toLowerCase());
-    const matchesCategory = !selectedCategory.value || p.category === selectedCategory.value;
+    const matchesCategory = !selectedCategory.value || p.categoryName === selectedCategory.value;
     return matchesSearch && matchesCategory;
   });
 });
 
 onMounted(() => {
-  catalogStore.searchProducts();
+  catalogStore.loadProducts();
 });
 
 function handleSearch() {
-  catalogStore.searchProducts(searchQuery.value, selectedCategory.value || undefined);
+  catalogStore.setSearch(searchQuery.value);
 }
 
 function selectCategory(category: string) {
   selectedCategory.value = selectedCategory.value === category ? null : category;
-  handleSearch();
+  catalogStore.setCategory(selectedCategory.value);
 }
 
 function selectProduct(productId: string) {
