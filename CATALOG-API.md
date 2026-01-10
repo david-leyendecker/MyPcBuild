@@ -50,24 +50,43 @@ The product catalog is automatically seeded on application startup with a compre
 ## API Endpoints
 
 ### GET /api/catalog/products
-Get paginated list of products with optional filtering
+Get paginated list of products with optional filtering, searching, and sorting.
 
 **Query Parameters:**
-- `category` (optional): Filter by ProductCategory enum (0-7)
+- `category` (optional): Filter by category name (e.g., "CPU", "GPU", "Motherboard")
 - `search` (optional): Search in product name or manufacturer
-- `page` (default: 1): Page number
-- `pageSize` (default: 20): Items per page
+- `page` (default: 1, min: 1): Page number
+- `itemsPerPage` (default: 10, min: 1, max: 100): Items per page
+- `sortBy` (default: "name"): Sort field - one of: "name", "category", "categoryName", "price", "manufacturer"
+- `sortDesc` (default: false): Sort in descending order
 
 **Response:**
 ```json
 {
-  "count": 24,
-  "pageCount": 2,
-  "pageNumber": 1,
-  "pageSize": 20,
-  "items": [...]
+  "items": [
+    {
+      "id": "guid",
+      "name": "AMD Ryzen 9 7950X",
+      "categoryName": "CPU",
+      "price": 549.99,
+      "manufacturer": "AMD"
+    }
+  ],
+  "total": 24,
+  "page": 1,
+  "itemsPerPage": 10,
+  "sortBy": "name",
+  "sortDesc": false,
+  "category": null,
+  "search": null
 }
 ```
+
+**Notes:**
+- Results are always ordered to ensure consistent pagination
+- Invalid page numbers (< 1) return HTTP 400
+- Invalid itemsPerPage (< 1 or > 100) returns HTTP 400
+- The `total` field indicates the total number of items matching the filters
 
 ### GET /api/catalog/products/{id}
 Get single product by GUID
