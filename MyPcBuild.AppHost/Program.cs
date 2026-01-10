@@ -9,8 +9,12 @@ var postgres = builder.AddPostgres("postgres")
 
 var postgresDb = postgres.AddDatabase("mypcbuild");
 
+// Add OpenAI service
+var openai = builder.AddOpenAI("openai");
+
 IResourceBuilder<ProjectResource> apiService = builder.AddProject<Projects.MyPcBuild_ApiService>("apiservice")
     .WithReference(postgresDb)
+    .WithReference(openai)
     .WithHttpHealthCheck("/health")
     .WaitFor(postgres);
 

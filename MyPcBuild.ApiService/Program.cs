@@ -2,6 +2,7 @@ using System;
 using System.Text.Json.Serialization;
 using Marten;
 using Marten.Events.Projections;
+using Microsoft.Extensions.AI;
 using MyPcBuild.ApiService.Domain.Events;
 using MyPcBuild.ApiService.Domain.Models;
 using MyPcBuild.ApiService.Features.Builds;
@@ -36,6 +37,12 @@ builder.Services.AddCors(options =>
               .AllowCredentials();
     });
 });
+
+// Add OpenAI chat client
+builder.AddOpenAIClient("openai");
+
+// Register AI product generator
+builder.Services.AddScoped<IAiProductGenerator, OpenAiProductGenerator>();
 
 // Register compatibility validator
 builder.Services.AddScoped<ICompatibilityValidator, CompatibilityValidator>();

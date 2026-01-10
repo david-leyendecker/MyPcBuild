@@ -16,6 +16,17 @@ public abstract record Product(
     /// Gets the category name for this product type.
     /// </summary>
     public abstract string CategoryName { get; }
+
+    /// <summary>
+    /// Indicates whether this product is a draft (AI-generated but not yet published).
+    /// Draft products cannot be added to builds.
+    /// </summary>
+    public bool IsDraft { get; init; } = false;
+
+    /// <summary>
+    /// The timestamp when the product was published (null for draft products).
+    /// </summary>
+    public DateTime? PublishedAt { get; init; }
 };
 
 /// <summary>

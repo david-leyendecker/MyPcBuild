@@ -17,7 +17,8 @@ public static class GetProducts
 
     private static readonly Dictionary<string, Func<IQueryable<Product>, string, IQueryable<Product>>> _filterFunctions = new(StringComparer.OrdinalIgnoreCase)
     {
-        [nameof(Product.CategoryName)] = (q, v) => q.Where(p => p.CategoryName.Contains(v, StringComparison.InvariantCultureIgnoreCase))
+        [nameof(Product.CategoryName)] = (q, v) => q.Where(p => p.CategoryName.Contains(v, StringComparison.InvariantCultureIgnoreCase)),
+        [nameof(Product.IsDraft)] = (q, v) => bool.TryParse(v, out bool isDraft) ? q.Where(p => p.IsDraft == isDraft) : q
     };
 
     public static IEndpointRouteBuilder MapGetProductsEndpoint(this IEndpointRouteBuilder app)
@@ -64,7 +65,9 @@ public static class GetProducts
                     p.Name,
                     p.CategoryName,
                     p.Price,
-                    p.Manufacturer
+                    p.Manufacturer,
+                    p.IsDraft,
+                    p.PublishedAt
                 )).ToList(),
                 pagination
             );
@@ -130,5 +133,7 @@ public record ProductSummary(
     string Name,
     string CategoryName,
     decimal Price,
-    string Manufacturer
+    string Manufacturer,
+    bool IsDraft,
+    DateTime? PublishedAt
 );
