@@ -11,32 +11,28 @@
 
     <v-row>
       <!-- Category Filter -->
-      <v-col cols="12" md="3" lg="2">
+      <v-col cols="12">
         <h3 class="text-subtitle-1 font-weight-medium mb-3">Categories</h3>
-        <div class="d-flex flex-column ga-2">
-          <v-btn 
-            :variant="catalogStore.selectedCategory === null ? 'elevated' : 'outlined'"
-            size="small"
-            class="justify-start"
-            @click="handleCategorySelect(null)"
-          >
+        <v-chip-group
+          :model-value="catalogStore.selectedCategory"
+          filter
+          @update:model-value="handleCategorySelect"
+        >
+          <v-chip value="">
             All Categories
-          </v-btn>
-          <v-btn 
+          </v-chip>
+          <v-chip 
             v-for="category in categories"
             :key="category"
-            :variant="catalogStore.selectedCategory === category ? 'elevated' : 'outlined'"
-            size="small"
-            class="justify-start"
-            @click="handleCategorySelect(category)"
+            :value="category"
           >
             {{ category }}
-          </v-btn>
-        </div>
+          </v-chip>
+        </v-chip-group>
       </v-col>
 
       <!-- Products Data Table -->
-      <v-col cols="12" md="9" lg="10">
+      <v-col cols="12">
         <v-card>
           <v-card-title>
             <v-text-field 
@@ -78,18 +74,10 @@
             </template>
 
             <template #item.actions="{ item }">
-              <v-btn 
-                icon="mdi-plus"
-                size="small"
-                variant="text"
-                color="primary"
-                @click="$emit('product-selected', item)"
-              >
-                <v-icon>mdi-plus</v-icon>
-                <v-tooltip activator="parent" location="top">
-                  Add to Build
-                </v-tooltip>
-              </v-btn>
+              <div class="d-flex ga-2 justify-end">
+                <v-icon color="medium-emphasis" icon="mdi-pencil" size="small" @click="edit(item.id)"></v-icon>
+                <v-icon color="medium-emphasis" icon="mdi-delete" size="small" @click="remove(item.id)"></v-icon>
+              </div>
             </template>
 
             <template #no-data>
@@ -150,7 +138,17 @@ function handleSearchDebounced(value: string | null) {
 }
 
 function handleCategorySelect(category: string | null) {
-  catalogStore.setCategory(category);
+  catalogStore.setCategory(category === '' ? null : category);
+}
+
+function edit(id: string) {
+  // TODO: Implement edit functionality
+  console.log('Edit product:', id);
+}
+
+function remove(id: string) {
+  // TODO: Implement remove functionality
+  console.log('Remove product:', id);
 }
 
 interface TableOptions {

@@ -1,11 +1,20 @@
 using Marten;
 using MyPcBuild.ApiService.Domain.Models;
 using MyPcBuild.ApiService.Infrastructure;
+using System.Linq.Expressions;
 
 namespace MyPcBuild.ApiService.Features.Catalog;
 
 public static class GetProducts
 {
+    private static readonly Dictionary<string, Expression<Func<Product, object>>> _sortKeySelectors = new(StringComparer.OrdinalIgnoreCase)
+    {
+        [nameof(Product.Name)] = p => p.Name,
+        [nameof(Product.CategoryName)] = p => p.CategoryName,
+        [nameof(Product.Price)] = p => p.Price,
+        [nameof(Product.Manufacturer)] = p => p.Manufacturer
+    };
+
     public static IEndpointRouteBuilder MapGetProductsEndpoint(this IEndpointRouteBuilder app)
     {
         app.MapGet("/api/catalog/products", async (
@@ -38,7 +47,7 @@ public static class GetProducts
                 .Skip(queryParams.GetSkip())
                 .Take(queryParams.ItemsPerPage)
                 .ToListAsync();
-            
+
             PaginationMetadata pagination = new()
             {
                 Total = totalCount,
@@ -67,24 +76,13 @@ public static class GetProducts
 
     private static IQueryable<Product> ApplySorting(IQueryable<Product> query, string sortBy, bool sortDesc)
     {
-        // Normalize sortBy to lowercase for case-insensitive comparison
-        string sortField = sortBy.ToLowerInvariant();
+        Expression<Func<Product, object>> keySelector = _sortKeySelectors.TryGetValue(sortBy, out Expression<Func<Product, object>>? selector)
+            ? selector
+            : _sortKeySelectors[nameof(Product.Name)];
 
-        return sortField switch
-        {
-            "name" => sortDesc ? query.OrderByDescending(p => p.Name) : query.OrderBy(p => p.Name),
-            "category" or "categoryname" => sortDesc 
-                ? query.OrderByDescending(p => p.CategoryName).ThenBy(p => p.Name)
-                : query.OrderBy(p => p.CategoryName).ThenBy(p => p.Name),
-            "price" => sortDesc 
-                ? query.OrderByDescending(p => p.Price).ThenBy(p => p.Name)
-                : query.OrderBy(p => p.Price).ThenBy(p => p.Name),
-            "manufacturer" => sortDesc 
-                ? query.OrderByDescending(p => p.Manufacturer).ThenBy(p => p.Name)
-                : query.OrderBy(p => p.Manufacturer).ThenBy(p => p.Name),
-            // Default to name sorting if invalid sortBy value
-            _ => query.OrderBy(p => p.Name)
-        };
+        return sortDesc
+            ? query.OrderByDescending(keySelector).ThenBy(p => p.Name)
+            : query.OrderBy(keySelector).ThenBy(p => p.Name);
     }
 }
 
