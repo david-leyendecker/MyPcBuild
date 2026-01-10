@@ -1,5 +1,6 @@
 using Marten;
 using MyPcBuild.ApiService.Domain.Models;
+using MyPcBuild.ApiService.Infrastructure;
 
 namespace MyPcBuild.ApiService.Features.Catalog;
 
@@ -9,48 +10,33 @@ public static class GetProducts
     {
         app.MapGet("/api/catalog/products", async (
             IDocumentSession session,
-            string? category = null,
-            string? search = null,
-            int page = 1,
-            int itemsPerPage = 10,
-            string sortBy = "name",
-            bool sortDesc = false) =>
+            [AsParameters] QueryParameters queryParams) =>
         {
-            // Validate parameters
-            if (page < 1)
-            {
-                return Results.BadRequest(new { error = "Page must be greater than or equal to 1" });
-            }
-
-            if (itemsPerPage < 1 || itemsPerPage > 100)
-            {
-                return Results.BadRequest(new { error = "ItemsPerPage must be between 1 and 100" });
-            }
-
             IQueryable<Product> query = session.Query<Product>();
 
             // Apply category filter
-            if (!string.IsNullOrWhiteSpace(category))
+            if (!string.IsNullOrWhiteSpace(queryParams.Category))
             {
-                query = query.Where(p => p.CategoryName == category);
+                query = query.Where(p => p.CategoryName == queryParams.Category);
             }
 
             // Apply search filter
-            if (!string.IsNullOrWhiteSpace(search))
+            if (!string.IsNullOrWhiteSpace(queryParams.Search))
             {
-                query = query.Where(p => p.Name.Contains(search) || p.Manufacturer.Contains(search));
+                query = query.Where(p => p.Name.Contains(queryParams.Search) || p.Manufacturer.Contains(queryParams.Search));
             }
 
             // Get total count before pagination
             int totalCount = await query.CountAsync();
 
             // Apply sorting (always ensure ordering for pagination correctness)
-            query = ApplySorting(query, sortBy, sortDesc);
+            string sortBy = queryParams.SortBy ?? "name";
+            query = ApplySorting(query, sortBy, queryParams.SortDesc);
 
             // Apply pagination
             IReadOnlyList<Product> productResults = await query
-                .Skip((page - 1) * itemsPerPage)
-                .Take(itemsPerPage)
+                .Skip(queryParams.GetSkip())
+                .Take(queryParams.ItemsPerPage)
                 .ToListAsync();
             
             GetProductsResponse response = new(
@@ -62,12 +48,12 @@ public static class GetProducts
                     p.Manufacturer
                 )).ToList(),
                 totalCount,
-                page,
-                itemsPerPage,
+                queryParams.Page,
+                queryParams.ItemsPerPage,
                 sortBy,
-                sortDesc,
-                category,
-                search
+                queryParams.SortDesc,
+                queryParams.Category,
+                queryParams.Search
             );
 
             return Results.Ok(response);

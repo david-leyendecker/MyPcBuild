@@ -53,10 +53,11 @@ The product catalog is automatically seeded on application startup with a compre
 Get paginated list of products with optional filtering, searching, and sorting.
 
 **Query Parameters:**
+All query parameters are validated using DataAnnotations.
 - `category` (optional): Filter by category name (e.g., "CPU", "GPU", "Motherboard")
 - `search` (optional): Search in product name or manufacturer
-- `page` (default: 1, min: 1): Page number
-- `itemsPerPage` (default: 10, min: 1, max: 100): Items per page
+- `page` (default: 1, min: 1): Page number - validated with `[Range(1, int.MaxValue)]`
+- `itemsPerPage` (default: 10, min: 1, max: 100): Items per page - validated with `[Range(1, 100)]`
 - `sortBy` (default: "name"): Sort field - one of: "name", "category", "categoryName", "price", "manufacturer"
 - `sortDesc` (default: false): Sort in descending order
 
@@ -84,8 +85,9 @@ Get paginated list of products with optional filtering, searching, and sorting.
 
 **Notes:**
 - Results are always ordered to ensure consistent pagination
-- Invalid page numbers (< 1) return HTTP 400
-- Invalid itemsPerPage (< 1 or > 100) returns HTTP 400
+- Query parameters use the shared `QueryParameters` class with DataAnnotations validation
+- Invalid page numbers (< 1) return HTTP 400 with validation error message
+- Invalid itemsPerPage (< 1 or > 100) returns HTTP 400 with validation error message
 - The `total` field indicates the total number of items matching the filters
 
 ### GET /api/catalog/products/{id}
