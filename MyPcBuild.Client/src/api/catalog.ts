@@ -14,6 +14,8 @@ export interface ProductSummary {
   categoryName: string;
   price: number;
   manufacturer: string;
+  isDraft: boolean;
+  publishedAt: string | null;
 }
 
 export interface GetProductsParams {
@@ -62,6 +64,21 @@ export interface CreateProductRequest {
   fields: Record<string, string>;
 }
 
+export interface GenerateProductRequest {
+  category: string;
+  description: string;
+}
+
+export interface GenerateProductResponse {
+  id: string;
+  product: Product;
+}
+
+export interface PublishProductResponse {
+  id: string;
+  product: Product;
+}
+
 export const catalogApi = {
   async getProducts(params: GetProductsParams): Promise<GetProductsResponse> {
     const response = await apiClient.get<GetProductsResponse>('/catalog/products', { params });
@@ -92,6 +109,16 @@ export const catalogApi = {
 
   async createProduct(request: CreateProductRequest): Promise<{ id: string }> {
     const response = await apiClient.post<{ id: string }>('/catalog/products', request);
+    return response.data;
+  },
+
+  async generateProductWithAi(request: GenerateProductRequest): Promise<GenerateProductResponse> {
+    const response = await apiClient.post<GenerateProductResponse>('/catalog/products/generate-with-ai', request);
+    return response.data;
+  },
+
+  async publishProduct(id: string): Promise<PublishProductResponse> {
+    const response = await apiClient.post<PublishProductResponse>(`/catalog/products/${id}/publish`);
     return response.data;
   }
 };

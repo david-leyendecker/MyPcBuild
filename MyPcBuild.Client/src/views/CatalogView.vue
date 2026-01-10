@@ -66,6 +66,27 @@
               <span class="font-weight-medium">{{ item.name }}</span>
             </template>
 
+            <template #item.isDraft="{ item }">
+              <v-chip 
+                v-if="item.isDraft" 
+                size="small" 
+                color="warning" 
+                variant="tonal"
+              >
+                <v-icon start icon="mdi-pencil"></v-icon>
+                Draft
+              </v-chip>
+              <v-chip 
+                v-else 
+                size="small" 
+                color="success" 
+                variant="tonal"
+              >
+                <v-icon start icon="mdi-check-circle"></v-icon>
+                Published
+              </v-chip>
+            </template>
+
             <template #item.price="{ item }">
               <span class="text-success font-weight-semibold">${{ item.price.toFixed(2) }}</span>
             </template>
@@ -78,6 +99,17 @@
 
             <template #item.actions="{ item }">
               <div class="d-flex ga-2 justify-end">
+                <v-tooltip v-if="item.isDraft" text="Publish product">
+                  <template #activator="{ props }">
+                    <v-icon 
+                      v-bind="props"
+                      color="success" 
+                      icon="mdi-check-circle" 
+                      size="small" 
+                      @click="publish(item.id)"
+                    ></v-icon>
+                  </template>
+                </v-tooltip>
                 <v-icon color="medium-emphasis" icon="mdi-pencil" size="small" @click="edit(item.id)"></v-icon>
                 <v-icon color="medium-emphasis" icon="mdi-delete" size="small" @click="remove(item.id)"></v-icon>
               </div>
@@ -122,6 +154,7 @@ const headers = [
   { title: 'Category', key: 'categoryName', sortable: true },
   { title: 'Manufacturer', key: 'manufacturer', sortable: true },
   { title: 'Price', key: 'price', sortable: true },
+  { title: 'Status', key: 'isDraft', sortable: true },
   { title: 'Actions', key: 'actions', sortable: false, align: 'center' as const }
 ];
 
