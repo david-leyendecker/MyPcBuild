@@ -39,6 +39,13 @@ public static class GetProducts
                 .Take(queryParams.ItemsPerPage)
                 .ToListAsync();
             
+            PaginationMetadata pagination = new()
+            {
+                Total = totalCount,
+                Page = queryParams.Page,
+                ItemsPerPage = queryParams.ItemsPerPage
+            };
+
             GetProductsResponse response = new(
                 productResults.Select(p => new ProductSummary(
                     p.Id,
@@ -47,13 +54,7 @@ public static class GetProducts
                     p.Price,
                     p.Manufacturer
                 )).ToList(),
-                totalCount,
-                queryParams.Page,
-                queryParams.ItemsPerPage,
-                sortBy,
-                queryParams.SortDesc,
-                queryParams.Category,
-                queryParams.Search
+                pagination
             );
 
             return Results.Ok(response);
@@ -89,13 +90,7 @@ public static class GetProducts
 
 public record GetProductsResponse(
     List<ProductSummary> Items,
-    int Total,
-    int Page,
-    int ItemsPerPage,
-    string SortBy,
-    bool SortDesc,
-    string? Category,
-    string? Search
+    PaginationMetadata Pagination
 );
 
 public record ProductSummary(

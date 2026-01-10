@@ -73,22 +73,32 @@ All query parameters are validated using DataAnnotations.
       "manufacturer": "AMD"
     }
   ],
-  "total": 24,
-  "page": 1,
-  "itemsPerPage": 10,
-  "sortBy": "name",
-  "sortDesc": false,
-  "category": null,
-  "search": null
+  "pagination": {
+    "total": 24,
+    "page": 1,
+    "itemsPerPage": 10,
+    "totalPages": 3,
+    "hasNextPage": true,
+    "hasPreviousPage": false
+  }
 }
 ```
+
+**Pagination Metadata:**
+The response uses a reusable `PaginationMetadata` object that provides:
+- `total`: Total number of items matching the query
+- `page`: Current page number (1-based)
+- `itemsPerPage`: Number of items per page
+- `totalPages`: Total number of pages (calculated)
+- `hasNextPage`: Boolean indicating if there is a next page
+- `hasPreviousPage`: Boolean indicating if there is a previous page
 
 **Notes:**
 - Results are always ordered to ensure consistent pagination
 - Query parameters use the shared `QueryParameters` class with DataAnnotations validation
 - Invalid page numbers (< 1) return HTTP 400 with validation error message
 - Invalid itemsPerPage (< 1 or > 100) returns HTTP 400 with validation error message
-- The `total` field indicates the total number of items matching the filters
+- The response does not echo back query parameters (category, search, sortBy, sortDesc) as the client already knows what it sent
 
 ### GET /api/catalog/products/{id}
 Get single product by GUID

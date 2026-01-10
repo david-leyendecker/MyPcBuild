@@ -25,15 +25,18 @@ export interface GetProductsParams {
   sortDesc?: boolean;
 }
 
-export interface GetProductsResponse {
-  items: ProductSummary[];
+export interface PaginationMetadata {
   total: number;
   page: number;
   itemsPerPage: number;
-  sortBy: string;
-  sortDesc: boolean;
-  category?: string;
-  search?: string;
+  totalPages: number;
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
+}
+
+export interface GetProductsResponse {
+  items: ProductSummary[];
+  pagination: PaginationMetadata;
 }
 
 export interface CatalogSearchParams {
