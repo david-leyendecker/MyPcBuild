@@ -337,8 +337,12 @@ async function generateWithAi() {
     const product = generatedProduct.value.product;
     formData.value.name = product.name;
     formData.value.price = product.price;
-    // @ts-ignore - manufacturer exists on all product types
-    formData.value.manufacturer = product.specifications?.Manufacturer || product.manufacturer || '';
+    
+    // Get manufacturer from specifications or use a default
+    const manufacturer = product.specifications && 'Manufacturer' in product.specifications 
+      ? String(product.specifications.Manufacturer)
+      : '';
+    formData.value.manufacturer = manufacturer;
     
     // Load field definitions for the category
     await onCategoryChange();

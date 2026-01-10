@@ -142,6 +142,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { useCatalogStore } from '@/stores/catalogStore';
+import { catalogApi } from '@/api/catalog';
 import ViewHeader from '@/components/ViewHeader.vue';
 import { PRODUCT_CATALOG } from '@/config/navigation';
 
@@ -175,6 +176,16 @@ function handleSearchDebounced(value: string | null) {
 
 function handleCategorySelect(category: string | null) {
   catalogStore.setCategory(category === '' ? null : category);
+}
+
+async function publish(id: string) {
+  try {
+    await catalogApi.publishProduct(id);
+    // Reload products to show updated status
+    await catalogStore.loadProducts();
+  } catch (error) {
+    console.error('Failed to publish product:', error);
+  }
 }
 
 function edit(id: string) {
