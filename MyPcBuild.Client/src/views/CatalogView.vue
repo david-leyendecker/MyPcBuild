@@ -15,16 +15,19 @@
         <h3 class="text-subtitle-1 font-weight-medium mb-3">Categories</h3>
         <v-chip-group
           :model-value="catalogStore.selectedCategory"
-          filter
           @update:model-value="handleCategorySelect"
         >
-          <v-chip value="">
+          <v-chip 
+            value=""
+            :color="catalogStore.selectedCategory === '' || catalogStore.selectedCategory === null ? 'primary' : undefined"
+          >
             All Categories
           </v-chip>
           <v-chip 
             v-for="category in categories"
             :key="category"
             :value="category"
+            :color="catalogStore.selectedCategory === category ? 'primary' : undefined"
           >
             {{ category }}
           </v-chip>

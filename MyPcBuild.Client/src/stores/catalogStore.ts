@@ -19,8 +19,14 @@ export const useCatalogStore = defineStore('catalog', () => {
     isLoading.value = true;
     error.value = null;
     try {
+      const filters: string[] = [];
+      
+      if (selectedCategory.value) {
+        filters.push(`CategoryName=${selectedCategory.value}`);
+      }
+      
       const response: GetProductsResponse = await catalogApi.getProducts({
-        category: selectedCategory.value || undefined,
+        filters: filters.length > 0 ? filters.join(',') : undefined,
         search: searchQuery.value || undefined,
         page: currentPage.value,
         itemsPerPage: itemsPerPage.value,

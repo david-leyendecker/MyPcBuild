@@ -17,7 +17,7 @@ export interface ProductSummary {
 }
 
 export interface GetProductsParams {
-  category?: string;
+  filters?: string;
   search?: string;
   page?: number;
   itemsPerPage?: number;

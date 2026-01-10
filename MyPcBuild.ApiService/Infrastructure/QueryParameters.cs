@@ -35,9 +35,9 @@ public class QueryParameters
     public bool SortDesc { get; init; }
 
     /// <summary>
-    /// Category filter.
+    /// Generic filters as comma-separated field=value pairs (e.g., "categoryName=cpu,manufacturer=intel").
     /// </summary>
-    public string? Category { get; init; }
+    public string? Filters { get; init; }
 
     /// <summary>
     /// Calculates how many items to skip for pagination.

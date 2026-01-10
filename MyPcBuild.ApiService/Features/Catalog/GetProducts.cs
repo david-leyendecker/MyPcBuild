@@ -15,6 +15,11 @@ public static class GetProducts
         [nameof(Product.Manufacturer)] = p => p.Manufacturer
     };
 
+    private static readonly Dictionary<string, Func<IQueryable<Product>, string, IQueryable<Product>>> _filterFunctions = new(StringComparer.OrdinalIgnoreCase)
+    {
+        [nameof(Product.CategoryName)] = (q, v) => q.Where(p => p.CategoryName.Contains(v, StringComparison.InvariantCultureIgnoreCase))
+    };
+
     public static IEndpointRouteBuilder MapGetProductsEndpoint(this IEndpointRouteBuilder app)
     {
         app.MapGet("/api/catalog/products", async (
@@ -23,16 +28,14 @@ public static class GetProducts
         {
             IQueryable<Product> query = session.Query<Product>();
 
-            // Apply category filter
-            if (!string.IsNullOrWhiteSpace(queryParams.Category))
-            {
-                query = query.Where(p => p.CategoryName == queryParams.Category);
-            }
+            // Apply generic filters
+            query = ApplyFilters(query, queryParams.Filters);
 
             // Apply search filter
             if (!string.IsNullOrWhiteSpace(queryParams.Search))
             {
-                query = query.Where(p => p.Name.Contains(queryParams.Search) || p.Manufacturer.Contains(queryParams.Search));
+                query = query.Where(p => p.Name.Contains(queryParams.Search, StringComparison.InvariantCultureIgnoreCase)
+                    || p.Manufacturer.Contains(queryParams.Search, StringComparison.InvariantCultureIgnoreCase));
             }
 
             // Get total count before pagination
@@ -72,6 +75,37 @@ public static class GetProducts
         .WithTags("Catalog");
 
         return app;
+    }
+
+    private static IQueryable<Product> ApplyFilters(IQueryable<Product> query, string? filtersString)
+    {
+        if (string.IsNullOrWhiteSpace(filtersString))
+        {
+            return query;
+        }
+
+        string[] filterPairs = filtersString.Split(',', StringSplitOptions.RemoveEmptyEntries);
+
+        foreach (string filterPair in filterPairs)
+        {
+            string[] parts = filterPair.Split('=', StringSplitOptions.RemoveEmptyEntries);
+            if (parts.Length != 2)
+            {
+                continue;
+            }
+
+            string fieldName = parts[0].Trim();
+            string filterValue = parts[1].Trim();
+
+            if (!_filterFunctions.TryGetValue(fieldName, out Func<IQueryable<Product>, string, IQueryable<Product>>? filterFunction))
+            {
+                throw new InvalidOperationException($"Filter '{fieldName}' is not supported. Supported filters: {string.Join(", ", _filterFunctions.Keys)}.");
+            }
+
+            query = filterFunction(query, filterValue);
+        }
+
+        return query;
     }
 
     private static IQueryable<Product> ApplySorting(IQueryable<Product> query, string sortBy, bool sortDesc)
