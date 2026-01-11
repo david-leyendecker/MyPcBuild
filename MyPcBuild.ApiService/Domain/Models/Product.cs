@@ -70,7 +70,7 @@ public record CpuProduct(
     bool IntegratedGraphics
 ) : Product(Id, Name, Price, Manufacturer)
 {
-    public override string CategoryName => "CPU";
+    public override string CategoryName => ProductCategory.CPU.ToString();
 };
 
 public record MotherboardProduct(
@@ -88,7 +88,7 @@ public record MotherboardProduct(
     StorageCapacity MaxMemory
 ) : Product(Id, Name, Price, Manufacturer), ISlottedProduct
 {
-    public override string CategoryName => "Motherboard";
+    public override string CategoryName => ProductCategory.Motherboard.ToString();
 };
 
 public record GpuProduct(
@@ -111,7 +111,7 @@ public record GpuProduct(
     bool RayTracing
 ) : Product(Id, Name, Price, Manufacturer), ISlottedProduct
 {
-    public override string CategoryName => "GPU";
+    public override string CategoryName => ProductCategory.GPU.ToString();
 };
 
 public record RamProduct(
@@ -128,7 +128,7 @@ public record RamProduct(
     Voltage Voltage
 ) : Product(Id, Name, Price, Manufacturer)
 {
-    public override string CategoryName => "RAM";
+    public override string CategoryName => ProductCategory.RAM.ToString();
 };
 
 public record PcCaseProduct(
@@ -144,7 +144,7 @@ public record PcCaseProduct(
     string SidePanelWindow
 ) : Product(Id, Name, Price, Manufacturer), IChamberedProduct
 {
-    public override string CategoryName => "PCCase";
+    public override string CategoryName => ProductCategory.Case.ToString();
 };
 
 public record PsuProduct(
@@ -161,7 +161,7 @@ public record PsuProduct(
     int PCIe8Pin
 ) : Product(Id, Name, Price, Manufacturer)
 {
-    public override string CategoryName => "PSU";
+    public override string CategoryName => ProductCategory.PowerSupply.ToString();
 };
 
 public record StorageProduct(
@@ -178,7 +178,7 @@ public record StorageProduct(
     DataSpeed WriteSpeed
 ) : Product(Id, Name, Price, Manufacturer)
 {
-    public override string CategoryName => "Storage";
+    public override string CategoryName => ProductCategory.Storage.ToString();
 };
 
 public record CoolerProduct(
@@ -194,6 +194,6 @@ public record CoolerProduct(
     CpuSocket[] Sockets
 ) : Product(Id, Name, Price, Manufacturer), ISpatialProduct
 {
-    public override string CategoryName => "Cooler";
+    public override string CategoryName => ProductCategory.Cooler.ToString();
 };
 

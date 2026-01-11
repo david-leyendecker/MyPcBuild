@@ -15,14 +15,14 @@ public static class CreateProduct
         {
             Product product = request.Category switch
             {
-                "CPU" => CreateCpuProduct(request),
-                "Motherboard" => CreateMotherboardProduct(request),
-                "GPU" => CreateGpuProduct(request),
-                "RAM" => CreateRamProduct(request),
-                "PCCase" => CreatePcCaseProduct(request),
-                "PSU" => CreatePsuProduct(request),
-                "Storage" => CreateStorageProduct(request),
-                "Cooler" => CreateCoolerProduct(request),
+                ProductCategory.CPU => CreateCpuProduct(request),
+                ProductCategory.Motherboard => CreateMotherboardProduct(request),
+                ProductCategory.GPU => CreateGpuProduct(request),
+                ProductCategory.RAM => CreateRamProduct(request),
+                ProductCategory.Case => CreatePcCaseProduct(request),
+                ProductCategory.PowerSupply => CreatePsuProduct(request),
+                ProductCategory.Storage => CreateStorageProduct(request),
+                ProductCategory.Cooler => CreateCoolerProduct(request),
                 _ => throw new ArgumentException($"Unknown category: {request.Category}")
             };
 
@@ -158,7 +158,7 @@ public static class CreateProduct
 
     private static CoolerProduct CreateCoolerProduct(CreateProductRequest request)
     {
-        string socketsStr = request.Fields.GetValueOrDefault("Sockets", "AM5,LGA1700");
+        string socketsStr = request.Fields.GetValueOrDefault("Sockets", string.Empty);
         string[] socketArr = socketsStr.Split(',', StringSplitOptions.RemoveEmptyEntries);
         CpuSocket[] sockets = socketArr.Select(s => ParseEnum<CpuSocket>(s.Trim())).ToArray();
 
@@ -167,10 +167,10 @@ public static class CreateProduct
             request.Name,
             request.Price,
             request.Manufacturer,
-            ParseDimensions(request.Fields.GetValueOrDefault("Dimensions", "140,140,160")),
-            Enum.Parse<CoolerType>(request.Fields.GetValueOrDefault("CoolerType", "Air")),
-            Length.FromMm(int.Parse(request.Fields.GetValueOrDefault("Height", "160"))),
-            Power.FromWatts(int.Parse(request.Fields.GetValueOrDefault("TDP", "220"))),
+            ParseDimensions(request.Fields.GetValueOrDefault("Dimensions", string.Empty)),
+            Enum.Parse<CoolerType>(request.Fields.GetValueOrDefault("CoolerType", string.Empty)),
+            Length.FromMm(int.Parse(request.Fields.GetValueOrDefault("Height", string.Empty))),
+            Power.FromWatts(int.Parse(request.Fields.GetValueOrDefault("TDP", string.Empty))),
             sockets
         );
     }
@@ -272,7 +272,7 @@ public static class CreateProduct
 }
 
 public record CreateProductRequest(
-    string Category,
+    ProductCategory Category,
     string Name,
     decimal Price,
     string Manufacturer,

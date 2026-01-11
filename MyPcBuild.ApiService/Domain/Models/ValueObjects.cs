@@ -14,16 +14,18 @@ public enum ProductCategory
     Case
 }
 
-public struct ProductCategoryInfo
+public readonly record struct ProductCategoryInfo
 {
-    public static readonly ProductCategoryInfo CPU = new("CPU");
-    public static readonly ProductCategoryInfo GPU = new("GPU");
-    public static readonly ProductCategoryInfo Motherboard = new("Motherboard");
-    public static readonly ProductCategoryInfo RAM = new("RAM");
-    public static readonly ProductCategoryInfo Storage = new("Storage");
-    public static readonly ProductCategoryInfo PowerSupply = new("PowerSupply");
-    public static readonly ProductCategoryInfo Cooler = new("Cooler");
-    public static readonly ProductCategoryInfo Case = new("Case");
+    public static readonly ProductCategoryInfo Cpu = new("cpu");
+    public static readonly ProductCategoryInfo Gpu = new("gpu");
+    public static readonly ProductCategoryInfo Motherboard = new("motherboard");
+    public static readonly ProductCategoryInfo Ram = new("ram");
+    public static readonly ProductCategoryInfo Storage = new("storage");
+    public static readonly ProductCategoryInfo PowerSupply = new("powersupply");
+    public static readonly ProductCategoryInfo Cooler = new("cooler");
+    public static readonly ProductCategoryInfo PcCase = new("pccase");
+
+
     public string Name { get; }
 
     private ProductCategoryInfo(string name)
