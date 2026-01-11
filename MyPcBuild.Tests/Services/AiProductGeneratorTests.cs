@@ -42,10 +42,10 @@ public class AiProductGeneratorTests
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(chatResponse);
 
-        OpenAiProductGenerator generator = new OpenAiProductGenerator(mockChatClient.Object, mockLogger.Object);
+        OpenAiProductGenerator generator = new OpenAiProductGenerator(mockLogger.Object, mockChatClient.Object, new ProductCategoryPromptFields());
 
         // Act
-        Product product = await generator.GenerateProductAsync("CPU", "High-end gaming processor", CancellationToken.None);
+        Product product = await generator.GenerateProductAsync(ProductCategory.CPU, "High-end gaming processor", CancellationToken.None);
 
         // Assert
         Assert.NotNull(product);
@@ -102,10 +102,10 @@ public class AiProductGeneratorTests
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(chatResponse);
 
-        OpenAiProductGenerator generator = new OpenAiProductGenerator(mockChatClient.Object, mockLogger.Object);
+        OpenAiProductGenerator generator = new OpenAiProductGenerator(mockLogger.Object, mockChatClient.Object, new ProductCategoryPromptFields());
 
         // Act
-        Product product = await generator.GenerateProductAsync("GPU", "Top-tier gaming graphics card", CancellationToken.None);
+        Product product = await generator.GenerateProductAsync(ProductCategory.GPU, "Top-tier gaming graphics card", CancellationToken.None);
 
         // Assert
         Assert.NotNull(product);
@@ -157,10 +157,10 @@ public class AiProductGeneratorTests
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(chatResponse);
 
-        OpenAiProductGenerator generator = new OpenAiProductGenerator(mockChatClient.Object, mockLogger.Object);
+        OpenAiProductGenerator generator = new OpenAiProductGenerator(mockLogger.Object, mockChatClient.Object, new ProductCategoryPromptFields());
 
         // Act
-        Product product = await generator.GenerateProductAsync("RAM", "High-speed memory kit", CancellationToken.None);
+        Product product = await generator.GenerateProductAsync(ProductCategory.RAM, "High-speed memory kit", CancellationToken.None);
 
         // Assert
         Assert.NotNull(product);
@@ -194,11 +194,11 @@ public class AiProductGeneratorTests
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(chatResponse);
 
-        OpenAiProductGenerator generator = new OpenAiProductGenerator(mockChatClient.Object, mockLogger.Object);
+        OpenAiProductGenerator generator = new OpenAiProductGenerator(mockLogger.Object, mockChatClient.Object, new ProductCategoryPromptFields());
 
         // Act & Assert
         await Assert.ThrowsAsync<InvalidOperationException>(async () =>
-            await generator.GenerateProductAsync("CPU", "Test description", CancellationToken.None)
+            await generator.GenerateProductAsync(ProductCategory.CPU, "Test description", CancellationToken.None)
         );
     }
 }

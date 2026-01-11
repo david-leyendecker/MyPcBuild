@@ -121,11 +121,11 @@ public class OpenAiProductGenerator(ILogger<OpenAiProductGenerator> logger, ICha
             price,
             manufacturer,
             ParseEnum<CpuSocket>(root.GetStringProperty("Socket")),
-            root.GetIntProperty("Cores"),
-            root.GetIntProperty("Threads"),
+            root.GetIntegerProperty("Cores"),
+            root.GetIntegerProperty("Threads"),
             Frequency.FromGHz(root.GetDecimalProperty("BaseClock")),
             Frequency.FromGHz(root.GetDecimalProperty("BoostClock")),
-            Power.FromWatts(root.GetIntProperty("TDP")),
+            Power.FromWatts(root.GetIntegerProperty("TDP")),
             root.GetBoolProperty("IntegratedGraphics")
         );
     }
@@ -137,13 +137,13 @@ public class OpenAiProductGenerator(ILogger<OpenAiProductGenerator> logger, ICha
             name,
             price,
             manufacturer,
-            ParseDimensions(root.GetStringProperty("Dimensions", "305,244,50")),
-            ParseSlots(root.GetStringProperty("Slots", "[]")),
+            root.ParseDimensionsFromJson("Dimensions", new Dimensions(305, 244, 50)),
+            root.ParseSlotsFromJson("Slots"),
             ParseEnum<CpuSocket>(root.GetStringProperty("Socket")),
             root.GetStringProperty("Chipset"),
             ParseEnum<FormFactor>(root.GetStringProperty("FormFactor")),
             ParseEnum<MemoryType>(root.GetStringProperty("MemoryType")),
-            StorageCapacity.FromGB(root.GetIntProperty("MaxMemory"))
+            StorageCapacity.FromGB(root.GetIntegerProperty("MaxMemory"))
         );
     }
 
@@ -154,16 +154,16 @@ public class OpenAiProductGenerator(ILogger<OpenAiProductGenerator> logger, ICha
             name,
             price,
             manufacturer,
-            ParseDimensions(root.GetStringProperty("Dimensions", "300,120,50")),
-            ParseSlots(root.GetStringProperty("Slots", "[]")),
+            root.ParseDimensionsFromJson("Dimensions", new Dimensions(300, 120, 50)),
+            root.ParseSlotsFromJson("Slots"),
             root.GetStringProperty("ChipsetManufacturer"),
             root.GetStringProperty("Series"),
-            StorageCapacity.FromGB(root.GetIntProperty("VRAM")),
+            StorageCapacity.FromGB(root.GetIntegerProperty("VRAM")),
             ParseEnum<MemoryType>(root.GetStringProperty("MemoryType")),
-            Frequency.FromMHz(root.GetIntProperty("CoreClock")),
-            Frequency.FromMHz(root.GetIntProperty("BoostClock")),
-            Power.FromWatts(root.GetIntProperty("TDP")),
-            Length.FromMm(root.GetIntProperty("Length")),
+            Frequency.FromMHz(root.GetIntegerProperty("CoreClock")),
+            Frequency.FromMHz(root.GetIntegerProperty("BoostClock")),
+            Power.FromWatts(root.GetIntegerProperty("TDP")),
+            Length.FromMm(root.GetIntegerProperty("Length")),
             ParseGpuPowerConnector(root.GetStringProperty("PowerConnectors")),
             root.GetBoolProperty("RayTracing")
         );
@@ -177,9 +177,9 @@ public class OpenAiProductGenerator(ILogger<OpenAiProductGenerator> logger, ICha
             price,
             manufacturer,
             ParseEnum<MemoryType>(root.GetStringProperty("Type")),
-            StorageCapacity.FromGB(root.GetIntProperty("Capacity")),
+            StorageCapacity.FromGB(root.GetIntegerProperty("Capacity")),
             root.GetStringProperty("Configuration"),
-            Frequency.FromMHz(root.GetIntProperty("Speed")),
+            Frequency.FromMHz(root.GetIntegerProperty("Speed")),
             root.GetStringProperty("CASLatency"),
             Voltage.FromVolts(root.GetDecimalProperty("Voltage"))
         );
@@ -192,8 +192,8 @@ public class OpenAiProductGenerator(ILogger<OpenAiProductGenerator> logger, ICha
             name,
             price,
             manufacturer,
-            ParseDimensions(root.GetStringProperty("Dimensions", "500,230,480")),
-            ParseChambers(root.GetStringProperty("Chambers", "[]")),
+            root.ParseDimensionsFromJson("Dimensions", new Dimensions(500, 230, 480)),
+            root.ParseChambersFromJson("Chambers"),
             root.GetStringProperty("FormFactor"),
             root.GetStringProperty("Color"),
             root.GetStringProperty("SidePanelWindow")
@@ -207,12 +207,12 @@ public class OpenAiProductGenerator(ILogger<OpenAiProductGenerator> logger, ICha
             name,
             price,
             manufacturer,
-            Power.FromWatts(root.GetIntProperty("Wattage")),
+            Power.FromWatts(root.GetIntegerProperty("Wattage")),
             root.GetStringProperty("Efficiency"),
             root.GetStringProperty("Modular"),
             root.GetStringProperty("FormFactor"),
-            Length.FromMm(root.GetIntProperty("Length")),
-            root.GetIntProperty("PCIe8Pin")
+            Length.FromMm(root.GetIntegerProperty("Length")),
+            root.GetIntegerProperty("PCIe8Pin")
         );
     }
 
@@ -226,9 +226,9 @@ public class OpenAiProductGenerator(ILogger<OpenAiProductGenerator> logger, ICha
             root.GetStringProperty("Type"),
             root.GetStringProperty("Interface"),
             root.GetStringProperty("StorageFormFactor"),
-            StorageCapacity.FromGB(root.GetIntProperty("Capacity")),
-            DataSpeed.FromMBps(root.GetIntProperty("ReadSpeed")),
-            DataSpeed.FromMBps(root.GetIntProperty("WriteSpeed"))
+            StorageCapacity.FromGB(root.GetIntegerProperty("Capacity")),
+            DataSpeed.FromMBps(root.GetIntegerProperty("ReadSpeed")),
+            DataSpeed.FromMBps(root.GetIntegerProperty("WriteSpeed"))
         );
     }
 
@@ -243,44 +243,15 @@ public class OpenAiProductGenerator(ILogger<OpenAiProductGenerator> logger, ICha
             name,
             price,
             manufacturer,
-            ParseDimensions(root.GetStringProperty("Dimensions", "140,140,160")),
+            root.ParseDimensionsFromJson("Dimensions", Dimensions.Zero),
             ParseEnum<CoolerType>(root.GetStringProperty("CoolerType")),
-            Length.FromMm(root.GetIntProperty("Height")),
-            Power.FromWatts(root.GetIntProperty("TDP")),
+            Length.FromMm(root.GetIntegerProperty("Height")),
+            Power.FromWatts(root.GetIntegerProperty("TDP")),
             sockets
         );
     }
 
     // Helper methods for JSON parsing
-
-    private Dimensions ParseDimensions(string value)
-    {
-        string[] parts = value.Split(',');
-        if (parts.Length != 3)
-        {
-            return Dimensions.Zero;
-        }
-
-        return new Dimensions(
-            decimal.Parse(parts[0].Trim()),
-            decimal.Parse(parts[1].Trim()),
-            decimal.Parse(parts[2].Trim())
-        );
-    }
-
-    private List<Slot> ParseSlots(string json)
-    {
-        // For AI-generated products, we'll keep slots empty for simplicity
-        // Advanced spatial editing can be done after publishing
-        return [];
-    }
-
-    private List<Chamber> ParseChambers(string json)
-    {
-        // For AI-generated products, we'll keep chambers empty for simplicity
-        // Advanced spatial editing can be done after publishing
-        return [];
-    }
 
     private T ParseEnum<T>(string value) where T : struct, Enum
     {
@@ -318,7 +289,7 @@ public static class JsonParseExtensions
             return defaultValue;
         }
 
-        public int GetIntProperty(string propertyName, int defaultValue = 0)
+        public int GetIntegerProperty(string propertyName, int defaultValue = 0)
         {
             if (!element.TryGetProperty(propertyName, out JsonElement property))
             {
@@ -370,6 +341,55 @@ public static class JsonParseExtensions
                 return result;
             }
             return defaultValue;
+        }
+
+
+        public Dimensions ParseDimensionsFromJson(string propertyName, Dimensions defaultValue)
+        {
+            if (!element.TryGetProperty(propertyName, out JsonElement dimensionsElement))
+            {
+                return defaultValue;
+            }
+
+            // Handle both object format {"Length": 320, "Width": 140, "Height": 50}
+            // and string format "320,140,50"
+            if (dimensionsElement.ValueKind == JsonValueKind.Object)
+            {
+                decimal length = dimensionsElement.GetDecimalProperty("Length");
+                decimal width = dimensionsElement.GetDecimalProperty("Width");
+                decimal height = dimensionsElement.GetDecimalProperty("Height");
+                return new Dimensions(length, width, height);
+            }
+            else if (dimensionsElement.ValueKind == JsonValueKind.String)
+            {
+                string value = dimensionsElement.GetString() ?? string.Empty;
+                string[] parts = value.Split(',');
+                if (parts.Length == 3)
+                {
+                    return new Dimensions(
+                        decimal.Parse(parts[0].Trim()),
+                        decimal.Parse(parts[1].Trim()),
+                        decimal.Parse(parts[2].Trim())
+                    );
+                }
+            }
+
+            return defaultValue;
+        }
+
+        public List<Slot> ParseSlotsFromJson(string propertyName)
+        {
+            // For AI-generated products, we'll keep slots empty for simplicity
+            // Advanced spatial editing can be done after publishing
+            // The AI might return slots data, but we ignore it for draft products
+            return [];
+        }
+
+        public List<Chamber> ParseChambersFromJson(string propertyName)
+        {
+            // For AI-generated products, we'll keep chambers empty for simplicity
+            // Advanced spatial editing can be done after publishing
+            return [];
         }
     }
 }
