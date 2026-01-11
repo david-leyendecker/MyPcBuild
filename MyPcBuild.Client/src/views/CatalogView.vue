@@ -63,7 +63,12 @@
             @update:options="handleTableOptionsUpdate"
           >
             <template #item.name="{ item }">
-              <span class="font-weight-medium">{{ item.name }}</span>
+              <span 
+                class="font-weight-medium cursor-pointer text-primary" 
+                @click="viewProduct(item.id)"
+              >
+                {{ item.name }}
+              </span>
             </template>
 
             <template #item.isDraft="{ item }">
@@ -141,10 +146,13 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
 import { useCatalogStore } from '@/stores/catalogStore';
 import { catalogApi } from '@/api/catalog';
 import ViewHeader from '@/components/ViewHeader.vue';
 import { PRODUCT_CATALOG } from '@/config/navigation';
+
+const router = useRouter();
 
 const catalogStore = useCatalogStore();
 const categories = ref(['CPU', 'Motherboard', 'GPU', 'RAM', 'Storage', 'PSU', 'PCCase', 'Cooler']);
@@ -188,9 +196,12 @@ async function publish(id: string) {
   }
 }
 
+function viewProduct(id: string) {
+  router.push(`/catalog/product/${id}`);
+}
+
 function edit(id: string) {
-  // TODO: Implement edit functionality
-  console.log('Edit product:', id);
+  router.push(`/catalog/product/${id}`);
 }
 
 function remove(id: string) {
@@ -237,5 +248,9 @@ function handleTableOptionsUpdate(options: TableOptions) {
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
+}
+
+.cursor-pointer {
+  cursor: pointer;
 }
 </style>

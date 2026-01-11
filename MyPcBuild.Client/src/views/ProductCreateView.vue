@@ -379,7 +379,7 @@ async function createProduct() {
   error.value = null;
   
   try {
-    await catalogApi.createProduct({
+    const response = await catalogApi.createProduct({
       category: formData.value.category,
       name: formData.value.name,
       price: formData.value.price,
@@ -387,8 +387,13 @@ async function createProduct() {
       fields: formData.value.fields
     });
 
-    // Success - redirect to catalog
-    router.push('/catalog');
+    // If AI-generated (draft), redirect to detail view for review
+    // Otherwise, redirect to catalog
+    if (creationMode.value === 'ai' && generatedProduct.value) {
+      router.push(`/catalog/product/${response.id}`);
+    } else {
+      router.push('/catalog');
+    }
   } catch (err) {
     error.value = err instanceof Error ? err.message : 'Failed to create product';
   } finally {
