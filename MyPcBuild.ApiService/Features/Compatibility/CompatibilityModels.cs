@@ -1,9 +1,11 @@
+using MyPcBuild.ApiService.Domain.Models;
+
 namespace MyPcBuild.ApiService.Features.Compatibility;
 
 public record CompatibilityIssue(
     string Message,
     IssueSeverity Severity,
-    string Category
+    ProductCategory Category
 );
 
 public enum IssueSeverity

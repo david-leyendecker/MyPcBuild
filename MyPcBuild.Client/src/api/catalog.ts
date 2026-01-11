@@ -5,6 +5,9 @@ export interface Product {
   name: string;
   category: string;
   price: number;
+  manufacturer: string;
+  isDraft : boolean;
+  publishedAt: string | null;
   specifications: Record<string, string | number>;
 }
 
@@ -96,7 +99,7 @@ export const catalogApi = {
   },
 
   async getProduct(id: string): Promise<Product> {
-    const response = await apiClient.get<Product>(`/catalog/${id}`);
+    const response = await apiClient.get<Product>(`/catalog/products/${id}`);
     return response.data;
   },
 

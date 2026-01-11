@@ -16,24 +16,54 @@ public enum ProductCategory
 
 public readonly record struct ProductCategoryInfo
 {
-    public static readonly ProductCategoryInfo Cpu = new("cpu");
-    public static readonly ProductCategoryInfo Gpu = new("gpu");
-    public static readonly ProductCategoryInfo Motherboard = new("motherboard");
-    public static readonly ProductCategoryInfo Ram = new("ram");
-    public static readonly ProductCategoryInfo Storage = new("storage");
-    public static readonly ProductCategoryInfo PowerSupply = new("powersupply");
-    public static readonly ProductCategoryInfo Cooler = new("cooler");
-    public static readonly ProductCategoryInfo PcCase = new("pccase");
+    public static readonly ProductCategoryInfo Cpu = new("cpu", "Processor");
+    public static readonly ProductCategoryInfo Gpu = new("gpu", "Graphics Card");
+    public static readonly ProductCategoryInfo Motherboard = new("motherboard", "Motherboard");
+    public static readonly ProductCategoryInfo Ram = new("ram", "Memory");
+    public static readonly ProductCategoryInfo Storage = new("storage", "Storage");
+    public static readonly ProductCategoryInfo PowerSupply = new("powersupply", "Power Supply");
+    public static readonly ProductCategoryInfo Cooler = new("cooler", "Cooler");
+    public static readonly ProductCategoryInfo PcCase = new("pccase", "Case");
 
 
     public string Name { get; }
+    public string DisplayValue { get; }
 
-    private ProductCategoryInfo(string name)
+    private ProductCategoryInfo(string name, string displayValue)
     {
         Name = name;
+        DisplayValue = displayValue;
     }
 
     public override string ToString() => Name;
+    
+    public static ProductCategoryInfo FromEnum(ProductCategory category) => category switch
+    {
+        ProductCategory.CPU => Cpu,
+        ProductCategory.GPU => Gpu,
+        ProductCategory.Motherboard => Motherboard,
+        ProductCategory.RAM => Ram,
+        ProductCategory.Storage => Storage,
+        ProductCategory.PowerSupply => PowerSupply,
+        ProductCategory.Cooler => Cooler,
+        ProductCategory.Case => PcCase,
+        _ => throw new ArgumentException($"Unknown category: {category}")
+    };
+
+    public static Dictionary<ProductCategory, ProductCategoryInfo> ByEnum()
+    {
+        return new Dictionary<ProductCategory, ProductCategoryInfo>
+        {
+            [ProductCategory.CPU] = Cpu,
+            [ProductCategory.GPU] = Gpu,
+            [ProductCategory.Motherboard] = Motherboard,
+            [ProductCategory.RAM] = Ram,
+            [ProductCategory.Storage] = Storage,
+            [ProductCategory.PowerSupply] = PowerSupply,
+            [ProductCategory.Cooler] = Cooler,
+            [ProductCategory.Case] = PcCase
+        };
+    }
 }
 
 /// <summary>

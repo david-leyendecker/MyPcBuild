@@ -45,7 +45,7 @@ public class CompatibilityValidator : ICompatibilityValidator
             issues.Add(new CompatibilityIssue(
                 $"CPU socket {cpu.Socket} is incompatible with motherboard socket {motherboard.Socket}",
                 IssueSeverity.Error,
-                "CPU/Motherboard"
+                ProductCategory.CPU
             ));
         }
     }
@@ -62,7 +62,7 @@ public class CompatibilityValidator : ICompatibilityValidator
                 issues.Add(new CompatibilityIssue(
                     $"{ram.Name} ({ram.Type}) is incompatible with motherboard memory type ({motherboard.MemoryType})",
                     IssueSeverity.Error,
-                    "RAM/Motherboard"
+                    ProductCategory.RAM
                 ));
             }
         }
@@ -74,19 +74,19 @@ public class CompatibilityValidator : ICompatibilityValidator
             issues.Add(new CompatibilityIssue(
                 $"Total RAM capacity ({totalRamCapacity}GB) exceeds motherboard maximum ({motherboard.MaxMemory.ValueInGB}GB)",
                 IssueSeverity.Error,
-                "RAM/Motherboard"
+                ProductCategory.RAM
             ));
         }
 
         // Check number of RAM sticks vs slots
         int totalRamSticks = rams.Sum(r => ParseRamConfiguration(r));
-        int availableMemorySlots = motherboard.Slots.Count(s => s.AllowedCategoryName == "RAM");
+        int availableMemorySlots = motherboard.Slots.Count(s => s.AllowedProductCategory == ProductCategory.RAM);
         if (totalRamSticks > availableMemorySlots)
         {
             issues.Add(new CompatibilityIssue(
                 $"Total RAM sticks ({totalRamSticks}) exceeds available memory slots ({availableMemorySlots})",
                 IssueSeverity.Error,
-                "RAM/Motherboard"
+                ProductCategory.RAM
             ));
         }
     }
@@ -107,7 +107,7 @@ public class CompatibilityValidator : ICompatibilityValidator
                         issues.Add(new CompatibilityIssue(
                             $"GPU requires 16-pin power connector (adapter needs at least 2x 8-pin), PSU has {psu.PCIe8Pin}x 8-pin connectors",
                             psu.PCIe8Pin == 0 ? IssueSeverity.Error : IssueSeverity.Warning,
-                            "GPU/PSU"
+                            ProductCategory.GPU
                         ));
                     }
                     break;
@@ -119,7 +119,7 @@ public class CompatibilityValidator : ICompatibilityValidator
                         issues.Add(new CompatibilityIssue(
                             $"GPU requires 2x 8-pin power connectors, PSU has {psu.PCIe8Pin}",
                             IssueSeverity.Error,
-                            "GPU/PSU"
+                            ProductCategory.GPU
                         ));
                     }
                     break;
@@ -131,7 +131,7 @@ public class CompatibilityValidator : ICompatibilityValidator
                         issues.Add(new CompatibilityIssue(
                             $"GPU requires 3x 8-pin power connectors, PSU has {psu.PCIe8Pin}",
                             IssueSeverity.Error,
-                            "GPU/PSU"
+                            ProductCategory.GPU
                         ));
                     }
                     break;
@@ -153,7 +153,7 @@ public class CompatibilityValidator : ICompatibilityValidator
                 issues.Add(new CompatibilityIssue(
                     $"Case form factor ({pcCase.FormFactor}) is incompatible with motherboard form factor ({motherboard.FormFactor})",
                     IssueSeverity.Error,
-                    "Case/Motherboard"
+                    ProductCategory.Case
                 ));
             }
         }
@@ -179,7 +179,7 @@ public class CompatibilityValidator : ICompatibilityValidator
             issues.Add(new CompatibilityIssue(
                 $"PSU wattage ({psu.Wattage.ValueInWatts}W) is insufficient for estimated system power draw ({totalEstimatedPower}W). Recommended: {recommendedWattage}W+",
                 IssueSeverity.Error,
-                "PSU"
+                ProductCategory.PowerSupply
             ));
         }
         else if (psu.Wattage.ValueInWatts < recommendedWattage)
@@ -187,7 +187,7 @@ public class CompatibilityValidator : ICompatibilityValidator
             issues.Add(new CompatibilityIssue(
                 $"PSU wattage ({psu.Wattage.ValueInWatts}W) is below recommended ({recommendedWattage}W) for optimal efficiency",
                 IssueSeverity.Warning,
-                "PSU"
+                ProductCategory.PowerSupply
             ));
         }
     }
@@ -202,7 +202,7 @@ public class CompatibilityValidator : ICompatibilityValidator
             issues.Add(new CompatibilityIssue(
                 $"Cooler does not support CPU socket {cpu.Socket}. Supported sockets: {string.Join(", ", cooler.Sockets)}",
                 IssueSeverity.Error,
-                "Cooler/CPU"
+                ProductCategory.Cooler
             ));
         }
 
@@ -212,7 +212,7 @@ public class CompatibilityValidator : ICompatibilityValidator
             issues.Add(new CompatibilityIssue(
                 $"Cooler TDP rating ({cooler.TDP.ValueInWatts}W) is below CPU TDP ({cpu.TDP.ValueInWatts}W)",
                 IssueSeverity.Error,
-                "Cooler/CPU"
+                ProductCategory.Cooler
             ));
         }
         else if (cooler.TDP.ValueInWatts < cpu.TDP.ValueInWatts * 1.1) // Less than 10% headroom
@@ -220,7 +220,7 @@ public class CompatibilityValidator : ICompatibilityValidator
             issues.Add(new CompatibilityIssue(
                 $"Cooler TDP rating ({cooler.TDP.ValueInWatts}W) has minimal headroom for CPU TDP ({cpu.TDP.ValueInWatts}W)",
                 IssueSeverity.Warning,
-                "Cooler/CPU"
+                ProductCategory.Cooler
             ));
         }
 

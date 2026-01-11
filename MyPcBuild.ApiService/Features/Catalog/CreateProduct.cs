@@ -208,7 +208,7 @@ public static class CreateProduct
             return slotDataList.Select(sd => new Slot(
                 Guid.NewGuid(),
                 sd.Name ?? "Unnamed Slot",
-                sd.AllowedCategory ?? "Unknown",
+                sd.AllowedCategory,
                 Vector3.Zero, // Position would need to be specified in a more advanced editor
                 new Dimensions(100, 100, 50), // Default dimensions
                 null // No sub-slots for now
@@ -282,5 +282,5 @@ public record CreateProductRequest(
 public record CreateProductResponse(Guid Id);
 
 // Helper records for JSON deserialization
-internal record SlotData(string? Name, string? AllowedCategory);
+internal record SlotData(string Name, ProductCategory AllowedCategory);
 internal record ChamberData(string? Name, decimal Length, decimal Width, decimal Height);

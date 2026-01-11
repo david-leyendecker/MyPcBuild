@@ -287,7 +287,7 @@ public class SpatialValidatorTests
                         new Slot(
                             mbSlotId,
                             "Motherboard Slot",
-                            "Motherboard",
+                            ProductCategory.Motherboard,
                             new Vector3(10, 10, 0),
                             new Dimensions(305, 244, 50)
                         )

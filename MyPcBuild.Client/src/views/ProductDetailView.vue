@@ -165,15 +165,12 @@ async function loadProduct() {
     formData.value.name = product.value.name;
     formData.value.price = product.value.price;
     formData.value.category = product.value.category;
+    formData.value.manufacturer = product.value.manufacturer;
     
     // Extract manufacturer and other fields from specifications
     if (product.value.specifications) {
-      const manufacturer = product.value.specifications['Manufacturer'];
-      formData.value.manufacturer = manufacturer ? String(manufacturer) : '';
-      
       // Populate other fields
       formData.value.fields = Object.entries(product.value.specifications)
-        .filter(([key]) => key !== 'Manufacturer')
         .reduce((acc, [key, value]) => {
           acc[key] = String(value);
           return acc;
