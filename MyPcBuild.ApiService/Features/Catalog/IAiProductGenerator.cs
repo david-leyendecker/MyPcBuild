@@ -14,5 +14,5 @@ public interface IAiProductGenerator
     /// <param name="description">Natural language description of the product</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>A draft product generated from the AI response</returns>
-    Task<Product> GenerateProductAsync(string category, string description, CancellationToken cancellationToken = default);
+    Task<Product> GenerateProductAsync(ProductCategory category, string description, CancellationToken cancellationToken = default);
 }

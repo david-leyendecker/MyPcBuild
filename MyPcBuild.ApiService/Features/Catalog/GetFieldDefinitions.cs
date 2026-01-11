@@ -6,18 +6,18 @@ public static class GetFieldDefinitions
 {
     public static IEndpointRouteBuilder MapGetFieldDefinitionsEndpoint(this IEndpointRouteBuilder app)
     {
-        app.MapGet("/api/catalog/field-definitions/{category}", (string category) =>
+        app.MapGet("/api/catalog/field-definitions/{category}", (ProductCategory category) =>
         {
             List<FieldDefinition> fields = category switch
             {
-                "CPU" => GetCpuFields(),
-                "Motherboard" => GetMotherboardFields(),
-                "GPU" => GetGpuFields(),
-                "RAM" => GetRamFields(),
-                "PCCase" => GetPcCaseFields(),
-                "PSU" => GetPsuFields(),
-                "Storage" => GetStorageFields(),
-                "Cooler" => GetCoolerFields(),
+                ProductCategory.CPU => GetCpuFields(),
+                ProductCategory.Motherboard => GetMotherboardFields(),
+                ProductCategory.GPU => GetGpuFields(),
+                ProductCategory.RAM => GetRamFields(),
+                ProductCategory.Case => GetPcCaseFields(),
+                ProductCategory.PowerSupply => GetPsuFields(),
+                ProductCategory.Storage => GetStorageFields(),
+                ProductCategory.Cooler => GetCoolerFields(),
                 _ => throw new ArgumentException($"Unknown category: {category}")
             };
 
@@ -94,7 +94,7 @@ public static class GetFieldDefinitions
             NumberField(nameof(GpuProduct.CoreClock), Frequency.Unit, required: true),
             NumberField(nameof(GpuProduct.BoostClock), Frequency.Unit, required: true),
             NumberField(nameof(GpuProduct.TDP), Power.Unit, required: true),
-                SelectField(nameof(GpuProduct.PowerConnectors), ["1x16-pin", "2x8-pin", "3x8-pin"], required: true),
+            SelectField(nameof(GpuProduct.PowerConnectors), ["1x16-pin", "2x8-pin", "3x8-pin"], required: true),
             BooleanField(nameof(GpuProduct.RayTracing)),
             DimensionsField(nameof(GpuProduct.Dimensions), Length.Unit, required: true),
             SlotsField(nameof(GpuProduct.Slots))
@@ -166,7 +166,7 @@ public static class GetFieldDefinitions
 }
 
 public record GetFieldDefinitionsResponse(
-    string Category,
+    ProductCategory Category,
     List<FieldDefinition> Fields
 );
 

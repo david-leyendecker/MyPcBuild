@@ -2,6 +2,38 @@ using System.Text.Json.Serialization;
 
 namespace MyPcBuild.ApiService.Domain.Models;
 
+public enum ProductCategory
+{
+    CPU,
+    GPU,
+    Motherboard,
+    RAM,
+    Storage,
+    PowerSupply,
+    Cooler,
+    Case
+}
+
+public struct ProductCategoryInfo
+{
+    public static readonly ProductCategoryInfo CPU = new("CPU");
+    public static readonly ProductCategoryInfo GPU = new("GPU");
+    public static readonly ProductCategoryInfo Motherboard = new("Motherboard");
+    public static readonly ProductCategoryInfo RAM = new("RAM");
+    public static readonly ProductCategoryInfo Storage = new("Storage");
+    public static readonly ProductCategoryInfo PowerSupply = new("PowerSupply");
+    public static readonly ProductCategoryInfo Cooler = new("Cooler");
+    public static readonly ProductCategoryInfo Case = new("Case");
+    public string Name { get; }
+
+    private ProductCategoryInfo(string name)
+    {
+        Name = name;
+    }
+
+    public override string ToString() => Name;
+}
+
 /// <summary>
 /// CPU socket types.
 /// </summary>

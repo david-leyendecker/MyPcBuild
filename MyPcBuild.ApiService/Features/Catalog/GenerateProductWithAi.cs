@@ -39,7 +39,7 @@ public static class GenerateProductWithAi
 }
 
 public record GenerateProductRequest(
-    string Category,
+    ProductCategory Category,
     string Description
 );
 

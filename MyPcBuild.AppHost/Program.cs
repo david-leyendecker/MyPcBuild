@@ -1,3 +1,4 @@
+using Aspire.Hosting.GitHub;
 using Aspire.Hosting.JavaScript;
 
 var builder = DistributedApplication.CreateBuilder(args);
@@ -10,11 +11,13 @@ var postgres = builder.AddPostgres("postgres")
 var postgresDb = postgres.AddDatabase("mypcbuild");
 
 // Add OpenAI service
-var openai = builder.AddOpenAI("openai");
+var aiModelApiKey = builder.AddParameter("github-model-api-key", secret: true);
+var aiModel = builder.AddGitHubModel("chat", GitHubModel.OpenAI.OpenAIGpt4oMini)
+    .WithApiKey(aiModelApiKey);
 
 IResourceBuilder<ProjectResource> apiService = builder.AddProject<Projects.MyPcBuild_ApiService>("apiservice")
     .WithReference(postgresDb)
-    .WithReference(openai)
+    .WithReference(aiModel)
     .WithHttpHealthCheck("/health")
     .WaitFor(postgres);
 
