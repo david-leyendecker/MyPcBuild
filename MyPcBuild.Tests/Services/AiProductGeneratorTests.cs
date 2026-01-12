@@ -15,7 +15,7 @@ public class AiProductGeneratorTests
         // Arrange
         string jsonResponse = """
 {
-  "Name": "AMD Ryzen 9 7950X",
+  "Name": "Ryzen 9 7950X",
   "Manufacturer": "AMD",
   "Price": 699.99,
   "Socket": "AM5",
@@ -55,7 +55,7 @@ public class AiProductGeneratorTests
         Assert.Null(product.PublishedAt);
 
         CpuProduct cpuProduct = (CpuProduct)product;
-        Assert.Equal("AMD Ryzen 9 7950X", cpuProduct.Name);
+        Assert.Equal("Ryzen 9 7950X", cpuProduct.Name);
         Assert.Equal("AMD", cpuProduct.Manufacturer);
         Assert.Equal(699.99m, cpuProduct.Price);
         Assert.Equal(CpuSocket.AM5, cpuProduct.Socket);
@@ -115,7 +115,7 @@ public class AiProductGeneratorTests
         Assert.Null(product.PublishedAt);
 
         GpuProduct gpuProduct = (GpuProduct)product;
-        Assert.Equal("NVIDIA GeForce RTX 4090", gpuProduct.Name);
+        Assert.Equal("GeForce RTX 4090", gpuProduct.Name);
         Assert.Equal("NVIDIA", gpuProduct.Manufacturer);
         Assert.Equal(1599.99m, gpuProduct.Price);
         Assert.Equal("NVIDIA", gpuProduct.ChipsetManufacturer);
@@ -169,7 +169,8 @@ public class AiProductGeneratorTests
         Assert.True(product.IsDraft);
 
         RamProduct ramProduct = (RamProduct)product;
-        Assert.Equal("Corsair Vengeance DDR5", ramProduct.Name);
+        Assert.Equal("Corsair", ramProduct.Manufacturer);
+        Assert.Equal("Vengeance DDR5", ramProduct.Name);
         Assert.Equal(MemoryType.DDR5, ramProduct.Type);
         Assert.Equal(32, ramProduct.Capacity.ValueInGB);
     }
