@@ -268,12 +268,17 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
-import { catalogApi, type FieldDefinition, type GenerateProductResponse } from '@/api/catalog';
+import { catalogApi, ProductCategory, categoryLabels, type FieldDefinition, type GenerateProductResponse } from '@/api/catalog';
 import DynamicFieldRenderer from '@/components/DynamicFieldRenderer.vue';
 
 const router = useRouter();
 
-const categories = ref(['CPU', 'Motherboard', 'GPU', 'RAM', 'Storage', 'PSU', 'PCCase', 'Cooler']);
+const categories = computed(() => 
+  Object.values(ProductCategory).map(value => ({
+    title: categoryLabels[value],
+    value
+  }))
+);
 const currentStep = ref(1);
 const creationMode = ref<'manual' | 'ai' | null>(null);
 const isLoadingFields = ref(false);

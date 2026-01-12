@@ -29,7 +29,7 @@
             :value="category"
             :color="catalogStore.selectedCategory === category ? 'primary' : undefined"
           >
-            {{ category }}
+            {{ categoryDisplayNames[category] }}
           </v-chip>
         </v-chip-group>
       </v-col>
@@ -145,17 +145,23 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { useCatalogStore } from '@/stores/catalogStore';
-import { catalogApi } from '@/api/catalog';
+import { catalogApi, ProductCategory, categoryLabels } from '@/api/catalog';
 import ViewHeader from '@/components/ViewHeader.vue';
 import { PRODUCT_CATALOG } from '@/config/navigation';
 
 const router = useRouter();
 
 const catalogStore = useCatalogStore();
-const categories = ref(['CPU', 'Motherboard', 'GPU', 'RAM', 'Storage', 'PSU', 'PCCase', 'Cooler']);
+const categories = computed(() => Object.values(ProductCategory));
+const categoryDisplayNames = computed(() => 
+  Object.entries(categoryLabels).reduce((acc, [key, label]) => {
+    acc[key] = label;
+    return acc;
+  }, {} as Record<string, string>)
+);
 const searchText = ref('');
 
 const headers = [

@@ -2,6 +2,7 @@ using Microsoft.Extensions.AI;
 using Microsoft.Extensions.Logging;
 using Moq;
 using MyPcBuild.ApiService.Domain.Models;
+using MyPcBuild.ApiService.Domain.Models.Spatial;
 using MyPcBuild.ApiService.Features.Catalog;
 
 namespace MyPcBuild.Tests.Services;
@@ -52,7 +53,7 @@ public class AiProductGeneratorTests
         Assert.IsType<CpuProduct>(product);
         Assert.True(product.IsDraft);
         Assert.Null(product.PublishedAt);
-        
+
         CpuProduct cpuProduct = (CpuProduct)product;
         Assert.Equal("AMD Ryzen 9 7950X", cpuProduct.Name);
         Assert.Equal("AMD", cpuProduct.Manufacturer);
@@ -112,7 +113,7 @@ public class AiProductGeneratorTests
         Assert.IsType<GpuProduct>(product);
         Assert.True(product.IsDraft);
         Assert.Null(product.PublishedAt);
-        
+
         GpuProduct gpuProduct = (GpuProduct)product;
         Assert.Equal("NVIDIA GeForce RTX 4090", gpuProduct.Name);
         Assert.Equal("NVIDIA", gpuProduct.Manufacturer);
@@ -166,7 +167,7 @@ public class AiProductGeneratorTests
         Assert.NotNull(product);
         Assert.IsType<RamProduct>(product);
         Assert.True(product.IsDraft);
-        
+
         RamProduct ramProduct = (RamProduct)product;
         Assert.Equal("Corsair Vengeance DDR5", ramProduct.Name);
         Assert.Equal(MemoryType.DDR5, ramProduct.Type);
@@ -200,5 +201,76 @@ public class AiProductGeneratorTests
         await Assert.ThrowsAsync<InvalidOperationException>(async () =>
             await generator.GenerateProductAsync(ProductCategory.CPU, "Test description", CancellationToken.None)
         );
+    }
+
+    [Fact]
+    public async Task GenerateProductAsync_RealResponse()
+    {
+        string jsonResponse = """
+        ```json
+        {
+            "Name": "NZXT S320 Elite",
+            "Manufacturer": "NZXT",
+            "Price": 69.99,
+            "FormFactor": "Mid Tower",
+            "Color": "Black",
+            "SidePanelWindow": "Tempered Glass",
+            "Dimensions": {
+                "length": 490,
+                "width": 210,
+                "height": 450
+            },
+            "Chambers": [
+                {
+                "Name": "Main Chamber",
+                "Dimensions": {
+                    "length": 450,
+                    "width": 200,
+                    "height": 450
+                }
+                },
+                {
+                "Name": "Power Supply Chamber",
+                "Dimensions": {
+                    "length": 450,
+                    "width": 210,
+                    "height": 200
+                }
+                }
+            ]
+        }
+        ```
+        """;
+
+        Mock<IChatClient> mockChatClient = new Mock<IChatClient>();
+        Mock<ILogger<OpenAiProductGenerator>> mockLogger = new Mock<ILogger<OpenAiProductGenerator>>();
+
+        ChatResponse chatResponse = new ChatResponse(
+            [
+                new ChatMessage(ChatRole.Assistant, jsonResponse)
+            ]);
+
+        mockChatClient
+            .Setup(x => x.GetResponseAsync(
+                It.IsAny<IEnumerable<ChatMessage>>(),
+                It.IsAny<ChatOptions>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(chatResponse);
+
+        OpenAiProductGenerator generator = new OpenAiProductGenerator(mockLogger.Object, mockChatClient.Object, new ProductCategoryPromptFields());
+
+        // Act
+        Product product = await generator.GenerateProductAsync(ProductCategory.Case, "NZXT S320 Elite", CancellationToken.None);
+
+        // Assert
+        Assert.NotNull(product);
+        Assert.IsType<PcCaseProduct>(product);
+        Assert.True(product.IsDraft);
+
+        PcCaseProduct pcCaseProduct = (PcCaseProduct)product;
+        Assert.Equal("S320 Elite", pcCaseProduct.Name);
+        Assert.Equal("NZXT", pcCaseProduct.Manufacturer);
+        Assert.Equal(69.99m, pcCaseProduct.Price);
+        Assert.Equal(new Dimensions(Length: 490, Width: 210, Height: 450), pcCaseProduct.Dimensions);
     }
 }

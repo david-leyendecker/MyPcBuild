@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
-import { type ProductSummary, type GetProductsResponse } from '@/api/catalog';
+import { type ProductSummary, type GetProductsResponse, getCategoryBackendValue } from '@/api/catalog';
 import { catalogApi } from '@/api/catalog';
 
 export const useCatalogStore = defineStore('catalog', () => {
@@ -22,7 +22,8 @@ export const useCatalogStore = defineStore('catalog', () => {
       const filters: string[] = [];
       
       if (selectedCategory.value) {
-        filters.push(`CategoryName=${selectedCategory.value}`);
+        const filterValue = getCategoryBackendValue(selectedCategory.value);
+        filters.push(`ProductCategory=${filterValue}`);
       }
       
       const response: GetProductsResponse = await catalogApi.getProducts({

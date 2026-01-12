@@ -92,9 +92,15 @@ public class OpenAiProductGenerator(ILogger<OpenAiProductGenerator> logger, ICha
         JsonElement root = doc.RootElement;
 
         Guid id = Guid.NewGuid();
+        string manufacturer = root.GetStringProperty("Manufacturer");
         string name = root.GetStringProperty("Name");
         decimal price = root.GetDecimalProperty("Price");
-        string manufacturer = root.GetStringProperty("Manufacturer");
+
+        // Remove manufacturer from product name if it starts with it
+        if (!string.IsNullOrEmpty(manufacturer) && name.StartsWith(manufacturer, StringComparison.OrdinalIgnoreCase))
+        {
+            name = name[manufacturer.Length..].Trim();
+        }
 
         Product product = category switch
         {
@@ -192,11 +198,11 @@ public class OpenAiProductGenerator(ILogger<OpenAiProductGenerator> logger, ICha
             name,
             price,
             manufacturer,
-            root.ParseDimensionsFromJson("Dimensions", new Dimensions(500, 230, 480)),
-            root.ParseChambersFromJson("Chambers"),
-            root.GetStringProperty("FormFactor"),
-            root.GetStringProperty("Color"),
-            root.GetStringProperty("SidePanelWindow")
+            root.ParseDimensionsFromJson(nameof(PcCaseProduct.Dimensions), Dimensions.Zero),
+            root.ParseChambersFromJson(nameof(PcCaseProduct.Chambers)),
+            root.GetStringProperty(nameof(PcCaseProduct.FormFactor)),
+            root.GetStringProperty(nameof(PcCaseProduct.Color)),
+            root.GetStringProperty(nameof(PcCaseProduct.SidePanelWindow))
         );
     }
 
@@ -351,30 +357,87 @@ public static class JsonParseExtensions
                 return defaultValue;
             }
 
-            // Handle both object format {"Length": 320, "Width": 140, "Height": 50}
-            // and string format "320,140,50"
-            if (dimensionsElement.ValueKind == JsonValueKind.Object)
+            try
             {
-                decimal length = dimensionsElement.GetDecimalProperty("Length");
-                decimal width = dimensionsElement.GetDecimalProperty("Width");
-                decimal height = dimensionsElement.GetDecimalProperty("Height");
-                return new Dimensions(length, width, height);
-            }
-            else if (dimensionsElement.ValueKind == JsonValueKind.String)
-            {
-                string value = dimensionsElement.GetString() ?? string.Empty;
-                string[] parts = value.Split(',');
-                if (parts.Length == 3)
+                // Handle object format: {"length": 320, "width": 140, "height": 50}
+                if (dimensionsElement.ValueKind == JsonValueKind.Object)
                 {
-                    return new Dimensions(
-                        decimal.Parse(parts[0].Trim()),
-                        decimal.Parse(parts[1].Trim()),
-                        decimal.Parse(parts[2].Trim())
-                    );
+                    JsonSerializerOptions options = new() { PropertyNameCaseInsensitive = true };
+                    Dimensions? des = dimensionsElement.Deserialize<Dimensions?>(options);
+
+                    if (des.HasValue && IsValidDimensions(des.Value))
+                    {
+                        return des.Value;
+                    }
                 }
+
+                // Handle array format: [320, 140, 50]
+                if (dimensionsElement.ValueKind == JsonValueKind.Array && dimensionsElement.GetArrayLength() == 3)
+                {
+                    JsonElement[] elements = dimensionsElement.EnumerateArray().ToArray();
+                    if (TryParseDecimal(elements[0], out decimal length) &&
+                        TryParseDecimal(elements[1], out decimal width) &&
+                        TryParseDecimal(elements[2], out decimal height))
+                    {
+                        Dimensions dimensions = new(length, width, height);
+                        if (IsValidDimensions(dimensions))
+                        {
+                            return dimensions;
+                        }
+                    }
+                }
+
+                // Handle string format: "320,140,50" or "320x140x50"
+                if (dimensionsElement.ValueKind == JsonValueKind.String)
+                {
+                    string value = dimensionsElement.GetString() ?? string.Empty;
+                    string[] parts = value.Split([',', 'x', 'X', '*'], StringSplitOptions.RemoveEmptyEntries);
+
+                    if (parts.Length == 3 &&
+                        decimal.TryParse(parts[0].Trim(), out decimal length) &&
+                        decimal.TryParse(parts[1].Trim(), out decimal width) &&
+                        decimal.TryParse(parts[2].Trim(), out decimal height))
+                    {
+                        Dimensions dimensions = new(length, width, height);
+                        if (IsValidDimensions(dimensions))
+                        {
+                            return dimensions;
+                        }
+                    }
+                }
+            }
+            catch
+            {
+                // If parsing fails for any reason, return default value
             }
 
             return defaultValue;
+        }
+
+        private static bool TryParseDecimal(JsonElement jsonElement, out decimal result)
+        {
+            result = 0m;
+
+            if (jsonElement.ValueKind == JsonValueKind.Number)
+            {
+                result = jsonElement.GetDecimal();
+                return true;
+            }
+
+            if (jsonElement.ValueKind == JsonValueKind.String)
+            {
+                return decimal.TryParse(jsonElement.GetString(), out result);
+            }
+
+            return false;
+        }
+
+        private static bool IsValidDimensions(Dimensions dimensions)
+        {
+            // Validate that dimensions are positive and within reasonable bounds (0-10000mm)
+            return dimensions.Length > 0 && dimensions.Length <= 10000 &&
+                   dimensions.Width > 0 && dimensions.Width <= 10000 &&
+                   dimensions.Height > 0 && dimensions.Height <= 10000;
         }
 
         public List<Slot> ParseSlotsFromJson(string propertyName)
