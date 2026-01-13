@@ -1,4 +1,6 @@
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace MyPcBuild.ApiService.Features.Catalog.DTOs;
 
@@ -461,6 +463,80 @@ public record ApiDimensions
 }
 
 /// <summary>
+/// JSON converter for ApiDimensions that handles various input formats (object, string).
+/// </summary>
+internal class ApiDimensionsConverter : JsonConverter<ApiDimensions>
+{
+    public override ApiDimensions Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    {
+        if (reader.TokenType == JsonTokenType.StartObject)
+        {
+            decimal length = 0, width = 0, height = 0;
+
+            while (reader.Read())
+            {
+                if (reader.TokenType == JsonTokenType.EndObject)
+                {
+                    break;
+                }
+
+                if (reader.TokenType == JsonTokenType.PropertyName)
+                {
+                    string propertyName = reader.GetString()!;
+                    reader.Read();
+
+                    decimal value = reader.TokenType == JsonTokenType.Number
+                        ? reader.GetDecimal()
+                        : 0;
+
+                    if (propertyName.Equals(nameof(ApiDimensions.Length), StringComparison.OrdinalIgnoreCase))
+                    {
+                        length = value;
+                    }
+                    else if (propertyName.Equals(nameof(ApiDimensions.Width), StringComparison.OrdinalIgnoreCase))
+                    {
+                        width = value;
+                    }
+                    else if (propertyName.Equals(nameof(ApiDimensions.Height), StringComparison.OrdinalIgnoreCase))
+                    {
+                        height = value;
+                    }
+                }
+            }
+
+            return new ApiDimensions { Length = length, Width = width, Height = height };
+        }
+
+        if (reader.TokenType == JsonTokenType.String)
+        {
+            string? str = reader.GetString();
+            if (!string.IsNullOrEmpty(str))
+            {
+                string[] parts = str.Split(',');
+                if (parts.Length == 3 &&
+                    decimal.TryParse(parts[0].Trim(), out decimal length) &&
+                    decimal.TryParse(parts[1].Trim(), out decimal width) &&
+                    decimal.TryParse(parts[2].Trim(), out decimal height))
+                {
+                    return new ApiDimensions { Length = length, Width = width, Height = height };
+                }
+            }
+        }
+
+        throw new JsonException("Invalid dimensions format");
+    }
+
+    public override void Write(Utf8JsonWriter writer, ApiDimensions value, JsonSerializerOptions options)
+    {
+        writer.WriteStartObject();
+        writer.WriteNumber(nameof(ApiDimensions.Length), value.Length);
+        writer.WriteNumber(nameof(ApiDimensions.Width), value.Width);
+        writer.WriteNumber(nameof(ApiDimensions.Height), value.Height);
+        writer.WriteEndObject();
+    }
+}
+
+/// <summary>
 /// Installation slot (API).
 /// </summary>
 public record ApiSlot
@@ -484,6 +560,32 @@ public record ApiSlot
 }
 
 /// <summary>
+/// JSON converter for ApiSlot lists (always returns empty list for AI-generated products).
+/// </summary>
+internal class ApiSlotListConverter : JsonConverter<List<ApiSlot>?>
+{
+    public override List<ApiSlot>? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    {
+        // Skip the value (could be array or string like "[]")
+        reader.Skip();
+        // Always return null for AI-generated draft products
+        return null;
+    }
+
+    public override void Write(Utf8JsonWriter writer, List<ApiSlot>? value, JsonSerializerOptions options)
+    {
+        if (value == null)
+        {
+            writer.WriteNullValue();
+        }
+        else
+        {
+            JsonSerializer.Serialize(writer, value, options);
+        }
+    }
+}
+
+/// <summary>
 /// Internal chamber (API).
 /// </summary>
 public record ApiChamber
@@ -499,6 +601,32 @@ public record ApiChamber
     /// </summary>
     [Required]
     public required ApiDimensions Dimensions { get; init; }
+}
+
+/// <summary>
+/// JSON converter for ApiChamber lists (always returns empty list for AI-generated products).
+/// </summary>
+internal class ApiChamberListConverter : JsonConverter<List<ApiChamber>?>
+{
+    public override List<ApiChamber>? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    {
+        // Skip the value (could be array or nested object)
+        reader.Skip();
+        // Always return null for AI-generated draft products
+        return null;
+    }
+
+    public override void Write(Utf8JsonWriter writer, List<ApiChamber>? value, JsonSerializerOptions options)
+    {
+        if (value == null)
+        {
+            writer.WriteNullValue();
+        }
+        else
+        {
+            JsonSerializer.Serialize(writer, value, options);
+        }
+    }
 }
 
 /// <summary>

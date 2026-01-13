@@ -1,3 +1,6 @@
+using System.Text.Json;
+using System.Text.Json.Serialization;
+
 namespace MyPcBuild.ApiService.Features.Catalog.DTOs;
 
 /// <summary>
@@ -71,3 +74,40 @@ public enum ApiGpuPowerConnector
     Triple8Pin,
     One16Pin
 }
+
+/// <summary>
+/// JSON converter for ApiGpuPowerConnector to handle string values like "1x16-pin", "2x8pin", etc.
+/// </summary>
+internal class ApiGpuPowerConnectorConverter : JsonConverter<ApiGpuPowerConnector>
+{
+    public override ApiGpuPowerConnector Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    {
+        if (reader.TokenType == JsonTokenType.String)
+        {
+            string value = reader.GetString() ?? string.Empty;
+            string normalized = value.Replace(" ", string.Empty).Replace("-", string.Empty).ToLowerInvariant();
+
+            return normalized switch
+            {
+                "1x16pin" or "16pin" or "one16pin" => ApiGpuPowerConnector.One16Pin,
+                "2x8pin" or "dual8pin" => ApiGpuPowerConnector.Dual8Pin,
+                "3x8pin" or "triple8pin" => ApiGpuPowerConnector.Triple8Pin,
+                _ => ApiGpuPowerConnector.Dual8Pin // Default fallback
+            };
+        }
+
+        // Try to parse as standard enum format
+        if (reader.TokenType == JsonTokenType.Number)
+        {
+            return (ApiGpuPowerConnector)reader.GetInt32();
+        }
+
+        throw new JsonException($"Cannot convert {reader.TokenType} to ApiGpuPowerConnector");
+    }
+
+    public override void Write(Utf8JsonWriter writer, ApiGpuPowerConnector value, JsonSerializerOptions options)
+    {
+        writer.WriteStringValue(value.ToString());
+    }
+}
+

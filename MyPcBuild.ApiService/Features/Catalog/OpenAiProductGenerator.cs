@@ -80,6 +80,10 @@ public class OpenAiProductGenerator(ILogger<OpenAiProductGenerator> logger, ICha
             NumberHandling = JsonNumberHandling.AllowReadingFromString,
             Converters =
             {
+                new ApiGpuPowerConnectorConverter(),
+                new ApiDimensionsConverter(),
+                new ApiSlotListConverter(),
+                new ApiChamberListConverter(),
                 new JsonStringEnumConverter()
             }
         };
