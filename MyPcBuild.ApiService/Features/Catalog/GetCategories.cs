@@ -9,19 +9,23 @@ public static class GetCategories
     {
         app.MapGet("/api/catalog/categories", async (IDocumentSession session) =>
         {
-            // Get product counts per category
-            IReadOnlyList<Product> allProducts = await session.Query<Product>().ToListAsync();
-            Dictionary<string, int> productCounts = allProducts
-                .GroupBy(p => p.CategoryName)
-                .ToDictionary(g => g.Key, g => g.Count());
-            
-            GetCategoriesResponse response = new(
-                productCounts.Select(kvp => new CategoryInfo(
-                    kvp.Key,
-                    kvp.Value
-                )).ToList()
-            );
+            Dictionary<ProductCategory, ProductCategoryInfo> categoryInfoDict = ProductCategoryInfo.ByEnum();
 
+            // Get product counts per category
+            Dictionary<ProductCategory, int> productCounts = (await session.Query<Product>()
+                .GroupBy(p => p.ProductCategory)
+                .Select(g => new { Category = g.Key, Count = g.Count() })
+                .ToListAsync())
+                .ToDictionary(x => x.Category, x => x.Count);
+
+            List<CategoryInfo> categories = [.. categoryInfoDict
+                .Select(kvp => new CategoryInfo(
+                    kvp.Key.ToString(),
+                    kvp.Value.DisplayValue,
+                    productCounts.GetValueOrDefault(kvp.Key, 0)
+                ))];
+
+            GetCategoriesResponse response = new(categories);
             return Results.Ok(response);
         })
         .WithName("GetCategories")
@@ -35,5 +39,6 @@ public record GetCategoriesResponse(List<CategoryInfo> Categories);
 
 public record CategoryInfo(
     string Name,
+    string DisplayValue,
     int ProductCount
 );

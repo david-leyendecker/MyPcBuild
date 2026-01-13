@@ -1,4 +1,6 @@
 using MyPcBuild.ApiService.Domain.Models;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace MyPcBuild.ApiService.Domain.Models.Spatial;
 
@@ -34,5 +36,24 @@ public record Chamber(
         }
 
         return result;
+    }
+}
+
+/// <summary>
+/// JSON converter for Chamber lists (always returns empty list for AI-generated products).
+/// </summary>
+internal class ChamberListConverter : JsonConverter<List<Chamber>>
+{
+    public override List<Chamber> Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    {
+        // Skip the value (could be array or null)
+        reader.Skip();
+        // Always return empty list for AI-generated draft products
+        return [];
+    }
+
+    public override void Write(Utf8JsonWriter writer, List<Chamber> value, JsonSerializerOptions options)
+    {
+        JsonSerializer.Serialize(writer, value, options);
     }
 }

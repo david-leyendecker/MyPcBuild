@@ -15,7 +15,18 @@ public abstract record Product(
     /// <summary>
     /// Gets the category name for this product type.
     /// </summary>
-    public abstract string CategoryName { get; }
+    public abstract ProductCategory ProductCategory { get; }
+
+    /// <summary>
+    /// Indicates whether this product is a draft (AI-generated but not yet published).
+    /// Draft products cannot be added to builds.
+    /// </summary>
+    public bool IsDraft { get; init; } = false;
+
+    /// <summary>
+    /// The timestamp when the product was published (null for draft products).
+    /// </summary>
+    public DateTime? PublishedAt { get; init; }
 };
 
 /// <summary>
@@ -59,7 +70,7 @@ public record CpuProduct(
     bool IntegratedGraphics
 ) : Product(Id, Name, Price, Manufacturer)
 {
-    public override string CategoryName => "CPU";
+    public override ProductCategory ProductCategory => Models.ProductCategory.CPU;
 };
 
 public record MotherboardProduct(
@@ -77,7 +88,7 @@ public record MotherboardProduct(
     StorageCapacity MaxMemory
 ) : Product(Id, Name, Price, Manufacturer), ISlottedProduct
 {
-    public override string CategoryName => "Motherboard";
+    public override ProductCategory ProductCategory => Models.ProductCategory.Motherboard;
 };
 
 public record GpuProduct(
@@ -100,7 +111,7 @@ public record GpuProduct(
     bool RayTracing
 ) : Product(Id, Name, Price, Manufacturer), ISlottedProduct
 {
-    public override string CategoryName => "GPU";
+    public override ProductCategory ProductCategory => Models.ProductCategory.GPU;
 };
 
 public record RamProduct(
@@ -117,7 +128,7 @@ public record RamProduct(
     Voltage Voltage
 ) : Product(Id, Name, Price, Manufacturer)
 {
-    public override string CategoryName => "RAM";
+    public override ProductCategory ProductCategory => Models.ProductCategory.RAM;
 };
 
 public record PcCaseProduct(
@@ -133,7 +144,7 @@ public record PcCaseProduct(
     string SidePanelWindow
 ) : Product(Id, Name, Price, Manufacturer), IChamberedProduct
 {
-    public override string CategoryName => "PCCase";
+    public override ProductCategory ProductCategory => Models.ProductCategory.Case;
 };
 
 public record PsuProduct(
@@ -150,7 +161,7 @@ public record PsuProduct(
     int PCIe8Pin
 ) : Product(Id, Name, Price, Manufacturer)
 {
-    public override string CategoryName => "PSU";
+    public override ProductCategory ProductCategory => Models.ProductCategory.PowerSupply;
 };
 
 public record StorageProduct(
@@ -167,7 +178,7 @@ public record StorageProduct(
     DataSpeed WriteSpeed
 ) : Product(Id, Name, Price, Manufacturer)
 {
-    public override string CategoryName => "Storage";
+    public override ProductCategory ProductCategory => Models.ProductCategory.Storage;
 };
 
 public record CoolerProduct(
@@ -183,6 +194,6 @@ public record CoolerProduct(
     CpuSocket[] Sockets
 ) : Product(Id, Name, Price, Manufacturer), ISpatialProduct
 {
-    public override string CategoryName => "Cooler";
+    public override ProductCategory ProductCategory => Models.ProductCategory.Cooler;
 };
 

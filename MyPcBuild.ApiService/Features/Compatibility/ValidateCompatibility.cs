@@ -46,7 +46,7 @@ public static class ValidateCompatibility
                     i.Severity.ToString(),
                     i.Category
                 )).ToList(),
-                products.Select(p => new ProductInfo(p.Id, p.Name, p.CategoryName)).ToList()
+                products.Select(p => new ProductInfo(p.Id, p.Name, p.ProductCategory)).ToList()
             );
 
             return Results.Ok(response);
@@ -71,11 +71,11 @@ public record ValidateCompatibilityResponse(
 public record CompatibilityIssueDto(
     string Message,
     string Severity,
-    string Category
+    ProductCategory Category
 );
 
 public record ProductInfo(
     Guid Id,
     string Name,
-    string Category
+    ProductCategory Category
 );

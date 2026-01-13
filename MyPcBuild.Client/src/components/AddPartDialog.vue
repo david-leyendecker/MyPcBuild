@@ -16,7 +16,7 @@
           size="small"
           @click="selectCategory(category)"
         >
-          {{ category }}
+          {{ categoryDisplayMap[category] }}
         </v-btn>
       </div>
     </div>
@@ -66,6 +66,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
 import { useCatalogStore } from '@/stores/catalogStore';
+import { ProductCategory, categoryLabels, getCategoryFromBackend } from '@/api/catalog';
 
 const emit = defineEmits<{
   'part-selected': [productId: string];
@@ -73,7 +74,8 @@ const emit = defineEmits<{
 }>();
 
 const catalogStore = useCatalogStore();
-const categories = ['CPU', 'Motherboard', 'GPU', 'RAM', 'Storage', 'PSU', 'Case', 'Cooler'];
+const categories = computed(() => Object.values(ProductCategory));
+const categoryDisplayMap = computed(() => categoryLabels);
 
 const searchQuery = ref('');
 const selectedCategory = ref<string | null>(null);
@@ -82,7 +84,8 @@ const isLoading = ref(false);
 const filteredProducts = computed(() => {
   return catalogStore.products.filter(p => {
     const matchesSearch = p.name.toLowerCase().includes(searchQuery.value.toLowerCase());
-    const matchesCategory = !selectedCategory.value || p.categoryName === selectedCategory.value;
+    const productCategoryEnum = getCategoryFromBackend(p.categoryName);
+    const matchesCategory = !selectedCategory.value || productCategoryEnum === selectedCategory.value;
     return matchesSearch && matchesCategory;
   });
 });

@@ -51,7 +51,7 @@ public class CompatibilityValidatorTests
         Assert.False(result.IsCompatible);
         Assert.True(result.HasErrors);
         Assert.Single(result.Issues);
-        Assert.Equal("CPU/Motherboard", result.Issues[0].Category);
+        Assert.Equal(ProductCategory.CPU, result.Issues[0].Category);
         Assert.Equal(IssueSeverity.Error, result.Issues[0].Severity);
         Assert.Contains("LGA1700", result.Issues[0].Message);
         Assert.Contains("AM5", result.Issues[0].Message);
@@ -95,7 +95,7 @@ public class CompatibilityValidatorTests
         // Assert
         Assert.False(result.IsCompatible);
         Assert.True(result.HasErrors);
-        Assert.Contains(result.Issues, i => i.Category == "RAM/Motherboard" && i.Message.Contains("DDR4") && i.Message.Contains("DDR5"));
+        Assert.Contains(result.Issues, i => i.Category == ProductCategory.RAM && i.Message.Contains("DDR4") && i.Message.Contains("DDR5"));
     }
 
     [Fact]
@@ -115,7 +115,7 @@ public class CompatibilityValidatorTests
         // Assert
         Assert.False(result.IsCompatible);
         Assert.True(result.HasErrors);
-        Assert.Contains(result.Issues, i => i.Category == "RAM/Motherboard" && i.Message.Contains("96") && i.Message.Contains("64"));
+        Assert.Contains(result.Issues, i => i.Category == ProductCategory.RAM && i.Message.Contains("96") && i.Message.Contains("64"));
     }
 
     [Fact]
@@ -136,7 +136,7 @@ public class CompatibilityValidatorTests
         // Assert
         Assert.False(result.IsCompatible);
         Assert.True(result.HasErrors);
-        Assert.Contains(result.Issues, i => i.Category == "RAM/Motherboard" && i.Message.Contains("6") && i.Message.Contains("4"));
+        Assert.Contains(result.Issues, i => i.Category == ProductCategory.RAM && i.Message.Contains("6") && i.Message.Contains("4"));
     }
 
     #endregion
@@ -203,7 +203,7 @@ public class CompatibilityValidatorTests
         // Assert
         Assert.False(result.IsCompatible);
         Assert.True(result.HasErrors);
-        Assert.Contains(result.Issues, i => i.Category == "Case/Motherboard" && i.Message.Contains("ATX") && i.Message.Contains("MicroATX"));
+        Assert.Contains(result.Issues, i => i.Category == ProductCategory.Case && i.Message.Contains("ATX") && i.Message.Contains("MicroATX"));
     }
 
     [Fact]
@@ -264,7 +264,7 @@ public class CompatibilityValidatorTests
         // Assert
         Assert.False(result.IsCompatible);
         Assert.True(result.HasErrors);
-        Assert.Contains(result.Issues, i => i.Category == "PSU" && i.Severity == IssueSeverity.Error && i.Message.Contains("770"));
+        Assert.Contains(result.Issues, i => i.Category == ProductCategory.PowerSupply && i.Severity == IssueSeverity.Error && i.Message.Contains("770"));
     }
 
     [Fact]
@@ -285,7 +285,7 @@ public class CompatibilityValidatorTests
         Assert.True(result.IsCompatible);
         Assert.False(result.HasErrors);
         Assert.True(result.HasWarnings);
-        Assert.Contains(result.Issues, i => i.Category == "PSU" && i.Severity == IssueSeverity.Warning);
+        Assert.Contains(result.Issues, i => i.Category == ProductCategory.PowerSupply && i.Severity == IssueSeverity.Warning);
     }
 
     #endregion
@@ -326,7 +326,7 @@ public class CompatibilityValidatorTests
         // Assert
         Assert.False(result.IsCompatible);
         Assert.True(result.HasErrors);
-        Assert.Contains(result.Issues, i => i.Category == "Cooler/CPU" && i.Message.Contains("AM5"));
+        Assert.Contains(result.Issues, i => i.Category == ProductCategory.Cooler && i.Message.Contains("AM5"));
     }
 
     [Fact]
@@ -345,7 +345,7 @@ public class CompatibilityValidatorTests
         // Assert
         Assert.False(result.IsCompatible);
         Assert.True(result.HasErrors);
-        Assert.Contains(result.Issues, i => i.Category == "Cooler/CPU" && i.Message.Contains("95") && i.Message.Contains("170"));
+        Assert.Contains(result.Issues, i => i.Category == ProductCategory.Cooler && i.Message.Contains("95") && i.Message.Contains("170"));
     }
 
 
@@ -375,10 +375,10 @@ public class CompatibilityValidatorTests
         Assert.False(result.IsCompatible);
         Assert.True(result.HasErrors);
         Assert.True(result.Issues.Count >= 4); // Socket, DDR, Case, PSU issues
-        Assert.Contains(result.Issues, i => i.Category == "CPU/Motherboard");
-        Assert.Contains(result.Issues, i => i.Category == "RAM/Motherboard");
-        Assert.Contains(result.Issues, i => i.Category == "Case/Motherboard");
-        Assert.Contains(result.Issues, i => i.Category == "PSU");
+        Assert.Contains(result.Issues, i => i.Category == ProductCategory.CPU);
+        Assert.Contains(result.Issues, i => i.Category == ProductCategory.RAM);
+        Assert.Contains(result.Issues, i => i.Category == ProductCategory.Case);
+        Assert.Contains(result.Issues, i => i.Category == ProductCategory.PowerSupply);
     }
 
     [Fact]
@@ -441,7 +441,7 @@ public class CompatibilityValidatorTests
             slots.Add(new Slot(
                 Guid.NewGuid(),
                 $"RAM Slot {i + 1}",
-                "RAM",
+                ProductCategory.RAM,
                 new Vector3(i * 20, 0, 0),
                 new Dimensions(150, 40, 10),
                 null

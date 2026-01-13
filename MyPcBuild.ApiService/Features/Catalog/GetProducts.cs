@@ -10,14 +10,15 @@ public static class GetProducts
     private static readonly Dictionary<string, Expression<Func<Product, object>>> _sortKeySelectors = new(StringComparer.OrdinalIgnoreCase)
     {
         [nameof(Product.Name)] = p => p.Name,
-        [nameof(Product.CategoryName)] = p => p.CategoryName,
+        [nameof(Product.ProductCategory)] = p => p.ProductCategory,
         [nameof(Product.Price)] = p => p.Price,
         [nameof(Product.Manufacturer)] = p => p.Manufacturer
     };
 
     private static readonly Dictionary<string, Func<IQueryable<Product>, string, IQueryable<Product>>> _filterFunctions = new(StringComparer.OrdinalIgnoreCase)
     {
-        [nameof(Product.CategoryName)] = (q, v) => q.Where(p => p.CategoryName.Contains(v, StringComparison.InvariantCultureIgnoreCase))
+        [nameof(Product.ProductCategory)] = (q, v) => q.Where(p => p.ProductCategory.ToString().Contains(v, StringComparison.InvariantCultureIgnoreCase)),
+        [nameof(Product.IsDraft)] = (q, v) => bool.TryParse(v, out bool isDraft) ? q.Where(p => p.IsDraft == isDraft) : q
     };
 
     public static IEndpointRouteBuilder MapGetProductsEndpoint(this IEndpointRouteBuilder app)
@@ -62,9 +63,11 @@ public static class GetProducts
                 productResults.Select(p => new ProductSummary(
                     p.Id,
                     p.Name,
-                    p.CategoryName,
+                    p.ProductCategory.ToString(),
                     p.Price,
-                    p.Manufacturer
+                    p.Manufacturer,
+                    p.IsDraft,
+                    p.PublishedAt
                 )).ToList(),
                 pagination
             );
@@ -130,5 +133,7 @@ public record ProductSummary(
     string Name,
     string CategoryName,
     decimal Price,
-    string Manufacturer
+    string Manufacturer,
+    bool IsDraft,
+    DateTime? PublishedAt
 );

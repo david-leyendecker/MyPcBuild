@@ -1,4 +1,6 @@
 using MyPcBuild.ApiService.Domain.Models;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace MyPcBuild.ApiService.Domain.Models.Spatial;
 
@@ -10,7 +12,7 @@ namespace MyPcBuild.ApiService.Domain.Models.Spatial;
 public record Slot(
     Guid Id,
     string Name,
-    string AllowedCategoryName,
+    ProductCategory AllowedProductCategory,
     Vector3 RelativePosition,
     Dimensions MaxDimensions,
     List<Slot>? SubSlots = null
@@ -39,5 +41,24 @@ public record Slot(
         }
 
         return result;
+    }
+}
+
+/// <summary>
+/// JSON converter for Slot lists (always returns empty list for AI-generated products).
+/// </summary>
+internal class SlotListConverter : JsonConverter<List<Slot>>
+{
+    public override List<Slot> Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    {
+        // Skip the value (could be array or null)
+        reader.Skip();
+        // Always return empty list for AI-generated draft products
+        return [];
+    }
+
+    public override void Write(Utf8JsonWriter writer, List<Slot> value, JsonSerializerOptions options)
+    {
+        JsonSerializer.Serialize(writer, value, options);
     }
 }

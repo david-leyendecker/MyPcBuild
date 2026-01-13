@@ -2,6 +2,7 @@ using System;
 using System.Text.Json.Serialization;
 using Marten;
 using Marten.Events.Projections;
+using Microsoft.Extensions.AI;
 using MyPcBuild.ApiService.Domain.Events;
 using MyPcBuild.ApiService.Domain.Models;
 using MyPcBuild.ApiService.Features.Builds;
@@ -21,7 +22,7 @@ builder.Services.AddProblemDetails();
 builder.Services.AddHttpContextAccessor();
 
 // Add CORS for Vue.js client
-string allowedOrigins = builder.Configuration["AllowedOrigins"] 
+string allowedOrigins = builder.Configuration["AllowedOrigins"]
     ?? throw new InvalidOperationException("AllowedOrigins configuration not found. Please set the AllowedOrigins environment variable.");
 
 string[] origins = allowedOrigins.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
@@ -37,6 +38,11 @@ builder.Services.AddCors(options =>
     });
 });
 
+builder.Services.AddSingleton<ProductCategoryPromptFields>();
+
+// Register AI product generator
+builder.Services.AddScoped<IAiProductGenerator, OpenAiProductGenerator>();
+
 // Register compatibility validator
 builder.Services.AddScoped<ICompatibilityValidator, CompatibilityValidator>();
 
@@ -44,7 +50,8 @@ builder.Services.AddScoped<ICompatibilityValidator, CompatibilityValidator>();
 builder.Services.AddScoped<ISpatialValidator, SpatialValidator>();
 
 // Add OpenAPI
-builder.Services.AddOpenApi();
+builder.AddAzureChatCompletionsClient("chat")
+    .AddChatClient();
 
 // Add Marten for Event Sourcing
 string connectionString = builder.Configuration.GetConnectionString("mypcbuild") ?? throw new InvalidOperationException("Connection string 'mypcbuild' not found.");
@@ -52,7 +59,7 @@ string connectionString = builder.Configuration.GetConnectionString("mypcbuild")
 builder.Services.AddMarten(opts =>
 {
     opts.Connection(connectionString);
-    
+
     // Configure event sourcing for Build aggregate
     opts.Events.AddEventTypes([
         typeof(BuildCreated),
@@ -61,10 +68,10 @@ builder.Services.AddMarten(opts =>
         typeof(PartRemoved),
         typeof(BuildRenamed)
     ]);
-    
+
     // Use Build as the aggregate with inline projection
     opts.Projections.Snapshot<Build>(SnapshotLifecycle.Inline);
-    
+
     // Configure Product hierarchy for polymorphic storage
     opts.Schema.For<Product>()
         .AddSubClass<CpuProduct>()
@@ -91,11 +98,6 @@ app.UseExceptionHandler();
 
 // Enable CORS
 app.UseCors();
-
-if (app.Environment.IsDevelopment())
-{
-    app.MapOpenApi();
-}
 
 // Map feature endpoints
 app.MapBuildEndpoints();

@@ -13,6 +13,19 @@ public static class AddPartToBuild
             AddPartRequest request,
             IDocumentSession session) =>
         {
+            // Validate that the product exists and is not a draft
+            Product? product = await session.LoadAsync<Product>(request.ProductId);
+            
+            if (product == null)
+            {
+                return Results.NotFound(new { error = "Product not found" });
+            }
+
+            if (product.IsDraft)
+            {
+                return Results.BadRequest(new { error = "Draft products cannot be added to builds. Please publish the product first." });
+            }
+
             PartAdded @event = new()
             {
                 BuildId = buildId,

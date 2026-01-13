@@ -29,7 +29,7 @@
             :value="category"
             :color="catalogStore.selectedCategory === category ? 'primary' : undefined"
           >
-            {{ category }}
+            {{ categoryDisplayNames[category] }}
           </v-chip>
         </v-chip-group>
       </v-col>
@@ -63,7 +63,33 @@
             @update:options="handleTableOptionsUpdate"
           >
             <template #item.name="{ item }">
-              <span class="font-weight-medium">{{ item.name }}</span>
+              <span 
+                class="font-weight-medium cursor-pointer text-primary" 
+                @click="viewProduct(item.id)"
+              >
+                {{ item.name }}
+              </span>
+            </template>
+
+            <template #item.isDraft="{ item }">
+              <v-chip 
+                v-if="item.isDraft" 
+                size="small" 
+                color="warning" 
+                variant="tonal"
+              >
+                <v-icon start icon="mdi-pencil"></v-icon>
+                Draft
+              </v-chip>
+              <v-chip 
+                v-else 
+                size="small" 
+                color="success" 
+                variant="tonal"
+              >
+                <v-icon start icon="mdi-check-circle"></v-icon>
+                Published
+              </v-chip>
             </template>
 
             <template #item.price="{ item }">
@@ -78,6 +104,17 @@
 
             <template #item.actions="{ item }">
               <div class="d-flex ga-2 justify-end">
+                <v-tooltip v-if="item.isDraft" text="Publish product">
+                  <template #activator="{ props }">
+                    <v-icon 
+                      v-bind="props"
+                      color="success" 
+                      icon="mdi-check-circle" 
+                      size="small" 
+                      @click="publish(item.id)"
+                    ></v-icon>
+                  </template>
+                </v-tooltip>
                 <v-icon color="medium-emphasis" icon="mdi-pencil" size="small" @click="edit(item.id)"></v-icon>
                 <v-icon color="medium-emphasis" icon="mdi-delete" size="small" @click="remove(item.id)"></v-icon>
               </div>
@@ -108,13 +145,23 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
+import { useRouter } from 'vue-router';
 import { useCatalogStore } from '@/stores/catalogStore';
+import { catalogApi, ProductCategory, categoryLabels } from '@/api/catalog';
 import ViewHeader from '@/components/ViewHeader.vue';
 import { PRODUCT_CATALOG } from '@/config/navigation';
 
+const router = useRouter();
+
 const catalogStore = useCatalogStore();
-const categories = ref(['CPU', 'Motherboard', 'GPU', 'RAM', 'Storage', 'PSU', 'PCCase', 'Cooler']);
+const categories = computed(() => Object.values(ProductCategory));
+const categoryDisplayNames = computed(() => 
+  Object.entries(categoryLabels).reduce((acc, [key, label]) => {
+    acc[key] = label;
+    return acc;
+  }, {} as Record<string, string>)
+);
 const searchText = ref('');
 
 const headers = [
@@ -122,6 +169,7 @@ const headers = [
   { title: 'Category', key: 'categoryName', sortable: true },
   { title: 'Manufacturer', key: 'manufacturer', sortable: true },
   { title: 'Price', key: 'price', sortable: true },
+  { title: 'Status', key: 'isDraft', sortable: true },
   { title: 'Actions', key: 'actions', sortable: false, align: 'center' as const }
 ];
 
@@ -144,9 +192,22 @@ function handleCategorySelect(category: string | null) {
   catalogStore.setCategory(category === '' ? null : category);
 }
 
+async function publish(id: string) {
+  try {
+    await catalogApi.publishProduct(id);
+    // Reload products to show updated status
+    await catalogStore.loadProducts();
+  } catch (error) {
+    console.error('Failed to publish product:', error);
+  }
+}
+
+function viewProduct(id: string) {
+  router.push(`/catalog/product/${id}`);
+}
+
 function edit(id: string) {
-  // TODO: Implement edit functionality
-  console.log('Edit product:', id);
+  router.push(`/catalog/product/${id}`);
 }
 
 function remove(id: string) {
@@ -193,5 +254,9 @@ function handleTableOptionsUpdate(options: TableOptions) {
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
+}
+
+.cursor-pointer {
+  cursor: pointer;
 }
 </style>

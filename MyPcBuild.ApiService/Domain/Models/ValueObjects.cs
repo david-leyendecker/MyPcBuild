@@ -1,6 +1,71 @@
+using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace MyPcBuild.ApiService.Domain.Models;
+
+public enum ProductCategory
+{
+    CPU,
+    GPU,
+    Motherboard,
+    RAM,
+    Storage,
+    PowerSupply,
+    Cooler,
+    Case
+}
+
+public readonly record struct ProductCategoryInfo
+{
+    public static readonly ProductCategoryInfo Cpu = new("cpu", "Processor");
+    public static readonly ProductCategoryInfo Gpu = new("gpu", "Graphics Card");
+    public static readonly ProductCategoryInfo Motherboard = new("motherboard", "Motherboard");
+    public static readonly ProductCategoryInfo Ram = new("ram", "Memory");
+    public static readonly ProductCategoryInfo Storage = new("storage", "Storage");
+    public static readonly ProductCategoryInfo PowerSupply = new("powersupply", "Power Supply");
+    public static readonly ProductCategoryInfo Cooler = new("cooler", "Cooler");
+    public static readonly ProductCategoryInfo PcCase = new("pccase", "Case");
+
+
+    public string Name { get; }
+    public string DisplayValue { get; }
+
+    private ProductCategoryInfo(string name, string displayValue)
+    {
+        Name = name;
+        DisplayValue = displayValue;
+    }
+
+    public override string ToString() => Name;
+    
+    public static ProductCategoryInfo FromEnum(ProductCategory category) => category switch
+    {
+        ProductCategory.CPU => Cpu,
+        ProductCategory.GPU => Gpu,
+        ProductCategory.Motherboard => Motherboard,
+        ProductCategory.RAM => Ram,
+        ProductCategory.Storage => Storage,
+        ProductCategory.PowerSupply => PowerSupply,
+        ProductCategory.Cooler => Cooler,
+        ProductCategory.Case => PcCase,
+        _ => throw new ArgumentException($"Unknown category: {category}")
+    };
+
+    public static Dictionary<ProductCategory, ProductCategoryInfo> ByEnum()
+    {
+        return new Dictionary<ProductCategory, ProductCategoryInfo>
+        {
+            [ProductCategory.CPU] = Cpu,
+            [ProductCategory.GPU] = Gpu,
+            [ProductCategory.Motherboard] = Motherboard,
+            [ProductCategory.RAM] = Ram,
+            [ProductCategory.Storage] = Storage,
+            [ProductCategory.PowerSupply] = PowerSupply,
+            [ProductCategory.Cooler] = Cooler,
+            [ProductCategory.Case] = PcCase
+        };
+    }
+}
 
 /// <summary>
 /// CPU socket types.
@@ -107,10 +172,48 @@ public enum GpuPowerConnector
     One16Pin
 }
 
+/// <summary>
+/// JSON converter for GpuPowerConnector to handle string values like "1x16-pin", "2x8pin", etc.
+/// </summary>
+internal class GpuPowerConnectorConverter : JsonConverter<GpuPowerConnector>
+{
+    public override GpuPowerConnector Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    {
+        if (reader.TokenType == JsonTokenType.String)
+        {
+            string value = reader.GetString() ?? string.Empty;
+            string normalized = value.Replace(" ", string.Empty).Replace("-", string.Empty).ToLowerInvariant();
+
+            return normalized switch
+            {
+                "1x16pin" or "16pin" or "one16pin" => GpuPowerConnector.One16Pin,
+                "2x8pin" or "dual8pin" => GpuPowerConnector.Dual8Pin,
+                "3x8pin" or "triple8pin" => GpuPowerConnector.Triple8Pin,
+                _ => GpuPowerConnector.Dual8Pin // Default fallback
+            };
+        }
+
+        // Try to parse as standard enum format
+        if (reader.TokenType == JsonTokenType.String || reader.TokenType == JsonTokenType.Number)
+        {
+            // Fall back to default enum deserialization
+            return GpuPowerConnector.Dual8Pin;
+        }
+
+        throw new JsonException($"Cannot convert {reader.TokenType} to GpuPowerConnector");
+    }
+
+    public override void Write(Utf8JsonWriter writer, GpuPowerConnector value, JsonSerializerOptions options)
+    {
+        writer.WriteStringValue(value.ToString());
+    }
+}
+
 
 /// <summary>
 /// Represents a frequency in gigahertz (GHz).
 /// </summary>
+[JsonConverter(typeof(FrequencyConverter))]
 public record Frequency
 {
     public static readonly string Unit = "GHz";
@@ -138,6 +241,7 @@ public record Frequency
 /// <summary>
 /// Represents a storage capacity in gigabytes (GB).
 /// </summary>
+[JsonConverter(typeof(StorageCapacityConverter))]
 public record StorageCapacity
 {
     public static readonly string Unit = "GB";
@@ -166,6 +270,7 @@ public record StorageCapacity
 /// <summary>
 /// Represents a power rating in watts (W).
 /// </summary>
+[JsonConverter(typeof(PowerConverter))]
 public record Power
 {
     public static readonly string Unit = "W";
@@ -190,6 +295,7 @@ public record Power
 /// <summary>
 /// Represents a voltage in volts (V).
 /// </summary>
+[JsonConverter(typeof(VoltageConverter))]
 public record Voltage
 {
     public static readonly string Unit = "V";
@@ -214,6 +320,7 @@ public record Voltage
 /// <summary>
 /// Represents a length/distance in millimeters (mm).
 /// </summary>
+[JsonConverter(typeof(LengthConverter))]
 public record Length
 {
     public static readonly string Unit = "mm";
@@ -242,6 +349,7 @@ public record Length
 /// <summary>
 /// Represents a data transfer speed in MB/s.
 /// </summary>
+[JsonConverter(typeof(DataSpeedConverter))]
 public record DataSpeed
 {
     public static readonly string Unit = "MB/s";
@@ -264,4 +372,108 @@ public record DataSpeed
     public decimal ToGBps() => ValueInMBps / 1000m;
 
     public override string ToString() => ValueInMBps >= 1000 ? $"{ToGBps():F2} GB/s" : $"{ValueInMBps} {Unit}";
+}
+
+// JSON Converters for value objects
+
+internal class FrequencyConverter : JsonConverter<Frequency>
+{
+    public override Frequency Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    {
+        if (reader.TokenType == JsonTokenType.Number)
+        {
+            return Frequency.FromGHz(reader.GetDecimal());
+        }
+        throw new JsonException($"Cannot convert {reader.TokenType} to Frequency");
+    }
+
+    public override void Write(Utf8JsonWriter writer, Frequency value, JsonSerializerOptions options)
+    {
+        writer.WriteNumberValue(value.ValueInGHz);
+    }
+}
+
+internal class StorageCapacityConverter : JsonConverter<StorageCapacity>
+{
+    public override StorageCapacity Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    {
+        if (reader.TokenType == JsonTokenType.Number)
+        {
+            return StorageCapacity.FromGB(reader.GetInt32());
+        }
+        throw new JsonException($"Cannot convert {reader.TokenType} to StorageCapacity");
+    }
+
+    public override void Write(Utf8JsonWriter writer, StorageCapacity value, JsonSerializerOptions options)
+    {
+        writer.WriteNumberValue(value.ValueInGB);
+    }
+}
+
+internal class PowerConverter : JsonConverter<Power>
+{
+    public override Power Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    {
+        if (reader.TokenType == JsonTokenType.Number)
+        {
+            return Power.FromWatts(reader.GetInt32());
+        }
+        throw new JsonException($"Cannot convert {reader.TokenType} to Power");
+    }
+
+    public override void Write(Utf8JsonWriter writer, Power value, JsonSerializerOptions options)
+    {
+        writer.WriteNumberValue(value.ValueInWatts);
+    }
+}
+
+internal class VoltageConverter : JsonConverter<Voltage>
+{
+    public override Voltage Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    {
+        if (reader.TokenType == JsonTokenType.Number)
+        {
+            return Voltage.FromVolts(reader.GetDecimal());
+        }
+        throw new JsonException($"Cannot convert {reader.TokenType} to Voltage");
+    }
+
+    public override void Write(Utf8JsonWriter writer, Voltage value, JsonSerializerOptions options)
+    {
+        writer.WriteNumberValue(value.ValueInVolts);
+    }
+}
+
+internal class LengthConverter : JsonConverter<Length>
+{
+    public override Length Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    {
+        if (reader.TokenType == JsonTokenType.Number)
+        {
+            return Length.FromMm(reader.GetInt32());
+        }
+        throw new JsonException($"Cannot convert {reader.TokenType} to Length");
+    }
+
+    public override void Write(Utf8JsonWriter writer, Length value, JsonSerializerOptions options)
+    {
+        writer.WriteNumberValue(value.ValueInMm);
+    }
+}
+
+internal class DataSpeedConverter : JsonConverter<DataSpeed>
+{
+    public override DataSpeed Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    {
+        if (reader.TokenType == JsonTokenType.Number)
+        {
+            return DataSpeed.FromMBps(reader.GetInt32());
+        }
+        throw new JsonException($"Cannot convert {reader.TokenType} to DataSpeed");
+    }
+
+    public override void Write(Utf8JsonWriter writer, DataSpeed value, JsonSerializerOptions options)
+    {
+        writer.WriteNumberValue(value.ValueInMBps);
+    }
 }

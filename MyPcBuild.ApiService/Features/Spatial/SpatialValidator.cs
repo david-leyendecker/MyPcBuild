@@ -80,10 +80,10 @@ public class SpatialValidator : ISpatialValidator
         }
 
         // Validate part category matches slot
-        if (slot.AllowedCategoryName != product.CategoryName)
+        if (slot.AllowedProductCategory != product.ProductCategory)
         {
             issues.Add(new SpatialIssue(
-                $"Product category {product.CategoryName} does not match slot allowed category {slot.AllowedCategoryName}",
+                $"Product category {product.ProductCategory} does not match slot allowed category {slot.AllowedProductCategory}",
                 SpatialIssueSeverity.Error,
                 "Category/Mismatch"
             ));

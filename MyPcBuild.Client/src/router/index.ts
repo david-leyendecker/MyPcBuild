@@ -3,6 +3,7 @@ import BuildsListView from '@/views/BuildsListView.vue';
 import BuildDetailView from '@/views/BuildDetailView.vue';
 import CatalogView from '@/views/CatalogView.vue';
 import ProductCreateView from '@/views/ProductCreateView.vue';
+import ProductDetailView from '@/views/ProductDetailView.vue';
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -25,6 +26,12 @@ const routes: Array<RouteRecordRaw> = [
     path: '/catalog/create',
     name: 'product-create',
     component: ProductCreateView
+  },
+  {
+    path: '/catalog/product/:id',
+    name: 'product-detail',
+    component: ProductDetailView,
+    props: true
   }
 ];
 
