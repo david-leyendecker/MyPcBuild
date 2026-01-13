@@ -1,6 +1,6 @@
 using Microsoft.Extensions.AI;
 using MyPcBuild.ApiService.Domain.Models;
-using MyPcBuild.ApiService.Domain.Models.Spatial;
+using MyPcBuild.ApiService.Features.Catalog.DTOs;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -8,6 +8,7 @@ namespace MyPcBuild.ApiService.Features.Catalog;
 
 /// <summary>
 /// Implementation of IAiProductGenerator using OpenAI for product generation.
+/// Uses API DTOs for schema extraction and parsing.
 /// </summary>
 public class OpenAiProductGenerator(ILogger<OpenAiProductGenerator> logger, IChatClient chatClient, ProductCategoryPromptFields productCategoryPromptFields) : IAiProductGenerator
 {
@@ -79,37 +80,37 @@ public class OpenAiProductGenerator(ILogger<OpenAiProductGenerator> logger, ICha
             NumberHandling = JsonNumberHandling.AllowReadingFromString,
             Converters =
             {
-                new GpuPowerConnectorConverter(),
-                new JsonStringEnumConverter(),
-                new DimensionsConverter(),
-                new SlotListConverter(),
-                new ChamberListConverter()
+                new JsonStringEnumConverter()
             }
         };
 
-        Product product = category switch
+        ProductDto dto = category switch
         {
-            ProductCategory.CPU => JsonSerializer.Deserialize<CpuProduct>(cleanedJson, options)!,
-            ProductCategory.Motherboard => JsonSerializer.Deserialize<MotherboardProduct>(cleanedJson, options)!,
-            ProductCategory.GPU => JsonSerializer.Deserialize<GpuProduct>(cleanedJson, options)!,
-            ProductCategory.RAM => JsonSerializer.Deserialize<RamProduct>(cleanedJson, options)!,
-            ProductCategory.Case => JsonSerializer.Deserialize<PcCaseProduct>(cleanedJson, options)!,
-            ProductCategory.PowerSupply => JsonSerializer.Deserialize<PsuProduct>(cleanedJson, options)!,
-            ProductCategory.Storage => JsonSerializer.Deserialize<StorageProduct>(cleanedJson, options)!,
-            ProductCategory.Cooler => JsonSerializer.Deserialize<CoolerProduct>(cleanedJson, options)!,
+            ProductCategory.CPU => JsonSerializer.Deserialize<CpuDto>(cleanedJson, options)!,
+            ProductCategory.Motherboard => JsonSerializer.Deserialize<MotherboardDto>(cleanedJson, options)!,
+            ProductCategory.GPU => JsonSerializer.Deserialize<GpuDto>(cleanedJson, options)!,
+            ProductCategory.RAM => JsonSerializer.Deserialize<RamDto>(cleanedJson, options)!,
+            ProductCategory.Case => JsonSerializer.Deserialize<PcCaseDto>(cleanedJson, options)!,
+            ProductCategory.PowerSupply => JsonSerializer.Deserialize<PsuDto>(cleanedJson, options)!,
+            ProductCategory.Storage => JsonSerializer.Deserialize<StorageDto>(cleanedJson, options)!,
+            ProductCategory.Cooler => JsonSerializer.Deserialize<CoolerDto>(cleanedJson, options)!,
             _ => throw new ArgumentException($"Unknown category: {category}")
         };
 
         Guid id = Guid.NewGuid();
-        string name = StripManufacturerPrefix(product.Name, product.Manufacturer);
+        string name = StripManufacturerPrefix(dto.Name, dto.Manufacturer);
 
-        return product with
+        // Set DTO properties for draft status
+        ProductDto draftDto = dto with
         {
             Id = id,
             Name = name,
             IsDraft = true,
             PublishedAt = null
         };
+
+        // Convert DTO to domain model
+        return ProductDtoMapper.ToDomain(draftDto, id);
     }
 
     private static string CleanJsonResponse(string jsonResponse)
