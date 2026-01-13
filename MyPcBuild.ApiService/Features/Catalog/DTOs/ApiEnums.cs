@@ -92,7 +92,7 @@ internal class ApiGpuPowerConnectorConverter : JsonConverter<ApiGpuPowerConnecto
                 "1x16pin" or "16pin" or "one16pin" => ApiGpuPowerConnector.One16Pin,
                 "2x8pin" or "dual8pin" => ApiGpuPowerConnector.Dual8Pin,
                 "3x8pin" or "triple8pin" => ApiGpuPowerConnector.Triple8Pin,
-                _ => ApiGpuPowerConnector.Dual8Pin // Default fallback
+                _ => throw new JsonException($"Unrecognized GPU power connector value: {value}. Expected one of: 1x16-pin, 2x8-pin, 3x8-pin")
             };
         }
 

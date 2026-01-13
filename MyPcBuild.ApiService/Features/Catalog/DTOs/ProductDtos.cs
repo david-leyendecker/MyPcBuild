@@ -560,7 +560,8 @@ public record ApiSlot
 }
 
 /// <summary>
-/// JSON converter for ApiSlot lists (always returns empty list for AI-generated products).
+/// JSON converter for ApiSlot lists.
+/// For AI-generated products, returns an empty list since spatial data is not provided by the AI.
 /// </summary>
 internal class ApiSlotListConverter : JsonConverter<List<ApiSlot>?>
 {
@@ -568,15 +569,16 @@ internal class ApiSlotListConverter : JsonConverter<List<ApiSlot>?>
     {
         // Skip the value (could be array or string like "[]")
         reader.Skip();
-        // Always return null for AI-generated draft products
-        return null;
+        // Return empty list for AI-generated draft products (spatial data not provided)
+        return [];
     }
 
     public override void Write(Utf8JsonWriter writer, List<ApiSlot>? value, JsonSerializerOptions options)
     {
-        if (value == null)
+        if (value == null || value.Count == 0)
         {
-            writer.WriteNullValue();
+            writer.WriteStartArray();
+            writer.WriteEndArray();
         }
         else
         {
@@ -604,7 +606,8 @@ public record ApiChamber
 }
 
 /// <summary>
-/// JSON converter for ApiChamber lists (always returns empty list for AI-generated products).
+/// JSON converter for ApiChamber lists.
+/// For AI-generated products, returns an empty list since spatial data is not provided by the AI.
 /// </summary>
 internal class ApiChamberListConverter : JsonConverter<List<ApiChamber>?>
 {
@@ -612,15 +615,16 @@ internal class ApiChamberListConverter : JsonConverter<List<ApiChamber>?>
     {
         // Skip the value (could be array or nested object)
         reader.Skip();
-        // Always return null for AI-generated draft products
-        return null;
+        // Return empty list for AI-generated draft products (spatial data not provided)
+        return [];
     }
 
     public override void Write(Utf8JsonWriter writer, List<ApiChamber>? value, JsonSerializerOptions options)
     {
-        if (value == null)
+        if (value == null || value.Count == 0)
         {
-            writer.WriteNullValue();
+            writer.WriteStartArray();
+            writer.WriteEndArray();
         }
         else
         {

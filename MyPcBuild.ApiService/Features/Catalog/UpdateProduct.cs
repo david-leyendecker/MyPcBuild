@@ -32,6 +32,12 @@ public static class UpdateProduct
         // Convert DTO to domain model, preserving the existing ID
         Product updatedProduct = ProductDtoMapper.ToDomain(dto, id);
 
+        // Validate that product category hasn't changed
+        if (updatedProduct.ProductCategory != existingProduct.ProductCategory)
+        {
+            return Results.BadRequest(new { error = $"Cannot change product category from {existingProduct.ProductCategory} to {updatedProduct.ProductCategory}" });
+        }
+
         session.Store(updatedProduct);
         await session.SaveChangesAsync();
 
