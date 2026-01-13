@@ -15,7 +15,7 @@ public static class GetProductById
             IDocumentSession session) =>
         {
             Product? product = await session.LoadAsync<Product>(id);
-            
+
             if (product is null)
             {
                 return Results.NotFound();
@@ -35,6 +35,9 @@ public static class GetProductById
     private static ProductDetailResponse MapToDetailResponse(Product product)
     {
         Dictionary<string, object> specifications = ExtractSpecifications(product);
+        ProductDetailDimensions? dimensions = ExtractDimensions(product);
+        List<ProductDetailSlot>? slots = ExtractSlots(product);
+        List<ProductDetailChamber>? chambers = ExtractChambers(product);
 
         return new ProductDetailResponse(
             product.Id.ToString(),
@@ -44,7 +47,10 @@ public static class GetProductById
             product.Manufacturer,
             product.IsDraft,
             product.PublishedAt?.ToString("O"),
-            specifications
+            specifications,
+            dimensions,
+            slots,
+            chambers
         );
     }
 
@@ -82,6 +88,7 @@ public static class GetProductById
                 [nameof(GpuProduct.BoostClock)] = gpu.BoostClock.ToString(),
                 [nameof(GpuProduct.TDP)] = gpu.TDP.ToString(),
                 [nameof(GpuProduct.Length)] = gpu.Length.ToString(),
+                [nameof(GpuProduct.PowerConnectors)] = gpu.PowerConnectors.ToString(),
                 [nameof(GpuProduct.RayTracing)] = gpu.RayTracing
             },
             RamProduct ram => new()
@@ -127,6 +134,48 @@ public static class GetProductById
             _ => specs
         };
     }
+
+    private static ProductDetailDimensions? ExtractDimensions(Product product)
+    {
+        return product switch
+        {
+            MotherboardProduct mb => new ProductDetailDimensions(mb.Dimensions.Length, mb.Dimensions.Width, mb.Dimensions.Height),
+            GpuProduct gpu => new ProductDetailDimensions(gpu.Dimensions.Length, gpu.Dimensions.Width, gpu.Dimensions.Height),
+            PcCaseProduct @case => new ProductDetailDimensions(@case.Dimensions.Length, @case.Dimensions.Width, @case.Dimensions.Height),
+            CoolerProduct cooler => new ProductDetailDimensions(cooler.Dimensions.Length, cooler.Dimensions.Width, cooler.Dimensions.Height),
+            _ => null
+        };
+    }
+
+    private static List<ProductDetailSlot>? ExtractSlots(Product product)
+    {
+        return product switch
+        {
+            MotherboardProduct mb => mb.Slots.Select(s => new ProductDetailSlot(
+                s.Name,
+                s.AllowedProductCategory.ToString(),
+                new ProductDetailLocation(s.RelativePosition.X, s.RelativePosition.Y, s.RelativePosition.Z)
+            )).ToList(),
+            GpuProduct gpu => gpu.Slots.Select(s => new ProductDetailSlot(
+                s.Name,
+                s.AllowedProductCategory.ToString(),
+                new ProductDetailLocation(s.RelativePosition.X, s.RelativePosition.Y, s.RelativePosition.Z)
+            )).ToList(),
+            _ => null
+        };
+    }
+
+    private static List<ProductDetailChamber>? ExtractChambers(Product product)
+    {
+        return product switch
+        {
+            PcCaseProduct @case => @case.Chambers.Select(c => new ProductDetailChamber(
+                c.Name,
+                new ProductDetailDimensions(c.Dimensions.Length, c.Dimensions.Width, c.Dimensions.Height)
+            )).ToList(),
+            _ => null
+        };
+    }
 }
 
 /// <summary>
@@ -140,5 +189,13 @@ public record ProductDetailResponse(
     string Manufacturer,
     bool IsDraft,
     string? PublishedAt,
-    Dictionary<string, object> Specifications
+    Dictionary<string, object> Specifications,
+    ProductDetailDimensions? Dimensions,
+    List<ProductDetailSlot>? Slots,
+    List<ProductDetailChamber>? Chambers
 );
+
+public record ProductDetailDimensions(decimal Length, decimal Width, decimal Height);
+public record ProductDetailLocation(decimal X, decimal Y, decimal Z);
+public record ProductDetailSlot(string Name, string AllowedCategory, ProductDetailLocation Location);
+public record ProductDetailChamber(string Name, ProductDetailDimensions Dimensions);

@@ -197,5 +197,10 @@ export const catalogApi = {
   async publishProduct(id: string): Promise<PublishProductResponse> {
     const response = await apiClient.post<PublishProductResponse>(`/catalog/products/${id}/publish`);
     return response.data;
+  },
+
+  async updateProduct(id: string, request: CreateProductRequest): Promise<{ id: string }> {
+    const response = await apiClient.put<{ id: string }>(`/catalog/products/${id}`, request);
+    return response.data;
   }
 };

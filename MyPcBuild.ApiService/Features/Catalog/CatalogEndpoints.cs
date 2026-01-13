@@ -9,6 +9,7 @@ public static class Endpoints
         app.MapGetCategoriesEndpoint();
         app.MapSearchProductsEndpoint();
         app.MapCreateProductEndpoint();
+        app.MapUpdateProductEndpoint();
         app.MapGetFieldDefinitionsEndpoint();
         app.MapGenerateProductWithAiEndpoint();
         app.MapPublishProductEndpoint();

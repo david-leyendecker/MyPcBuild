@@ -384,6 +384,16 @@ internal class FrequencyConverter : JsonConverter<Frequency>
         {
             return Frequency.FromGHz(reader.GetDecimal());
         }
+        
+        if (reader.TokenType == JsonTokenType.StartObject)
+        {
+            using JsonDocument doc = JsonDocument.ParseValue(ref reader);
+            if (doc.RootElement.TryGetProperty("ValueInGHz", out JsonElement valueElement))
+            {
+                return Frequency.FromGHz(valueElement.GetDecimal());
+            }
+        }
+        
         throw new JsonException($"Cannot convert {reader.TokenType} to Frequency");
     }
 
@@ -401,6 +411,16 @@ internal class StorageCapacityConverter : JsonConverter<StorageCapacity>
         {
             return StorageCapacity.FromGB(reader.GetInt32());
         }
+        
+        if (reader.TokenType == JsonTokenType.StartObject)
+        {
+            using JsonDocument doc = JsonDocument.ParseValue(ref reader);
+            if (doc.RootElement.TryGetProperty("ValueInGB", out JsonElement valueElement))
+            {
+                return StorageCapacity.FromGB(valueElement.GetInt32());
+            }
+        }
+        
         throw new JsonException($"Cannot convert {reader.TokenType} to StorageCapacity");
     }
 
@@ -418,6 +438,16 @@ internal class PowerConverter : JsonConverter<Power>
         {
             return Power.FromWatts(reader.GetInt32());
         }
+        
+        if (reader.TokenType == JsonTokenType.StartObject)
+        {
+            using JsonDocument doc = JsonDocument.ParseValue(ref reader);
+            if (doc.RootElement.TryGetProperty("ValueInWatts", out JsonElement valueElement))
+            {
+                return Power.FromWatts(valueElement.GetInt32());
+            }
+        }
+        
         throw new JsonException($"Cannot convert {reader.TokenType} to Power");
     }
 
@@ -435,6 +465,16 @@ internal class VoltageConverter : JsonConverter<Voltage>
         {
             return Voltage.FromVolts(reader.GetDecimal());
         }
+        
+        if (reader.TokenType == JsonTokenType.StartObject)
+        {
+            using JsonDocument doc = JsonDocument.ParseValue(ref reader);
+            if (doc.RootElement.TryGetProperty("ValueInVolts", out JsonElement valueElement))
+            {
+                return Voltage.FromVolts(valueElement.GetDecimal());
+            }
+        }
+        
         throw new JsonException($"Cannot convert {reader.TokenType} to Voltage");
     }
 
@@ -452,6 +492,16 @@ internal class LengthConverter : JsonConverter<Length>
         {
             return Length.FromMm(reader.GetInt32());
         }
+        
+        if (reader.TokenType == JsonTokenType.StartObject)
+        {
+            using JsonDocument doc = JsonDocument.ParseValue(ref reader);
+            if (doc.RootElement.TryGetProperty("ValueInMm", out JsonElement valueElement))
+            {
+                return Length.FromMm(valueElement.GetInt32());
+            }
+        }
+        
         throw new JsonException($"Cannot convert {reader.TokenType} to Length");
     }
 
@@ -469,6 +519,16 @@ internal class DataSpeedConverter : JsonConverter<DataSpeed>
         {
             return DataSpeed.FromMBps(reader.GetInt32());
         }
+        
+        if (reader.TokenType == JsonTokenType.StartObject)
+        {
+            using JsonDocument doc = JsonDocument.ParseValue(ref reader);
+            if (doc.RootElement.TryGetProperty("ValueInMBps", out JsonElement valueElement))
+            {
+                return DataSpeed.FromMBps(valueElement.GetInt32());
+            }
+        }
+        
         throw new JsonException($"Cannot convert {reader.TokenType} to DataSpeed");
     }
 

@@ -41,6 +41,39 @@
                   ></v-select>
                 </v-col>
               </v-row>
+              
+              <v-row dense class="mt-2">
+                <v-col cols="12">
+                  <label class="text-caption font-weight-semibold d-block mb-1">Location (mm)</label>
+                </v-col>
+                <v-col cols="4">
+                  <v-text-field 
+                    v-model.number="slot.location.x"
+                    label="X"
+                    type="number"
+                    suffix="mm"
+                    density="compact"
+                  ></v-text-field>
+                </v-col>
+                <v-col cols="4">
+                  <v-text-field 
+                    v-model.number="slot.location.y"
+                    label="Y"
+                    type="number"
+                    suffix="mm"
+                    density="compact"
+                  ></v-text-field>
+                </v-col>
+                <v-col cols="4">
+                  <v-text-field 
+                    v-model.number="slot.location.z"
+                    label="Z"
+                    type="number"
+                    suffix="mm"
+                    density="compact"
+                  ></v-text-field>
+                </v-col>
+              </v-row>
             </div>
             <v-btn 
               icon="mdi-delete"
@@ -57,11 +90,17 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue';
+import { ref, watch, computed } from 'vue';
+import { ProductCategory, categoryLabels } from '@/api/catalog';
 
 interface SlotData {
   name: string;
   allowedCategory: string;
+  location: {
+    x: number;
+    y: number;
+    z: number;
+  };
 }
 
 interface Props {
@@ -73,7 +112,12 @@ const emit = defineEmits<{
   'update:modelValue': [value: string]
 }>();
 
-const categories = ref(['CPU', 'GPU', 'RAM', 'Storage', 'Cooler', 'PSU']);
+const categories = computed(() => 
+  Object.values(ProductCategory).map(value => ({
+    title: categoryLabels[value],
+    value
+  }))
+);
 const slots = ref<SlotData[]>([]);
 
 // Parse slot data from JSON string
@@ -96,7 +140,12 @@ slots.value = parseSlotsValue(props.modelValue);
 function addSlot() {
   slots.value.push({
     name: '',
-    allowedCategory: ''
+    allowedCategory: '',
+    location: {
+      x: 0,
+      y: 0,
+      z: 0
+    }
   });
 }
 

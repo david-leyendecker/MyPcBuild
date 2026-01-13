@@ -209,7 +209,7 @@ public static class CreateProduct
                 Guid.NewGuid(),
                 sd.Name ?? "Unnamed Slot",
                 sd.AllowedCategory,
-                Vector3.Zero, // Position would need to be specified in a more advanced editor
+                sd.Location != null ? new Vector3(sd.Location.X, sd.Location.Y, sd.Location.Z) : Vector3.Zero,
                 new Dimensions(100, 100, 50), // Default dimensions
                 null // No sub-slots for now
             )).ToList();
@@ -282,5 +282,6 @@ public record CreateProductRequest(
 public record CreateProductResponse(Guid Id);
 
 // Helper records for JSON deserialization
-internal record SlotData(string Name, ProductCategory AllowedCategory);
+internal record SlotData(string Name, ProductCategory AllowedCategory, LocationData? Location);
+internal record LocationData(decimal X, decimal Y, decimal Z);
 internal record ChamberData(string? Name, decimal Length, decimal Width, decimal Height);
