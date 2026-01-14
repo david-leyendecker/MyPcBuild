@@ -4,7 +4,6 @@
 
 import type {
   ProductRequest,
-  ProductResponse,
   CpuSocket,
   MemoryType,
   FormFactor,

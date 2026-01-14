@@ -313,7 +313,7 @@ async function onCategoryChange() {
     isLoadingFields.value = true;
     error.value = null;
     try {
-      fieldDefinitions.value = await catalogApi.getFieldDefinitions(formData.value.category);
+      fieldDefinitions.value = await catalogApi.getFieldDefinitions(formData.value.category as any);
       // Initialize fields with empty values
       formData.value.fields = {};
     } catch (err) {
@@ -334,7 +334,7 @@ async function generateWithAi() {
   
   try {
     generatedProduct.value = await catalogApi.generateProductWithAi({
-      category: formData.value.category,
+      category: formData.value.category as any,
       description: aiDescription.value
     });
 
@@ -385,7 +385,7 @@ async function createProduct() {
   
   try {
     const response = await catalogApi.createProduct({
-      category: formData.value.category,
+      category: formData.value.category as any,
       name: formData.value.name,
       price: formData.value.price,
       manufacturer: formData.value.manufacturer,
