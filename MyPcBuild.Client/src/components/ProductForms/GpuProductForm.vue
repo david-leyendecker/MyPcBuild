@@ -1,5 +1,5 @@
 <template>
-  <div class="gpu-product-form d-flex flex-column ga-3">
+  <ProductFormContainer>
     <!-- Chipset Manufacturer and Series - Side by side -->
     <v-row dense>
       <v-col cols="6">
@@ -108,12 +108,13 @@
         :editable="editable"
       />
     </div>
-  </div>
+  </ProductFormContainer>
 </template>
 
 <script setup lang="ts">
 import { ref, watch } from 'vue';
 import type { GpuProductRequest, GpuProductResponse, MemoryType, GpuPowerConnector } from '@/types/products';
+import ProductFormContainer from '@/components/ProductFormContainer.vue';
 import FrequencyInput from '@/components/ValueObjects/FrequencyInput.vue';
 import PowerInput from '@/components/ValueObjects/PowerInput.vue';
 import LengthInput from '@/components/ValueObjects/LengthInput.vue';

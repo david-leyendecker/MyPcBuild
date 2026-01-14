@@ -1,5 +1,5 @@
 <template>
-  <div class="cpu-product-form d-flex flex-column ga-3">
+  <ProductFormContainer>
     <!-- CPU Socket -->
     <v-select 
       v-model="localProduct.socket"
@@ -67,12 +67,13 @@
       :disabled="!editable"
       density="comfortable"
     ></v-checkbox>
-  </div>
+  </ProductFormContainer>
 </template>
 
 <script setup lang="ts">
 import { ref, watch } from 'vue';
 import type { CpuProductRequest, CpuProductResponse, CpuSocket } from '@/types/products';
+import ProductFormContainer from '@/components/ProductFormContainer.vue';
 import FrequencyInput from '@/components/ValueObjects/FrequencyInput.vue';
 import PowerInput from '@/components/ValueObjects/PowerInput.vue';
 

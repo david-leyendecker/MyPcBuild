@@ -9,6 +9,12 @@ export const inputDefaults = {
   hideDetails: 'auto',
 } as const;
 
+/**
+ * Gap spacing configuration for product forms
+ * Change this value to adjust spacing globally across all product forms
+ */
+export const productFormGapClass = 'ga-3';
+
 export const vuetifyDefaults = {
   VTextField: inputDefaults,
   VTextarea: inputDefaults,
@@ -27,5 +33,9 @@ export const vuetifyDefaults = {
   VSwitch: {
     density: inputDefaults.density,
     hideDetails: inputDefaults.hideDetails,
+  },
+  // Product form container defaults
+  'product-form-container': {
+    class: `d-flex flex-column ${productFormGapClass}`,
   },
 };

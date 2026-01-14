@@ -1,5 +1,5 @@
 <template>
-  <div class="ram-product-form d-flex flex-column ga-3">
+  <ProductFormContainer>
     <!-- Type and Configuration - Side by side -->
     <v-row dense>
       <v-col cols="6">
@@ -62,12 +62,13 @@
         />
       </v-col>
     </v-row>
-  </div>
+  </ProductFormContainer>
 </template>
 
 <script setup lang="ts">
 import { ref, watch } from 'vue';
 import type { RamProductRequest, RamProductResponse, MemoryType } from '@/types/products';
+import ProductFormContainer from '@/components/ProductFormContainer.vue';
 import StorageCapacityInput from '@/components/ValueObjects/StorageCapacityInput.vue';
 import FrequencyInput from '@/components/ValueObjects/FrequencyInput.vue';
 import VoltageInput from '@/components/ValueObjects/VoltageInput.vue';

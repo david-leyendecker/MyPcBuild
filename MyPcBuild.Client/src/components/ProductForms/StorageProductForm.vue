@@ -1,5 +1,5 @@
 <template>
-  <div class="storage-product-form d-flex flex-column ga-3">
+  <ProductFormContainer>
     <!-- Type and Interface - Side by side -->
     <v-row dense>
       <v-col cols="6">
@@ -62,12 +62,13 @@
         />
       </v-col>
     </v-row>
-  </div>
+  </ProductFormContainer>
 </template>
 
 <script setup lang="ts">
 import { ref, watch } from 'vue';
 import type { StorageProductRequest, StorageProductResponse } from '@/types/products';
+import ProductFormContainer from '@/components/ProductFormContainer.vue';
 import StorageCapacityInput from '@/components/ValueObjects/StorageCapacityInput.vue';
 import DataSpeedInput from '@/components/ValueObjects/DataSpeedInput.vue';
 
