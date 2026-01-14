@@ -5,25 +5,8 @@
 import apiClient from './client';
 import type {
   ProductRequest,
-  ProductResponse,
-  CpuProductRequest,
-  CpuProductResponse,
-  GpuProductRequest,
-  GpuProductResponse,
-  MotherboardProductRequest,
-  MotherboardProductResponse,
-  RamProductRequest,
-  RamProductResponse,
-  StorageProductRequest,
-  StorageProductResponse,
-  PsuProductRequest,
-  PsuProductResponse,
-  CoolerProductRequest,
-  CoolerProductResponse,
-  PcCaseProductRequest,
-  PcCaseProductResponse
+  ProductResponse
 } from '@/types/products';
-import { ProductCategory as TypedProductCategory } from '@/types/products';
 
 // Re-export old types for compatibility during migration
 export { ProductCategory, categoryLabels, categoryMapping, getCategoryBackendValue, getCategoryFromBackend, getCategoryDisplayName } from './catalog';

@@ -3,61 +3,19 @@
  * These interfaces match the API DTOs from the backend
  */
 
-// ========== Enums ==========
+// ========== Enums (as string literals for API compatibility) ==========
 
-export enum ProductCategory {
-  CPU = 'cpu',
-  GPU = 'gpu',
-  Motherboard = 'motherboard',
-  RAM = 'ram',
-  Storage = 'storage',
-  PowerSupply = 'powersupply',
-  Cooler = 'cooler',
-  Case = 'case'
-}
+export type ProductCategory = 'cpu' | 'gpu' | 'motherboard' | 'ram' | 'storage' | 'powersupply' | 'cooler' | 'case';
 
-export enum CpuSocket {
-  LGA1700 = 'LGA1700',
-  LGA1200 = 'LGA1200',
-  LGA1151 = 'LGA1151',
-  LGA2066 = 'LGA2066',
-  AM5 = 'AM5',
-  AM4 = 'AM4',
-  sTRX4 = 'sTRX4',
-  TR4 = 'TR4'
-}
+export type CpuSocket = 'LGA1700' | 'LGA1200' | 'LGA1151' | 'LGA2066' | 'AM5' | 'AM4' | 'sTRX4' | 'TR4';
 
-export enum MemoryType {
-  DDR3 = 'DDR3',
-  DDR4 = 'DDR4',
-  DDR5 = 'DDR5',
-  GDDR5 = 'GDDR5',
-  GDDR5X = 'GDDR5X',
-  GDDR6 = 'GDDR6',
-  GDDR6X = 'GDDR6X',
-  HBM2 = 'HBM2',
-  HBM2E = 'HBM2E',
-  HBM3 = 'HBM3'
-}
+export type MemoryType = 'DDR3' | 'DDR4' | 'DDR5' | 'GDDR5' | 'GDDR5X' | 'GDDR6' | 'GDDR6X' | 'HBM2' | 'HBM2E' | 'HBM3';
 
-export enum FormFactor {
-  ATX = 'ATX',
-  MicroATX = 'MicroATX',
-  MiniITX = 'MiniITX',
-  EATX = 'EATX'
-}
+export type FormFactor = 'ATX' | 'MicroATX' | 'MiniITX' | 'EATX';
 
-export enum CoolerType {
-  Air = 'Air',
-  AIO = 'AIO',
-  CustomLoop = 'CustomLoop'
-}
+export type CoolerType = 'Air' | 'AIO' | 'CustomLoop';
 
-export enum GpuPowerConnector {
-  Dual8Pin = 'Dual8Pin',
-  Triple8Pin = 'Triple8Pin',
-  One16Pin = 'One16Pin'
-}
+export type GpuPowerConnector = 'Dual8Pin' | 'Triple8Pin' | 'One16Pin';
 
 // ========== Value Objects ==========
 
@@ -123,7 +81,7 @@ export interface ProductBase {
 // ========== CPU Product ==========
 
 export interface CpuProductRequest {
-  category: ProductCategory.CPU;
+  category: 'cpu';
   name: string;
   price: number;
   manufacturer: string;
@@ -137,7 +95,7 @@ export interface CpuProductRequest {
 }
 
 export interface CpuProductResponse extends ProductBase {
-  category: ProductCategory.CPU;
+  category: 'cpu';
   socket: CpuSocket;
   cores: number;
   threads: number;
@@ -150,7 +108,7 @@ export interface CpuProductResponse extends ProductBase {
 // ========== GPU Product ==========
 
 export interface GpuProductRequest {
-  category: ProductCategory.GPU;
+  category: 'gpu';
   name: string;
   price: number;
   manufacturer: string;
@@ -169,7 +127,7 @@ export interface GpuProductRequest {
 }
 
 export interface GpuProductResponse extends ProductBase {
-  category: ProductCategory.GPU;
+  category: 'gpu';
   chipsetManufacturer: string;
   series: string;
   vram: StorageCapacity;
@@ -187,7 +145,7 @@ export interface GpuProductResponse extends ProductBase {
 // ========== Motherboard Product ==========
 
 export interface MotherboardProductRequest {
-  category: ProductCategory.Motherboard;
+  category: 'motherboard';
   name: string;
   price: number;
   manufacturer: string;
@@ -201,7 +159,7 @@ export interface MotherboardProductRequest {
 }
 
 export interface MotherboardProductResponse extends ProductBase {
-  category: ProductCategory.Motherboard;
+  category: 'motherboard';
   socket: CpuSocket;
   chipset: string;
   formFactor: FormFactor;
@@ -214,7 +172,7 @@ export interface MotherboardProductResponse extends ProductBase {
 // ========== RAM Product ==========
 
 export interface RamProductRequest {
-  category: ProductCategory.RAM;
+  category: 'ram';
   name: string;
   price: number;
   manufacturer: string;
@@ -227,7 +185,7 @@ export interface RamProductRequest {
 }
 
 export interface RamProductResponse extends ProductBase {
-  category: ProductCategory.RAM;
+  category: 'ram';
   type: MemoryType;
   capacity: StorageCapacity;
   configuration: string;
@@ -239,7 +197,7 @@ export interface RamProductResponse extends ProductBase {
 // ========== Storage Product ==========
 
 export interface StorageProductRequest {
-  category: ProductCategory.Storage;
+  category: 'storage';
   name: string;
   price: number;
   manufacturer: string;
@@ -252,7 +210,7 @@ export interface StorageProductRequest {
 }
 
 export interface StorageProductResponse extends ProductBase {
-  category: ProductCategory.Storage;
+  category: 'storage';
   type: string;
   interface: string;
   storageFormFactor: string;
@@ -264,7 +222,7 @@ export interface StorageProductResponse extends ProductBase {
 // ========== PSU Product ==========
 
 export interface PsuProductRequest {
-  category: ProductCategory.PowerSupply;
+  category: 'powersupply';
   name: string;
   price: number;
   manufacturer: string;
@@ -277,7 +235,7 @@ export interface PsuProductRequest {
 }
 
 export interface PsuProductResponse extends ProductBase {
-  category: ProductCategory.PowerSupply;
+  category: 'powersupply';
   wattage: Power;
   efficiency: string;
   modular: string;
@@ -289,7 +247,7 @@ export interface PsuProductResponse extends ProductBase {
 // ========== Cooler Product ==========
 
 export interface CoolerProductRequest {
-  category: ProductCategory.Cooler;
+  category: 'cooler';
   name: string;
   price: number;
   manufacturer: string;
@@ -301,7 +259,7 @@ export interface CoolerProductRequest {
 }
 
 export interface CoolerProductResponse extends ProductBase {
-  category: ProductCategory.Cooler;
+  category: 'cooler';
   coolerType: CoolerType;
   height: Length;
   tdp: Power;
@@ -312,7 +270,7 @@ export interface CoolerProductResponse extends ProductBase {
 // ========== PC Case Product ==========
 
 export interface PcCaseProductRequest {
-  category: ProductCategory.Case;
+  category: 'case';
   name: string;
   price: number;
   manufacturer: string;
@@ -324,7 +282,7 @@ export interface PcCaseProductRequest {
 }
 
 export interface PcCaseProductResponse extends ProductBase {
-  category: ProductCategory.Case;
+  category: 'case';
   formFactor: string;
   color: string;
   sidePanelWindow: string;
