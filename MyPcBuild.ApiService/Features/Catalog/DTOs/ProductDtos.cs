@@ -110,25 +110,22 @@ public record CpuProductRequest : ProductRequest
     public required int Threads { get; init; }
 
     /// <summary>
-    /// Base clock frequency in GHz.
+    /// Base clock frequency.
     /// </summary>
     [Required]
-    [Range(0.1, 10.0)]
-    public required decimal BaseClock { get; init; }
+    public required ApiFrequency BaseClock { get; init; }
 
     /// <summary>
-    /// Boost clock frequency in GHz.
+    /// Boost clock frequency.
     /// </summary>
     [Required]
-    [Range(0.1, 10.0)]
-    public required decimal BoostClock { get; init; }
+    public required ApiFrequency BoostClock { get; init; }
 
     /// <summary>
-    /// Thermal Design Power in watts.
+    /// Thermal Design Power.
     /// </summary>
     [Required]
-    [Range(1, 1000)]
-    public required int TDP { get; init; }
+    public required ApiPower TDP { get; init; }
 
     /// <summary>
     /// Whether the CPU has integrated graphics.
@@ -161,22 +158,22 @@ public record CpuProductResponse : ProductResponse
     public required int Threads { get; init; }
 
     /// <summary>
-    /// Base clock frequency in GHz.
+    /// Base clock frequency.
     /// </summary>
     [Required]
-    public required decimal BaseClock { get; init; }
+    public required ApiFrequency BaseClock { get; init; }
 
     /// <summary>
-    /// Boost clock frequency in GHz.
+    /// Boost clock frequency.
     /// </summary>
     [Required]
-    public required decimal BoostClock { get; init; }
+    public required ApiFrequency BoostClock { get; init; }
 
     /// <summary>
-    /// Thermal Design Power in watts.
+    /// Thermal Design Power.
     /// </summary>
     [Required]
-    public required int TDP { get; init; }
+    public required ApiPower TDP { get; init; }
 
     /// <summary>
     /// Whether the CPU has integrated graphics.
@@ -217,11 +214,10 @@ public record MotherboardProductRequest : ProductRequest
     public required ApiMemoryType MemoryType { get; init; }
 
     /// <summary>
-    /// Maximum memory capacity in GB.
+    /// Maximum memory capacity.
     /// </summary>
     [Required]
-    [Range(1, 2048)]
-    public required int MaxMemory { get; init; }
+    public required ApiStorageCapacity MaxMemory { get; init; }
 
     /// <summary>
     /// Physical dimensions in millimeters.
@@ -265,10 +261,10 @@ public record MotherboardProductResponse : ProductResponse
     public required ApiMemoryType MemoryType { get; init; }
 
     /// <summary>
-    /// Maximum memory capacity in GB.
+    /// Maximum memory capacity.
     /// </summary>
     [Required]
-    public required int MaxMemory { get; init; }
+    public required ApiStorageCapacity MaxMemory { get; init; }
 
     /// <summary>
     /// Physical dimensions in millimeters.
@@ -302,11 +298,10 @@ public record GpuProductRequest : ProductRequest
     public required string Series { get; init; }
 
     /// <summary>
-    /// Video RAM capacity in GB.
+    /// Video RAM capacity.
     /// </summary>
     [Required]
-    [Range(1, 256)]
-    public required int VRAM { get; init; }
+    public required ApiStorageCapacity VRAM { get; init; }
 
     /// <summary>
     /// Memory type.
@@ -315,32 +310,28 @@ public record GpuProductRequest : ProductRequest
     public required ApiMemoryType MemoryType { get; init; }
 
     /// <summary>
-    /// Core clock frequency in MHz.
+    /// Core clock frequency.
     /// </summary>
     [Required]
-    [Range(100, 5000)]
-    public required int CoreClock { get; init; }
+    public required ApiFrequency CoreClock { get; init; }
 
     /// <summary>
-    /// Boost clock frequency in MHz.
+    /// Boost clock frequency.
     /// </summary>
     [Required]
-    [Range(100, 5000)]
-    public required int BoostClock { get; init; }
+    public required ApiFrequency BoostClock { get; init; }
 
     /// <summary>
-    /// Thermal Design Power in watts.
+    /// Thermal Design Power.
     /// </summary>
     [Required]
-    [Range(1, 1000)]
-    public required int TDP { get; init; }
+    public required ApiPower TDP { get; init; }
 
     /// <summary>
-    /// GPU length in millimeters.
+    /// GPU length.
     /// </summary>
     [Required]
-    [Range(1, 1000)]
-    public required int Length { get; init; }
+    public required ApiLength Length { get; init; }
 
     /// <summary>
     /// Power connector configuration.
@@ -384,10 +375,10 @@ public record GpuProductResponse : ProductResponse
     public required string Series { get; init; }
 
     /// <summary>
-    /// Video RAM capacity in GB.
+    /// Video RAM capacity.
     /// </summary>
     [Required]
-    public required int VRAM { get; init; }
+    public required ApiStorageCapacity VRAM { get; init; }
 
     /// <summary>
     /// Memory type.
@@ -396,28 +387,28 @@ public record GpuProductResponse : ProductResponse
     public required ApiMemoryType MemoryType { get; init; }
 
     /// <summary>
-    /// Core clock frequency in MHz.
+    /// Core clock frequency.
     /// </summary>
     [Required]
-    public required int CoreClock { get; init; }
+    public required ApiFrequency CoreClock { get; init; }
 
     /// <summary>
-    /// Boost clock frequency in MHz.
+    /// Boost clock frequency.
     /// </summary>
     [Required]
-    public required int BoostClock { get; init; }
+    public required ApiFrequency BoostClock { get; init; }
 
     /// <summary>
-    /// Thermal Design Power in watts.
+    /// Thermal Design Power.
     /// </summary>
     [Required]
-    public required int TDP { get; init; }
+    public required ApiPower TDP { get; init; }
 
     /// <summary>
-    /// GPU length in millimeters.
+    /// GPU length.
     /// </summary>
     [Required]
-    public required int Length { get; init; }
+    public required ApiLength Length { get; init; }
 
     /// <summary>
     /// Power connector configuration.
@@ -457,11 +448,10 @@ public record RamProductRequest : ProductRequest
     public required ApiMemoryType Type { get; init; }
 
     /// <summary>
-    /// Total capacity in GB.
+    /// Total capacity.
     /// </summary>
     [Required]
-    [Range(1, 512)]
-    public required int Capacity { get; init; }
+    public required ApiStorageCapacity Capacity { get; init; }
 
     /// <summary>
     /// Configuration description (e.g., "2x16GB").
@@ -470,11 +460,10 @@ public record RamProductRequest : ProductRequest
     public required string Configuration { get; init; }
 
     /// <summary>
-    /// Memory speed in MHz.
+    /// Memory speed.
     /// </summary>
     [Required]
-    [Range(800, 10000)]
-    public required int Speed { get; init; }
+    public required ApiFrequency Speed { get; init; }
 
     /// <summary>
     /// CAS latency (e.g., "CL16").
@@ -483,11 +472,10 @@ public record RamProductRequest : ProductRequest
     public required string CASLatency { get; init; }
 
     /// <summary>
-    /// Operating voltage in volts.
+    /// Operating voltage.
     /// </summary>
     [Required]
-    [Range(0.5, 3.0)]
-    public required decimal Voltage { get; init; }
+    public required ApiVoltage Voltage { get; init; }
 }
 
 /// <summary>
@@ -502,10 +490,10 @@ public record RamProductResponse : ProductResponse
     public required ApiMemoryType Type { get; init; }
 
     /// <summary>
-    /// Total capacity in GB.
+    /// Total capacity.
     /// </summary>
     [Required]
-    public required int Capacity { get; init; }
+    public required ApiStorageCapacity Capacity { get; init; }
 
     /// <summary>
     /// Configuration description (e.g., "2x16GB").
@@ -514,10 +502,10 @@ public record RamProductResponse : ProductResponse
     public required string Configuration { get; init; }
 
     /// <summary>
-    /// Memory speed in MHz.
+    /// Memory speed.
     /// </summary>
     [Required]
-    public required int Speed { get; init; }
+    public required ApiFrequency Speed { get; init; }
 
     /// <summary>
     /// CAS latency (e.g., "CL16").
@@ -526,10 +514,10 @@ public record RamProductResponse : ProductResponse
     public required string CASLatency { get; init; }
 
     /// <summary>
-    /// Operating voltage in volts.
+    /// Operating voltage.
     /// </summary>
     [Required]
-    public required decimal Voltage { get; init; }
+    public required ApiVoltage Voltage { get; init; }
 }
 
 // ========== PC Case Product ==========
@@ -612,11 +600,10 @@ public record PcCaseProductResponse : ProductResponse
 public record PsuProductRequest : ProductRequest
 {
     /// <summary>
-    /// Power rating in watts.
+    /// Power rating.
     /// </summary>
     [Required]
-    [Range(200, 3000)]
-    public required int Wattage { get; init; }
+    public required ApiPower Wattage { get; init; }
 
     /// <summary>
     /// Efficiency rating (e.g., "80+ Gold").
@@ -637,11 +624,10 @@ public record PsuProductRequest : ProductRequest
     public required string FormFactor { get; init; }
 
     /// <summary>
-    /// PSU length in millimeters.
+    /// PSU length.
     /// </summary>
     [Required]
-    [Range(1, 500)]
-    public required int Length { get; init; }
+    public required ApiLength Length { get; init; }
 
     /// <summary>
     /// Number of PCIe 8-pin connectors.
@@ -657,10 +643,10 @@ public record PsuProductRequest : ProductRequest
 public record PsuProductResponse : ProductResponse
 {
     /// <summary>
-    /// Power rating in watts.
+    /// Power rating.
     /// </summary>
     [Required]
-    public required int Wattage { get; init; }
+    public required ApiPower Wattage { get; init; }
 
     /// <summary>
     /// Efficiency rating (e.g., "80+ Gold").
@@ -681,10 +667,10 @@ public record PsuProductResponse : ProductResponse
     public required string FormFactor { get; init; }
 
     /// <summary>
-    /// PSU length in millimeters.
+    /// PSU length.
     /// </summary>
     [Required]
-    public required int Length { get; init; }
+    public required ApiLength Length { get; init; }
 
     /// <summary>
     /// Number of PCIe 8-pin connectors.
@@ -719,25 +705,22 @@ public record StorageProductRequest : ProductRequest
     public required string StorageFormFactor { get; init; }
 
     /// <summary>
-    /// Storage capacity in GB.
+    /// Storage capacity.
     /// </summary>
     [Required]
-    [Range(1, 100000)]
-    public required int Capacity { get; init; }
+    public required ApiStorageCapacity Capacity { get; init; }
 
     /// <summary>
-    /// Read speed in MB/s.
+    /// Read speed.
     /// </summary>
     [Required]
-    [Range(1, 20000)]
-    public required int ReadSpeed { get; init; }
+    public required ApiDataSpeed ReadSpeed { get; init; }
 
     /// <summary>
-    /// Write speed in MB/s.
+    /// Write speed.
     /// </summary>
     [Required]
-    [Range(1, 20000)]
-    public required int WriteSpeed { get; init; }
+    public required ApiDataSpeed WriteSpeed { get; init; }
 }
 
 /// <summary>
@@ -764,22 +747,22 @@ public record StorageProductResponse : ProductResponse
     public required string StorageFormFactor { get; init; }
 
     /// <summary>
-    /// Storage capacity in GB.
+    /// Storage capacity.
     /// </summary>
     [Required]
-    public required int Capacity { get; init; }
+    public required ApiStorageCapacity Capacity { get; init; }
 
     /// <summary>
-    /// Read speed in MB/s.
+    /// Read speed.
     /// </summary>
     [Required]
-    public required int ReadSpeed { get; init; }
+    public required ApiDataSpeed ReadSpeed { get; init; }
 
     /// <summary>
-    /// Write speed in MB/s.
+    /// Write speed.
     /// </summary>
     [Required]
-    public required int WriteSpeed { get; init; }
+    public required ApiDataSpeed WriteSpeed { get; init; }
 }
 
 // ========== Cooler Product ==========
@@ -796,18 +779,16 @@ public record CoolerProductRequest : ProductRequest
     public required ApiCoolerType CoolerType { get; init; }
 
     /// <summary>
-    /// Cooler height in millimeters.
+    /// Cooler height.
     /// </summary>
     [Required]
-    [Range(1, 500)]
-    public required int Height { get; init; }
+    public required ApiLength Height { get; init; }
 
     /// <summary>
-    /// Thermal Design Power rating in watts.
+    /// Thermal Design Power rating.
     /// </summary>
     [Required]
-    [Range(1, 1000)]
-    public required int TDP { get; init; }
+    public required ApiPower TDP { get; init; }
 
     /// <summary>
     /// Compatible CPU sockets.
@@ -834,16 +815,16 @@ public record CoolerProductResponse : ProductResponse
     public required ApiCoolerType CoolerType { get; init; }
 
     /// <summary>
-    /// Cooler height in millimeters.
+    /// Cooler height.
     /// </summary>
     [Required]
-    public required int Height { get; init; }
+    public required ApiLength Height { get; init; }
 
     /// <summary>
-    /// Thermal Design Power rating in watts.
+    /// Thermal Design Power rating.
     /// </summary>
     [Required]
-    public required int TDP { get; init; }
+    public required ApiPower TDP { get; init; }
 
     /// <summary>
     /// Compatible CPU sockets.

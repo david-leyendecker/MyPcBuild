@@ -64,9 +64,9 @@ public static class ProductDtoMapper
             Socket = ToApiCpuSocket(cpu.Socket),
             Cores = cpu.Cores,
             Threads = cpu.Threads,
-            BaseClock = cpu.BaseClock.ValueInGHz,
-            BoostClock = cpu.BoostClock.ValueInGHz,
-            TDP = cpu.TDP.ValueInWatts,
+            BaseClock = ApiFrequency.FromGHz(cpu.BaseClock.ValueInGHz),
+            BoostClock = ApiFrequency.FromGHz(cpu.BoostClock.ValueInGHz),
+            TDP = ApiPower.FromWatts(cpu.TDP.ValueInWatts),
             IntegratedGraphics = cpu.IntegratedGraphics
         };
     }
@@ -86,7 +86,7 @@ public static class ProductDtoMapper
             Chipset = mb.Chipset,
             FormFactor = ToApiFormFactor(mb.FormFactor),
             MemoryType = ToApiMemoryType(mb.MemoryType),
-            MaxMemory = mb.MaxMemory.ValueInGB,
+            MaxMemory = ApiStorageCapacity.FromGB(mb.MaxMemory.ValueInGB),
             Dimensions = ToDimensionsModel(mb.Dimensions),
             Slots = mb.Slots.Select(ToSlotModel).ToList()
         };
@@ -105,12 +105,12 @@ public static class ProductDtoMapper
             PublishedAt = gpu.PublishedAt,
             ChipsetManufacturer = gpu.ChipsetManufacturer,
             Series = gpu.Series,
-            VRAM = gpu.VRAM.ValueInGB,
+            VRAM = ApiStorageCapacity.FromGB(gpu.VRAM.ValueInGB),
             MemoryType = ToApiMemoryType(gpu.MemoryType),
-            CoreClock = (int)gpu.CoreClock.ToMHz(),
-            BoostClock = (int)gpu.BoostClock.ToMHz(),
-            TDP = gpu.TDP.ValueInWatts,
-            Length = gpu.Length.ValueInMm,
+            CoreClock = ApiFrequency.FromMHz((int)gpu.CoreClock.ToMHz()),
+            BoostClock = ApiFrequency.FromMHz((int)gpu.BoostClock.ToMHz()),
+            TDP = ApiPower.FromWatts(gpu.TDP.ValueInWatts),
+            Length = ApiLength.FromMm(gpu.Length.ValueInMm),
             PowerConnectors = ToApiGpuPowerConnector(gpu.PowerConnectors),
             RayTracing = gpu.RayTracing,
             Dimensions = ToDimensionsModel(gpu.Dimensions),
@@ -130,11 +130,11 @@ public static class ProductDtoMapper
             IsDraft = ram.IsDraft,
             PublishedAt = ram.PublishedAt,
             Type = ToApiMemoryType(ram.Type),
-            Capacity = ram.Capacity.ValueInGB,
+            Capacity = ApiStorageCapacity.FromGB(ram.Capacity.ValueInGB),
             Configuration = ram.Configuration,
-            Speed = (int)ram.Speed.ToMHz(),
+            Speed = ApiFrequency.FromMHz((int)ram.Speed.ToMHz()),
             CASLatency = ram.CASLatency,
-            Voltage = ram.Voltage.ValueInVolts
+            Voltage = ApiVoltage.FromVolts(ram.Voltage.ValueInVolts)
         };
     }
 
@@ -168,11 +168,11 @@ public static class ProductDtoMapper
             Manufacturer = psu.Manufacturer,
             IsDraft = psu.IsDraft,
             PublishedAt = psu.PublishedAt,
-            Wattage = psu.Wattage.ValueInWatts,
+            Wattage = ApiPower.FromWatts(psu.Wattage.ValueInWatts),
             Efficiency = psu.Efficiency,
             Modular = psu.Modular,
             FormFactor = psu.FormFactor,
-            Length = psu.Length.ValueInMm,
+            Length = ApiLength.FromMm(psu.Length.ValueInMm),
             PCIe8Pin = psu.PCIe8Pin
         };
     }
@@ -191,9 +191,9 @@ public static class ProductDtoMapper
             Type = storage.Type,
             Interface = storage.Interface,
             StorageFormFactor = storage.StorageFormFactor,
-            Capacity = storage.Capacity.ValueInGB,
-            ReadSpeed = storage.ReadSpeed.ValueInMBps,
-            WriteSpeed = storage.WriteSpeed.ValueInMBps
+            Capacity = ApiStorageCapacity.FromGB(storage.Capacity.ValueInGB),
+            ReadSpeed = ApiDataSpeed.FromMBps(storage.ReadSpeed.ValueInMBps),
+            WriteSpeed = ApiDataSpeed.FromMBps(storage.WriteSpeed.ValueInMBps)
         };
     }
 
@@ -209,8 +209,8 @@ public static class ProductDtoMapper
             IsDraft = cooler.IsDraft,
             PublishedAt = cooler.PublishedAt,
             CoolerType = ToApiCoolerType(cooler.CoolerType),
-            Height = cooler.Height.ValueInMm,
-            TDP = cooler.TDP.ValueInWatts,
+            Height = ApiLength.FromMm(cooler.Height.ValueInMm),
+            TDP = ApiPower.FromWatts(cooler.TDP.ValueInWatts),
             Sockets = cooler.Sockets.Select(ToApiCpuSocket).ToList(),
             Dimensions = ToDimensionsModel(cooler.Dimensions)
         };
@@ -228,9 +228,9 @@ public static class ProductDtoMapper
             ToDomainCpuSocket(request.Socket),
             request.Cores,
             request.Threads,
-            Frequency.FromGHz(request.BaseClock),
-            Frequency.FromGHz(request.BoostClock),
-            Power.FromWatts(request.TDP),
+            Frequency.FromGHz(request.BaseClock.ValueInGHz),
+            Frequency.FromGHz(request.BoostClock.ValueInGHz),
+            Power.FromWatts(request.TDP.ValueInWatts),
             request.IntegratedGraphics
         );
     }
@@ -248,7 +248,7 @@ public static class ProductDtoMapper
             request.Chipset,
             ToDomainFormFactor(request.FormFactor),
             ToDomainMemoryType(request.MemoryType),
-            StorageCapacity.FromGB(request.MaxMemory)
+            StorageCapacity.FromGB(request.MaxMemory.ValueInGB)
         );
     }
 
@@ -263,12 +263,12 @@ public static class ProductDtoMapper
             request.Slots?.Select(ToDomainSlot).ToList() ?? [],
             request.ChipsetManufacturer,
             request.Series,
-            StorageCapacity.FromGB(request.VRAM),
+            StorageCapacity.FromGB(request.VRAM.ValueInGB),
             ToDomainMemoryType(request.MemoryType),
-            Frequency.FromMHz(request.CoreClock),
-            Frequency.FromMHz(request.BoostClock),
-            Power.FromWatts(request.TDP),
-            Length.FromMm(request.Length),
+            Frequency.FromMHz((int)request.CoreClock.ToMHz()),
+            Frequency.FromMHz((int)request.BoostClock.ToMHz()),
+            Power.FromWatts(request.TDP.ValueInWatts),
+            Length.FromMm(request.Length.ValueInMm),
             ToDomainGpuPowerConnector(request.PowerConnectors),
             request.RayTracing
         );
@@ -282,11 +282,11 @@ public static class ProductDtoMapper
             request.Price,
             request.Manufacturer,
             ToDomainMemoryType(request.Type),
-            StorageCapacity.FromGB(request.Capacity),
+            StorageCapacity.FromGB(request.Capacity.ValueInGB),
             request.Configuration,
-            Frequency.FromMHz(request.Speed),
+            Frequency.FromMHz((int)request.Speed.ToMHz()),
             request.CASLatency,
-            Voltage.FromVolts(request.Voltage)
+            Voltage.FromVolts(request.Voltage.ValueInVolts)
         );
     }
 
@@ -312,11 +312,11 @@ public static class ProductDtoMapper
             request.Name,
             request.Price,
             request.Manufacturer,
-            Power.FromWatts(request.Wattage),
+            Power.FromWatts(request.Wattage.ValueInWatts),
             request.Efficiency,
             request.Modular,
             request.FormFactor,
-            Length.FromMm(request.Length),
+            Length.FromMm(request.Length.ValueInMm),
             request.PCIe8Pin
         );
     }
@@ -331,9 +331,9 @@ public static class ProductDtoMapper
             request.Type,
             request.Interface,
             request.StorageFormFactor,
-            StorageCapacity.FromGB(request.Capacity),
-            DataSpeed.FromMBps(request.ReadSpeed),
-            DataSpeed.FromMBps(request.WriteSpeed)
+            StorageCapacity.FromGB(request.Capacity.ValueInGB),
+            DataSpeed.FromMBps(request.ReadSpeed.ValueInMBps),
+            DataSpeed.FromMBps(request.WriteSpeed.ValueInMBps)
         );
     }
 
@@ -346,8 +346,8 @@ public static class ProductDtoMapper
             request.Manufacturer,
             ToDomainDimensions(request.Dimensions),
             ToDomainCoolerType(request.CoolerType),
-            Length.FromMm(request.Height),
-            Power.FromWatts(request.TDP),
+            Length.FromMm(request.Height.ValueInMm),
+            Power.FromWatts(request.TDP.ValueInWatts),
             request.Sockets.Select(ToDomainCpuSocket).ToArray()
         );
     }
