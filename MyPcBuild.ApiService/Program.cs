@@ -1,4 +1,5 @@
 using System;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using Marten;
 using Marten.Events.Projections;
@@ -88,6 +89,9 @@ builder.Services.AddHostedService<ProductSeeder>();
 
 builder.Services.ConfigureHttpJsonOptions(options =>
 {
+    // Add custom converter for ProductCategory to handle case-insensitive deserialization
+    options.SerializerOptions.Converters.Add(new ProductCategoryJsonConverter());
+    // Keep the generic string enum converter for other enums
     options.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
 });
 
