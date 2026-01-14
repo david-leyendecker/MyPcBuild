@@ -96,14 +96,14 @@ const localProduct = ref<Partial<StorageProductRequest>>({
 watch(
   () => props.modelValue,
   (newValue) => {
-    localProduct.value = {
+    Object.assign(localProduct.value, {
       type: newValue.type ?? 'SSD',
       interface: newValue.interface ?? 'NVMe',
       storageFormFactor: newValue.storageFormFactor ?? 'M.2 2280',
       capacity: newValue.capacity ?? { valueInGB: 1000 },
       readSpeed: newValue.readSpeed ?? { valueInMBps: 7000 },
       writeSpeed: newValue.writeSpeed ?? { valueInMBps: 5000 }
-    };
+    });
   },
   { deep: true }
 );

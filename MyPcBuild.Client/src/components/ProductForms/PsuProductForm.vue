@@ -99,14 +99,14 @@ const localProduct = ref<Partial<PsuProductRequest>>({
 watch(
   () => props.modelValue,
   (newValue) => {
-    localProduct.value = {
+    Object.assign(localProduct.value, {
       wattage: newValue.wattage ?? { valueInWatts: 750 },
       efficiency: newValue.efficiency ?? '80+ Gold',
       modular: newValue.modular ?? 'Fully Modular',
       formFactor: newValue.formFactor ?? 'ATX',
       length: newValue.length ?? { valueInMm: 160 },
       pcie8Pin: newValue.pcie8Pin ?? 4
-    };
+    });
   },
   { deep: true }
 );

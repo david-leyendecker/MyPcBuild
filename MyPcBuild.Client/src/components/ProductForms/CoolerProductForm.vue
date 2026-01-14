@@ -99,13 +99,13 @@ const localProduct = ref<Partial<CoolerProductRequest>>({
 watch(
   () => props.modelValue,
   (newValue) => {
-    localProduct.value = {
+    Object.assign(localProduct.value, {
       coolerType: newValue.coolerType,
-      height: newValue.height ?? { valueInMm: 155 },
+      height: newValue.height ?? { valueInMm: 150 },
       tdp: newValue.tdp ?? { valueInWatts: 220 },
       sockets: newValue.sockets ?? [],
-      dimensions: newValue.dimensions ?? { length: 120, width: 120, height: 155 }
-    };
+      dimensions: newValue.dimensions ?? { length: 100, width: 100, height: 150 }
+    });
   },
   { deep: true }
 );

@@ -47,7 +47,9 @@ internal class ApiFrequencyConverter : JsonConverter<ApiFrequency>
 
     public override void Write(Utf8JsonWriter writer, ApiFrequency value, JsonSerializerOptions options)
     {
-        writer.WriteNumberValue(value.ValueInGHz);
+        writer.WriteStartObject();
+        writer.WriteNumber("valueInGHz", value.ValueInGHz);
+        writer.WriteEndObject();
     }
 }
 
@@ -91,7 +93,9 @@ internal class ApiStorageCapacityConverter : JsonConverter<ApiStorageCapacity>
 
     public override void Write(Utf8JsonWriter writer, ApiStorageCapacity value, JsonSerializerOptions options)
     {
-        writer.WriteNumberValue(value.ValueInGB);
+        writer.WriteStartObject();
+        writer.WriteNumber("valueInGB", value.ValueInGB);
+        writer.WriteEndObject();
     }
 }
 
@@ -135,7 +139,9 @@ internal class ApiPowerConverter : JsonConverter<ApiPower>
 
     public override void Write(Utf8JsonWriter writer, ApiPower value, JsonSerializerOptions options)
     {
-        writer.WriteNumberValue(value.ValueInWatts);
+        writer.WriteStartObject();
+        writer.WriteNumber("valueInWatts", value.ValueInWatts);
+        writer.WriteEndObject();
     }
 }
 
@@ -179,7 +185,9 @@ internal class ApiVoltageConverter : JsonConverter<ApiVoltage>
 
     public override void Write(Utf8JsonWriter writer, ApiVoltage value, JsonSerializerOptions options)
     {
-        writer.WriteNumberValue(value.ValueInVolts);
+        writer.WriteStartObject();
+        writer.WriteNumber("valueInVolts", value.ValueInVolts);
+        writer.WriteEndObject();
     }
 }
 
@@ -223,7 +231,9 @@ internal class ApiLengthConverter : JsonConverter<ApiLength>
 
     public override void Write(Utf8JsonWriter writer, ApiLength value, JsonSerializerOptions options)
     {
-        writer.WriteNumberValue(value.ValueInMm);
+        writer.WriteStartObject();
+        writer.WriteNumber("valueInMm", value.ValueInMm);
+        writer.WriteEndObject();
     }
 }
 
@@ -267,6 +277,8 @@ internal class ApiDataSpeedConverter : JsonConverter<ApiDataSpeed>
 
     public override void Write(Utf8JsonWriter writer, ApiDataSpeed value, JsonSerializerOptions options)
     {
-        writer.WriteNumberValue(value.ValueInMBps);
+        writer.WriteStartObject();
+        writer.WriteNumber("valueInMBps", value.ValueInMBps);
+        writer.WriteEndObject();
     }
 }

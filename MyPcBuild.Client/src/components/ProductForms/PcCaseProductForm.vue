@@ -73,12 +73,12 @@ const localProduct = ref<Partial<PcCaseProductRequest>>({
 watch(
   () => props.modelValue,
   (newValue) => {
-    localProduct.value = {
+    Object.assign(localProduct.value, {
       formFactor: newValue.formFactor ?? 'Mid Tower',
       color: newValue.color ?? 'Black',
       sidePanelWindow: newValue.sidePanelWindow ?? 'Tempered Glass',
       dimensions: newValue.dimensions ?? { length: 450, width: 210, height: 450 }
-    };
+    });
   },
   { deep: true }
 );

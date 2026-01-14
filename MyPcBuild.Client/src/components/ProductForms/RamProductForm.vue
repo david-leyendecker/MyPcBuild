@@ -103,14 +103,14 @@ const localProduct = ref<Partial<RamProductRequest>>({
 watch(
   () => props.modelValue,
   (newValue) => {
-    localProduct.value = {
+    Object.assign(localProduct.value, {
       type: newValue.type,
       capacity: newValue.capacity ?? { valueInGB: 32 },
       configuration: newValue.configuration ?? '2x16GB',
       speed: newValue.speed ?? { valueInGHz: 3.6 },
       casLatency: newValue.casLatency ?? 'CL16',
       voltage: newValue.voltage ?? { valueInVolts: 1.35 }
-    };
+    });
   },
   { deep: true }
 );

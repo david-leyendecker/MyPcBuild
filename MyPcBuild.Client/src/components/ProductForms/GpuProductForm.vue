@@ -166,7 +166,7 @@ const localProduct = ref<Partial<GpuProductRequest>>({
 watch(
   () => props.modelValue,
   (newValue) => {
-    localProduct.value = {
+    Object.assign(localProduct.value, {
       chipsetManufacturer: newValue.chipsetManufacturer ?? '',
       series: newValue.series ?? '',
       vram: newValue.vram ?? { valueInGB: 8 },
@@ -178,7 +178,7 @@ watch(
       powerConnectors: newValue.powerConnectors,
       rayTracing: newValue.rayTracing ?? false,
       dimensions: newValue.dimensions ?? { length: 300, width: 130, height: 50 }
-    };
+    });
   },
   { deep: true }
 );

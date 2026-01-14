@@ -113,7 +113,7 @@ const localProduct = ref<Partial<CpuProductRequest>>({
 watch(
   () => props.modelValue,
   (newValue) => {
-    localProduct.value = {
+    Object.assign(localProduct.value, {
       socket: newValue.socket,
       cores: newValue.cores ?? 8,
       threads: newValue.threads ?? 16,
@@ -121,7 +121,7 @@ watch(
       boostClock: newValue.boostClock ?? { valueInGHz: 5.0 },
       tdp: newValue.tdp ?? { valueInWatts: 105 },
       integratedGraphics: newValue.integratedGraphics ?? false
-    };
+    });
   },
   { deep: true }
 );

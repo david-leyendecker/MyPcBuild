@@ -121,14 +121,14 @@ const localProduct = ref<Partial<MotherboardProductRequest>>({
 watch(
   () => props.modelValue,
   (newValue) => {
-    localProduct.value = {
+    Object.assign(localProduct.value, {
       socket: newValue.socket,
       chipset: newValue.chipset ?? '',
       formFactor: newValue.formFactor,
       memoryType: newValue.memoryType,
-      maxMemory: newValue.maxMemory ?? { valueInGB: 128 },
-      dimensions: newValue.dimensions ?? { length: 305, width: 244, height: 5 }
-    };
+      maxMemory: newValue.maxMemory ?? { valueInGB: 32 },
+      dimensions: newValue.dimensions ?? { length: 305, width: 244, height: 50 }
+    });
   },
   { deep: true }
 );
