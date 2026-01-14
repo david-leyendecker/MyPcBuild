@@ -17,7 +17,14 @@ public static class GetProducts
 
     private static readonly Dictionary<string, Func<IQueryable<Product>, string, IQueryable<Product>>> _filterFunctions = new(StringComparer.OrdinalIgnoreCase)
     {
-        [nameof(Product.ProductCategory)] = (q, v) => q.Where(p => p.ProductCategory.ToString().Contains(v, StringComparison.InvariantCultureIgnoreCase)),
+        [nameof(Product.ProductCategory)] = (q, v) => 
+        {
+            if (Enum.TryParse<ProductCategory>(v, ignoreCase: true, out ProductCategory category))
+            {
+                return q.Where(p => p.ProductCategory == category);
+            }
+            return q;
+        },
         [nameof(Product.IsDraft)] = (q, v) => bool.TryParse(v, out bool isDraft) ? q.Where(p => p.IsDraft == isDraft) : q
     };
 
