@@ -1,18 +1,20 @@
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using MyPcBuild.ApiService.Domain.Models;
 
 namespace MyPcBuild.ApiService.Features.Catalog.DTOs;
 
 /// <summary>
-/// Base DTO for product requests and responses.
+/// Base request for creating/updating products.
 /// </summary>
-public abstract record ProductDto
+public abstract record ProductRequest
 {
     /// <summary>
-    /// Product ID (only in responses).
+    /// Product category.
     /// </summary>
-    public Guid? Id { get; init; }
+    [Required]
+    public required ProductCategory Category { get; init; }
 
     /// <summary>
     /// Product name.
@@ -32,6 +34,42 @@ public abstract record ProductDto
     /// </summary>
     [Required]
     public required string Manufacturer { get; init; }
+}
+
+/// <summary>
+/// Base response for product queries.
+/// </summary>
+public abstract record ProductResponse
+{
+    /// <summary>
+    /// Product ID.
+    /// </summary>
+    [Required]
+    public required Guid Id { get; init; }
+
+    /// <summary>
+    /// Product category.
+    /// </summary>
+    [Required]
+    public required ProductCategory Category { get; init; }
+
+    /// <summary>
+    /// Product name.
+    /// </summary>
+    [Required]
+    public required string Name { get; init; }
+
+    /// <summary>
+    /// Product price in USD.
+    /// </summary>
+    [Required]
+    public required decimal Price { get; init; }
+
+    /// <summary>
+    /// Manufacturer name.
+    /// </summary>
+    [Required]
+    public required string Manufacturer { get; init; }
 
     /// <summary>
     /// Indicates whether this product is a draft (AI-generated but not yet published).
@@ -44,10 +82,12 @@ public abstract record ProductDto
     public DateTime? PublishedAt { get; init; }
 }
 
+// ========== CPU Product ==========
+
 /// <summary>
-/// DTO for CPU products (API).
+/// Request for creating/updating CPU products.
 /// </summary>
-public record CpuDto : ProductDto
+public record CpuProductRequest : ProductRequest
 {
     /// <summary>
     /// CPU socket type.
@@ -98,9 +138,59 @@ public record CpuDto : ProductDto
 }
 
 /// <summary>
-/// DTO for motherboard products (API).
+/// Response for CPU product queries.
 /// </summary>
-public record MotherboardDto : ProductDto
+public record CpuProductResponse : ProductResponse
+{
+    /// <summary>
+    /// CPU socket type.
+    /// </summary>
+    [Required]
+    public required ApiCpuSocket Socket { get; init; }
+
+    /// <summary>
+    /// Number of CPU cores.
+    /// </summary>
+    [Required]
+    public required int Cores { get; init; }
+
+    /// <summary>
+    /// Number of CPU threads.
+    /// </summary>
+    [Required]
+    public required int Threads { get; init; }
+
+    /// <summary>
+    /// Base clock frequency in GHz.
+    /// </summary>
+    [Required]
+    public required decimal BaseClock { get; init; }
+
+    /// <summary>
+    /// Boost clock frequency in GHz.
+    /// </summary>
+    [Required]
+    public required decimal BoostClock { get; init; }
+
+    /// <summary>
+    /// Thermal Design Power in watts.
+    /// </summary>
+    [Required]
+    public required int TDP { get; init; }
+
+    /// <summary>
+    /// Whether the CPU has integrated graphics.
+    /// </summary>
+    [Required]
+    public required bool IntegratedGraphics { get; init; }
+}
+
+// ========== Motherboard Product ==========
+
+/// <summary>
+/// Request for creating/updating motherboard products.
+/// </summary>
+public record MotherboardProductRequest : ProductRequest
 {
     /// <summary>
     /// CPU socket type.
@@ -137,18 +227,67 @@ public record MotherboardDto : ProductDto
     /// Physical dimensions in millimeters.
     /// </summary>
     [Required]
-    public required ApiDimensions Dimensions { get; init; }
+    public required DimensionsModel Dimensions { get; init; }
 
     /// <summary>
     /// Installation slots (optional, usually empty for AI-generated products).
     /// </summary>
-    public List<ApiSlot>? Slots { get; init; }
+    public List<SlotModel>? Slots { get; init; }
 }
 
 /// <summary>
-/// DTO for GPU products (API).
+/// Response for motherboard product queries.
 /// </summary>
-public record GpuDto : ProductDto
+public record MotherboardProductResponse : ProductResponse
+{
+    /// <summary>
+    /// CPU socket type.
+    /// </summary>
+    [Required]
+    public required ApiCpuSocket Socket { get; init; }
+
+    /// <summary>
+    /// Chipset name.
+    /// </summary>
+    [Required]
+    public required string Chipset { get; init; }
+
+    /// <summary>
+    /// Motherboard form factor.
+    /// </summary>
+    [Required]
+    public required ApiFormFactor FormFactor { get; init; }
+
+    /// <summary>
+    /// Memory type supported.
+    /// </summary>
+    [Required]
+    public required ApiMemoryType MemoryType { get; init; }
+
+    /// <summary>
+    /// Maximum memory capacity in GB.
+    /// </summary>
+    [Required]
+    public required int MaxMemory { get; init; }
+
+    /// <summary>
+    /// Physical dimensions in millimeters.
+    /// </summary>
+    [Required]
+    public required DimensionsModel Dimensions { get; init; }
+
+    /// <summary>
+    /// Installation slots.
+    /// </summary>
+    public List<SlotModel>? Slots { get; init; }
+}
+
+// ========== GPU Product ==========
+
+/// <summary>
+/// Request for creating/updating GPU products.
+/// </summary>
+public record GpuProductRequest : ProductRequest
 {
     /// <summary>
     /// GPU chipset manufacturer (NVIDIA, AMD, Intel).
@@ -219,18 +358,97 @@ public record GpuDto : ProductDto
     /// Physical dimensions in millimeters.
     /// </summary>
     [Required]
-    public required ApiDimensions Dimensions { get; init; }
+    public required DimensionsModel Dimensions { get; init; }
 
     /// <summary>
     /// Installation slots (optional, usually empty for AI-generated products).
     /// </summary>
-    public List<ApiSlot>? Slots { get; init; }
+    public List<SlotModel>? Slots { get; init; }
 }
 
 /// <summary>
-/// DTO for RAM products (API).
+/// Response for GPU product queries.
 /// </summary>
-public record RamDto : ProductDto
+public record GpuProductResponse : ProductResponse
+{
+    /// <summary>
+    /// GPU chipset manufacturer (NVIDIA, AMD, Intel).
+    /// </summary>
+    [Required]
+    public required string ChipsetManufacturer { get; init; }
+
+    /// <summary>
+    /// GPU series name.
+    /// </summary>
+    [Required]
+    public required string Series { get; init; }
+
+    /// <summary>
+    /// Video RAM capacity in GB.
+    /// </summary>
+    [Required]
+    public required int VRAM { get; init; }
+
+    /// <summary>
+    /// Memory type.
+    /// </summary>
+    [Required]
+    public required ApiMemoryType MemoryType { get; init; }
+
+    /// <summary>
+    /// Core clock frequency in MHz.
+    /// </summary>
+    [Required]
+    public required int CoreClock { get; init; }
+
+    /// <summary>
+    /// Boost clock frequency in MHz.
+    /// </summary>
+    [Required]
+    public required int BoostClock { get; init; }
+
+    /// <summary>
+    /// Thermal Design Power in watts.
+    /// </summary>
+    [Required]
+    public required int TDP { get; init; }
+
+    /// <summary>
+    /// GPU length in millimeters.
+    /// </summary>
+    [Required]
+    public required int Length { get; init; }
+
+    /// <summary>
+    /// Power connector configuration.
+    /// </summary>
+    [Required]
+    public required ApiGpuPowerConnector PowerConnectors { get; init; }
+
+    /// <summary>
+    /// Whether the GPU supports ray tracing.
+    /// </summary>
+    [Required]
+    public required bool RayTracing { get; init; }
+
+    /// <summary>
+    /// Physical dimensions in millimeters.
+    /// </summary>
+    [Required]
+    public required DimensionsModel Dimensions { get; init; }
+
+    /// <summary>
+    /// Installation slots.
+    /// </summary>
+    public List<SlotModel>? Slots { get; init; }
+}
+
+// ========== RAM Product ==========
+
+/// <summary>
+/// Request for creating/updating RAM products.
+/// </summary>
+public record RamProductRequest : ProductRequest
 {
     /// <summary>
     /// Memory type.
@@ -273,9 +491,53 @@ public record RamDto : ProductDto
 }
 
 /// <summary>
-/// DTO for PC case products (API).
+/// Response for RAM product queries.
 /// </summary>
-public record PcCaseDto : ProductDto
+public record RamProductResponse : ProductResponse
+{
+    /// <summary>
+    /// Memory type.
+    /// </summary>
+    [Required]
+    public required ApiMemoryType Type { get; init; }
+
+    /// <summary>
+    /// Total capacity in GB.
+    /// </summary>
+    [Required]
+    public required int Capacity { get; init; }
+
+    /// <summary>
+    /// Configuration description (e.g., "2x16GB").
+    /// </summary>
+    [Required]
+    public required string Configuration { get; init; }
+
+    /// <summary>
+    /// Memory speed in MHz.
+    /// </summary>
+    [Required]
+    public required int Speed { get; init; }
+
+    /// <summary>
+    /// CAS latency (e.g., "CL16").
+    /// </summary>
+    [Required]
+    public required string CASLatency { get; init; }
+
+    /// <summary>
+    /// Operating voltage in volts.
+    /// </summary>
+    [Required]
+    public required decimal Voltage { get; init; }
+}
+
+// ========== PC Case Product ==========
+
+/// <summary>
+/// Request for creating/updating PC case products.
+/// </summary>
+public record PcCaseProductRequest : ProductRequest
 {
     /// <summary>
     /// Case form factor description.
@@ -299,18 +561,55 @@ public record PcCaseDto : ProductDto
     /// Physical dimensions in millimeters.
     /// </summary>
     [Required]
-    public required ApiDimensions Dimensions { get; init; }
+    public required DimensionsModel Dimensions { get; init; }
 
     /// <summary>
     /// Internal chambers (optional, usually empty for AI-generated products).
     /// </summary>
-    public List<ApiChamber>? Chambers { get; init; }
+    public List<ChamberModel>? Chambers { get; init; }
 }
 
 /// <summary>
-/// DTO for PSU products (API).
+/// Response for PC case product queries.
 /// </summary>
-public record PsuDto : ProductDto
+public record PcCaseProductResponse : ProductResponse
+{
+    /// <summary>
+    /// Case form factor description.
+    /// </summary>
+    [Required]
+    public required string FormFactor { get; init; }
+
+    /// <summary>
+    /// Case color.
+    /// </summary>
+    [Required]
+    public required string Color { get; init; }
+
+    /// <summary>
+    /// Side panel window type (e.g., "Tempered Glass", "Acrylic", "None").
+    /// </summary>
+    [Required]
+    public required string SidePanelWindow { get; init; }
+
+    /// <summary>
+    /// Physical dimensions in millimeters.
+    /// </summary>
+    [Required]
+    public required DimensionsModel Dimensions { get; init; }
+
+    /// <summary>
+    /// Internal chambers.
+    /// </summary>
+    public List<ChamberModel>? Chambers { get; init; }
+}
+
+// ========== PSU Product ==========
+
+/// <summary>
+/// Request for creating/updating PSU products.
+/// </summary>
+public record PsuProductRequest : ProductRequest
 {
     /// <summary>
     /// Power rating in watts.
@@ -353,9 +652,53 @@ public record PsuDto : ProductDto
 }
 
 /// <summary>
-/// DTO for storage products (API).
+/// Response for PSU product queries.
 /// </summary>
-public record StorageDto : ProductDto
+public record PsuProductResponse : ProductResponse
+{
+    /// <summary>
+    /// Power rating in watts.
+    /// </summary>
+    [Required]
+    public required int Wattage { get; init; }
+
+    /// <summary>
+    /// Efficiency rating (e.g., "80+ Gold").
+    /// </summary>
+    [Required]
+    public required string Efficiency { get; init; }
+
+    /// <summary>
+    /// Modularity type (e.g., "Fully Modular", "Semi-Modular", "Non-Modular").
+    /// </summary>
+    [Required]
+    public required string Modular { get; init; }
+
+    /// <summary>
+    /// PSU form factor (e.g., "ATX", "SFX").
+    /// </summary>
+    [Required]
+    public required string FormFactor { get; init; }
+
+    /// <summary>
+    /// PSU length in millimeters.
+    /// </summary>
+    [Required]
+    public required int Length { get; init; }
+
+    /// <summary>
+    /// Number of PCIe 8-pin connectors.
+    /// </summary>
+    [Required]
+    public required int PCIe8Pin { get; init; }
+}
+
+// ========== Storage Product ==========
+
+/// <summary>
+/// Request for creating/updating storage products.
+/// </summary>
+public record StorageProductRequest : ProductRequest
 {
     /// <summary>
     /// Storage type (e.g., "SSD", "HDD").
@@ -398,9 +741,53 @@ public record StorageDto : ProductDto
 }
 
 /// <summary>
-/// DTO for cooler products (API).
+/// Response for storage product queries.
 /// </summary>
-public record CoolerDto : ProductDto
+public record StorageProductResponse : ProductResponse
+{
+    /// <summary>
+    /// Storage type (e.g., "SSD", "HDD").
+    /// </summary>
+    [Required]
+    public required string Type { get; init; }
+
+    /// <summary>
+    /// Interface type (e.g., "NVMe", "SATA").
+    /// </summary>
+    [Required]
+    public required string Interface { get; init; }
+
+    /// <summary>
+    /// Storage form factor (e.g., "M.2 2280", "2.5 inch").
+    /// </summary>
+    [Required]
+    public required string StorageFormFactor { get; init; }
+
+    /// <summary>
+    /// Storage capacity in GB.
+    /// </summary>
+    [Required]
+    public required int Capacity { get; init; }
+
+    /// <summary>
+    /// Read speed in MB/s.
+    /// </summary>
+    [Required]
+    public required int ReadSpeed { get; init; }
+
+    /// <summary>
+    /// Write speed in MB/s.
+    /// </summary>
+    [Required]
+    public required int WriteSpeed { get; init; }
+}
+
+// ========== Cooler Product ==========
+
+/// <summary>
+/// Request for creating/updating cooler products.
+/// </summary>
+public record CoolerProductRequest : ProductRequest
 {
     /// <summary>
     /// Cooler type.
@@ -432,13 +819,51 @@ public record CoolerDto : ProductDto
     /// Physical dimensions in millimeters.
     /// </summary>
     [Required]
-    public required ApiDimensions Dimensions { get; init; }
+    public required DimensionsModel Dimensions { get; init; }
 }
 
 /// <summary>
-/// Physical dimensions (API).
+/// Response for cooler product queries.
 /// </summary>
-public record ApiDimensions
+public record CoolerProductResponse : ProductResponse
+{
+    /// <summary>
+    /// Cooler type.
+    /// </summary>
+    [Required]
+    public required ApiCoolerType CoolerType { get; init; }
+
+    /// <summary>
+    /// Cooler height in millimeters.
+    /// </summary>
+    [Required]
+    public required int Height { get; init; }
+
+    /// <summary>
+    /// Thermal Design Power rating in watts.
+    /// </summary>
+    [Required]
+    public required int TDP { get; init; }
+
+    /// <summary>
+    /// Compatible CPU sockets.
+    /// </summary>
+    [Required]
+    public required List<ApiCpuSocket> Sockets { get; init; }
+
+    /// <summary>
+    /// Physical dimensions in millimeters.
+    /// </summary>
+    [Required]
+    public required DimensionsModel Dimensions { get; init; }
+}
+
+// ========== Supporting Models ==========
+
+/// <summary>
+/// Physical dimensions model.
+/// </summary>
+public record DimensionsModel
 {
     /// <summary>
     /// Length in millimeters.
@@ -463,11 +888,11 @@ public record ApiDimensions
 }
 
 /// <summary>
-/// JSON converter for ApiDimensions that handles various input formats (object, string).
+/// JSON converter for DimensionsModel that handles various input formats (object, string).
 /// </summary>
-internal class ApiDimensionsConverter : JsonConverter<ApiDimensions>
+internal class DimensionsModelConverter : JsonConverter<DimensionsModel>
 {
-    public override ApiDimensions Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    public override DimensionsModel Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
         if (reader.TokenType == JsonTokenType.StartObject)
         {
@@ -489,22 +914,22 @@ internal class ApiDimensionsConverter : JsonConverter<ApiDimensions>
                         ? reader.GetDecimal()
                         : 0;
 
-                    if (propertyName.Equals(nameof(ApiDimensions.Length), StringComparison.OrdinalIgnoreCase))
+                    if (propertyName.Equals(nameof(DimensionsModel.Length), StringComparison.OrdinalIgnoreCase))
                     {
                         length = value;
                     }
-                    else if (propertyName.Equals(nameof(ApiDimensions.Width), StringComparison.OrdinalIgnoreCase))
+                    else if (propertyName.Equals(nameof(DimensionsModel.Width), StringComparison.OrdinalIgnoreCase))
                     {
                         width = value;
                     }
-                    else if (propertyName.Equals(nameof(ApiDimensions.Height), StringComparison.OrdinalIgnoreCase))
+                    else if (propertyName.Equals(nameof(DimensionsModel.Height), StringComparison.OrdinalIgnoreCase))
                     {
                         height = value;
                     }
                 }
             }
 
-            return new ApiDimensions { Length = length, Width = width, Height = height };
+            return new DimensionsModel { Length = length, Width = width, Height = height };
         }
 
         if (reader.TokenType == JsonTokenType.String)
@@ -518,7 +943,7 @@ internal class ApiDimensionsConverter : JsonConverter<ApiDimensions>
                     decimal.TryParse(parts[1].Trim(), out decimal width) &&
                     decimal.TryParse(parts[2].Trim(), out decimal height))
                 {
-                    return new ApiDimensions { Length = length, Width = width, Height = height };
+                    return new DimensionsModel { Length = length, Width = width, Height = height };
                 }
             }
         }
@@ -526,20 +951,20 @@ internal class ApiDimensionsConverter : JsonConverter<ApiDimensions>
         throw new JsonException("Invalid dimensions format");
     }
 
-    public override void Write(Utf8JsonWriter writer, ApiDimensions value, JsonSerializerOptions options)
+    public override void Write(Utf8JsonWriter writer, DimensionsModel value, JsonSerializerOptions options)
     {
         writer.WriteStartObject();
-        writer.WriteNumber(nameof(ApiDimensions.Length), value.Length);
-        writer.WriteNumber(nameof(ApiDimensions.Width), value.Width);
-        writer.WriteNumber(nameof(ApiDimensions.Height), value.Height);
+        writer.WriteNumber(nameof(DimensionsModel.Length), value.Length);
+        writer.WriteNumber(nameof(DimensionsModel.Width), value.Width);
+        writer.WriteNumber(nameof(DimensionsModel.Height), value.Height);
         writer.WriteEndObject();
     }
 }
 
 /// <summary>
-/// Installation slot (API).
+/// Installation slot model.
 /// </summary>
-public record ApiSlot
+public record SlotModel
 {
     /// <summary>
     /// Slot name.
@@ -556,16 +981,16 @@ public record ApiSlot
     /// <summary>
     /// Relative position.
     /// </summary>
-    public ApiVector3? Location { get; init; }
+    public Vector3Model? Location { get; init; }
 }
 
 /// <summary>
-/// JSON converter for ApiSlot lists.
+/// JSON converter for SlotModel lists.
 /// For AI-generated products, returns an empty list since spatial data is not provided by the AI.
 /// </summary>
-internal class ApiSlotListConverter : JsonConverter<List<ApiSlot>?>
+internal class SlotModelListConverter : JsonConverter<List<SlotModel>?>
 {
-    public override List<ApiSlot>? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    public override List<SlotModel>? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
         // Skip the value (could be array or string like "[]")
         reader.Skip();
@@ -573,7 +998,7 @@ internal class ApiSlotListConverter : JsonConverter<List<ApiSlot>?>
         return [];
     }
 
-    public override void Write(Utf8JsonWriter writer, List<ApiSlot>? value, JsonSerializerOptions options)
+    public override void Write(Utf8JsonWriter writer, List<SlotModel>? value, JsonSerializerOptions options)
     {
         if (value == null || value.Count == 0)
         {
@@ -588,9 +1013,9 @@ internal class ApiSlotListConverter : JsonConverter<List<ApiSlot>?>
 }
 
 /// <summary>
-/// Internal chamber (API).
+/// Internal chamber model.
 /// </summary>
-public record ApiChamber
+public record ChamberModel
 {
     /// <summary>
     /// Chamber name.
@@ -602,16 +1027,16 @@ public record ApiChamber
     /// Chamber dimensions.
     /// </summary>
     [Required]
-    public required ApiDimensions Dimensions { get; init; }
+    public required DimensionsModel Dimensions { get; init; }
 }
 
 /// <summary>
-/// JSON converter for ApiChamber lists.
+/// JSON converter for ChamberModel lists.
 /// For AI-generated products, returns an empty list since spatial data is not provided by the AI.
 /// </summary>
-internal class ApiChamberListConverter : JsonConverter<List<ApiChamber>?>
+internal class ChamberModelListConverter : JsonConverter<List<ChamberModel>?>
 {
-    public override List<ApiChamber>? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    public override List<ChamberModel>? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
         // Skip the value (could be array or nested object)
         reader.Skip();
@@ -619,7 +1044,7 @@ internal class ApiChamberListConverter : JsonConverter<List<ApiChamber>?>
         return [];
     }
 
-    public override void Write(Utf8JsonWriter writer, List<ApiChamber>? value, JsonSerializerOptions options)
+    public override void Write(Utf8JsonWriter writer, List<ChamberModel>? value, JsonSerializerOptions options)
     {
         if (value == null || value.Count == 0)
         {
@@ -634,9 +1059,9 @@ internal class ApiChamberListConverter : JsonConverter<List<ApiChamber>?>
 }
 
 /// <summary>
-/// 3D vector (API).
+/// 3D vector model.
 /// </summary>
-public record ApiVector3
+public record Vector3Model
 {
     /// <summary>
     /// X coordinate.

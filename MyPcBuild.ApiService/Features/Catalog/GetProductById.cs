@@ -7,7 +7,7 @@ namespace MyPcBuild.ApiService.Features.Catalog;
 public static class GetProductById
 {
     /// <summary>
-    /// Retrieves a product by its ID with strongly-typed DTO.
+    /// Retrieves a product by its ID with strongly-typed response.
     /// </summary>
     public static IEndpointRouteBuilder MapGetProductByIdEndpoint(this IEndpointRouteBuilder app)
     {
@@ -22,11 +22,11 @@ public static class GetProductById
                 return Results.NotFound();
             }
 
-            ProductDto dto = ProductDtoMapper.ToDto(product);
-            return Results.Ok(dto);
+            ProductResponse response = ProductDtoMapper.ToResponse(product);
+            return Results.Ok(response);
         })
         .WithName("GetProductById")
-        .Produces<ProductDto>(StatusCodes.Status200OK)
+        .Produces<ProductResponse>(StatusCodes.Status200OK)
         .Produces(StatusCodes.Status404NotFound)
         .WithTags("Catalog");
 

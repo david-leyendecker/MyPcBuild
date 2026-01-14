@@ -4,55 +4,58 @@ using MyPcBuild.ApiService.Domain.Models.Spatial;
 namespace MyPcBuild.ApiService.Features.Catalog.DTOs;
 
 /// <summary>
-/// Maps between API DTOs and domain models.
+/// Maps between API DTOs (Request/Response) and domain models.
 /// </summary>
 public static class ProductDtoMapper
 {
     /// <summary>
-    /// Maps a domain Product to an API DTO.
+    /// Maps a domain Product to an API Response.
     /// </summary>
-    public static ProductDto ToDto(Product product)
+    public static ProductResponse ToResponse(Product product)
     {
         return product switch
         {
-            CpuProduct cpu => ToCpuDto(cpu),
-            MotherboardProduct mb => ToMotherboardDto(mb),
-            GpuProduct gpu => ToGpuDto(gpu),
-            RamProduct ram => ToRamDto(ram),
-            PcCaseProduct pcCase => ToPcCaseDto(pcCase),
-            PsuProduct psu => ToPsuDto(psu),
-            StorageProduct storage => ToStorageDto(storage),
-            CoolerProduct cooler => ToCoolerDto(cooler),
+            CpuProduct cpu => ToCpuResponse(cpu),
+            MotherboardProduct mb => ToMotherboardResponse(mb),
+            GpuProduct gpu => ToGpuResponse(gpu),
+            RamProduct ram => ToRamResponse(ram),
+            PcCaseProduct pcCase => ToPcCaseResponse(pcCase),
+            PsuProduct psu => ToPsuResponse(psu),
+            StorageProduct storage => ToStorageResponse(storage),
+            CoolerProduct cooler => ToCoolerResponse(cooler),
             _ => throw new ArgumentException($"Unknown product type: {product.GetType().Name}")
         };
     }
 
     /// <summary>
-    /// Maps an API DTO to a domain Product.
+    /// Maps an API Request to a domain Product.
     /// </summary>
-    public static Product ToDomain(ProductDto dto, Guid? id = null)
+    public static Product ToDomain(ProductRequest request, Guid? id = null)
     {
-        return dto switch
+        Guid productId = id ?? Guid.NewGuid();
+        
+        return request switch
         {
-            CpuDto cpu => ToCpuDomain(cpu, id ?? Guid.NewGuid()),
-            MotherboardDto mb => ToMotherboardDomain(mb, id ?? Guid.NewGuid()),
-            GpuDto gpu => ToGpuDomain(gpu, id ?? Guid.NewGuid()),
-            RamDto ram => ToRamDomain(ram, id ?? Guid.NewGuid()),
-            PcCaseDto pcCase => ToPcCaseDomain(pcCase, id ?? Guid.NewGuid()),
-            PsuDto psu => ToPsuDomain(psu, id ?? Guid.NewGuid()),
-            StorageDto storage => ToStorageDomain(storage, id ?? Guid.NewGuid()),
-            CoolerDto cooler => ToCoolerDomain(cooler, id ?? Guid.NewGuid()),
-            _ => throw new ArgumentException($"Unknown DTO type: {dto.GetType().Name}")
+            CpuProductRequest cpu => ToCpuDomain(cpu, productId),
+            MotherboardProductRequest mb => ToMotherboardDomain(mb, productId),
+            GpuProductRequest gpu => ToGpuDomain(gpu, productId),
+            RamProductRequest ram => ToRamDomain(ram, productId),
+            PcCaseProductRequest pcCase => ToPcCaseDomain(pcCase, productId),
+            PsuProductRequest psu => ToPsuDomain(psu, productId),
+            StorageProductRequest storage => ToStorageDomain(storage, productId),
+            CoolerProductRequest cooler => ToCoolerDomain(cooler, productId),
+            _ => throw new ArgumentException($"Unknown request type: {request.GetType().Name}")
         };
     }
 
-    // Domain to DTO mappings
+    // Domain to Response mappings
 
-    private static CpuDto ToCpuDto(CpuProduct cpu)
+    private static CpuProductResponse ToCpuResponse(CpuProduct cpu)
     {
-        return new CpuDto
+        return new CpuProductResponse
         {
             Id = cpu.Id,
+            Category = cpu.ProductCategory,
             Name = cpu.Name,
             Price = cpu.Price,
             Manufacturer = cpu.Manufacturer,
@@ -68,11 +71,12 @@ public static class ProductDtoMapper
         };
     }
 
-    private static MotherboardDto ToMotherboardDto(MotherboardProduct mb)
+    private static MotherboardProductResponse ToMotherboardResponse(MotherboardProduct mb)
     {
-        return new MotherboardDto
+        return new MotherboardProductResponse
         {
             Id = mb.Id,
+            Category = mb.ProductCategory,
             Name = mb.Name,
             Price = mb.Price,
             Manufacturer = mb.Manufacturer,
@@ -83,16 +87,17 @@ public static class ProductDtoMapper
             FormFactor = ToApiFormFactor(mb.FormFactor),
             MemoryType = ToApiMemoryType(mb.MemoryType),
             MaxMemory = mb.MaxMemory.ValueInGB,
-            Dimensions = ToApiDimensions(mb.Dimensions),
-            Slots = mb.Slots.Select(ToApiSlot).ToList()
+            Dimensions = ToDimensionsModel(mb.Dimensions),
+            Slots = mb.Slots.Select(ToSlotModel).ToList()
         };
     }
 
-    private static GpuDto ToGpuDto(GpuProduct gpu)
+    private static GpuProductResponse ToGpuResponse(GpuProduct gpu)
     {
-        return new GpuDto
+        return new GpuProductResponse
         {
             Id = gpu.Id,
+            Category = gpu.ProductCategory,
             Name = gpu.Name,
             Price = gpu.Price,
             Manufacturer = gpu.Manufacturer,
@@ -108,16 +113,17 @@ public static class ProductDtoMapper
             Length = gpu.Length.ValueInMm,
             PowerConnectors = ToApiGpuPowerConnector(gpu.PowerConnectors),
             RayTracing = gpu.RayTracing,
-            Dimensions = ToApiDimensions(gpu.Dimensions),
-            Slots = gpu.Slots.Select(ToApiSlot).ToList()
+            Dimensions = ToDimensionsModel(gpu.Dimensions),
+            Slots = gpu.Slots.Select(ToSlotModel).ToList()
         };
     }
 
-    private static RamDto ToRamDto(RamProduct ram)
+    private static RamProductResponse ToRamResponse(RamProduct ram)
     {
-        return new RamDto
+        return new RamProductResponse
         {
             Id = ram.Id,
+            Category = ram.ProductCategory,
             Name = ram.Name,
             Price = ram.Price,
             Manufacturer = ram.Manufacturer,
@@ -132,11 +138,12 @@ public static class ProductDtoMapper
         };
     }
 
-    private static PcCaseDto ToPcCaseDto(PcCaseProduct pcCase)
+    private static PcCaseProductResponse ToPcCaseResponse(PcCaseProduct pcCase)
     {
-        return new PcCaseDto
+        return new PcCaseProductResponse
         {
             Id = pcCase.Id,
+            Category = pcCase.ProductCategory,
             Name = pcCase.Name,
             Price = pcCase.Price,
             Manufacturer = pcCase.Manufacturer,
@@ -145,16 +152,17 @@ public static class ProductDtoMapper
             FormFactor = pcCase.FormFactor,
             Color = pcCase.Color,
             SidePanelWindow = pcCase.SidePanelWindow,
-            Dimensions = ToApiDimensions(pcCase.Dimensions),
-            Chambers = pcCase.Chambers.Select(ToApiChamber).ToList()
+            Dimensions = ToDimensionsModel(pcCase.Dimensions),
+            Chambers = pcCase.Chambers.Select(ToChamberModel).ToList()
         };
     }
 
-    private static PsuDto ToPsuDto(PsuProduct psu)
+    private static PsuProductResponse ToPsuResponse(PsuProduct psu)
     {
-        return new PsuDto
+        return new PsuProductResponse
         {
             Id = psu.Id,
+            Category = psu.ProductCategory,
             Name = psu.Name,
             Price = psu.Price,
             Manufacturer = psu.Manufacturer,
@@ -169,11 +177,12 @@ public static class ProductDtoMapper
         };
     }
 
-    private static StorageDto ToStorageDto(StorageProduct storage)
+    private static StorageProductResponse ToStorageResponse(StorageProduct storage)
     {
-        return new StorageDto
+        return new StorageProductResponse
         {
             Id = storage.Id,
+            Category = storage.ProductCategory,
             Name = storage.Name,
             Price = storage.Price,
             Manufacturer = storage.Manufacturer,
@@ -188,11 +197,12 @@ public static class ProductDtoMapper
         };
     }
 
-    private static CoolerDto ToCoolerDto(CoolerProduct cooler)
+    private static CoolerProductResponse ToCoolerResponse(CoolerProduct cooler)
     {
-        return new CoolerDto
+        return new CoolerProductResponse
         {
             Id = cooler.Id,
+            Category = cooler.ProductCategory,
             Name = cooler.Name,
             Price = cooler.Price,
             Manufacturer = cooler.Manufacturer,
@@ -202,176 +212,144 @@ public static class ProductDtoMapper
             Height = cooler.Height.ValueInMm,
             TDP = cooler.TDP.ValueInWatts,
             Sockets = cooler.Sockets.Select(ToApiCpuSocket).ToList(),
-            Dimensions = ToApiDimensions(cooler.Dimensions)
+            Dimensions = ToDimensionsModel(cooler.Dimensions)
         };
     }
 
-    // DTO to Domain mappings
+    // Request to Domain mappings
 
-    private static CpuProduct ToCpuDomain(CpuDto dto, Guid id)
+    private static CpuProduct ToCpuDomain(CpuProductRequest request, Guid id)
     {
         return new CpuProduct(
             id,
-            dto.Name,
-            dto.Price,
-            dto.Manufacturer,
-            ToDomainCpuSocket(dto.Socket),
-            dto.Cores,
-            dto.Threads,
-            Frequency.FromGHz(dto.BaseClock),
-            Frequency.FromGHz(dto.BoostClock),
-            Power.FromWatts(dto.TDP),
-            dto.IntegratedGraphics
-        )
-        {
-            IsDraft = dto.IsDraft,
-            PublishedAt = dto.PublishedAt
-        };
+            request.Name,
+            request.Price,
+            request.Manufacturer,
+            ToDomainCpuSocket(request.Socket),
+            request.Cores,
+            request.Threads,
+            Frequency.FromGHz(request.BaseClock),
+            Frequency.FromGHz(request.BoostClock),
+            Power.FromWatts(request.TDP),
+            request.IntegratedGraphics
+        );
     }
 
-    private static MotherboardProduct ToMotherboardDomain(MotherboardDto dto, Guid id)
+    private static MotherboardProduct ToMotherboardDomain(MotherboardProductRequest request, Guid id)
     {
         return new MotherboardProduct(
             id,
-            dto.Name,
-            dto.Price,
-            dto.Manufacturer,
-            ToDomainDimensions(dto.Dimensions),
-            dto.Slots?.Select(ToDomainSlot).ToList() ?? [],
-            ToDomainCpuSocket(dto.Socket),
-            dto.Chipset,
-            ToDomainFormFactor(dto.FormFactor),
-            ToDomainMemoryType(dto.MemoryType),
-            StorageCapacity.FromGB(dto.MaxMemory)
-        )
-        {
-            IsDraft = dto.IsDraft,
-            PublishedAt = dto.PublishedAt
-        };
+            request.Name,
+            request.Price,
+            request.Manufacturer,
+            ToDomainDimensions(request.Dimensions),
+            request.Slots?.Select(ToDomainSlot).ToList() ?? [],
+            ToDomainCpuSocket(request.Socket),
+            request.Chipset,
+            ToDomainFormFactor(request.FormFactor),
+            ToDomainMemoryType(request.MemoryType),
+            StorageCapacity.FromGB(request.MaxMemory)
+        );
     }
 
-    private static GpuProduct ToGpuDomain(GpuDto dto, Guid id)
+    private static GpuProduct ToGpuDomain(GpuProductRequest request, Guid id)
     {
         return new GpuProduct(
             id,
-            dto.Name,
-            dto.Price,
-            dto.Manufacturer,
-            ToDomainDimensions(dto.Dimensions),
-            dto.Slots?.Select(ToDomainSlot).ToList() ?? [],
-            dto.ChipsetManufacturer,
-            dto.Series,
-            StorageCapacity.FromGB(dto.VRAM),
-            ToDomainMemoryType(dto.MemoryType),
-            Frequency.FromMHz(dto.CoreClock),
-            Frequency.FromMHz(dto.BoostClock),
-            Power.FromWatts(dto.TDP),
-            Length.FromMm(dto.Length),
-            ToDomainGpuPowerConnector(dto.PowerConnectors),
-            dto.RayTracing
-        )
-        {
-            IsDraft = dto.IsDraft,
-            PublishedAt = dto.PublishedAt
-        };
+            request.Name,
+            request.Price,
+            request.Manufacturer,
+            ToDomainDimensions(request.Dimensions),
+            request.Slots?.Select(ToDomainSlot).ToList() ?? [],
+            request.ChipsetManufacturer,
+            request.Series,
+            StorageCapacity.FromGB(request.VRAM),
+            ToDomainMemoryType(request.MemoryType),
+            Frequency.FromMHz(request.CoreClock),
+            Frequency.FromMHz(request.BoostClock),
+            Power.FromWatts(request.TDP),
+            Length.FromMm(request.Length),
+            ToDomainGpuPowerConnector(request.PowerConnectors),
+            request.RayTracing
+        );
     }
 
-    private static RamProduct ToRamDomain(RamDto dto, Guid id)
+    private static RamProduct ToRamDomain(RamProductRequest request, Guid id)
     {
         return new RamProduct(
             id,
-            dto.Name,
-            dto.Price,
-            dto.Manufacturer,
-            ToDomainMemoryType(dto.Type),
-            StorageCapacity.FromGB(dto.Capacity),
-            dto.Configuration,
-            Frequency.FromMHz(dto.Speed),
-            dto.CASLatency,
-            Voltage.FromVolts(dto.Voltage)
-        )
-        {
-            IsDraft = dto.IsDraft,
-            PublishedAt = dto.PublishedAt
-        };
+            request.Name,
+            request.Price,
+            request.Manufacturer,
+            ToDomainMemoryType(request.Type),
+            StorageCapacity.FromGB(request.Capacity),
+            request.Configuration,
+            Frequency.FromMHz(request.Speed),
+            request.CASLatency,
+            Voltage.FromVolts(request.Voltage)
+        );
     }
 
-    private static PcCaseProduct ToPcCaseDomain(PcCaseDto dto, Guid id)
+    private static PcCaseProduct ToPcCaseDomain(PcCaseProductRequest request, Guid id)
     {
         return new PcCaseProduct(
             id,
-            dto.Name,
-            dto.Price,
-            dto.Manufacturer,
-            ToDomainDimensions(dto.Dimensions),
-            dto.Chambers?.Select(ToDomainChamber).ToList() ?? [],
-            dto.FormFactor,
-            dto.Color,
-            dto.SidePanelWindow
-        )
-        {
-            IsDraft = dto.IsDraft,
-            PublishedAt = dto.PublishedAt
-        };
+            request.Name,
+            request.Price,
+            request.Manufacturer,
+            ToDomainDimensions(request.Dimensions),
+            request.Chambers?.Select(ToDomainChamber).ToList() ?? [],
+            request.FormFactor,
+            request.Color,
+            request.SidePanelWindow
+        );
     }
 
-    private static PsuProduct ToPsuDomain(PsuDto dto, Guid id)
+    private static PsuProduct ToPsuDomain(PsuProductRequest request, Guid id)
     {
         return new PsuProduct(
             id,
-            dto.Name,
-            dto.Price,
-            dto.Manufacturer,
-            Power.FromWatts(dto.Wattage),
-            dto.Efficiency,
-            dto.Modular,
-            dto.FormFactor,
-            Length.FromMm(dto.Length),
-            dto.PCIe8Pin
-        )
-        {
-            IsDraft = dto.IsDraft,
-            PublishedAt = dto.PublishedAt
-        };
+            request.Name,
+            request.Price,
+            request.Manufacturer,
+            Power.FromWatts(request.Wattage),
+            request.Efficiency,
+            request.Modular,
+            request.FormFactor,
+            Length.FromMm(request.Length),
+            request.PCIe8Pin
+        );
     }
 
-    private static StorageProduct ToStorageDomain(StorageDto dto, Guid id)
+    private static StorageProduct ToStorageDomain(StorageProductRequest request, Guid id)
     {
         return new StorageProduct(
             id,
-            dto.Name,
-            dto.Price,
-            dto.Manufacturer,
-            dto.Type,
-            dto.Interface,
-            dto.StorageFormFactor,
-            StorageCapacity.FromGB(dto.Capacity),
-            DataSpeed.FromMBps(dto.ReadSpeed),
-            DataSpeed.FromMBps(dto.WriteSpeed)
-        )
-        {
-            IsDraft = dto.IsDraft,
-            PublishedAt = dto.PublishedAt
-        };
+            request.Name,
+            request.Price,
+            request.Manufacturer,
+            request.Type,
+            request.Interface,
+            request.StorageFormFactor,
+            StorageCapacity.FromGB(request.Capacity),
+            DataSpeed.FromMBps(request.ReadSpeed),
+            DataSpeed.FromMBps(request.WriteSpeed)
+        );
     }
 
-    private static CoolerProduct ToCoolerDomain(CoolerDto dto, Guid id)
+    private static CoolerProduct ToCoolerDomain(CoolerProductRequest request, Guid id)
     {
         return new CoolerProduct(
             id,
-            dto.Name,
-            dto.Price,
-            dto.Manufacturer,
-            ToDomainDimensions(dto.Dimensions),
-            ToDomainCoolerType(dto.CoolerType),
-            Length.FromMm(dto.Height),
-            Power.FromWatts(dto.TDP),
-            dto.Sockets.Select(ToDomainCpuSocket).ToArray()
-        )
-        {
-            IsDraft = dto.IsDraft,
-            PublishedAt = dto.PublishedAt
-        };
+            request.Name,
+            request.Price,
+            request.Manufacturer,
+            ToDomainDimensions(request.Dimensions),
+            ToDomainCoolerType(request.CoolerType),
+            Length.FromMm(request.Height),
+            Power.FromWatts(request.TDP),
+            request.Sockets.Select(ToDomainCpuSocket).ToArray()
+        );
     }
 
     // Helper conversion methods
@@ -482,9 +460,9 @@ public static class ProductDtoMapper
         _ => throw new ArgumentException($"Unknown API GPU power connector: {connector}")
     };
 
-    private static ApiDimensions ToApiDimensions(Dimensions dimensions)
+    private static DimensionsModel ToDimensionsModel(Dimensions dimensions)
     {
-        return new ApiDimensions
+        return new DimensionsModel
         {
             Length = dimensions.Length,
             Width = dimensions.Width,
@@ -492,18 +470,18 @@ public static class ProductDtoMapper
         };
     }
 
-    private static Dimensions ToDomainDimensions(ApiDimensions dimensions)
+    private static Dimensions ToDomainDimensions(DimensionsModel dimensions)
     {
         return new Dimensions(dimensions.Length, dimensions.Width, dimensions.Height);
     }
 
-    private static ApiSlot ToApiSlot(Slot slot)
+    private static SlotModel ToSlotModel(Slot slot)
     {
-        return new ApiSlot
+        return new SlotModel
         {
             Name = slot.Name,
             AllowedCategory = slot.AllowedProductCategory.ToString(),
-            Location = new ApiVector3
+            Location = new Vector3Model
             {
                 X = slot.RelativePosition.X,
                 Y = slot.RelativePosition.Y,
@@ -512,7 +490,7 @@ public static class ProductDtoMapper
         };
     }
 
-    private static Slot ToDomainSlot(ApiSlot slot)
+    private static Slot ToDomainSlot(SlotModel slot)
     {
         ProductCategory category = Enum.Parse<ProductCategory>(slot.AllowedCategory, ignoreCase: true);
         Vector3 position = slot.Location != null
@@ -529,16 +507,16 @@ public static class ProductDtoMapper
         );
     }
 
-    private static ApiChamber ToApiChamber(Chamber chamber)
+    private static ChamberModel ToChamberModel(Chamber chamber)
     {
-        return new ApiChamber
+        return new ChamberModel
         {
             Name = chamber.Name,
-            Dimensions = ToApiDimensions(chamber.Dimensions)
+            Dimensions = ToDimensionsModel(chamber.Dimensions)
         };
     }
 
-    private static Chamber ToDomainChamber(ApiChamber chamber)
+    private static Chamber ToDomainChamber(ChamberModel chamber)
     {
         return new Chamber(
             Guid.NewGuid(),

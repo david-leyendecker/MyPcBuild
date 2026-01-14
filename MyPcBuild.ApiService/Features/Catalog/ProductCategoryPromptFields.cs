@@ -4,102 +4,110 @@ using MyPcBuild.ApiService.Features.Catalog.DTOs;
 namespace MyPcBuild.ApiService.Features.Catalog;
 
 /// <summary>
-/// Provides field schemas for AI product generation based on API DTOs.
+/// Provides field schemas for AI product generation based on API Request DTOs.
 /// </summary>
 public class ProductCategoryPromptFields
 {
     private static readonly Dictionary<ProductCategory, List<SystemPromptCategoryField>> _categoryStructures = new()
     {
         [ProductCategory.CPU] = [
-            new(nameof(CpuDto.Name), "product name (string)"),
-            new(nameof(CpuDto.Manufacturer), "manufacturer name (string)"),
-            new(nameof(CpuDto.Price), "decimal price"),
-            new(nameof(CpuDto.Socket), $"string: {string.Join(", ", Enum.GetNames(typeof(ApiCpuSocket)))}"),
-            new(nameof(CpuDto.Cores), "integer cores"),
-            new(nameof(CpuDto.Threads), "integer threads"),
-            new(nameof(CpuDto.BaseClock), "decimal GHz"),
-            new(nameof(CpuDto.BoostClock), "decimal GHz"),
-            new(nameof(CpuDto.TDP), "integer watts"),
-            new(nameof(CpuDto.IntegratedGraphics), "boolean")
+            new(nameof(CpuProductRequest.Category), $"string: {ProductCategory.CPU}"),
+            new(nameof(CpuProductRequest.Name), "product name (string)"),
+            new(nameof(CpuProductRequest.Manufacturer), "manufacturer name (string)"),
+            new(nameof(CpuProductRequest.Price), "decimal price"),
+            new(nameof(CpuProductRequest.Socket), $"string: {string.Join(", ", Enum.GetNames(typeof(ApiCpuSocket)))}"),
+            new(nameof(CpuProductRequest.Cores), "integer cores"),
+            new(nameof(CpuProductRequest.Threads), "integer threads"),
+            new(nameof(CpuProductRequest.BaseClock), "decimal GHz"),
+            new(nameof(CpuProductRequest.BoostClock), "decimal GHz"),
+            new(nameof(CpuProductRequest.TDP), "integer watts"),
+            new(nameof(CpuProductRequest.IntegratedGraphics), "boolean")
         ],
         [ProductCategory.Motherboard] = [
-            new(nameof(MotherboardDto.Name), "product name (string)"),
-            new(nameof(MotherboardDto.Manufacturer), "manufacturer name (string)"),
-            new(nameof(MotherboardDto.Price), "decimal price"),
-            new(nameof(MotherboardDto.Socket), $"string: {string.Join(", ", Enum.GetNames(typeof(ApiCpuSocket)))}"),
-            new(nameof(MotherboardDto.Chipset), "chipset name (string)"),
-            new(nameof(MotherboardDto.FormFactor), $"string: {string.Join(", ", Enum.GetNames(typeof(ApiFormFactor)))}"),
-            new(nameof(MotherboardDto.MemoryType), $"string: {ApiMemoryType.DDR3}, {ApiMemoryType.DDR4}, {ApiMemoryType.DDR5}"),
-            new(nameof(MotherboardDto.MaxMemory), "integer GB"),
-            new(nameof(MotherboardDto.Dimensions), "object with Length, Width, Height in mm (decimals)")
+            new(nameof(MotherboardProductRequest.Category), $"string: {ProductCategory.Motherboard}"),
+            new(nameof(MotherboardProductRequest.Name), "product name (string)"),
+            new(nameof(MotherboardProductRequest.Manufacturer), "manufacturer name (string)"),
+            new(nameof(MotherboardProductRequest.Price), "decimal price"),
+            new(nameof(MotherboardProductRequest.Socket), $"string: {string.Join(", ", Enum.GetNames(typeof(ApiCpuSocket)))}"),
+            new(nameof(MotherboardProductRequest.Chipset), "chipset name (string)"),
+            new(nameof(MotherboardProductRequest.FormFactor), $"string: {string.Join(", ", Enum.GetNames(typeof(ApiFormFactor)))}"),
+            new(nameof(MotherboardProductRequest.MemoryType), $"string: {ApiMemoryType.DDR3}, {ApiMemoryType.DDR4}, {ApiMemoryType.DDR5}"),
+            new(nameof(MotherboardProductRequest.MaxMemory), "integer GB"),
+            new(nameof(MotherboardProductRequest.Dimensions), "object with Length, Width, Height in mm (decimals)")
         ],
         [ProductCategory.GPU] = [
-            new(nameof(GpuDto.Name), "product name (string)"),
-            new(nameof(GpuDto.Manufacturer), "manufacturer name (string)"),
-            new(nameof(GpuDto.Price), "decimal price"),
-            new(nameof(GpuDto.ChipsetManufacturer), "string: NVIDIA, AMD, Intel"),
-            new(nameof(GpuDto.Series), "series name (string)"),
-            new(nameof(GpuDto.VRAM), "integer GB"),
-            new(nameof(GpuDto.MemoryType), $"string: {ApiMemoryType.GDDR6}, {ApiMemoryType.GDDR6X}, {ApiMemoryType.GDDR5}"),
-            new(nameof(GpuDto.CoreClock), "integer MHz"),
-            new(nameof(GpuDto.BoostClock), "integer MHz"),
-            new(nameof(GpuDto.TDP), "integer watts"),
-            new(nameof(GpuDto.Length), "integer mm"),
-            new(nameof(GpuDto.PowerConnectors), $"string: {string.Join(", ", Enum.GetNames(typeof(ApiGpuPowerConnector)))}"),
-            new(nameof(GpuDto.RayTracing), "boolean"),
-            new(nameof(GpuDto.Dimensions), "object with Length, Width, Height in mm (decimals)")
+            new(nameof(GpuProductRequest.Category), $"string: {ProductCategory.GPU}"),
+            new(nameof(GpuProductRequest.Name), "product name (string)"),
+            new(nameof(GpuProductRequest.Manufacturer), "manufacturer name (string)"),
+            new(nameof(GpuProductRequest.Price), "decimal price"),
+            new(nameof(GpuProductRequest.ChipsetManufacturer), "string: NVIDIA, AMD, Intel"),
+            new(nameof(GpuProductRequest.Series), "series name (string)"),
+            new(nameof(GpuProductRequest.VRAM), "integer GB"),
+            new(nameof(GpuProductRequest.MemoryType), $"string: {ApiMemoryType.GDDR6}, {ApiMemoryType.GDDR6X}, {ApiMemoryType.GDDR5}"),
+            new(nameof(GpuProductRequest.CoreClock), "integer MHz"),
+            new(nameof(GpuProductRequest.BoostClock), "integer MHz"),
+            new(nameof(GpuProductRequest.TDP), "integer watts"),
+            new(nameof(GpuProductRequest.Length), "integer mm"),
+            new(nameof(GpuProductRequest.PowerConnectors), $"string: {string.Join(", ", Enum.GetNames(typeof(ApiGpuPowerConnector)))}"),
+            new(nameof(GpuProductRequest.RayTracing), "boolean"),
+            new(nameof(GpuProductRequest.Dimensions), "object with Length, Width, Height in mm (decimals)")
         ],
         [ProductCategory.RAM] = [
-            new(nameof(RamDto.Name), "product name (string)"),
-            new(nameof(RamDto.Manufacturer), "manufacturer name (string)"),
-            new(nameof(RamDto.Price), "decimal price"),
-            new(nameof(RamDto.Type), $"string: {ApiMemoryType.DDR5}, {ApiMemoryType.DDR4}, {ApiMemoryType.DDR3}"),
-            new(nameof(RamDto.Capacity), "integer GB"),
-            new(nameof(RamDto.Configuration), "string: e.g., 2x16GB"),
-            new(nameof(RamDto.Speed), "integer MHz"),
-            new(nameof(RamDto.CASLatency), "string: e.g., CL16"),
-            new(nameof(RamDto.Voltage), "decimal volts")
+            new(nameof(RamProductRequest.Category), $"string: {ProductCategory.RAM}"),
+            new(nameof(RamProductRequest.Name), "product name (string)"),
+            new(nameof(RamProductRequest.Manufacturer), "manufacturer name (string)"),
+            new(nameof(RamProductRequest.Price), "decimal price"),
+            new(nameof(RamProductRequest.Type), $"string: {ApiMemoryType.DDR5}, {ApiMemoryType.DDR4}, {ApiMemoryType.DDR3}"),
+            new(nameof(RamProductRequest.Capacity), "integer GB"),
+            new(nameof(RamProductRequest.Configuration), "string: e.g., 2x16GB"),
+            new(nameof(RamProductRequest.Speed), "integer MHz"),
+            new(nameof(RamProductRequest.CASLatency), "string: e.g., CL16"),
+            new(nameof(RamProductRequest.Voltage), "decimal volts")
         ],
         [ProductCategory.Case] = [
-            new(nameof(PcCaseDto.Name), "product name (string)"),
-            new(nameof(PcCaseDto.Manufacturer), "manufacturer name (string)"),
-            new(nameof(PcCaseDto.Price), "decimal price"),
-            new(nameof(PcCaseDto.FormFactor), "string form factor description"),
-            new(nameof(PcCaseDto.Color), "color name (string)"),
-            new(nameof(PcCaseDto.SidePanelWindow), "string: None, Acrylic, or Tempered Glass"),
-            new(nameof(PcCaseDto.Dimensions), "object with Length, Width, Height in mm (decimals)")
+            new(nameof(PcCaseProductRequest.Category), $"string: {ProductCategory.Case}"),
+            new(nameof(PcCaseProductRequest.Name), "product name (string)"),
+            new(nameof(PcCaseProductRequest.Manufacturer), "manufacturer name (string)"),
+            new(nameof(PcCaseProductRequest.Price), "decimal price"),
+            new(nameof(PcCaseProductRequest.FormFactor), "string form factor description"),
+            new(nameof(PcCaseProductRequest.Color), "color name (string)"),
+            new(nameof(PcCaseProductRequest.SidePanelWindow), "string: None, Acrylic, or Tempered Glass"),
+            new(nameof(PcCaseProductRequest.Dimensions), "object with Length, Width, Height in mm (decimals)")
         ],
         [ProductCategory.PowerSupply] = [
-            new(nameof(PsuDto.Name), "product name (string)"),
-            new(nameof(PsuDto.Manufacturer), "manufacturer name (string)"),
-            new(nameof(PsuDto.Price), "decimal price"),
-            new(nameof(PsuDto.Wattage), "integer watts"),
-            new(nameof(PsuDto.Efficiency), "string: 80+ Bronze, 80+ Gold, 80+ Platinum, or 80+ Titanium"),
-            new(nameof(PsuDto.Modular), "string: Non-Modular, Semi-Modular, or Fully Modular"),
-            new(nameof(PsuDto.FormFactor), "string: ATX or SFX"),
-            new(nameof(PsuDto.Length), "integer mm"),
-            new(nameof(PsuDto.PCIe8Pin), "integer count")
+            new(nameof(PsuProductRequest.Category), $"string: {ProductCategory.PowerSupply}"),
+            new(nameof(PsuProductRequest.Name), "product name (string)"),
+            new(nameof(PsuProductRequest.Manufacturer), "manufacturer name (string)"),
+            new(nameof(PsuProductRequest.Price), "decimal price"),
+            new(nameof(PsuProductRequest.Wattage), "integer watts"),
+            new(nameof(PsuProductRequest.Efficiency), "string: 80+ Bronze, 80+ Gold, 80+ Platinum, or 80+ Titanium"),
+            new(nameof(PsuProductRequest.Modular), "string: Non-Modular, Semi-Modular, or Fully Modular"),
+            new(nameof(PsuProductRequest.FormFactor), "string: ATX or SFX"),
+            new(nameof(PsuProductRequest.Length), "integer mm"),
+            new(nameof(PsuProductRequest.PCIe8Pin), "integer count")
         ],
         [ProductCategory.Storage] = [
-            new(nameof(StorageDto.Name), "product name (string)"),
-            new(nameof(StorageDto.Manufacturer), "manufacturer name (string)"),
-            new(nameof(StorageDto.Price), "decimal price"),
-            new(nameof(StorageDto.Type), "string: SSD or HDD"),
-            new(nameof(StorageDto.Interface), "string: NVMe, SATA, or M.2"),
-            new(nameof(StorageDto.StorageFormFactor), "string: M.2 2280, 2.5 inch, or 3.5 inch"),
-            new(nameof(StorageDto.Capacity), "integer GB"),
-            new(nameof(StorageDto.ReadSpeed), "integer MB/s"),
-            new(nameof(StorageDto.WriteSpeed), "integer MB/s")
+            new(nameof(StorageProductRequest.Category), $"string: {ProductCategory.Storage}"),
+            new(nameof(StorageProductRequest.Name), "product name (string)"),
+            new(nameof(StorageProductRequest.Manufacturer), "manufacturer name (string)"),
+            new(nameof(StorageProductRequest.Price), "decimal price"),
+            new(nameof(StorageProductRequest.Type), "string: SSD or HDD"),
+            new(nameof(StorageProductRequest.Interface), "string: NVMe, SATA, or M.2"),
+            new(nameof(StorageProductRequest.StorageFormFactor), "string: M.2 2280, 2.5 inch, or 3.5 inch"),
+            new(nameof(StorageProductRequest.Capacity), "integer GB"),
+            new(nameof(StorageProductRequest.ReadSpeed), "integer MB/s"),
+            new(nameof(StorageProductRequest.WriteSpeed), "integer MB/s")
         ],
         [ProductCategory.Cooler] = [
-            new(nameof(CoolerDto.Name), "product name (string)"),
-            new(nameof(CoolerDto.Manufacturer), "manufacturer name (string)"),
-            new(nameof(CoolerDto.Price), "decimal price"),
-            new(nameof(CoolerDto.CoolerType), $"string: {string.Join(", ", Enum.GetNames(typeof(ApiCoolerType)))}"),
-            new(nameof(CoolerDto.Height), "integer mm"),
-            new(nameof(CoolerDto.TDP), "integer watts"),
-            new(nameof(CoolerDto.Sockets), $"array of strings: {string.Join(", ", Enum.GetNames(typeof(ApiCpuSocket)))}"),
-            new(nameof(CoolerDto.Dimensions), "object with Length, Width, Height in mm (decimals)")
+            new(nameof(CoolerProductRequest.Category), $"string: {ProductCategory.Cooler}"),
+            new(nameof(CoolerProductRequest.Name), "product name (string)"),
+            new(nameof(CoolerProductRequest.Manufacturer), "manufacturer name (string)"),
+            new(nameof(CoolerProductRequest.Price), "decimal price"),
+            new(nameof(CoolerProductRequest.CoolerType), $"string: {string.Join(", ", Enum.GetNames(typeof(ApiCoolerType)))}"),
+            new(nameof(CoolerProductRequest.Height), "integer mm"),
+            new(nameof(CoolerProductRequest.TDP), "integer watts"),
+            new(nameof(CoolerProductRequest.Sockets), $"array of strings: {string.Join(", ", Enum.GetNames(typeof(ApiCpuSocket)))}"),
+            new(nameof(CoolerProductRequest.Dimensions), "object with Length, Width, Height in mm (decimals)")
         ]
     };
 
