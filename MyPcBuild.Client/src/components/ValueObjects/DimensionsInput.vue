@@ -1,6 +1,6 @@
 <template>
   <div class="dimensions-input">
-    <v-row dense>
+    <v-row>
       <v-col cols="4">
         <v-text-field 
           :model-value="dimensions.length"
