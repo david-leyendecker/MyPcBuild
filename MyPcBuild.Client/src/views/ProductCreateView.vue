@@ -115,7 +115,6 @@
                   v-model="formData.category"
                   :items="categories"
                   label="Category *"
-                  @update:model-value="onCategoryChange"
                 ></v-select>
 
                 <v-text-field 
@@ -186,17 +185,12 @@
                 ></v-text-field>
               </div>
 
-              <div v-if="isLoadingFields" class="d-flex justify-center py-4">
-                <v-progress-circular indeterminate color="primary"></v-progress-circular>
-              </div>
-
-              <div v-else-if="fieldDefinitions.length > 0">
-                <!-- Use dynamic field renderer -->
-                <DynamicFieldRenderer 
-                  v-model="formData.fields"
-                  :field-definitions="fieldDefinitions"
-                />
-              </div>
+              <!-- Use ProductFormSelector -->
+              <ProductFormSelector 
+                v-model="productFormData"
+                :category="formData.category"
+                :editable="true"
+              />
 
               <v-alert v-if="error" type="error" class="mt-3">
                 {{ error }}
@@ -224,17 +218,12 @@
             <div v-else>
               <h3 class="text-h5 mb-3">{{ formData.category }} Details</h3>
 
-              <div v-if="isLoadingFields" class="d-flex justify-center py-4">
-                <v-progress-circular indeterminate color="primary"></v-progress-circular>
-              </div>
-
-              <div v-else-if="fieldDefinitions.length > 0">
-                <!-- Use dynamic field renderer -->
-                <DynamicFieldRenderer 
-                  v-model="formData.fields"
-                  :field-definitions="fieldDefinitions"
-                />
-              </div>
+              <!-- Use ProductFormSelector -->
+              <ProductFormSelector 
+                v-model="productFormData"
+                :category="formData.category"
+                :editable="true"
+              />
 
               <v-alert v-if="error" type="error" class="mt-3">
                 {{ error }}
@@ -268,8 +257,11 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
-import { catalogApi, ProductCategory, categoryLabels, type FieldDefinition, type GenerateProductResponse } from '@/api/catalog';
-import DynamicFieldRenderer from '@/components/DynamicFieldRenderer.vue';
+import { catalogApi, ProductCategory, categoryLabels, type GenerateProductResponse } from '@/api/catalog';
+import { createTypedProduct } from '@/api/catalogTyped';
+import ProductFormSelector from '@/components/ProductFormSelector.vue';
+import { fieldsToTypedProduct } from '@/utils/productFieldConverters';
+import type { ProductRequest } from '@/types/products';
 
 const router = useRouter();
 
@@ -281,11 +273,9 @@ const categories = computed(() =>
 );
 const currentStep = ref(1);
 const creationMode = ref<'manual' | 'ai' | null>(null);
-const isLoadingFields = ref(false);
 const isCreating = ref(false);
 const isGenerating = ref(false);
 const error = ref<string | null>(null);
-const fieldDefinitions = ref<FieldDefinition[]>([]);
 const aiDescription = ref('');
 const generatedProduct = ref<GenerateProductResponse | null>(null);
 
@@ -293,9 +283,10 @@ const formData = ref({
   category: '',
   name: '',
   manufacturer: '',
-  price: 0,
-  fields: {} as Record<string, string>
+  price: 0
 });
+
+const productFormData = ref<Partial<ProductRequest>>({});
 
 const canProceedToStep3 = computed(() => {
   return formData.value.category && 
@@ -306,22 +297,6 @@ const canProceedToStep3 = computed(() => {
 
 function selectCreationMode(mode: 'manual' | 'ai') {
   creationMode.value = mode;
-}
-
-async function onCategoryChange() {
-  if (formData.value.category) {
-    isLoadingFields.value = true;
-    error.value = null;
-    try {
-      fieldDefinitions.value = await catalogApi.getFieldDefinitions(formData.value.category as any);
-      // Initialize fields with empty values
-      formData.value.fields = {};
-    } catch (err) {
-      error.value = err instanceof Error ? err.message : 'Failed to load field definitions';
-    } finally {
-      isLoadingFields.value = false;
-    }
-  }
 }
 
 async function generateWithAi() {
@@ -349,17 +324,16 @@ async function generateWithAi() {
       : '';
     formData.value.manufacturer = manufacturer;
     
-    // Load field definitions for the category
-    await onCategoryChange();
-    
-    // Populate fields from the generated product specifications
+    // Convert specifications to typed product form data
     if (product.specifications) {
-      formData.value.fields = Object.entries(product.specifications)
+      const fields = Object.entries(product.specifications)
         .filter(([key]) => key !== 'Manufacturer')
         .reduce((acc, [key, value]) => {
           acc[key] = String(value);
           return acc;
         }, {} as Record<string, string>);
+      
+      productFormData.value = fieldsToTypedProduct(fields, formData.value.category);
     }
 
     // Move to review step
@@ -384,13 +358,16 @@ async function createProduct() {
   error.value = null;
   
   try {
-    const response = await catalogApi.createProduct({
-      category: formData.value.category as any,
+    // Build the complete typed product request
+    const productRequest: any = {
+      ...productFormData.value,
+      category: formData.value.category,
       name: formData.value.name,
       price: formData.value.price,
-      manufacturer: formData.value.manufacturer,
-      fields: formData.value.fields
-    });
+      manufacturer: formData.value.manufacturer
+    };
+
+    const response = await createTypedProduct(productRequest);
 
     // If AI-generated (draft), redirect to detail view for review
     // Otherwise, redirect to catalog

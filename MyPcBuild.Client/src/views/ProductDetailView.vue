@@ -85,30 +85,12 @@
 
           <h3 class="text-h5 mb-3">{{ formData.category }} Details</h3>
 
-          <div v-if="isLoadingFields" class="d-flex justify-center py-4">
-            <v-progress-circular indeterminate color="primary"></v-progress-circular>
-          </div>
-
-          <div v-else-if="fieldDefinitions.length > 0">
-            <!-- Display fields as read-only or editable based on mode -->
-            <div v-if="!isEditMode" class="d-flex flex-column ga-3">
-              <v-text-field
-                v-for="field in fieldDefinitions"
-                :key="field.name"
-                :label="field.name"
-                :model-value="formData.fields[field.name] || ''"
-                :suffix="field.unit || undefined"
-                readonly
-              ></v-text-field>
-            </div>
-            
-            <!-- Use DynamicFieldRenderer for edit mode -->
-            <DynamicFieldRenderer 
-              v-else
-              v-model="formData.fields"
-              :field-definitions="fieldDefinitions"
-            />
-          </div>
+          <!-- Use ProductFormSelector -->
+          <ProductFormSelector 
+            v-model="productFormData"
+            :category="formData.category"
+            :editable="isEditMode"
+          />
 
           <v-alert v-if="publishError || updateError" type="error" class="mt-3">
             {{ publishError || updateError }}
@@ -158,15 +140,17 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { catalogApi, type FieldDefinition, type Product } from '@/api/catalog';
-import DynamicFieldRenderer from '@/components/DynamicFieldRenderer.vue';
+import { catalogApi, type Product } from '@/api/catalog';
+import { updateTypedProduct } from '@/api/catalogTyped';
+import ProductFormSelector from '@/components/ProductFormSelector.vue';
+import { fieldsToTypedProduct } from '@/utils/productFieldConverters';
+import type { ProductRequest } from '@/types/products';
 
 const route = useRoute();
 const router = useRouter();
 
 const product = ref<Product | null>(null);
 const isLoading = ref(true);
-const isLoadingFields = ref(false);
 const isPublishing = ref(false);
 const isUpdating = ref(false);
 const isEditMode = ref(false);
@@ -175,23 +159,23 @@ const publishError = ref<string | null>(null);
 const publishSuccess = ref(false);
 const updateError = ref<string | null>(null);
 const updateSuccess = ref(false);
-const fieldDefinitions = ref<FieldDefinition[]>([]);
 
 const formData = ref({
   category: '',
   name: '',
   manufacturer: '',
-  price: 0,
-  fields: {} as Record<string, string>
+  price: 0
 });
 
 const originalFormData = ref({
   category: '',
   name: '',
   manufacturer: '',
-  price: 0,
-  fields: {} as Record<string, string>
+  price: 0
 });
+
+const productFormData = ref<Partial<ProductRequest>>({});
+const originalProductFormData = ref<Partial<ProductRequest>>({});
 
 onMounted(async () => {
   await loadProduct();
@@ -215,40 +199,24 @@ async function loadProduct() {
     formData.value.category = product.value.category;
     formData.value.manufacturer = product.value.manufacturer;
     
-    // Extract manufacturer and other fields from specifications
+    // Convert specifications to typed product form data
     if (product.value.specifications) {
-      // Populate other fields
-      formData.value.fields = Object.entries(product.value.specifications)
+      const fields = Object.entries(product.value.specifications)
         .reduce((acc, [key, value]) => {
           acc[key] = String(value);
           return acc;
         }, {} as Record<string, string>);
+      
+      productFormData.value = fieldsToTypedProduct(fields, formData.value.category);
     }
-
-    // Load field definitions for the category
-    await loadFieldDefinitions();
     
     // Store original values for cancel operation
     originalFormData.value = JSON.parse(JSON.stringify(formData.value));
+    originalProductFormData.value = JSON.parse(JSON.stringify(productFormData.value));
   } catch (err) {
     error.value = err instanceof Error ? err.message : 'Failed to load product';
   } finally {
     isLoading.value = false;
-  }
-}
-
-async function loadFieldDefinitions() {
-  if (!formData.value.category) {
-    return;
-  }
-
-  isLoadingFields.value = true;
-  try {
-    fieldDefinitions.value = await catalogApi.getFieldDefinitions(formData.value.category as any);
-  } catch (err) {
-    console.error('Failed to load field definitions:', err);
-  } finally {
-    isLoadingFields.value = false;
   }
 }
 
@@ -288,6 +256,7 @@ function enterEditMode() {
 function cancelEdit() {
   // Restore original values
   formData.value = JSON.parse(JSON.stringify(originalFormData.value));
+  productFormData.value = JSON.parse(JSON.stringify(originalProductFormData.value));
   isEditMode.value = false;
   updateSuccess.value = false;
   updateError.value = null;
@@ -303,13 +272,16 @@ async function saveProduct() {
   updateSuccess.value = false;
   
   try {
-    await catalogApi.updateProduct(product.value.id, {
-      category: formData.value.category as any,
+    // Build the complete typed product request
+    const productRequest: any = {
+      ...productFormData.value,
+      category: formData.value.category,
       name: formData.value.name,
       price: formData.value.price,
-      manufacturer: formData.value.manufacturer,
-      fields: formData.value.fields
-    });
+      manufacturer: formData.value.manufacturer
+    };
+
+    await updateTypedProduct(product.value.id, productRequest);
     
     updateSuccess.value = true;
     
