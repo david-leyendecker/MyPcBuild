@@ -140,16 +140,15 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { catalogApi, type Product } from '@/api/catalog';
-import { updateTypedProduct } from '@/api/catalogTyped';
+import { catalogApi } from '@/api/catalog';
+import { getTypedProduct, updateTypedProduct } from '@/api/catalogTyped';
 import ProductFormSelector from '@/components/ProductFormSelector.vue';
-import { fieldsToTypedProduct } from '@/utils/productFieldConverters';
-import type { ProductRequest } from '@/types/products';
+import type { ProductRequest, ProductResponse } from '@/types/products';
 
 const route = useRoute();
 const router = useRouter();
 
-const product = ref<Product | null>(null);
+const product = ref<ProductResponse | null>(null);
 const isLoading = ref(true);
 const isPublishing = ref(false);
 const isUpdating = ref(false);
@@ -191,7 +190,7 @@ async function loadProduct() {
   }
 
   try {
-    product.value = await catalogApi.getProduct(productId);
+    product.value = await getTypedProduct(productId);
     
     // Populate form data from product
     formData.value.name = product.value.name;
@@ -199,16 +198,9 @@ async function loadProduct() {
     formData.value.category = product.value.category;
     formData.value.manufacturer = product.value.manufacturer;
     
-    // Convert specifications to typed product form data
-    if (product.value.specifications) {
-      const fields = Object.entries(product.value.specifications)
-        .reduce((acc, [key, value]) => {
-          acc[key] = String(value);
-          return acc;
-        }, {} as Record<string, string>);
-      
-      productFormData.value = fieldsToTypedProduct(fields, formData.value.category);
-    }
+    // Extract category-specific data (remove base ProductBase fields)
+    const { id, isDraft, publishedAt, category, name, price, manufacturer, ...categoryData } = product.value;
+    productFormData.value = categoryData as Partial<ProductRequest>;
     
     // Store original values for cancel operation
     originalFormData.value = JSON.parse(JSON.stringify(formData.value));
