@@ -8,6 +8,7 @@ using MyPcBuild.ApiService.Domain.Events;
 using MyPcBuild.ApiService.Domain.Models;
 using MyPcBuild.ApiService.Features.Builds;
 using MyPcBuild.ApiService.Features.Catalog;
+using MyPcBuild.ApiService.Features.Catalog.DTOs;
 using MyPcBuild.ApiService.Features.Compatibility;
 using MyPcBuild.ApiService.Features.Spatial;
 using MyPcBuild.ApiService.Infrastructure;
@@ -89,6 +90,8 @@ builder.Services.AddHostedService<ProductSeeder>();
 
 builder.Services.ConfigureHttpJsonOptions(options =>
 {
+    // Add custom converter for ProductRequest to handle polymorphic deserialization
+    options.SerializerOptions.Converters.Add(new ProductRequestJsonConverter());
     // Add custom converter for ProductCategory to handle case-insensitive deserialization
     options.SerializerOptions.Converters.Add(new ProductCategoryJsonConverter());
     // Keep the generic string enum converter for other enums
