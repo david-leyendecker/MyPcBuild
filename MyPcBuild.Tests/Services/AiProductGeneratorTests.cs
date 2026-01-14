@@ -15,6 +15,7 @@ public class AiProductGeneratorTests
         // Arrange
         string jsonResponse = """
 {
+  "Category": "CPU",
   "Name": "Ryzen 9 7950X",
   "Manufacturer": "AMD",
   "Price": 699.99,
@@ -70,6 +71,7 @@ public class AiProductGeneratorTests
         // Arrange
         string jsonResponse = """
 {
+  "Category": "GPU",
   "Name": "NVIDIA GeForce RTX 4090",
   "Manufacturer": "NVIDIA",
   "Price": 1599.99,
@@ -130,6 +132,7 @@ public class AiProductGeneratorTests
         string jsonResponse = """
 ```json
 {
+  "Category": "RAM",
   "Name": "Corsair Vengeance DDR5",
   "Manufacturer": "Corsair",
   "Price": 129.99,
@@ -210,6 +213,7 @@ public class AiProductGeneratorTests
         string jsonResponse = """
         ```json
         {
+            "Category": "Case",
             "Name": "NZXT S320 Elite",
             "Manufacturer": "NZXT",
             "Price": 69.99,
