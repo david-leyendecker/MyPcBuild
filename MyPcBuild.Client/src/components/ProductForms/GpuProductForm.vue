@@ -1,5 +1,5 @@
 <template>
-  <div class="gpu-product-form">
+  <div class="gpu-product-form d-flex flex-column ga-3">
     <!-- Chipset Manufacturer and Series - Side by side -->
     <v-row dense>
       <v-col cols="6">

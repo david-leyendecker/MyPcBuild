@@ -1,5 +1,5 @@
 <template>
-  <div class="cpu-product-form">
+  <div class="cpu-product-form d-flex flex-column ga-3">
     <!-- CPU Socket -->
     <v-select 
       v-model="localProduct.socket"

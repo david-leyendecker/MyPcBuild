@@ -1,5 +1,5 @@
 <template>
-  <div class="cooler-product-form">
+  <div class="cooler-product-form d-flex flex-column ga-3">
     <!-- Cooler Type and Height - Side by side -->
     <v-row dense>
       <v-col cols="6">

@@ -1,5 +1,5 @@
 <template>
-  <div class="storage-product-form">
+  <div class="storage-product-form d-flex flex-column ga-3">
     <!-- Type and Interface - Side by side -->
     <v-row dense>
       <v-col cols="6">

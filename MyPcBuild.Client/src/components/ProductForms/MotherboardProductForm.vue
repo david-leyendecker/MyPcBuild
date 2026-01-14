@@ -1,5 +1,5 @@
 <template>
-  <div class="motherboard-product-form">
+  <div class="motherboard-product-form d-flex flex-column ga-3">
     <!-- Socket and Chipset - Side by side -->
     <v-row dense>
       <v-col cols="6">

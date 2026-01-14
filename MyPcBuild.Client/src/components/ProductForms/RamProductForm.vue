@@ -1,5 +1,5 @@
 <template>
-  <div class="ram-product-form">
+  <div class="ram-product-form d-flex flex-column ga-3">
     <!-- Type and Configuration - Side by side -->
     <v-row dense>
       <v-col cols="6">

@@ -1,5 +1,5 @@
 <template>
-  <div class="psu-product-form">
+  <div class="psu-product-form d-flex flex-column ga-3">
     <!-- Wattage and Efficiency - Side by side -->
     <v-row dense>
       <v-col cols="6">

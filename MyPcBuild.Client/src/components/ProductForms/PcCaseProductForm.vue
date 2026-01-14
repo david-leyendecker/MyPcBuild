@@ -1,5 +1,5 @@
 <template>
-  <div class="case-product-form">
+  <div class="case-product-form d-flex flex-column ga-3">
     <!-- Form Factor and Color - Side by side -->
     <v-row dense>
       <v-col cols="6">
