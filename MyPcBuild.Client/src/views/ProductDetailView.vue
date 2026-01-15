@@ -50,36 +50,50 @@
 
     <v-card v-else-if="product">
       <v-card-text>
-        <div class="d-flex flex-column ga-4">
+        <v-container fluid>
           <h3 class="text-h5 mb-3">Basic Information</h3>
           
-          <div class="d-flex flex-column ga-3">
-            <v-text-field 
-              v-model="formData.name"
-              label="Product Name *"
-              :readonly="!isEditMode"
-            ></v-text-field>
+          <v-row>
+            <v-col cols="12">
+              <v-text-field 
+                v-model="formData.name"
+                label="Product Name *"
+                :readonly="!isEditMode"
+              ></v-text-field>
+            </v-col>
+          </v-row>
 
-            <v-text-field 
-              v-model="formData.manufacturer"
-              label="Manufacturer *"
-              :readonly="!isEditMode"
-            ></v-text-field>
+          <v-row>
+            <v-col cols="12">
+              <v-text-field 
+                v-model="formData.manufacturer"
+                label="Manufacturer *"
+                :readonly="!isEditMode"
+              ></v-text-field>
+            </v-col>
+          </v-row>
 
-            <v-text-field 
-              v-model.number="formData.price"
-              label="Price *"
-              type="number"
-              prefix="$"
-              :readonly="!isEditMode"
-            ></v-text-field>
+          <v-row>
+            <v-col cols="12">
+              <v-text-field 
+                v-model.number="formData.price"
+                label="Price *"
+                type="number"
+                prefix="$"
+                :readonly="!isEditMode"
+              ></v-text-field>
+            </v-col>
+          </v-row>
 
-            <v-text-field 
-              v-model="formData.category"
-              label="Category"
-              readonly
-            ></v-text-field>
-          </div>
+          <v-row>
+            <v-col cols="12">
+              <v-text-field 
+                v-model="formData.category"
+                label="Category"
+                readonly
+              ></v-text-field>
+            </v-col>
+          </v-row>
 
           <v-divider class="my-4"></v-divider>
 
@@ -100,38 +114,40 @@
             {{ publishSuccess ? 'Product successfully published!' : 'Product successfully updated!' }}
           </v-alert>
 
-          <div class="d-flex justify-space-between mt-4">
-            <v-btn 
-              prepend-icon="mdi-arrow-left"
-              variant="text"
-              @click="isEditMode ? cancelEdit() : $router.push('/catalog')"
-            >
-              {{ isEditMode ? 'Cancel' : 'Back to Catalog' }}
-            </v-btn>
-            
-            <div class="d-flex ga-2">
+          <v-row class="mt-4">
+            <v-col cols="12" class="d-flex justify-space-between">
               <v-btn 
-                v-if="isEditMode"
-                prepend-icon="mdi-content-save"
-                color="primary"
-                :loading="isUpdating"
-                @click="saveProduct"
+                prepend-icon="mdi-arrow-left"
+                variant="text"
+                @click="isEditMode ? cancelEdit() : $router.push('/catalog')"
               >
-                Save Changes
+                {{ isEditMode ? 'Cancel' : 'Back to Catalog' }}
               </v-btn>
               
-              <v-btn 
-                v-if="product?.isDraft && !isEditMode"
-                prepend-icon="mdi-check-circle"
-                color="success"
-                :loading="isPublishing"
-                @click="publishProduct"
-              >
-                Publish Product
-              </v-btn>
-            </div>
-          </div>
-        </div>
+              <div class="d-flex ga-2">
+                <v-btn 
+                  v-if="isEditMode"
+                  prepend-icon="mdi-content-save"
+                  color="primary"
+                  :loading="isUpdating"
+                  @click="saveProduct"
+                >
+                  Save Changes
+                </v-btn>
+                
+                <v-btn 
+                  v-if="product?.isDraft && !isEditMode"
+                  prepend-icon="mdi-check-circle"
+                  color="success"
+                  :loading="isPublishing"
+                  @click="publishProduct"
+                >
+                  Publish Product
+                </v-btn>
+              </div>
+            </v-col>
+          </v-row>
+        </v-container>
       </v-card-text>
     </v-card>
   </div>
