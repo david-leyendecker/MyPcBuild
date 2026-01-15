@@ -1,75 +1,78 @@
 <template>
-  <ProductFormContainer>
+  <v-container fluid class="pa-0">
     <!-- Socket and Chipset - Side by side -->
-    <v-row dense>
-      <v-col cols="6">
+    <v-row>
+      <v-col cols="12" md="6">
         <v-select 
           v-model="localProduct.socket"
           :items="socketOptions"
           label="CPU Socket"
           :readonly="!editable"
           :variant="editable ? 'filled' : 'outlined'"
-          density="comfortable"
         ></v-select>
       </v-col>
-      <v-col cols="6">
+      <v-col cols="12" md="6">
         <v-text-field 
           v-model="localProduct.chipset"
           label="Chipset"
           :readonly="!editable"
           :variant="editable ? 'filled' : 'outlined'"
-          density="comfortable"
           placeholder="e.g., Z790, X670E"
         ></v-text-field>
       </v-col>
     </v-row>
 
     <!-- Form Factor and Memory Type - Side by side -->
-    <v-row dense>
-      <v-col cols="6">
+    <v-row>
+      <v-col cols="12" md="6">
         <v-select 
           v-model="localProduct.formFactor"
           :items="formFactorOptions"
           label="Form Factor"
           :readonly="!editable"
           :variant="editable ? 'filled' : 'outlined'"
-          density="comfortable"
         ></v-select>
       </v-col>
-      <v-col cols="6">
+      <v-col cols="12" md="6">
         <v-select 
           v-model="localProduct.memoryType"
           :items="memoryTypeOptions"
           label="Memory Type"
           :readonly="!editable"
           :variant="editable ? 'filled' : 'outlined'"
-          density="comfortable"
         ></v-select>
       </v-col>
     </v-row>
 
-    <!-- Max Memory -->
-    <StorageCapacityInput 
-      v-model="localProduct.maxMemory"
-      label="Maximum Memory Capacity"
-      :editable="editable"
-    />
+    <v-row>
+      <v-col cols="12">
+        <!-- Max Memory -->
+        <StorageCapacityInput 
+          v-model="localProduct.maxMemory"
+          label="Maximum Memory Capacity"
+          :editable="editable"
+        />
+      </v-col>
+    </v-row>
 
-    <!-- Dimensions -->
-    <div class="mb-2">
-      <label class="text-subtitle-2 font-weight-semibold mb-2 d-block">Dimensions</label>
-      <DimensionsInput 
-        v-model="localProduct.dimensions"
-        :editable="editable"
-      />
-    </div>
-  </ProductFormContainer>
+    <v-row>
+      <v-col cols="12">
+        <!-- Dimensions -->
+        <div class="mb-2">
+          <label class="text-subtitle-2 font-weight-semibold mb-2 d-block">Dimensions</label>
+          <DimensionsInput 
+            v-model="localProduct.dimensions"
+            :editable="editable"
+          />
+        </div>
+      </v-col>
+    </v-row>
+  </v-container>
 </template>
 
 <script setup lang="ts">
 import { ref, watch } from 'vue';
 import type { MotherboardProductRequest, MotherboardProductResponse, CpuSocket, FormFactor, MemoryType } from '@/types/products';
-import ProductFormContainer from '@/components/ProductFormContainer.vue';
 import StorageCapacityInput from '@/components/ValueObjects/StorageCapacityInput.vue';
 import DimensionsInput from '@/components/ValueObjects/DimensionsInput.vue';
 

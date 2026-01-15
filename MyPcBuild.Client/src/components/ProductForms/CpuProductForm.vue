@@ -1,49 +1,50 @@
 <template>
-  <ProductFormContainer>
-    <!-- CPU Socket -->
-    <v-select 
-      v-model="localProduct.socket"
-      :items="socketOptions"
-      label="CPU Socket"
-      :readonly="!editable"
-      :variant="editable ? 'filled' : 'outlined'"
-      density="comfortable"
-    ></v-select>
+  <v-container fluid class="pa-0">
+    <v-row>
+      <v-col cols="12">
+        <!-- CPU Socket -->
+        <v-select 
+          v-model="localProduct.socket"
+          :items="socketOptions"
+          label="CPU Socket"
+          :readonly="!editable"
+          :variant="editable ? 'filled' : 'outlined'"
+        ></v-select>
+      </v-col>
+    </v-row>
 
     <!-- Cores and Threads - Side by side -->
-    <v-row dense>
-      <v-col cols="6">
+    <v-row>
+      <v-col cols="12" md="6">
         <v-text-field 
           v-model.number="localProduct.cores"
           label="Cores"
           :readonly="!editable"
           type="number"
           :variant="editable ? 'filled' : 'outlined'"
-          density="comfortable"
         ></v-text-field>
       </v-col>
-      <v-col cols="6">
+      <v-col cols="12" md="6">
         <v-text-field 
           v-model.number="localProduct.threads"
           label="Threads"
           :readonly="!editable"
           type="number"
           :variant="editable ? 'filled' : 'outlined'"
-          density="comfortable"
         ></v-text-field>
       </v-col>
     </v-row>
 
     <!-- Base Clock and Boost Clock - Side by side -->
-    <v-row dense>
-      <v-col cols="6">
+    <v-row>
+      <v-col cols="12" md="6">
         <FrequencyInput 
           v-model="localProduct.baseClock"
           label="Base Clock"
           :editable="editable"
         />
       </v-col>
-      <v-col cols="6">
+      <v-col cols="12" md="6">
         <FrequencyInput 
           v-model="localProduct.boostClock"
           label="Boost Clock"
@@ -52,28 +53,34 @@
       </v-col>
     </v-row>
 
-    <!-- TDP -->
-    <PowerInput 
-      v-model="localProduct.tdp"
-      label="TDP (Thermal Design Power)"
-      :editable="editable"
-    />
+    <v-row>
+      <v-col cols="12">
+        <!-- TDP -->
+        <PowerInput 
+          v-model="localProduct.tdp"
+          label="TDP (Thermal Design Power)"
+          :editable="editable"
+        />
+      </v-col>
+    </v-row>
 
-    <!-- Integrated Graphics -->
-    <v-checkbox 
-      v-model="localProduct.integratedGraphics"
-      label="Integrated Graphics"
-      :readonly="!editable"
-      :disabled="!editable"
-      density="comfortable"
-    ></v-checkbox>
-  </ProductFormContainer>
+    <v-row>
+      <v-col cols="12">
+        <!-- Integrated Graphics -->
+        <v-checkbox 
+          v-model="localProduct.integratedGraphics"
+          label="Integrated Graphics"
+          :readonly="!editable"
+          :disabled="!editable"
+        ></v-checkbox>
+      </v-col>
+    </v-row>
+  </v-container>
 </template>
 
 <script setup lang="ts">
 import { ref, watch } from 'vue';
 import type { CpuProductRequest, CpuProductResponse, CpuSocket } from '@/types/products';
-import ProductFormContainer from '@/components/ProductFormContainer.vue';
 import FrequencyInput from '@/components/ValueObjects/FrequencyInput.vue';
 import PowerInput from '@/components/ValueObjects/PowerInput.vue';
 

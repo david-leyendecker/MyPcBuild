@@ -1,18 +1,17 @@
 <template>
-  <ProductFormContainer>
+  <v-container fluid class="pa-0">
     <!-- Cooler Type and Height - Side by side -->
-    <v-row dense>
-      <v-col cols="6">
+    <v-row>
+      <v-col cols="12" md="6">
         <v-select 
           v-model="localProduct.coolerType"
           :items="coolerTypeOptions"
           label="Cooler Type"
           :readonly="!editable"
           :variant="editable ? 'filled' : 'outlined'"
-          density="comfortable"
         ></v-select>
       </v-col>
-      <v-col cols="6">
+      <v-col cols="12" md="6">
         <LengthInput 
           v-model="localProduct.height"
           label="Height"
@@ -21,40 +20,50 @@
       </v-col>
     </v-row>
 
-    <!-- TDP -->
-    <PowerInput 
-      v-model="localProduct.tdp"
-      label="TDP Rating"
-      :editable="editable"
-    />
+    <v-row>
+      <v-col cols="12">
+        <!-- TDP -->
+        <PowerInput 
+          v-model="localProduct.tdp"
+          label="TDP Rating"
+          :editable="editable"
+        />
+      </v-col>
+    </v-row>
 
-    <!-- Compatible Sockets -->
-    <v-select 
-      v-model="localProduct.sockets"
-      :items="socketOptions"
-      label="Compatible CPU Sockets"
-      :readonly="!editable"
-      :variant="editable ? 'filled' : 'outlined'"
-      density="comfortable"
-      multiple
-      chips
-    ></v-select>
+    <v-row>
+      <v-col cols="12">
+        <!-- Compatible Sockets -->
+        <v-select 
+          v-model="localProduct.sockets"
+          :items="socketOptions"
+          label="Compatible CPU Sockets"
+          :readonly="!editable"
+          :variant="editable ? 'filled' : 'outlined'"
+          multiple
+          chips
+        ></v-select>
+      </v-col>
+    </v-row>
 
-    <!-- Dimensions -->
-    <div class="mb-2">
-      <label class="text-subtitle-2 font-weight-semibold mb-2 d-block">Dimensions</label>
-      <DimensionsInput 
-        v-model="localProduct.dimensions"
-        :editable="editable"
-      />
-    </div>
-  </ProductFormContainer>
+    <v-row>
+      <v-col cols="12">
+        <!-- Dimensions -->
+        <div class="mb-2">
+          <label class="text-subtitle-2 font-weight-semibold mb-2 d-block">Dimensions</label>
+          <DimensionsInput 
+            v-model="localProduct.dimensions"
+            :editable="editable"
+          />
+        </div>
+      </v-col>
+    </v-row>
+  </v-container>
 </template>
 
 <script setup lang="ts">
 import { ref, watch } from 'vue';
 import type { CoolerProductRequest, CoolerProductResponse, CoolerType, CpuSocket } from '@/types/products';
-import ProductFormContainer from '@/components/ProductFormContainer.vue';
 import PowerInput from '@/components/ValueObjects/PowerInput.vue';
 import LengthInput from '@/components/ValueObjects/LengthInput.vue';
 import DimensionsInput from '@/components/ValueObjects/DimensionsInput.vue';

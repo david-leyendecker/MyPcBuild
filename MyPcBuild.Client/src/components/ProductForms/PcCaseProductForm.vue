@@ -1,54 +1,58 @@
 <template>
-  <ProductFormContainer>
+  <v-container fluid class="pa-0">
     <!-- Form Factor and Color - Side by side -->
-    <v-row dense>
-      <v-col cols="6">
+    <v-row>
+      <v-col cols="12" md="6">
         <v-text-field 
           v-model="localProduct.formFactor"
           label="Form Factor"
           :readonly="!editable"
           :variant="editable ? 'filled' : 'outlined'"
-          density="comfortable"
           placeholder="e.g., Mid Tower, Full Tower"
         ></v-text-field>
       </v-col>
-      <v-col cols="6">
+      <v-col cols="12" md="6">
         <v-text-field 
           v-model="localProduct.color"
           label="Color"
           :readonly="!editable"
           :variant="editable ? 'filled' : 'outlined'"
-          density="comfortable"
           placeholder="e.g., Black, White"
         ></v-text-field>
       </v-col>
     </v-row>
 
-    <!-- Side Panel Window -->
-    <v-text-field 
-      v-model="localProduct.sidePanelWindow"
-      label="Side Panel Window"
-      :readonly="!editable"
-      :variant="editable ? 'filled' : 'outlined'"
-      density="comfortable"
-      placeholder="e.g., Tempered Glass, Acrylic, None"
-    ></v-text-field>
+    <v-row>
+      <v-col cols="12">
+        <!-- Side Panel Window -->
+        <v-text-field 
+          v-model="localProduct.sidePanelWindow"
+          label="Side Panel Window"
+          :readonly="!editable"
+          :variant="editable ? 'filled' : 'outlined'"
+          placeholder="e.g., Tempered Glass, Acrylic, None"
+        ></v-text-field>
+      </v-col>
+    </v-row>
 
-    <!-- Dimensions -->
-    <div class="mb-2">
-      <label class="text-subtitle-2 font-weight-semibold mb-2 d-block">Dimensions</label>
-      <DimensionsInput 
-        v-model="localProduct.dimensions"
-        :editable="editable"
-      />
-    </div>
-  </ProductFormContainer>
+    <v-row>
+      <v-col cols="12">
+        <!-- Dimensions -->
+        <div class="mb-2">
+          <label class="text-subtitle-2 font-weight-semibold mb-2 d-block">Dimensions</label>
+          <DimensionsInput 
+            v-model="localProduct.dimensions"
+            :editable="editable"
+          />
+        </div>
+      </v-col>
+    </v-row>
+  </v-container>
 </template>
 
 <script setup lang="ts">
 import { ref, watch } from 'vue';
 import type { PcCaseProductRequest, PcCaseProductResponse } from '@/types/products';
-import ProductFormContainer from '@/components/ProductFormContainer.vue';
 import DimensionsInput from '@/components/ValueObjects/DimensionsInput.vue';
 
 interface Props {

@@ -1,60 +1,57 @@
 <template>
-  <ProductFormContainer>
+  <v-container fluid class="pa-0">
     <!-- Chipset Manufacturer and Series - Side by side -->
-    <v-row dense>
-      <v-col cols="6">
+    <v-row>
+      <v-col cols="12" md="6">
         <v-text-field 
           v-model="localProduct.chipsetManufacturer"
           label="Chipset Manufacturer"
           :readonly="!editable"
           :variant="editable ? 'filled' : 'outlined'"
-          density="comfortable"
           placeholder="e.g., NVIDIA, AMD"
         ></v-text-field>
       </v-col>
-      <v-col cols="6">
+      <v-col cols="12" md="6">
         <v-text-field 
           v-model="localProduct.series"
           label="Series"
           :readonly="!editable"
           :variant="editable ? 'filled' : 'outlined'"
-          density="comfortable"
           placeholder="e.g., RTX 4090, RX 7900 XTX"
         ></v-text-field>
       </v-col>
     </v-row>
 
     <!-- VRAM and Memory Type - Side by side -->
-    <v-row dense>
-      <v-col cols="6">
+    <v-row>
+      <v-col cols="12" md="6">
         <StorageCapacityInput 
           v-model="localProduct.vram"
           label="VRAM"
           :editable="editable"
         />
       </v-col>
-      <v-col cols="6">
+      <v-col cols="12" md="6">
         <v-select 
           v-model="localProduct.memoryType"
           :items="memoryTypeOptions"
           label="Memory Type"
           :readonly="!editable"
           :variant="editable ? 'filled' : 'outlined'"
-          density="comfortable"
         ></v-select>
       </v-col>
     </v-row>
 
     <!-- Core Clock and Boost Clock - Side by side -->
-    <v-row dense>
-      <v-col cols="6">
+    <v-row>
+      <v-col cols="12" md="6">
         <FrequencyInput 
           v-model="localProduct.coreClock"
           label="Core Clock"
           :editable="editable"
         />
       </v-col>
-      <v-col cols="6">
+      <v-col cols="12" md="6">
         <FrequencyInput 
           v-model="localProduct.boostClock"
           label="Boost Clock"
@@ -64,15 +61,15 @@
     </v-row>
 
     <!-- TDP and Length - Side by side -->
-    <v-row dense>
-      <v-col cols="6">
+    <v-row>
+      <v-col cols="12" md="6">
         <PowerInput 
           v-model="localProduct.tdp"
           label="TDP"
           :editable="editable"
         />
       </v-col>
-      <v-col cols="6">
+      <v-col cols="12" md="6">
         <LengthInput 
           v-model="localProduct.length"
           label="Card Length"
@@ -81,40 +78,49 @@
       </v-col>
     </v-row>
 
-    <!-- Power Connectors -->
-    <v-select 
-      v-model="localProduct.powerConnectors"
-      :items="powerConnectorOptions"
-      label="Power Connectors"
-      :readonly="!editable"
-      :variant="editable ? 'filled' : 'outlined'"
-      density="comfortable"
-    ></v-select>
+    <v-row>
+      <v-col cols="12">
+        <!-- Power Connectors -->
+        <v-select 
+          v-model="localProduct.powerConnectors"
+          :items="powerConnectorOptions"
+          label="Power Connectors"
+          :readonly="!editable"
+          :variant="editable ? 'filled' : 'outlined'"
+        ></v-select>
+      </v-col>
+    </v-row>
 
-    <!-- Ray Tracing -->
-    <v-checkbox 
-      v-model="localProduct.rayTracing"
-      label="Ray Tracing Support"
-      :readonly="!editable"
-      :disabled="!editable"
-      density="comfortable"
-    ></v-checkbox>
+    <v-row>
+      <v-col cols="12">
+        <!-- Ray Tracing -->
+        <v-checkbox 
+          v-model="localProduct.rayTracing"
+          label="Ray Tracing Support"
+          :readonly="!editable"
+          :disabled="!editable"
+        ></v-checkbox>
+      </v-col>
+    </v-row>
 
-    <!-- Dimensions -->
-    <div class="mb-2">
-      <label class="text-subtitle-2 font-weight-semibold mb-2 d-block">Dimensions</label>
-      <DimensionsInput 
-        v-model="localProduct.dimensions"
-        :editable="editable"
-      />
-    </div>
-  </ProductFormContainer>
+    <v-row>
+      <v-col cols="12">
+        <!-- Dimensions -->
+        <div class="mb-2">
+          <label class="text-subtitle-2 font-weight-semibold mb-2 d-block">Dimensions</label>
+          <DimensionsInput 
+            v-model="localProduct.dimensions"
+            :editable="editable"
+          />
+        </div>
+      </v-col>
+    </v-row>
+  </v-container>
 </template>
 
 <script setup lang="ts">
 import { ref, watch } from 'vue';
 import type { GpuProductRequest, GpuProductResponse, MemoryType, GpuPowerConnector } from '@/types/products';
-import ProductFormContainer from '@/components/ProductFormContainer.vue';
 import FrequencyInput from '@/components/ValueObjects/FrequencyInput.vue';
 import PowerInput from '@/components/ValueObjects/PowerInput.vue';
 import LengthInput from '@/components/ValueObjects/LengthInput.vue';

@@ -1,39 +1,37 @@
 <template>
-  <ProductFormContainer>
+  <v-container fluid class="pa-0">
     <!-- Type and Configuration - Side by side -->
-    <v-row dense>
-      <v-col cols="6">
+    <v-row>
+      <v-col cols="12" md="6">
         <v-select 
           v-model="localProduct.type"
           :items="memoryTypeOptions"
           label="Memory Type"
           :readonly="!editable"
           :variant="editable ? 'filled' : 'outlined'"
-          density="comfortable"
         ></v-select>
       </v-col>
-      <v-col cols="6">
+      <v-col cols="12" md="6">
         <v-text-field 
           v-model="localProduct.configuration"
           label="Configuration"
           :readonly="!editable"
           :variant="editable ? 'filled' : 'outlined'"
-          density="comfortable"
           placeholder="e.g., 2x16GB"
         ></v-text-field>
       </v-col>
     </v-row>
 
     <!-- Capacity and Speed - Side by side -->
-    <v-row dense>
-      <v-col cols="6">
+    <v-row>
+      <v-col cols="12" md="6">
         <StorageCapacityInput 
           v-model="localProduct.capacity"
           label="Total Capacity"
           :editable="editable"
         />
       </v-col>
-      <v-col cols="6">
+      <v-col cols="12" md="6">
         <FrequencyInput 
           v-model="localProduct.speed"
           label="Speed (MHz)"
@@ -43,18 +41,17 @@
     </v-row>
 
     <!-- CAS Latency and Voltage - Side by side -->
-    <v-row dense>
-      <v-col cols="6">
+    <v-row>
+      <v-col cols="12" md="6">
         <v-text-field 
           v-model="localProduct.casLatency"
           label="CAS Latency"
           :readonly="!editable"
           :variant="editable ? 'filled' : 'outlined'"
-          density="comfortable"
           placeholder="e.g., CL16"
         ></v-text-field>
       </v-col>
-      <v-col cols="6">
+      <v-col cols="12" md="6">
         <VoltageInput 
           v-model="localProduct.voltage"
           label="Voltage"
@@ -62,13 +59,12 @@
         />
       </v-col>
     </v-row>
-  </ProductFormContainer>
+  </v-container>
 </template>
 
 <script setup lang="ts">
 import { ref, watch } from 'vue';
 import type { RamProductRequest, RamProductResponse, MemoryType } from '@/types/products';
-import ProductFormContainer from '@/components/ProductFormContainer.vue';
 import StorageCapacityInput from '@/components/ValueObjects/StorageCapacityInput.vue';
 import FrequencyInput from '@/components/ValueObjects/FrequencyInput.vue';
 import VoltageInput from '@/components/ValueObjects/VoltageInput.vue';
