@@ -9,7 +9,6 @@ import './style.css'
 
 import App from './App.vue'
 import { router } from './router'
-import { vuetifyDefaults } from './config/vuetify-defaults'
 
 const vuetify = createVuetify({
   components,
@@ -17,7 +16,6 @@ const vuetify = createVuetify({
   theme: {
     defaultTheme: 'system',
   },
-  defaults: vuetifyDefaults,
 })
 
 const app = createApp(App)

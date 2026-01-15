@@ -50,65 +50,61 @@
 
     <v-card v-else-if="product">
       <v-card-text>
-        <div class="d-flex flex-column ga-4">
+        <v-container fluid>
           <h3 class="text-h5 mb-3">Basic Information</h3>
           
-          <div class="d-flex flex-column ga-3">
-            <v-text-field 
-              v-model="formData.name"
-              label="Product Name *"
-              :readonly="!isEditMode"
-            ></v-text-field>
+          <v-row>
+            <v-col cols="12">
+              <v-text-field 
+                v-model="formData.name"
+                label="Product Name *"
+                :readonly="!isEditMode"
+              ></v-text-field>
+            </v-col>
+          </v-row>
 
-            <v-text-field 
-              v-model="formData.manufacturer"
-              label="Manufacturer *"
-              :readonly="!isEditMode"
-            ></v-text-field>
+          <v-row>
+            <v-col cols="12">
+              <v-text-field 
+                v-model="formData.manufacturer"
+                label="Manufacturer *"
+                :readonly="!isEditMode"
+              ></v-text-field>
+            </v-col>
+          </v-row>
 
-            <v-text-field 
-              v-model.number="formData.price"
-              label="Price *"
-              type="number"
-              prefix="$"
-              :readonly="!isEditMode"
-            ></v-text-field>
+          <v-row>
+            <v-col cols="12">
+              <v-text-field 
+                v-model.number="formData.price"
+                label="Price *"
+                type="number"
+                prefix="$"
+                :readonly="!isEditMode"
+              ></v-text-field>
+            </v-col>
+          </v-row>
 
-            <v-text-field 
-              v-model="formData.category"
-              label="Category"
-              readonly
-            ></v-text-field>
-          </div>
+          <v-row>
+            <v-col cols="12">
+              <v-text-field 
+                v-model="formData.category"
+                label="Category"
+                readonly
+              ></v-text-field>
+            </v-col>
+          </v-row>
 
           <v-divider class="my-4"></v-divider>
 
           <h3 class="text-h5 mb-3">{{ formData.category }} Details</h3>
 
-          <div v-if="isLoadingFields" class="d-flex justify-center py-4">
-            <v-progress-circular indeterminate color="primary"></v-progress-circular>
-          </div>
-
-          <div v-else-if="fieldDefinitions.length > 0">
-            <!-- Display fields as read-only or editable based on mode -->
-            <div v-if="!isEditMode" class="d-flex flex-column ga-3">
-              <v-text-field
-                v-for="field in fieldDefinitions"
-                :key="field.name"
-                :label="field.name"
-                :model-value="formData.fields[field.name] || ''"
-                :suffix="field.unit || undefined"
-                readonly
-              ></v-text-field>
-            </div>
-            
-            <!-- Use DynamicFieldRenderer for edit mode -->
-            <DynamicFieldRenderer 
-              v-else
-              v-model="formData.fields"
-              :field-definitions="fieldDefinitions"
-            />
-          </div>
+          <!-- Use ProductFormSelector -->
+          <ProductFormSelector 
+            v-model="productFormData"
+            :category="formData.category"
+            :editable="isEditMode"
+          />
 
           <v-alert v-if="publishError || updateError" type="error" class="mt-3">
             {{ publishError || updateError }}
@@ -118,38 +114,40 @@
             {{ publishSuccess ? 'Product successfully published!' : 'Product successfully updated!' }}
           </v-alert>
 
-          <div class="d-flex justify-space-between mt-4">
-            <v-btn 
-              prepend-icon="mdi-arrow-left"
-              variant="text"
-              @click="isEditMode ? cancelEdit() : $router.push('/catalog')"
-            >
-              {{ isEditMode ? 'Cancel' : 'Back to Catalog' }}
-            </v-btn>
-            
-            <div class="d-flex ga-2">
+          <v-row class="mt-4">
+            <v-col cols="12" class="d-flex justify-space-between">
               <v-btn 
-                v-if="isEditMode"
-                prepend-icon="mdi-content-save"
-                color="primary"
-                :loading="isUpdating"
-                @click="saveProduct"
+                prepend-icon="mdi-arrow-left"
+                variant="text"
+                @click="isEditMode ? cancelEdit() : $router.push('/catalog')"
               >
-                Save Changes
+                {{ isEditMode ? 'Cancel' : 'Back to Catalog' }}
               </v-btn>
               
-              <v-btn 
-                v-if="product?.isDraft && !isEditMode"
-                prepend-icon="mdi-check-circle"
-                color="success"
-                :loading="isPublishing"
-                @click="publishProduct"
-              >
-                Publish Product
-              </v-btn>
-            </div>
-          </div>
-        </div>
+              <div class="d-flex ga-2">
+                <v-btn 
+                  v-if="isEditMode"
+                  prepend-icon="mdi-content-save"
+                  color="primary"
+                  :loading="isUpdating"
+                  @click="saveProduct"
+                >
+                  Save Changes
+                </v-btn>
+                
+                <v-btn 
+                  v-if="product?.isDraft && !isEditMode"
+                  prepend-icon="mdi-check-circle"
+                  color="success"
+                  :loading="isPublishing"
+                  @click="publishProduct"
+                >
+                  Publish Product
+                </v-btn>
+              </div>
+            </v-col>
+          </v-row>
+        </v-container>
       </v-card-text>
     </v-card>
   </div>
@@ -158,15 +156,16 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { catalogApi, type FieldDefinition, type Product } from '@/api/catalog';
-import DynamicFieldRenderer from '@/components/DynamicFieldRenderer.vue';
+import { catalogApi } from '@/api/catalog';
+import { getTypedProduct, updateTypedProduct } from '@/api/catalogTyped';
+import ProductFormSelector from '@/components/ProductFormSelector.vue';
+import type { ProductRequest, ProductResponse } from '@/types/products';
 
 const route = useRoute();
 const router = useRouter();
 
-const product = ref<Product | null>(null);
+const product = ref<ProductResponse | null>(null);
 const isLoading = ref(true);
-const isLoadingFields = ref(false);
 const isPublishing = ref(false);
 const isUpdating = ref(false);
 const isEditMode = ref(false);
@@ -175,23 +174,23 @@ const publishError = ref<string | null>(null);
 const publishSuccess = ref(false);
 const updateError = ref<string | null>(null);
 const updateSuccess = ref(false);
-const fieldDefinitions = ref<FieldDefinition[]>([]);
 
 const formData = ref({
   category: '',
   name: '',
   manufacturer: '',
-  price: 0,
-  fields: {} as Record<string, string>
+  price: 0
 });
 
 const originalFormData = ref({
   category: '',
   name: '',
   manufacturer: '',
-  price: 0,
-  fields: {} as Record<string, string>
+  price: 0
 });
+
+const productFormData = ref<Partial<ProductRequest>>({});
+const originalProductFormData = ref<Partial<ProductRequest>>({});
 
 onMounted(async () => {
   await loadProduct();
@@ -207,7 +206,7 @@ async function loadProduct() {
   }
 
   try {
-    product.value = await catalogApi.getProduct(productId);
+    product.value = await getTypedProduct(productId);
     
     // Populate form data from product
     formData.value.name = product.value.name;
@@ -215,40 +214,17 @@ async function loadProduct() {
     formData.value.category = product.value.category;
     formData.value.manufacturer = product.value.manufacturer;
     
-    // Extract manufacturer and other fields from specifications
-    if (product.value.specifications) {
-      // Populate other fields
-      formData.value.fields = Object.entries(product.value.specifications)
-        .reduce((acc, [key, value]) => {
-          acc[key] = String(value);
-          return acc;
-        }, {} as Record<string, string>);
-    }
-
-    // Load field definitions for the category
-    await loadFieldDefinitions();
+    // Extract category-specific data (remove base ProductBase fields)
+    const { id, isDraft, publishedAt, category, name, price, manufacturer, ...categoryData } = product.value;
+    productFormData.value = categoryData as Partial<ProductRequest>;
     
     // Store original values for cancel operation
     originalFormData.value = JSON.parse(JSON.stringify(formData.value));
+    originalProductFormData.value = JSON.parse(JSON.stringify(productFormData.value));
   } catch (err) {
     error.value = err instanceof Error ? err.message : 'Failed to load product';
   } finally {
     isLoading.value = false;
-  }
-}
-
-async function loadFieldDefinitions() {
-  if (!formData.value.category) {
-    return;
-  }
-
-  isLoadingFields.value = true;
-  try {
-    fieldDefinitions.value = await catalogApi.getFieldDefinitions(formData.value.category as any);
-  } catch (err) {
-    console.error('Failed to load field definitions:', err);
-  } finally {
-    isLoadingFields.value = false;
   }
 }
 
@@ -288,6 +264,7 @@ function enterEditMode() {
 function cancelEdit() {
   // Restore original values
   formData.value = JSON.parse(JSON.stringify(originalFormData.value));
+  productFormData.value = JSON.parse(JSON.stringify(originalProductFormData.value));
   isEditMode.value = false;
   updateSuccess.value = false;
   updateError.value = null;
@@ -303,13 +280,16 @@ async function saveProduct() {
   updateSuccess.value = false;
   
   try {
-    await catalogApi.updateProduct(product.value.id, {
-      category: formData.value.category as any,
+    // Build the complete typed product request
+    const productRequest: any = {
+      ...productFormData.value,
+      category: formData.value.category,
       name: formData.value.name,
       price: formData.value.price,
-      manufacturer: formData.value.manufacturer,
-      fields: formData.value.fields
-    });
+      manufacturer: formData.value.manufacturer
+    };
+
+    await updateTypedProduct(product.value.id, productRequest);
     
     updateSuccess.value = true;
     
