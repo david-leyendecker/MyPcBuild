@@ -141,8 +141,10 @@
         <v-card>
           <v-card-title>Add Component</v-card-title>
           <v-card-text>
-            <AddPartDialog 
+            <AddPartDialogWithSlots 
+              :build-id="buildStore.currentBuild.id"
               @part-selected="handleAddPart"
+              @part-selected-with-slot="handleAddPartToSlot"
               @close="showAddPartDialog = false"
             />
           </v-card-text>
@@ -157,7 +159,7 @@ import { ref, computed, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import { useBuildStore } from '@/stores/buildStore';
 import CompatibilityPanel from '@/components/CompatibilityPanel.vue';
-import AddPartDialog from '@/components/AddPartDialog.vue';
+import AddPartDialogWithSlots from '@/components/AddPartDialogWithSlots.vue';
 import Viewer3D from '@/components/Viewer3D.vue';
 
 interface Props {
@@ -197,6 +199,22 @@ async function handleAddPart(productId: string) {
     showAddPartDialog.value = false;
   } catch (error) {
     console.error('Failed to add part:', error);
+  }
+}
+
+async function handleAddPartToSlot(productId: string, slotId: string, position: { x: number; y: number; z: number }) {
+  if (!buildStore.currentBuild) return;
+  
+  try {
+    await buildStore.addPartToSlot(buildStore.currentBuild.id, {
+      productId,
+      pricePaid: 0, // TODO: Get price from product
+      slotId,
+      position
+    });
+    showAddPartDialog.value = false;
+  } catch (error) {
+    console.error('Failed to add part to slot:', error);
   }
 }
 
