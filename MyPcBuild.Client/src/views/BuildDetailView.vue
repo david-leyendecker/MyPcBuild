@@ -44,6 +44,21 @@
         </v-col>
       </v-row>
 
+      <!-- 3D Visualization Section -->
+      <v-row v-if="hasSpatialParts">
+        <v-col cols="12">
+          <v-card>
+            <v-card-title>3D Build Visualization</v-card-title>
+            <v-card-text>
+              <Viewer3D 
+                :parts="buildStore.currentBuild.parts"
+                :collisions="collidingPartIds"
+              />
+            </v-card-text>
+          </v-card>
+        </v-col>
+      </v-row>
+
       <!-- Parts List Section -->
       <v-row>
         <v-col cols="12">
@@ -143,6 +158,7 @@ import { useRoute } from 'vue-router';
 import { useBuildStore } from '@/stores/buildStore';
 import CompatibilityPanel from '@/components/CompatibilityPanel.vue';
 import AddPartDialog from '@/components/AddPartDialog.vue';
+import Viewer3D from '@/components/Viewer3D.vue';
 
 interface Props {
   id: string;
@@ -156,6 +172,17 @@ const showAddPartDialog = ref(false);
 
 const totalCost = computed(() => {
   return buildStore.currentBuild?.parts.reduce((sum, part) => sum + part.pricePaid, 0) ?? 0;
+});
+
+const hasSpatialParts = computed(() => {
+  return buildStore.currentBuild?.parts.some(p => p.dimensions && p.position) ?? false;
+});
+
+const collidingPartIds = computed(() => {
+  // Extract part IDs that have collision issues from compatibility issues
+  // This is a simplified version - in a real implementation, we'd need to parse
+  // the collision issue messages to extract the specific part IDs
+  return [];
 });
 
 onMounted(() => {
