@@ -47,6 +47,16 @@
         </div>
       </v-col>
     </v-row>
+
+    <v-row>
+      <v-col cols="12">
+        <!-- Chambers -->
+        <ChambersInput 
+          v-model="localProduct.chambers"
+          :editable="editable"
+        />
+      </v-col>
+    </v-row>
   </v-container>
 </template>
 
@@ -54,6 +64,7 @@
 import { ref, watch } from 'vue';
 import type { PcCaseProductRequest, PcCaseProductResponse } from '@/types/products';
 import DimensionsInput from '@/components/ValueObjects/DimensionsInput.vue';
+import ChambersInput from '@/components/ValueObjects/ChambersInput.vue';
 
 interface Props {
   modelValue: Partial<PcCaseProductRequest> | Partial<PcCaseProductResponse>;
@@ -72,7 +83,8 @@ const localProduct = ref<Partial<PcCaseProductRequest>>({
   formFactor: props.modelValue.formFactor ?? 'Mid Tower',
   color: props.modelValue.color ?? 'Black',
   sidePanelWindow: props.modelValue.sidePanelWindow ?? 'Tempered Glass',
-  dimensions: props.modelValue.dimensions ?? { length: 450, width: 210, height: 450 }
+  dimensions: props.modelValue.dimensions ?? { length: 450, width: 210, height: 450 },
+  chambers: props.modelValue.chambers ?? []
 });
 
 watch(
@@ -82,7 +94,8 @@ watch(
       formFactor: newValue.formFactor ?? 'Mid Tower',
       color: newValue.color ?? 'Black',
       sidePanelWindow: newValue.sidePanelWindow ?? 'Tempered Glass',
-      dimensions: newValue.dimensions ?? { length: 450, width: 210, height: 450 }
+      dimensions: newValue.dimensions ?? { length: 450, width: 210, height: 450 },
+      chambers: newValue.chambers ?? []
     });
   },
   { deep: true }

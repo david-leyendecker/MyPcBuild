@@ -67,6 +67,16 @@
         </div>
       </v-col>
     </v-row>
+
+    <v-row>
+      <v-col cols="12">
+        <!-- Slots -->
+        <SlotsInput 
+          v-model="localProduct.slots"
+          :editable="editable"
+        />
+      </v-col>
+    </v-row>
   </v-container>
 </template>
 
@@ -75,6 +85,7 @@ import { ref, watch } from 'vue';
 import type { MotherboardProductRequest, MotherboardProductResponse, CpuSocket, FormFactor, MemoryType } from '@/types/products';
 import StorageCapacityInput from '@/components/ValueObjects/StorageCapacityInput.vue';
 import DimensionsInput from '@/components/ValueObjects/DimensionsInput.vue';
+import SlotsInput from '@/components/ValueObjects/SlotsInput.vue';
 
 interface Props {
   modelValue: Partial<MotherboardProductRequest> | Partial<MotherboardProductResponse>;
@@ -119,7 +130,8 @@ const localProduct = ref<Partial<MotherboardProductRequest>>({
   formFactor: props.modelValue.formFactor,
   memoryType: props.modelValue.memoryType,
   maxMemory: props.modelValue.maxMemory ?? { valueInGB: 128 },
-  dimensions: props.modelValue.dimensions ?? { length: 305, width: 244, height: 5 }
+  dimensions: props.modelValue.dimensions ?? { length: 305, width: 244, height: 5 },
+  slots: props.modelValue.slots ?? []
 });
 
 watch(
@@ -131,7 +143,8 @@ watch(
       formFactor: newValue.formFactor,
       memoryType: newValue.memoryType,
       maxMemory: newValue.maxMemory ?? { valueInGB: 32 },
-      dimensions: newValue.dimensions ?? { length: 305, width: 244, height: 50 }
+      dimensions: newValue.dimensions ?? { length: 305, width: 244, height: 50 },
+      slots: newValue.slots ?? []
     });
   },
   { deep: true }

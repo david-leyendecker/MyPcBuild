@@ -56,14 +56,19 @@ export interface Vector3 {
 }
 
 export interface Slot {
+  id?: string;
   name: string;
   allowedCategory: string;
-  location?: Vector3;
+  relativePosition: Vector3;
+  maxDimensions: Dimensions;
+  subSlots?: Slot[];
 }
 
 export interface Chamber {
+  id?: string;
   name: string;
   dimensions: Dimensions;
+  slots: Slot[];
 }
 
 // ========== Product Base ==========
