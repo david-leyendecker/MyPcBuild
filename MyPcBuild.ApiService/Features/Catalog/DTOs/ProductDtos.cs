@@ -962,7 +962,19 @@ public record SlotModel
     /// <summary>
     /// Relative position.
     /// </summary>
-    public Vector3Model? Location { get; init; }
+    [Required]
+    public required Vector3Model RelativePosition { get; init; }
+
+    /// <summary>
+    /// Maximum dimensions that can fit in this slot.
+    /// </summary>
+    [Required]
+    public required DimensionsModel MaxDimensions { get; init; }
+
+    /// <summary>
+    /// Sub-slots (optional, for nested slot hierarchies).
+    /// </summary>
+    public List<SlotModel>? SubSlots { get; init; }
 }
 
 /// <summary>
@@ -1009,6 +1021,12 @@ public record ChamberModel
     /// </summary>
     [Required]
     public required DimensionsModel Dimensions { get; init; }
+
+    /// <summary>
+    /// Slots within this chamber.
+    /// </summary>
+    [Required]
+    public required List<SlotModel> Slots { get; init; }
 }
 
 /// <summary>

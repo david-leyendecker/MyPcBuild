@@ -481,29 +481,43 @@ public static class ProductDtoMapper
         {
             Name = slot.Name,
             AllowedCategory = slot.AllowedProductCategory.ToString(),
-            Location = new Vector3Model
+            RelativePosition = new Vector3Model
             {
                 X = slot.RelativePosition.X,
                 Y = slot.RelativePosition.Y,
                 Z = slot.RelativePosition.Z
-            }
+            },
+            MaxDimensions = new DimensionsModel
+            {
+                Length = slot.MaxDimensions.Length,
+                Width = slot.MaxDimensions.Width,
+                Height = slot.MaxDimensions.Height
+            },
+            SubSlots = slot.SubSlots?.Select(ToSlotModel).ToList()
         };
     }
 
     private static Slot ToDomainSlot(SlotModel slot)
     {
         ProductCategory category = Enum.Parse<ProductCategory>(slot.AllowedCategory, ignoreCase: true);
-        Vector3 position = slot.Location != null
-            ? new Vector3(slot.Location.X, slot.Location.Y, slot.Location.Z)
-            : Vector3.Zero;
+        Vector3 position = new Vector3(
+            slot.RelativePosition.X, 
+            slot.RelativePosition.Y, 
+            slot.RelativePosition.Z
+        );
+        Dimensions maxDimensions = new Dimensions(
+            slot.MaxDimensions.Length,
+            slot.MaxDimensions.Width,
+            slot.MaxDimensions.Height
+        );
 
         return new Slot(
             Guid.NewGuid(),
             slot.Name,
             category,
             position,
-            new Dimensions(100, 100, 50), // Default dimensions
-            null
+            maxDimensions,
+            slot.SubSlots?.Select(ToDomainSlot).ToList()
         );
     }
 
@@ -512,7 +526,8 @@ public static class ProductDtoMapper
         return new ChamberModel
         {
             Name = chamber.Name,
-            Dimensions = ToDimensionsModel(chamber.Dimensions)
+            Dimensions = ToDimensionsModel(chamber.Dimensions),
+            Slots = chamber.Slots.Select(ToSlotModel).ToList()
         };
     }
 
@@ -522,7 +537,7 @@ public static class ProductDtoMapper
             Guid.NewGuid(),
             chamber.Name,
             ToDomainDimensions(chamber.Dimensions),
-            []
+            chamber.Slots.Select(ToDomainSlot).ToList()
         );
     }
 }
