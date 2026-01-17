@@ -158,6 +158,7 @@
 import { ref, computed, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import { useBuildStore } from '@/stores/buildStore';
+import { useCatalogStore } from '@/stores/catalogStore';
 import CompatibilityPanel from '@/components/CompatibilityPanel.vue';
 import AddPartDialogWithSlots from '@/components/AddPartDialogWithSlots.vue';
 import Viewer3D from '@/components/Viewer3D.vue';
@@ -170,6 +171,7 @@ withDefaults(defineProps<Props>(), {});
 
 const route = useRoute();
 const buildStore = useBuildStore();
+const catalogStore = useCatalogStore();
 const showAddPartDialog = ref(false);
 
 const totalCost = computed(() => {
@@ -181,10 +183,29 @@ const hasSpatialParts = computed(() => {
 });
 
 const collidingPartIds = computed(() => {
-  // Extract part IDs that have collision issues from compatibility issues
-  // This is a simplified version - in a real implementation, we'd need to parse
-  // the collision issue messages to extract the specific part IDs
-  return [];
+  // Extract part IDs from collision-related compatibility issues
+  const collisionIssues = buildStore.validationIssues.filter(
+    issue => issue.category.toLowerCase().includes('collision') || 
+             issue.message.toLowerCase().includes('collision')
+  );
+  
+  const partIds: string[] = [];
+  
+  // Try to extract part IDs from issue messages
+  // Messages typically contain part names like "Collision detected between 'Part A' and 'Part B'"
+  collisionIssues.forEach(issue => {
+    // For now, mark all parts as potentially colliding if there are any collision issues
+    // A more sophisticated implementation would parse the message to extract specific part IDs
+    if (buildStore.currentBuild?.parts) {
+      buildStore.currentBuild.parts.forEach(part => {
+        if (issue.message.includes(part.name) && !partIds.includes(part.id)) {
+          partIds.push(part.id);
+        }
+      });
+    }
+  });
+  
+  return partIds;
 });
 
 onMounted(() => {
@@ -206,9 +227,13 @@ async function handleAddPartToSlot(productId: string, slotId: string, position: 
   if (!buildStore.currentBuild) return;
   
   try {
+    // Get product to fetch the actual price
+    const product = catalogStore.products.find(p => p.id === productId);
+    const pricePaid = product?.price ?? 0;
+    
     await buildStore.addPartToSlot(buildStore.currentBuild.id, {
       productId,
-      pricePaid: 0, // TODO: Get price from product
+      pricePaid,
       slotId,
       position
     });
