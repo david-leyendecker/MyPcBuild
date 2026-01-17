@@ -1,91 +1,122 @@
 <template>
-  <div class="fade-in">
-    <div v-if="buildStore.isLoading" class="d-flex justify-center py-8">
-      <v-progress-circular indeterminate color="primary"></v-progress-circular>
-    </div>
+  <v-container class="fade-in" fluid>
+    <!-- Loading State -->
+    <v-row v-if="buildStore.isLoading" justify="center" align="center" style="min-height: 50vh">
+      <v-col cols="12" class="text-center">
+        <v-progress-circular indeterminate color="primary"></v-progress-circular>
+      </v-col>
+    </v-row>
 
-    <v-alert v-else-if="buildStore.error" type="error" class="mb-3">
-      {{ buildStore.error }}
-    </v-alert>
+    <!-- Error State -->
+    <v-row v-else-if="buildStore.error">
+      <v-col cols="12">
+        <v-alert type="error">
+          {{ buildStore.error }}
+        </v-alert>
+      </v-col>
+    </v-row>
 
-    <div v-else-if="buildStore.currentBuild" class="d-flex flex-column ga-4">
-      <!-- Header -->
-      <div class="d-flex justify-space-between align-start">
-        <div>
+    <!-- Main Content -->
+    <template v-else-if="buildStore.currentBuild">
+      <!-- Header Section -->
+      <v-row justify="space-between">
+        <v-col cols="10">
           <h2 class="text-h4 text-primary">{{ buildStore.currentBuild.name }}</h2>
           <p class="text-medium-emphasis text-body-2 mt-2">
             Created: {{ new Date(buildStore.currentBuild.createdAt).toLocaleDateString() }}
           </p>
-        </div>
-        <v-btn 
-          prepend-icon="mdi-arrow-left"
-          variant="text"
-          @click="$router.back()"
-        >
-          Back
-        </v-btn>
-      </div>
-
-      <!-- Compatibility Status -->
-      <CompatibilityPanel />
-
-      <!-- Parts List -->
-      <v-card>
-        <v-card-title>PC Components</v-card-title>
-        <v-card-text>
-          <div v-if="buildStore.currentBuild.parts.length === 0" class="text-center py-6">
-            <p class="text-medium-emphasis mb-4">No components added yet.</p>
-            <v-btn 
-              prepend-icon="mdi-plus"
-              color="primary"
-              @click="showAddPartDialog = true"
-            >
-              Add Component
-            </v-btn>
-          </div>
-
-          <div v-else class="d-flex flex-column ga-3">
-            <v-card 
-              v-for="part in buildStore.currentBuild.parts"
-              :key="part.id"
-              variant="outlined"
-            >
-              <v-card-text>
-                <div class="d-flex justify-space-between align-center">
-                  <div>
-                    <h4 class="text-h6 mb-1">{{ part.name }}</h4>
-                    <p class="text-primary text-body-2 my-1">{{ part.category }}</p>
-                    <p class="text-medium-emphasis font-weight-medium mt-2">${{ part.pricePaid.toFixed(2) }}</p>
-                  </div>
-                  <v-btn 
-                    icon="mdi-delete"
-                    size="small"
-                    color="error"
-                    variant="text"
-                    @click="removePart(part.id)"
-                  ></v-btn>
-                </div>
-              </v-card-text>
-            </v-card>
-
-            <v-divider></v-divider>
-
-            <div class="pt-3">
-              <p class="text-h6"><strong>Total Cost:</strong> ${{ totalCost.toFixed(2) }}</p>
-            </div>
-          </div>
-        </v-card-text>
-        <v-card-actions>
+        </v-col>
+        <v-col cols="1" class="text-right">
           <v-btn 
-            prepend-icon="mdi-plus"
-            color="primary"
-            block
-            @click="showAddPartDialog = true"
+            prepend-icon="mdi-arrow-left"
+            variant="text"
+            @click="$router.back()"
           >
-            Add Component
+            Back
           </v-btn>
-        </v-card-actions>
-      </v-card>
+        </v-col>
+      </v-row>
+
+      <!-- Compatibility Status Section -->
+      <v-row>
+        <v-col cols="12">
+          <CompatibilityPanel />
+        </v-col>
+      </v-row>
+
+      <!-- Parts List Section -->
+      <v-row>
+        <v-col cols="12">
+          <v-card>
+            <v-card-title>PC Components</v-card-title>
+            <v-card-text>
+              <v-row v-if="buildStore.currentBuild.parts.length === 0" justify="center">
+                <v-col cols="12" class="text-center py-6">
+                  <p class="text-medium-emphasis mb-4">No components added yet.</p>
+                  <v-btn 
+                    prepend-icon="mdi-plus"
+                    color="primary"
+                    @click="showAddPartDialog = true"
+                  >
+                    Add Component
+                  </v-btn>
+                </v-col>
+              </v-row>
+
+              <v-row v-else>
+                <v-col cols="12">
+                  <v-row>
+                    <v-col 
+                      v-for="part in buildStore.currentBuild.parts"
+                      :key="part.id"
+                      cols="12"
+                    >
+                      <v-card variant="outlined">
+                        <v-card-text>
+                          <v-row justify="space-between">
+                            <v-col cols="10">
+                              <h4 class="text-h6 mb-1">{{ part.name }}</h4>
+                              <p class="text-primary text-body-2 my-1">{{ part.category }}</p>
+                              <p class="text-medium-emphasis font-weight-medium mt-2">${{ part.pricePaid.toFixed(2) }}</p>
+                            </v-col>
+                            <v-col cols="1" class="text-right">
+                              <v-btn 
+                                icon="mdi-delete"
+                                size="small"
+                                color="error"
+                                variant="text"
+                                @click="removePart(part.id)"
+                              ></v-btn>
+                            </v-col>
+                          </v-row>
+                        </v-card-text>
+                      </v-card>
+                    </v-col>
+                  </v-row>
+
+                  <v-divider class="my-4"></v-divider>
+
+                  <v-row class="pt-3">
+                    <v-col cols="12">
+                      <p class="text-h6"><strong>Total Cost:</strong> ${{ totalCost.toFixed(2) }}</p>
+                    </v-col>
+                  </v-row>
+                </v-col>
+              </v-row>
+            </v-card-text>
+            <v-card-actions>
+              <v-btn 
+                prepend-icon="mdi-plus"
+                color="primary"
+                block
+                @click="showAddPartDialog = true"
+              >
+                Add Component
+              </v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-col>
+      </v-row>
 
       <!-- Add Part Dialog -->
       <v-dialog 
@@ -102,8 +133,8 @@
           </v-card-text>
         </v-card>
       </v-dialog>
-    </div>
-  </div>
+    </template>
+  </v-container>
 </template>
 
 <script setup lang="ts">
