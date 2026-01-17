@@ -124,10 +124,13 @@ const emit = defineEmits<{
   'update:modelValue': [value: Chamber[]]
 }>();
 
+const DEFAULT_DIMENSIONS = { length: 0, width: 0, height: 0 };
+const DEFAULT_SLOTS: never[] = [];
+
 const localChambers = ref<Chamber[]>(props.modelValue.map(chamber => ({
   ...chamber,
-  dimensions: chamber.dimensions || { length: 0, width: 0, height: 0 },
-  slots: chamber.slots || []
+  dimensions: chamber.dimensions || DEFAULT_DIMENSIONS,
+  slots: chamber.slots || DEFAULT_SLOTS
 })));
 
 watch(
@@ -135,8 +138,8 @@ watch(
   (newValue) => {
     localChambers.value = newValue.map(chamber => ({
       ...chamber,
-      dimensions: chamber.dimensions || { length: 0, width: 0, height: 0 },
-      slots: chamber.slots || []
+      dimensions: chamber.dimensions || DEFAULT_DIMENSIONS,
+      slots: chamber.slots || DEFAULT_SLOTS
     }));
   },
   { deep: true }

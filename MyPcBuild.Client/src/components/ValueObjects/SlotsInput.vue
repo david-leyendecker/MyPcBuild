@@ -178,10 +178,13 @@ const categoryOptions = [
   { title: 'Case', value: 'Case' }
 ];
 
+const DEFAULT_POSITION = { x: 0, y: 0, z: 0 };
+const DEFAULT_DIMENSIONS = { length: 0, width: 0, height: 0 };
+
 const localSlots = ref<Slot[]>(props.modelValue.map(slot => ({
   ...slot,
-  relativePosition: slot.relativePosition || { x: 0, y: 0, z: 0 },
-  maxDimensions: slot.maxDimensions || { length: 0, width: 0, height: 0 }
+  relativePosition: slot.relativePosition || DEFAULT_POSITION,
+  maxDimensions: slot.maxDimensions || DEFAULT_DIMENSIONS
 })));
 
 watch(
@@ -189,8 +192,8 @@ watch(
   (newValue) => {
     localSlots.value = newValue.map(slot => ({
       ...slot,
-      relativePosition: slot.relativePosition || { x: 0, y: 0, z: 0 },
-      maxDimensions: slot.maxDimensions || { length: 0, width: 0, height: 0 }
+      relativePosition: slot.relativePosition || DEFAULT_POSITION,
+      maxDimensions: slot.maxDimensions || DEFAULT_DIMENSIONS
     }));
   },
   { deep: true }
@@ -200,7 +203,7 @@ function addSlot() {
   localSlots.value.push({
     name: '',
     allowedCategory: 'CPU',
-    relativePosition: { x: 0, y: 0, z: 0 },
+    relativePosition: { ...DEFAULT_POSITION },
     maxDimensions: { length: 50, width: 50, height: 20 },
     subSlots: []
   });

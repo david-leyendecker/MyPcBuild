@@ -130,7 +130,7 @@ const localProduct = ref<Partial<MotherboardProductRequest>>({
   formFactor: props.modelValue.formFactor,
   memoryType: props.modelValue.memoryType,
   maxMemory: props.modelValue.maxMemory ?? { valueInGB: 128 },
-  dimensions: props.modelValue.dimensions ?? { length: 305, width: 244, height: 5 },
+  dimensions: props.modelValue.dimensions ?? { length: 305, width: 244, height: 50 },
   slots: props.modelValue.slots ?? []
 });
 
@@ -142,7 +142,7 @@ watch(
       chipset: newValue.chipset ?? '',
       formFactor: newValue.formFactor,
       memoryType: newValue.memoryType,
-      maxMemory: newValue.maxMemory ?? { valueInGB: 32 },
+      maxMemory: newValue.maxMemory ?? { valueInGB: 128 },
       dimensions: newValue.dimensions ?? { length: 305, width: 244, height: 50 },
       slots: newValue.slots ?? []
     });
