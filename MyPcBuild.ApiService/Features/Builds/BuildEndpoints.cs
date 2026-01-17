@@ -9,6 +9,8 @@ public static class Endpoints
             .MapGetBuildEndpoint()
             .MapCreateBuildEndpoint()
             .MapAddPartEndpoint()
+            .MapAddPartToSlotEndpoint()
+            .MapGetAvailableSlotsEndpoint()
             .MapRemovePartEndpoint();
     }
 }
