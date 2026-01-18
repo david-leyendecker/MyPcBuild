@@ -149,35 +149,35 @@
             <v-row dense>
               <v-col cols="4">
                 <v-text-field
-                  v-model.number="(slot.rotation || DEFAULT_ROTATION).x"
+                  :model-value="slot.rotation?.x ?? 0"
+                  @update:model-value="updateRotation(slot, 'x', $event)"
                   label="X (Pitch)"
                   type="number"
                   :readonly="!editable"
                   :variant="editable ? 'filled' : 'outlined'"
                   density="compact"
-                  @update:model-value="emitUpdate"
                 ></v-text-field>
               </v-col>
               <v-col cols="4">
                 <v-text-field
-                  v-model.number="(slot.rotation || DEFAULT_ROTATION).y"
+                  :model-value="slot.rotation?.y ?? 0"
+                  @update:model-value="updateRotation(slot, 'y', $event)"
                   label="Y (Yaw)"
                   type="number"
                   :readonly="!editable"
                   :variant="editable ? 'filled' : 'outlined'"
                   density="compact"
-                  @update:model-value="emitUpdate"
                 ></v-text-field>
               </v-col>
               <v-col cols="4">
                 <v-text-field
-                  v-model.number="(slot.rotation || DEFAULT_ROTATION).z"
+                  :model-value="slot.rotation?.z ?? 0"
+                  @update:model-value="updateRotation(slot, 'z', $event)"
                   label="Z (Roll)"
                   type="number"
                   :readonly="!editable"
                   :variant="editable ? 'filled' : 'outlined'"
                   density="compact"
-                  @update:model-value="emitUpdate"
                 ></v-text-field>
               </v-col>
             </v-row>
@@ -225,9 +225,9 @@ const DEFAULT_ROTATION = { x: 0, y: 0, z: 0 };
 
 const localSlots = ref<Slot[]>(props.modelValue.map(slot => ({
   ...slot,
-  relativePosition: slot.relativePosition || DEFAULT_POSITION,
-  maxDimensions: slot.maxDimensions || DEFAULT_DIMENSIONS,
-  rotation: slot.rotation || DEFAULT_ROTATION
+  relativePosition: slot.relativePosition || { ...DEFAULT_POSITION },
+  maxDimensions: slot.maxDimensions || { ...DEFAULT_DIMENSIONS },
+  rotation: slot.rotation ? { ...slot.rotation } : { ...DEFAULT_ROTATION }
 })));
 
 watch(
@@ -235,9 +235,9 @@ watch(
   (newValue) => {
     localSlots.value = newValue.map(slot => ({
       ...slot,
-      relativePosition: slot.relativePosition || DEFAULT_POSITION,
-      maxDimensions: slot.maxDimensions || DEFAULT_DIMENSIONS,
-      rotation: slot.rotation || DEFAULT_ROTATION
+      relativePosition: slot.relativePosition || { ...DEFAULT_POSITION },
+      maxDimensions: slot.maxDimensions || { ...DEFAULT_DIMENSIONS },
+      rotation: slot.rotation ? { ...slot.rotation } : { ...DEFAULT_ROTATION }
     }));
   },
   { deep: true }
@@ -257,6 +257,14 @@ function addSlot() {
 
 function removeSlot(index: number) {
   localSlots.value.splice(index, 1);
+  emitUpdate();
+}
+
+function updateRotation(slot: Slot, axis: 'x' | 'y' | 'z', value: string | number) {
+  if (!slot.rotation) {
+    slot.rotation = { ...DEFAULT_ROTATION };
+  }
+  slot.rotation[axis] = typeof value === 'string' ? parseFloat(value) || 0 : value;
   emitUpdate();
 }
 

@@ -50,6 +50,9 @@ public static class GetAvailableSlots
                                     slot.MaxDimensions.Width,
                                     slot.MaxDimensions.Height
                                 ),
+                                slot.Rotation != Rotation.Identity 
+                                    ? new RotationDto(slot.Rotation.X, slot.Rotation.Y, slot.Rotation.Z)
+                                    : null,
                                 isOccupied,
                                 product.Id,
                                 product.Name
@@ -78,6 +81,9 @@ public static class GetAvailableSlots
                                 slot.MaxDimensions.Width,
                                 slot.MaxDimensions.Height
                             ),
+                            slot.Rotation != Rotation.Identity 
+                                ? new RotationDto(slot.Rotation.X, slot.Rotation.Y, slot.Rotation.Z)
+                                : null,
                             isOccupied,
                             product.Id,
                             product.Name
@@ -101,6 +107,7 @@ public record AvailableSlotDto(
     string AllowedCategory,
     Vector3Dto AbsolutePosition,
     DimensionsDto MaxDimensions,
+    RotationDto? Rotation,
     bool IsOccupied,
     Guid ParentProductId,
     string ParentProductName

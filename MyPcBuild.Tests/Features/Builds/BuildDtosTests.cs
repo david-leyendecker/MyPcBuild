@@ -89,6 +89,7 @@ public class BuildDtosTests
         Guid parentProductId = Guid.NewGuid();
         Vector3Dto position = new(10, 20, 30);
         DimensionsDto dimensions = new(50, 50, 50);
+        RotationDto rotation = new(0, 90, 0);
 
         // Act
         AvailableSlotDto availableSlot = new(
@@ -97,6 +98,7 @@ public class BuildDtosTests
             "CPU",
             position,
             dimensions,
+            rotation,
             false,
             parentProductId,
             "ASUS Motherboard"
@@ -108,6 +110,7 @@ public class BuildDtosTests
         Assert.Equal("CPU", availableSlot.AllowedCategory);
         Assert.Equal(position, availableSlot.AbsolutePosition);
         Assert.Equal(dimensions, availableSlot.MaxDimensions);
+        Assert.Equal(rotation, availableSlot.Rotation);
         Assert.False(availableSlot.IsOccupied);
         Assert.Equal(parentProductId, availableSlot.ParentProductId);
         Assert.Equal("ASUS Motherboard", availableSlot.ParentProductName);

@@ -201,7 +201,7 @@ const props = defineProps<Props>();
 
 const emit = defineEmits<{
   'part-selected': [productId: string];
-  'part-selected-with-slot': [productId: string, slotId: string, position: { x: number; y: number; z: number }];
+  'part-selected-with-slot': [productId: string, slotId: string, position: { x: number; y: number; z: number }, rotation?: { x: number; y: number; z: number } | null];
   'close': [];
 }>();
 
@@ -297,7 +297,8 @@ function confirmAddWithoutSlot() {
 
 function confirmAddToSlot() {
   if (selectedProductId.value && selectedSlotId.value) {
-    emit('part-selected-with-slot', selectedProductId.value, selectedSlotId.value, position.value);
+    const selectedSlot = availableSlots.value.find(s => s.id === selectedSlotId.value);
+    emit('part-selected-with-slot', selectedProductId.value, selectedSlotId.value, position.value, selectedSlot?.rotation);
   }
 }
 </script>

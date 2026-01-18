@@ -101,6 +101,7 @@ export interface AvailableSlot {
   allowedCategory: string;
   absolutePosition: Vector3;
   maxDimensions: Dimensions;
+  rotation?: Rotation | null;
   isOccupied: boolean;
   parentProductId: string;
   parentProductName: string;
