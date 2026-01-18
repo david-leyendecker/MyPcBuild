@@ -538,6 +538,12 @@ public static class ProductDtoMapper
         return new ChamberModel
         {
             Name = chamber.Name,
+            RelativePosition = new Vector3Model
+            {
+                X = chamber.RelativePosition.X,
+                Y = chamber.RelativePosition.Y,
+                Z = chamber.RelativePosition.Z
+            },
             Dimensions = ToDimensionsModel(chamber.Dimensions),
             Slots = chamber.Slots.Select(ToSlotModel).ToList()
         };
@@ -548,6 +554,11 @@ public static class ProductDtoMapper
         return new Chamber(
             Guid.NewGuid(),
             chamber.Name,
+            new Vector3(
+                chamber.RelativePosition.X,
+                chamber.RelativePosition.Y,
+                chamber.RelativePosition.Z
+            ),
             ToDomainDimensions(chamber.Dimensions),
             chamber.Slots.Select(ToDomainSlot).ToList()
         );

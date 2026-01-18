@@ -74,6 +74,7 @@ export interface Slot {
 export interface Chamber {
   id?: string;
   name: string;
+  relativePosition: Vector3;
   dimensions: Dimensions;
   slots: Slot[];
 }

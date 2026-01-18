@@ -52,7 +52,7 @@
 import { ref, onMounted, onUnmounted, watch } from 'vue';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-import type { Slot, Chamber, Dimensions } from '@/types/products';
+import type { Slot, Chamber, Dimensions, Vector3 } from '@/types/products';
 
 interface Props {
   dimensions?: Dimensions | null;
@@ -226,9 +226,9 @@ function updateVisualization() {
       
       const chamberMesh = new THREE.Mesh(chamberGeom, chamberMat);
       chamberMesh.position.set(
-        chamber.dimensions.length / 2,
-        chamber.dimensions.height / 2,
-        chamber.dimensions.width / 2
+        chamber.relativePosition.x + chamber.dimensions.length / 2,
+        chamber.relativePosition.y + chamber.dimensions.height / 2,
+        chamber.relativePosition.z + chamber.dimensions.width / 2
       );
       
       const chamberEdges = new THREE.EdgesGeometry(chamberGeom);
@@ -240,23 +240,23 @@ function updateVisualization() {
       
       scene.add(chamberMesh);
       
-      // Render slots in chamber
+      // Render slots in chamber (offset by chamber position)
       if (chamber.slots) {
-        chamber.slots.forEach(slot => renderSlot(slot));
+        chamber.slots.forEach(slot => renderSlot(slot, chamber.relativePosition));
       }
     });
   }
   
   // Render direct slots
   if (props.slots && props.slots.length > 0) {
-    props.slots.forEach(slot => renderSlot(slot));
+    props.slots.forEach(slot => renderSlot(slot, { x: 0, y: 0, z: 0 }));
   }
   
   // Adjust camera to fit content
   fitCameraToContent();
 }
 
-function renderSlot(slot: Slot) {
+function renderSlot(slot: Slot, offset: Vector3 = { x: 0, y: 0, z: 0 }) {
   const slotGeom = new THREE.BoxGeometry(
     slot.maxDimensions.length,
     slot.maxDimensions.height,
@@ -271,11 +271,11 @@ function renderSlot(slot: Slot) {
   
   const slotMesh = new THREE.Mesh(slotGeom, slotMat);
   
-  // Position
+  // Position (add chamber offset)
   slotMesh.position.set(
-    slot.relativePosition.x + slot.maxDimensions.length / 2,
-    slot.relativePosition.y + slot.maxDimensions.height / 2,
-    slot.relativePosition.z + slot.maxDimensions.width / 2
+    offset.x + slot.relativePosition.x + slot.maxDimensions.length / 2,
+    offset.y + slot.relativePosition.y + slot.maxDimensions.height / 2,
+    offset.z + slot.relativePosition.z + slot.maxDimensions.width / 2
   );
   
   // Rotation
@@ -298,9 +298,14 @@ function renderSlot(slot: Slot) {
   scene.add(slotMesh);
   slotMeshes.set(slot.name, slotMesh);
   
-  // Render sub-slots
+  // Render sub-slots (with accumulated offset)
   if (slot.subSlots) {
-    slot.subSlots.forEach(subSlot => renderSlot(subSlot));
+    const subSlotOffset = {
+      x: offset.x + slot.relativePosition.x,
+      y: offset.y + slot.relativePosition.y,
+      z: offset.z + slot.relativePosition.z
+    };
+    slot.subSlots.forEach(subSlot => renderSlot(subSlot, subSlotOffset));
   }
 }
 

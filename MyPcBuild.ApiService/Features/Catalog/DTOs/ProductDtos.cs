@@ -1022,6 +1022,12 @@ public record ChamberModel
     public required string Name { get; init; }
 
     /// <summary>
+    /// Relative position of the chamber within its parent (e.g., PC case).
+    /// </summary>
+    [Required]
+    public required Vector3Model RelativePosition { get; init; }
+
+    /// <summary>
     /// Chamber dimensions.
     /// </summary>
     [Required]

@@ -52,6 +52,47 @@
 
         <v-row dense>
           <v-col cols="12">
+            <label class="text-caption font-weight-semibold mb-1 d-block">Chamber Position (mm)</label>
+            <v-row dense>
+              <v-col cols="4">
+                <v-text-field
+                  v-model.number="chamber.relativePosition.x"
+                  label="X"
+                  type="number"
+                  :readonly="!editable"
+                  :variant="editable ? 'filled' : 'outlined'"
+                  density="compact"
+                  @update:model-value="emitUpdate"
+                ></v-text-field>
+              </v-col>
+              <v-col cols="4">
+                <v-text-field
+                  v-model.number="chamber.relativePosition.y"
+                  label="Y"
+                  type="number"
+                  :readonly="!editable"
+                  :variant="editable ? 'filled' : 'outlined'"
+                  density="compact"
+                  @update:model-value="emitUpdate"
+                ></v-text-field>
+              </v-col>
+              <v-col cols="4">
+                <v-text-field
+                  v-model.number="chamber.relativePosition.z"
+                  label="Z"
+                  type="number"
+                  :readonly="!editable"
+                  :variant="editable ? 'filled' : 'outlined'"
+                  density="compact"
+                  @update:model-value="emitUpdate"
+                ></v-text-field>
+              </v-col>
+            </v-row>
+          </v-col>
+        </v-row>
+
+        <v-row dense>
+          <v-col cols="12">
             <label class="text-caption font-weight-semibold mb-1 d-block">Chamber Dimensions (mm)</label>
             <v-row dense>
               <v-col cols="4">
@@ -125,10 +166,12 @@ const emit = defineEmits<{
 }>();
 
 const DEFAULT_DIMENSIONS = { length: 0, width: 0, height: 0 };
+const DEFAULT_POSITION = { x: 0, y: 0, z: 0 };
 const DEFAULT_SLOTS: never[] = [];
 
 const localChambers = ref<Chamber[]>(props.modelValue.map(chamber => ({
   ...chamber,
+  relativePosition: chamber.relativePosition || DEFAULT_POSITION,
   dimensions: chamber.dimensions || DEFAULT_DIMENSIONS,
   slots: chamber.slots || DEFAULT_SLOTS
 })));
@@ -138,6 +181,7 @@ watch(
   (newValue) => {
     localChambers.value = newValue.map(chamber => ({
       ...chamber,
+      relativePosition: chamber.relativePosition || DEFAULT_POSITION,
       dimensions: chamber.dimensions || DEFAULT_DIMENSIONS,
       slots: chamber.slots || DEFAULT_SLOTS
     }));
@@ -148,6 +192,7 @@ watch(
 function addChamber() {
   localChambers.value.push({
     name: '',
+    relativePosition: { x: 0, y: 0, z: 0 },
     dimensions: { length: 400, width: 200, height: 400 },
     slots: []
   });

@@ -85,6 +85,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<{
   close: [];
+  resize: [];
 }>();
 
 const isOpen = ref(true);
@@ -162,6 +163,9 @@ function toggleMaximize() {
     };
     isMaximized.value = true;
   }
+  
+  // Emit resize event so child components can adjust
+  setTimeout(() => emit('resize'), 50);
 }
 
 function close() {
@@ -234,6 +238,9 @@ function stopResize() {
   isResizing.value = false;
   document.removeEventListener('mousemove', onResize);
   document.removeEventListener('mouseup', stopResize);
+  
+  // Emit resize event so child components can adjust
+  emit('resize');
 }
 
 onMounted(() => {
