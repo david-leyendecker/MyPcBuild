@@ -106,6 +106,20 @@
             :editable="isEditMode"
           />
 
+          <!-- 3D Preview for products with spatial data -->
+          <div v-if="hasSpatialData" class="mt-6">
+            <v-divider class="mb-4"></v-divider>
+            <h3 class="text-h5 mb-3">3D Preview</h3>
+            <p class="text-body-2 text-medium-emphasis mb-3">
+              Interactive visualization of slots and chambers
+            </p>
+            <ProductViewer3D 
+              :dimensions="(productFormData as any).dimensions"
+              :slots="(productFormData as any).slots"
+              :chambers="(productFormData as any).chambers"
+            />
+          </div>
+
           <v-alert v-if="publishError || updateError" type="error" class="mt-3">
             {{ publishError || updateError }}
           </v-alert>
@@ -154,11 +168,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { catalogApi } from '@/api/catalog';
 import { getTypedProduct, updateTypedProduct } from '@/api/catalogTyped';
 import ProductFormSelector from '@/components/ProductFormSelector.vue';
+import ProductViewer3D from '@/components/ProductViewer3D.vue';
 import type { ProductRequest, ProductResponse } from '@/types/products';
 
 const route = useRoute();
@@ -191,6 +206,13 @@ const originalFormData = ref({
 
 const productFormData = ref<Partial<ProductRequest>>({});
 const originalProductFormData = ref<Partial<ProductRequest>>({});
+
+const hasSpatialData = computed(() => {
+  const data = productFormData.value as any;
+  const hasSlots = data.slots && data.slots.length > 0;
+  const hasChambers = data.chambers && data.chambers.length > 0;
+  return hasSlots || hasChambers;
+});
 
 onMounted(async () => {
   await loadProduct();

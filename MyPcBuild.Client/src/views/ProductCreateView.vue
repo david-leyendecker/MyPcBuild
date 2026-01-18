@@ -203,6 +203,20 @@
                   :editable="true"
                 />
 
+                <!-- 3D Preview for products with spatial data -->
+                <div v-if="hasSpatialData" class="mt-6">
+                  <v-divider class="mb-4"></v-divider>
+                  <h4 class="text-h6 mb-3">3D Preview</h4>
+                  <p class="text-body-2 text-medium-emphasis mb-3">
+                    Interactive visualization of slots and chambers
+                  </p>
+                  <ProductViewer3D 
+                    :dimensions="(productFormData as any).dimensions"
+                    :slots="(productFormData as any).slots"
+                    :chambers="(productFormData as any).chambers"
+                  />
+                </div>
+
                 <v-alert v-if="error" type="error" class="mt-3">
                   {{ error }}
                 </v-alert>
@@ -239,6 +253,20 @@
                   :category="formData.category"
                   :editable="true"
                 />
+
+                <!-- 3D Preview for products with spatial data -->
+                <div v-if="hasSpatialData" class="mt-6">
+                  <v-divider class="mb-4"></v-divider>
+                  <h4 class="text-h6 mb-3">3D Preview</h4>
+                  <p class="text-body-2 text-medium-emphasis mb-3">
+                    Interactive visualization of slots and chambers
+                  </p>
+                  <ProductViewer3D 
+                    :dimensions="(productFormData as any).dimensions"
+                    :slots="(productFormData as any).slots"
+                    :chambers="(productFormData as any).chambers"
+                  />
+                </div>
 
                 <v-alert v-if="error" type="error" class="mt-3">
                   {{ error }}
@@ -278,6 +306,7 @@ import { useRouter } from 'vue-router';
 import { catalogApi, ProductCategory, categoryLabels, type GenerateProductResponse } from '@/api/catalog';
 import { createTypedProduct } from '@/api/catalogTyped';
 import ProductFormSelector from '@/components/ProductFormSelector.vue';
+import ProductViewer3D from '@/components/ProductViewer3D.vue';
 import { fieldsToTypedProduct } from '@/utils/productFieldConverters';
 import type { ProductRequest } from '@/types/products';
 
@@ -305,6 +334,13 @@ const formData = ref({
 });
 
 const productFormData = ref<Partial<ProductRequest>>({});
+
+const hasSpatialData = computed(() => {
+  const data = productFormData.value as any;
+  const hasSlots = data.slots && data.slots.length > 0;
+  const hasChambers = data.chambers && data.chambers.length > 0;
+  return hasSlots || hasChambers;
+});
 
 const canProceedToStep3 = computed(() => {
   return formData.value.category && 
