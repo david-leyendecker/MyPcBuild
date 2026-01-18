@@ -79,6 +79,7 @@ let axesHelper: THREE.AxesHelper;
 let raycaster: THREE.Raycaster;
 let mouse: THREE.Vector2;
 let slotMeshes: Map<string, THREE.Mesh> = new Map();
+let productMeshes: THREE.Mesh[] = [];
 
 onMounted(() => {
   if (!viewerEl.value) return;
@@ -179,6 +180,30 @@ function updateVisualization() {
   });
   slotMeshes.clear();
   
+  // Clear existing product meshes (dimensions box and chambers)
+  productMeshes.forEach(mesh => {
+    scene.remove(mesh);
+    mesh.traverse((child) => {
+      if (child instanceof THREE.Mesh) {
+        child.geometry.dispose();
+        if (Array.isArray(child.material)) {
+          child.material.forEach(m => m.dispose());
+        } else {
+          child.material.dispose();
+        }
+      }
+      if (child instanceof THREE.LineSegments) {
+        child.geometry.dispose();
+        if (Array.isArray(child.material)) {
+          child.material.forEach(m => m.dispose());
+        } else {
+          child.material.dispose();
+        }
+      }
+    });
+  });
+  productMeshes = [];
+  
   // Render main product dimensions if available
   if (props.dimensions) {
     const geometry = new THREE.BoxGeometry(
@@ -206,6 +231,7 @@ function updateVisualization() {
     mesh.add(wireframe);
     
     scene.add(mesh);
+    productMeshes.push(mesh);
   }
   
   // Render chambers
@@ -239,6 +265,7 @@ function updateVisualization() {
       chamberMesh.add(chamberWireframe);
       
       scene.add(chamberMesh);
+      productMeshes.push(chamberMesh);
       
       // Render slots in chamber (offset by chamber position)
       if (chamber.slots) {
