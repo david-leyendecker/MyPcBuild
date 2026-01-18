@@ -109,7 +109,17 @@
           <!-- 3D Preview for products with spatial data -->
           <div v-if="hasSpatialData" class="mt-6">
             <v-divider class="mb-4"></v-divider>
-            <h3 class="text-h5 mb-3">3D Preview</h3>
+            <div class="d-flex justify-space-between align-center mb-3">
+              <h3 class="text-h5">3D Preview</h3>
+              <v-btn
+                prepend-icon="mdi-open-in-new"
+                variant="text"
+                size="small"
+                @click="open3DInPopout"
+              >
+                Open in Popout
+              </v-btn>
+            </div>
             <p class="text-body-2 text-medium-emphasis mb-3">
               Interactive visualization of slots and chambers
             </p>
@@ -172,12 +182,14 @@ import { ref, onMounted, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { catalogApi } from '@/api/catalog';
 import { getTypedProduct, updateTypedProduct } from '@/api/catalogTyped';
+import { use3DPopout } from '@/composables/use3DPopout';
 import ProductFormSelector from '@/components/ProductFormSelector.vue';
 import ProductViewer3D from '@/components/ProductViewer3D.vue';
 import type { ProductRequest, ProductResponse } from '@/types/products';
 
 const route = useRoute();
 const router = useRouter();
+const { openPopout } = use3DPopout();
 
 const product = ref<ProductResponse | null>(null);
 const isLoading = ref(true);
@@ -328,6 +340,19 @@ async function saveProduct() {
   } finally {
     isUpdating.value = false;
   }
+}
+
+function open3DInPopout() {
+  const data = productFormData.value as any;
+  openPopout({
+    component: ProductViewer3D,
+    props: {
+      dimensions: data.dimensions,
+      slots: data.slots,
+      chambers: data.chambers,
+    },
+    title: `3D Preview - ${formData.value.name}`,
+  });
 }
 </script>
 

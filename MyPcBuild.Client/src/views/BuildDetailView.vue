@@ -48,7 +48,17 @@
       <v-row v-if="hasSpatialParts">
         <v-col cols="12">
           <v-card>
-            <v-card-title>3D Build Visualization</v-card-title>
+            <v-card-title class="d-flex justify-space-between align-center">
+              <span>3D Build Visualization</span>
+              <v-btn
+                prepend-icon="mdi-open-in-new"
+                variant="text"
+                size="small"
+                @click="open3DInPopout"
+              >
+                Open in Popout
+              </v-btn>
+            </v-card-title>
             <v-card-text>
               <Viewer3D 
                 :parts="buildStore.currentBuild.parts"
@@ -159,6 +169,7 @@ import { ref, computed, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import { useBuildStore } from '@/stores/buildStore';
 import { useCatalogStore } from '@/stores/catalogStore';
+import { use3DPopout } from '@/composables/use3DPopout';
 import CompatibilityPanel from '@/components/CompatibilityPanel.vue';
 import AddPartDialogWithSlots from '@/components/AddPartDialogWithSlots.vue';
 import Viewer3D from '@/components/Viewer3D.vue';
@@ -173,6 +184,7 @@ const route = useRoute();
 const buildStore = useBuildStore();
 const catalogStore = useCatalogStore();
 const showAddPartDialog = ref(false);
+const { openPopout } = use3DPopout();
 
 const totalCost = computed(() => {
   return buildStore.currentBuild?.parts.reduce((sum, part) => sum + part.pricePaid, 0) ?? 0;
@@ -252,6 +264,19 @@ async function removePart(productId: string) {
   } catch (error) {
     console.error('Failed to remove part:', error);
   }
+}
+
+function open3DInPopout() {
+  if (!buildStore.currentBuild) return;
+  
+  openPopout({
+    component: Viewer3D,
+    props: {
+      parts: buildStore.currentBuild.parts,
+      collisions: collidingPartIds.value,
+    },
+    title: `3D Preview - ${buildStore.currentBuild.name}`,
+  });
 }
 </script>
 

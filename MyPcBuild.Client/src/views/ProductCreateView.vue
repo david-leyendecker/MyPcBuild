@@ -206,7 +206,17 @@
                 <!-- 3D Preview for products with spatial data -->
                 <div v-if="hasSpatialData" class="mt-6">
                   <v-divider class="mb-4"></v-divider>
-                  <h4 class="text-h6 mb-3">3D Preview</h4>
+                  <div class="d-flex justify-space-between align-center mb-3">
+                    <h4 class="text-h6">3D Preview</h4>
+                    <v-btn
+                      prepend-icon="mdi-open-in-new"
+                      variant="text"
+                      size="small"
+                      @click="open3DInPopout"
+                    >
+                      Open in Popout
+                    </v-btn>
+                  </div>
                   <p class="text-body-2 text-medium-emphasis mb-3">
                     Interactive visualization of slots and chambers
                   </p>
@@ -257,7 +267,17 @@
                 <!-- 3D Preview for products with spatial data -->
                 <div v-if="hasSpatialData" class="mt-6">
                   <v-divider class="mb-4"></v-divider>
-                  <h4 class="text-h6 mb-3">3D Preview</h4>
+                  <div class="d-flex justify-space-between align-center mb-3">
+                    <h4 class="text-h6">3D Preview</h4>
+                    <v-btn
+                      prepend-icon="mdi-open-in-new"
+                      variant="text"
+                      size="small"
+                      @click="open3DInPopout"
+                    >
+                      Open in Popout
+                    </v-btn>
+                  </div>
                   <p class="text-body-2 text-medium-emphasis mb-3">
                     Interactive visualization of slots and chambers
                   </p>
@@ -305,12 +325,14 @@ import { ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { catalogApi, ProductCategory, categoryLabels, type GenerateProductResponse } from '@/api/catalog';
 import { createTypedProduct } from '@/api/catalogTyped';
+import { use3DPopout } from '@/composables/use3DPopout';
 import ProductFormSelector from '@/components/ProductFormSelector.vue';
 import ProductViewer3D from '@/components/ProductViewer3D.vue';
 import { fieldsToTypedProduct } from '@/utils/productFieldConverters';
 import type { ProductRequest } from '@/types/products';
 
 const router = useRouter();
+const { openPopout } = use3DPopout();
 
 const categories = computed(() => 
   Object.values(ProductCategory).map(value => ({
@@ -435,6 +457,19 @@ async function createProduct() {
   } finally {
     isCreating.value = false;
   }
+}
+
+function open3DInPopout() {
+  const data = productFormData.value as any;
+  openPopout({
+    component: ProductViewer3D,
+    props: {
+      dimensions: data.dimensions,
+      slots: data.slots,
+      chambers: data.chambers,
+    },
+    title: `3D Preview - ${formData.value.name || 'New Product'}`,
+  });
 }
 </script>
 
