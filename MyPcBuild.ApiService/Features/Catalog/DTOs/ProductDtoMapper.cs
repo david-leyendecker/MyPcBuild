@@ -493,6 +493,14 @@ public static class ProductDtoMapper
                 Width = slot.MaxDimensions.Width,
                 Height = slot.MaxDimensions.Height
             },
+            Rotation = slot.Rotation != Rotation.Identity 
+                ? new RotationModel 
+                { 
+                    X = slot.Rotation.X, 
+                    Y = slot.Rotation.Y, 
+                    Z = slot.Rotation.Z 
+                } 
+                : null,
             SubSlots = slot.SubSlots?.Select(ToSlotModel).ToList()
         };
     }
@@ -510,6 +518,9 @@ public static class ProductDtoMapper
             slot.MaxDimensions.Width,
             slot.MaxDimensions.Height
         );
+        Rotation rotation = slot.Rotation != null
+            ? new Rotation(slot.Rotation.X, slot.Rotation.Y, slot.Rotation.Z)
+            : Rotation.Identity;
 
         return new Slot(
             Guid.NewGuid(),
@@ -517,6 +528,7 @@ public static class ProductDtoMapper
             category,
             position,
             maxDimensions,
+            rotation,
             slot.SubSlots?.Select(ToDomainSlot).ToList()
         );
     }

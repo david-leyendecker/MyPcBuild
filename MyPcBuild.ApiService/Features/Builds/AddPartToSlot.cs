@@ -33,7 +33,8 @@ public static class AddPartToSlot
                 ProductId = request.ProductId,
                 PricePaid = request.PricePaid,
                 SlotId = request.SlotId,
-                Position = request.Position
+                Position = request.Position,
+                Rotation = request.Rotation
             };
 
             session.Events.Append(buildId, @event);
@@ -52,5 +53,6 @@ public record AddPartToSlotRequest(
     Guid ProductId,
     decimal PricePaid,
     Guid SlotId,
-    Vector3 Position
+    Vector3 Position,
+    Rotation? Rotation
 );

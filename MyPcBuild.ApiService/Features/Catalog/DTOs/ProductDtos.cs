@@ -972,6 +972,11 @@ public record SlotModel
     public required DimensionsModel MaxDimensions { get; init; }
 
     /// <summary>
+    /// Rotation to apply to parts placed in this slot (optional).
+    /// </summary>
+    public RotationModel? Rotation { get; init; }
+
+    /// <summary>
     /// Sub-slots (optional, for nested slot hierarchies).
     /// </summary>
     public List<SlotModel>? SubSlots { get; init; }
@@ -1079,4 +1084,25 @@ public record Vector3Model
     /// </summary>
     [Required]
     public required decimal Z { get; init; }
+}
+
+/// <summary>
+/// 3D rotation model using Euler angles (in degrees).
+/// </summary>
+public record RotationModel
+{
+    /// <summary>
+    /// X rotation (pitch) in degrees.
+    /// </summary>
+    public decimal X { get; init; }
+
+    /// <summary>
+    /// Y rotation (yaw) in degrees.
+    /// </summary>
+    public decimal Y { get; init; }
+
+    /// <summary>
+    /// Z rotation (roll) in degrees.
+    /// </summary>
+    public decimal Z { get; init; }
 }

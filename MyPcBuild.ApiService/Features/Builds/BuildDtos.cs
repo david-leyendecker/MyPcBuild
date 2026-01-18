@@ -16,12 +16,19 @@ public record DimensionsDto(
     decimal Height
 );
 
+public record RotationDto(
+    decimal X,
+    decimal Y,
+    decimal Z
+);
+
 public record SlotDto(
     Guid Id,
     string Name,
     string AllowedCategory,
     Vector3Dto RelativePosition,
-    DimensionsDto MaxDimensions
+    DimensionsDto MaxDimensions,
+    RotationDto? Rotation
 );
 
 public record ChamberDto(

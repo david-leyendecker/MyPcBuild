@@ -37,6 +37,7 @@ public class BuildDtosTests
         Guid slotId = Guid.NewGuid();
         Vector3Dto position = new(0, 0, 0);
         DimensionsDto dimensions = new(50, 50, 50);
+        RotationDto rotation = new(0, 90, 0);
 
         // Act
         SlotDto slot = new(
@@ -44,7 +45,8 @@ public class BuildDtosTests
             "Test Slot",
             "CPU",
             position,
-            dimensions
+            dimensions,
+            rotation
         );
 
         // Assert
@@ -53,6 +55,7 @@ public class BuildDtosTests
         Assert.Equal("CPU", slot.AllowedCategory);
         Assert.Equal(position, slot.RelativePosition);
         Assert.Equal(dimensions, slot.MaxDimensions);
+        Assert.Equal(rotation, slot.Rotation);
     }
 
     [Fact]

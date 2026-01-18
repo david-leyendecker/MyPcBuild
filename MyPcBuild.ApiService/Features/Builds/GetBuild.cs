@@ -47,7 +47,10 @@ public static class GetBuild
                             s.Name,
                             s.AllowedProductCategory.ToString(),
                             new Vector3Dto(s.RelativePosition.X, s.RelativePosition.Y, s.RelativePosition.Z),
-                            new DimensionsDto(s.MaxDimensions.Length, s.MaxDimensions.Width, s.MaxDimensions.Height)
+                            new DimensionsDto(s.MaxDimensions.Length, s.MaxDimensions.Width, s.MaxDimensions.Height),
+                            s.Rotation != Rotation.Identity 
+                                ? new RotationDto(s.Rotation.X, s.Rotation.Y, s.Rotation.Z) 
+                                : null
                         )).ToList();
                     }
 
@@ -64,13 +67,20 @@ public static class GetBuild
                                 s.Name,
                                 s.AllowedProductCategory.ToString(),
                                 new Vector3Dto(s.RelativePosition.X, s.RelativePosition.Y, s.RelativePosition.Z),
-                                new DimensionsDto(s.MaxDimensions.Length, s.MaxDimensions.Width, s.MaxDimensions.Height)
+                                new DimensionsDto(s.MaxDimensions.Length, s.MaxDimensions.Width, s.MaxDimensions.Height),
+                                s.Rotation != Rotation.Identity 
+                                    ? new RotationDto(s.Rotation.X, s.Rotation.Y, s.Rotation.Z) 
+                                    : null
                             )).ToList()
                         )).ToList();
                     }
 
                     Vector3Dto? position = part.Position != null 
                         ? new Vector3Dto(part.Position.X, part.Position.Y, part.Position.Z) 
+                        : null;
+
+                    RotationDto? rotation = part.Rotation != null
+                        ? new RotationDto(part.Rotation.X, part.Rotation.Y, part.Rotation.Z)
                         : null;
 
                     productDetails.Add(new ProductDetails(
@@ -81,6 +91,7 @@ public static class GetBuild
                         part.PricePaid,
                         part.SlotId,
                         position,
+                        rotation,
                         dimensions,
                         slots,
                         chambers
@@ -146,6 +157,7 @@ public record ProductDetails(
     decimal PricePaid,
     Guid? SlotId,
     Vector3Dto? Position,
+    RotationDto? Rotation,
     DimensionsDto? Dimensions,
     List<SlotDto>? Slots,
     List<ChamberDto>? Chambers

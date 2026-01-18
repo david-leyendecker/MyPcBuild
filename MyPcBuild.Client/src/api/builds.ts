@@ -6,6 +6,12 @@ export interface Vector3 {
   z: number;
 }
 
+export interface Rotation {
+  x: number;
+  y: number;
+  z: number;
+}
+
 export interface Dimensions {
   length: number;
   width: number;
@@ -18,6 +24,7 @@ export interface Slot {
   allowedCategory: string;
   relativePosition: Vector3;
   maxDimensions: Dimensions;
+  rotation?: Rotation | null;
 }
 
 export interface Chamber {
@@ -66,6 +73,7 @@ export interface BuildPart {
   pricePaid: number;
   slotId?: string | null;
   position?: Vector3 | null;
+  rotation?: Rotation | null;
   dimensions?: Dimensions | null;
   slots?: Slot[] | null;
   chambers?: Chamber[] | null;
@@ -103,6 +111,7 @@ export interface AddPartToSlotRequest {
   pricePaid: number;
   slotId: string;
   position: Vector3;
+  rotation?: Rotation | null;
 }
 
 export const buildsApi = {

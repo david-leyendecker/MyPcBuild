@@ -55,12 +55,19 @@ export interface Vector3 {
   z: number;
 }
 
+export interface Rotation {
+  x: number;
+  y: number;
+  z: number;
+}
+
 export interface Slot {
   id?: string;
   name: string;
   allowedCategory: string;
   relativePosition: Vector3;
   maxDimensions: Dimensions;
+  rotation?: Rotation | null;
   subSlots?: Slot[];
 }
 

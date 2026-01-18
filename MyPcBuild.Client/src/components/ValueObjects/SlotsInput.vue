@@ -142,6 +142,47 @@
             </v-row>
           </v-col>
         </v-row>
+
+        <v-row dense>
+          <v-col cols="12">
+            <label class="text-caption font-weight-semibold mb-1 d-block">Rotation (degrees, optional)</label>
+            <v-row dense>
+              <v-col cols="4">
+                <v-text-field
+                  v-model.number="(slot.rotation || DEFAULT_ROTATION).x"
+                  label="X (Pitch)"
+                  type="number"
+                  :readonly="!editable"
+                  :variant="editable ? 'filled' : 'outlined'"
+                  density="compact"
+                  @update:model-value="emitUpdate"
+                ></v-text-field>
+              </v-col>
+              <v-col cols="4">
+                <v-text-field
+                  v-model.number="(slot.rotation || DEFAULT_ROTATION).y"
+                  label="Y (Yaw)"
+                  type="number"
+                  :readonly="!editable"
+                  :variant="editable ? 'filled' : 'outlined'"
+                  density="compact"
+                  @update:model-value="emitUpdate"
+                ></v-text-field>
+              </v-col>
+              <v-col cols="4">
+                <v-text-field
+                  v-model.number="(slot.rotation || DEFAULT_ROTATION).z"
+                  label="Z (Roll)"
+                  type="number"
+                  :readonly="!editable"
+                  :variant="editable ? 'filled' : 'outlined'"
+                  density="compact"
+                  @update:model-value="emitUpdate"
+                ></v-text-field>
+              </v-col>
+            </v-row>
+          </v-col>
+        </v-row>
       </v-card>
     </div>
   </div>
@@ -180,11 +221,13 @@ const categoryOptions = [
 
 const DEFAULT_POSITION = { x: 0, y: 0, z: 0 };
 const DEFAULT_DIMENSIONS = { length: 0, width: 0, height: 0 };
+const DEFAULT_ROTATION = { x: 0, y: 0, z: 0 };
 
 const localSlots = ref<Slot[]>(props.modelValue.map(slot => ({
   ...slot,
   relativePosition: slot.relativePosition || DEFAULT_POSITION,
-  maxDimensions: slot.maxDimensions || DEFAULT_DIMENSIONS
+  maxDimensions: slot.maxDimensions || DEFAULT_DIMENSIONS,
+  rotation: slot.rotation || DEFAULT_ROTATION
 })));
 
 watch(
@@ -193,7 +236,8 @@ watch(
     localSlots.value = newValue.map(slot => ({
       ...slot,
       relativePosition: slot.relativePosition || DEFAULT_POSITION,
-      maxDimensions: slot.maxDimensions || DEFAULT_DIMENSIONS
+      maxDimensions: slot.maxDimensions || DEFAULT_DIMENSIONS,
+      rotation: slot.rotation || DEFAULT_ROTATION
     }));
   },
   { deep: true }
@@ -205,6 +249,7 @@ function addSlot() {
     allowedCategory: 'CPU',
     relativePosition: { ...DEFAULT_POSITION },
     maxDimensions: { length: 50, width: 50, height: 20 },
+    rotation: { ...DEFAULT_ROTATION },
     subSlots: []
   });
   emitUpdate();

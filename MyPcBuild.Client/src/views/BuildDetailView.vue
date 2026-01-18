@@ -179,7 +179,7 @@ const totalCost = computed(() => {
 });
 
 const hasSpatialParts = computed(() => {
-  return buildStore.currentBuild?.parts.some(p => p.dimensions && p.position) ?? false;
+  return buildStore.currentBuild?.parts.some(p => p.dimensions) ?? false;
 });
 
 const collidingPartIds = computed(() => {

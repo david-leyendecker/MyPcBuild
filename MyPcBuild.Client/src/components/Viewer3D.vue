@@ -157,7 +157,11 @@ function updateScene() {
 
   // Add parts
   props.parts.forEach(part => {
-    if (!part.dimensions || !part.position) return;
+    if (!part.dimensions) return;
+
+    // Use position if available, otherwise place at origin (for cases)
+    const position = part.position || { x: 0, y: 0, z: 0 };
+    const rotation = part.rotation || { x: 0, y: 0, z: 0 };
 
     const geometry = new THREE.BoxGeometry(
       part.dimensions.length,
@@ -168,14 +172,23 @@ function updateScene() {
     const material = new THREE.MeshStandardMaterial({
       color: getCategoryColor(part.categoryName),
       transparent: true,
-      opacity: 0.8
+      opacity: part.categoryName === 'Case' ? 0.3 : 0.8
     });
 
     const mesh = new THREE.Mesh(geometry, material);
+    
+    // Set position (center of the box)
     mesh.position.set(
-      part.position.x + part.dimensions.length / 2,
-      part.position.y + part.dimensions.height / 2,
-      part.position.z + part.dimensions.width / 2
+      position.x + part.dimensions.length / 2,
+      position.y + part.dimensions.height / 2,
+      position.z + part.dimensions.width / 2
+    );
+    
+    // Apply rotation (convert degrees to radians)
+    mesh.rotation.set(
+      (rotation.x * Math.PI) / 180,
+      (rotation.y * Math.PI) / 180,
+      (rotation.z * Math.PI) / 180
     );
     
     // Add wireframe
@@ -187,6 +200,40 @@ function updateScene() {
     mesh.userData = { part };
     scene.add(mesh);
     partMeshes.set(part.id, mesh);
+
+    // Render chambers if this is a case
+    if (part.chambers && part.chambers.length > 0) {
+      part.chambers.forEach((chamber) => {
+        const chamberGeom = new THREE.BoxGeometry(
+          chamber.dimensions.length,
+          chamber.dimensions.height,
+          chamber.dimensions.width
+        );
+        const chamberMat = new THREE.MeshStandardMaterial({
+          color: 0x888888,
+          transparent: true,
+          opacity: 0.1,
+          wireframe: false
+        });
+        const chamberMesh = new THREE.Mesh(chamberGeom, chamberMat);
+        
+        chamberMesh.position.set(
+          position.x + chamber.dimensions.length / 2,
+          position.y + chamber.dimensions.height / 2,
+          position.z + chamber.dimensions.width / 2
+        );
+
+        // Add chamber wireframe
+        const chamberEdges = new THREE.EdgesGeometry(chamberGeom);
+        const chamberWireframe = new THREE.LineSegments(
+          chamberEdges,
+          new THREE.LineBasicMaterial({ color: 0xaaaaaa, linewidth: 1 })
+        );
+        chamberMesh.add(chamberWireframe);
+
+        scene.add(chamberMesh);
+      });
+    }
   });
 
   highlightCollisions();
