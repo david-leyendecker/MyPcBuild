@@ -1,70 +1,68 @@
 <template>
-  <div class="d-flex flex-column ga-3">
-    <p class="text-body-2 text-medium-emphasis">Search and select a component to add to your build</p>
+  <n-flex vertical :size="12">
+    <p style="font-size: 14px; opacity: 0.7;">Search and select a component to add to your build</p>
 
-    <div class="d-flex flex-column ga-3">
-      <v-text-field 
-        v-model="searchQuery"
+    <n-flex vertical :size="12">
+      <n-input 
+        v-model:value="searchQuery"
         placeholder="Search components..."
         @keyup.enter="handleSearch"
-      ></v-text-field>
-      <div class="d-flex flex-wrap ga-2">
-        <v-btn 
+      />
+      <n-flex wrap :size="8">
+        <n-button 
           v-for="category in categories"
           :key="category"
-          :variant="selectedCategory === category ? 'elevated' : 'outlined'"
+          :type="selectedCategory === category ? 'primary' : 'default'"
           size="small"
           @click="selectCategory(category)"
         >
           {{ categoryDisplayMap[category] }}
-        </v-btn>
-      </div>
-    </div>
+        </n-button>
+      </n-flex>
+    </n-flex>
 
-    <div v-if="isLoading" class="d-flex justify-center py-4">
-      <v-progress-circular indeterminate color="primary"></v-progress-circular>
-    </div>
+    <n-flex v-if="isLoading" justify="center" style="padding: 16px 0;">
+      <n-spin />
+    </n-flex>
 
-    <div v-else-if="filteredProducts.length === 0" class="text-center py-4">
-      <p class="text-medium-emphasis">No components found</p>
-    </div>
+    <n-flex v-else-if="filteredProducts.length === 0" vertical align="center" style="padding: 16px 0;">
+      <p style="opacity: 0.6;">No components found</p>
+    </n-flex>
 
-    <div 
+    <n-scrollbar 
       v-else 
-      class="overflow-y-auto"
-      style="max-height: 400px; border: 1px solid rgba(var(--v-border-color), var(--v-border-opacity)); border-radius: 4px;"
+      style="max-height: 400px;"
     >
-      <div 
-        v-for="product in filteredProducts"
-        :key="product.id"
-        class="pa-3 product-item"
-        style="border-bottom: 1px solid rgba(var(--v-border-color), var(--v-border-opacity)); cursor: pointer;"
-        @click="selectProduct(product.id)"
-      >
-        <div class="d-flex justify-space-between align-center">
-          <div>
-            <h4 class="text-subtitle-1 mb-1">{{ product.name }}</h4>
-            <p class="text-success font-weight-semibold text-body-2">${{ product.price.toFixed(2) }}</p>
-          </div>
-          <v-icon>mdi-arrow-right</v-icon>
+      <n-flex vertical :size="0">
+        <div 
+          v-for="product in filteredProducts"
+          :key="product.id"
+          class="product-item"
+          style="padding: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.09); cursor: pointer;"
+          @click="selectProduct(product.id)"
+        >
+          <n-flex justify="space-between" align="center">
+            <div>
+              <h4 style="font-size: 16px; margin-bottom: 4px;">{{ product.name }}</h4>
+              <p style="color: #18a058; font-weight: 600; font-size: 14px;">${{ product.price.toFixed(2) }}</p>
+            </div>
+            <span>→</span>
+          </n-flex>
         </div>
-      </div>
-    </div>
+      </n-flex>
+    </n-scrollbar>
 
-    <div class="d-flex justify-end ga-2 pt-3" style="border-top: 1px solid rgba(var(--v-border-color), var(--v-border-opacity));">
-      <v-btn 
-        prepend-icon="mdi-close"
-        variant="text"
-        @click="$emit('close')"
-      >
+    <n-flex justify="end" :size="8" style="padding-top: 12px; border-top: 1px solid rgba(255, 255, 255, 0.09);">
+      <n-button @click="$emit('close')">
         Cancel
-      </v-btn>
-    </div>
-  </div>
+      </n-button>
+    </n-flex>
+  </n-flex>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
+import { NInput, NButton, NFlex, NSpin, NScrollbar } from 'naive-ui';
 import { useCatalogStore } from '@/stores/catalogStore';
 import { ProductCategory, categoryLabels, getCategoryFromBackend } from '@/api/catalog';
 
@@ -114,6 +112,6 @@ function selectProduct(productId: string) {
 }
 
 .product-item:hover {
-  background-color: rgba(var(--v-theme-on-surface), 0.05);
+  background-color: rgba(255, 255, 255, 0.05);
 }
 </style>

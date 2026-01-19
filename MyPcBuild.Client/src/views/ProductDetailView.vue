@@ -1,126 +1,109 @@
 <template>
   <div class="fade-in">
-    <div class="mb-4 d-flex justify-space-between align-center">
-      <h2 class="text-h4 text-primary">
-        {{ isEditMode ? 'Edit Product' : (product?.isDraft ? 'Review Draft Product' : 'Product Details') }}
-      </h2>
-      <div class="d-flex ga-2">
-        <v-btn 
-          v-if="!isEditMode && !product?.isDraft"
-          prepend-icon="mdi-pencil"
-          color="primary"
-          variant="tonal"
-          @click="enterEditMode"
-        >
-          Edit Product
-        </v-btn>
-        <v-btn 
-          prepend-icon="mdi-arrow-left"
-          variant="text"
-          @click="$router.push('/catalog')"
-        >
-          Back to Catalog
-        </v-btn>
-      </div>
-    </div>
+    <n-flex vertical :gap="16">
+      <n-flex justify="space-between" align="center" style="flex-direction: row;">
+        <h2 class="text-h4">
+          {{ isEditMode ? 'Edit Product' : (product?.isDraft ? 'Review Draft Product' : 'Product Details') }}
+        </h2>
+        <n-flex :gap="8">
+          <n-button 
+            v-if="!isEditMode && !product?.isDraft"
+            type="primary"
+            @click="enterEditMode"
+          >
+            ✏️ Edit Product
+          </n-button>
+          <n-button 
+            text
+            @click="$router.push('/catalog')"
+          >
+            ← Back to Catalog
+          </n-button>
+        </n-flex>
+      </n-flex>
 
-    <v-alert v-if="product?.isDraft" type="warning" class="mb-4">
-      <v-icon start icon="mdi-alert-circle"></v-icon>
-      This product is a draft and cannot be added to builds until published.
-    </v-alert>
+      <n-alert v-if="product?.isDraft" type="warning">
+        ⚠️ This product is a draft and cannot be added to builds until published.
+      </n-alert>
 
-    <v-alert v-if="isEditMode" type="info" class="mb-4">
-      <v-icon start icon="mdi-pencil"></v-icon>
-      You are editing this product. Make your changes and click "Save Changes" to update.
-    </v-alert>
+      <n-alert v-if="isEditMode" type="info">
+        ✏️ You are editing this product. Make your changes and click "Save Changes" to update.
+      </n-alert>
 
-    <v-card v-if="isLoading" class="pa-8">
-      <div class="d-flex justify-center">
-        <v-progress-circular indeterminate color="primary"></v-progress-circular>
-      </div>
-    </v-card>
+      <n-card v-if="isLoading" style="padding: 32px;">
+        <div style="display: flex; justify-content: center;">
+          <n-spin></n-spin>
+        </div>
+      </n-card>
 
-    <v-card v-else-if="error">
-      <v-card-text>
-        <v-alert type="error">
+      <n-card v-else-if="error">
+        <n-alert type="error">
           {{ error }}
-        </v-alert>
-      </v-card-text>
-    </v-card>
+        </n-alert>
+      </n-card>
 
-    <v-card v-else-if="product">
-      <v-card-text>
-        <v-container fluid>
-          <h3 class="text-h5 mb-3">Basic Information</h3>
-          
-          <v-row>
-            <v-col cols="12">
-              <v-text-field 
-                v-model="formData.name"
-                label="Product Name *"
-                :readonly="!isEditMode"
-              ></v-text-field>
-            </v-col>
-          </v-row>
+      <n-card v-else-if="product">
+        <n-flex vertical :gap="12">
+          <div>
+            <h3 class="text-h5" style="margin-bottom: 12px;">Basic Information</h3>
+            
+            <n-flex vertical :gap="12">
+              <n-input 
+                v-model:value="formData.name"
+                :disabled="!isEditMode"
+              >
+                <template #prefix>Product Name *</template>
+              </n-input>
 
-          <v-row>
-            <v-col cols="12">
-              <v-text-field 
-                v-model="formData.manufacturer"
-                label="Manufacturer *"
-                :readonly="!isEditMode"
-              ></v-text-field>
-            </v-col>
-          </v-row>
+              <n-input 
+                v-model:value="formData.manufacturer"
+                :disabled="!isEditMode"
+              >
+                <template #prefix>Manufacturer *</template>
+              </n-input>
 
-          <v-row>
-            <v-col cols="12">
-              <v-text-field 
-                v-model.number="formData.price"
-                label="Price *"
-                type="number"
-                prefix="$"
-                :readonly="!isEditMode"
-              ></v-text-field>
-            </v-col>
-          </v-row>
+              <n-input-number 
+                v-model:value="formData.price"
+                :disabled="!isEditMode"
+              >
+                <template #prefix>Price * ($)</template>
+              </n-input-number>
 
-          <v-row>
-            <v-col cols="12">
-              <v-text-field 
-                v-model="formData.category"
-                label="Category"
-                readonly
-              ></v-text-field>
-            </v-col>
-          </v-row>
+              <n-input 
+                v-model:value="formData.category"
+                disabled
+              >
+                <template #prefix>Category</template>
+              </n-input>
+            </n-flex>
+          </div>
 
-          <v-divider class="my-4"></v-divider>
+          <n-divider></n-divider>
 
-          <h3 class="text-h5 mb-3">{{ formData.category }} Details</h3>
+          <div>
+            <h3 class="text-h5" style="margin-bottom: 12px;">{{ formData.category }} Details</h3>
 
-          <!-- Use ProductFormSelector -->
-          <ProductFormSelector 
-            v-model="productFormData"
-            :category="formData.category"
-            :editable="isEditMode"
-          />
+            <!-- Use ProductFormSelector -->
+            <ProductFormSelector 
+              v-model="productFormData"
+              :category="formData.category"
+              :editable="isEditMode"
+            />
+          </div>
 
           <!-- 3D Preview for products with spatial data -->
-          <div v-if="hasSpatialData" class="mt-6">
-            <v-divider class="mb-4"></v-divider>
-            <div class="d-flex justify-space-between align-center mb-3">
+          <div v-if="hasSpatialData">
+            <n-divider></n-divider>
+            <n-flex justify="space-between" align="center" style="margin-bottom: 12px;">
               <h3 class="text-h5">3D Preview</h3>
-              <v-btn
-                prepend-icon="mdi-open-in-new"
-                variant="text"
-                size="small"
+              <n-button
+                text
                 @click="open3DInPopout"
               >
-                Open in Popout
-              </v-btn>
-            </div>
-            <p class="text-body-2 text-medium-emphasis mb-3">
+                ↗ Open in Popout
+              </n-button>
+            </n-flex>
+            <p class="text-body-2" style="margin-bottom: 12px;">
               Interactive visualization of slots and chambers
             </p>
             <ProductViewer3D 
@@ -130,56 +113,52 @@
             />
           </div>
 
-          <v-alert v-if="publishError || updateError" type="error" class="mt-3">
+          <n-alert v-if="publishError || updateError" type="error">
             {{ publishError || updateError }}
-          </v-alert>
+          </n-alert>
 
-          <v-alert v-if="publishSuccess || updateSuccess" type="success" class="mt-3">
+          <n-alert v-if="publishSuccess || updateSuccess" type="success">
             {{ publishSuccess ? 'Product successfully published!' : 'Product successfully updated!' }}
-          </v-alert>
+          </n-alert>
 
-          <v-row class="mt-4">
-            <v-col cols="12" class="d-flex justify-space-between">
-              <v-btn 
-                prepend-icon="mdi-arrow-left"
-                variant="text"
-                @click="isEditMode ? cancelEdit() : $router.push('/catalog')"
+          <n-flex justify="space-between" style="margin-top: 16px;">
+            <n-button 
+              text
+              @click="isEditMode ? cancelEdit() : $router.push('/catalog')"
+            >
+              {{ isEditMode ? '← Cancel' : '← Back to Catalog' }}
+            </n-button>
+            
+            <n-flex :gap="8">
+              <n-button 
+                v-if="isEditMode"
+                type="primary"
+                :loading="isUpdating"
+                @click="saveProduct"
               >
-                {{ isEditMode ? 'Cancel' : 'Back to Catalog' }}
-              </v-btn>
+                💾 Save Changes
+              </n-button>
               
-              <div class="d-flex ga-2">
-                <v-btn 
-                  v-if="isEditMode"
-                  prepend-icon="mdi-content-save"
-                  color="primary"
-                  :loading="isUpdating"
-                  @click="saveProduct"
-                >
-                  Save Changes
-                </v-btn>
-                
-                <v-btn 
-                  v-if="product?.isDraft && !isEditMode"
-                  prepend-icon="mdi-check-circle"
-                  color="success"
-                  :loading="isPublishing"
-                  @click="publishProduct"
-                >
-                  Publish Product
-                </v-btn>
-              </div>
-            </v-col>
-          </v-row>
-        </v-container>
-      </v-card-text>
-    </v-card>
+              <n-button 
+                v-if="product?.isDraft && !isEditMode"
+                type="success"
+                :loading="isPublishing"
+                @click="publishProduct"
+              >
+                ✓ Publish Product
+              </n-button>
+            </n-flex>
+          </n-flex>
+        </n-flex>
+      </n-card>
+    </n-flex>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+import { NCard, NButton, NInput, NInputNumber, NAlert, NFlex, NDivider, NSpin } from 'naive-ui';
 import { catalogApi } from '@/api/catalog';
 import { getTypedProduct, updateTypedProduct } from '@/api/catalogTyped';
 import { use3DPopout } from '@/composables/use3DPopout';
@@ -364,5 +343,19 @@ function open3DInPopout() {
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
+}
+
+.text-h4 {
+  font-size: 2.125rem;
+  font-weight: 500;
+}
+
+.text-h5 {
+  font-size: 1.5rem;
+  font-weight: 500;
+}
+
+.text-body-2 {
+  font-size: 0.875rem;
 }
 </style>

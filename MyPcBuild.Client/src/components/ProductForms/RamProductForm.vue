@@ -1,69 +1,67 @@
 <template>
-  <v-container fluid class="pa-0">
+  <n-flex vertical :size="12">
     <!-- Type and Configuration - Side by side -->
-    <v-row>
-      <v-col cols="12" md="6">
-        <v-select 
-          v-model="localProduct.type"
-          :items="memoryTypeOptions"
-          label="Memory Type"
-          :readonly="!editable"
-          :variant="editable ? 'filled' : 'outlined'"
-        ></v-select>
-      </v-col>
-      <v-col cols="12" md="6">
-        <v-text-field 
-          v-model="localProduct.configuration"
-          label="Configuration"
-          :readonly="!editable"
-          :variant="editable ? 'filled' : 'outlined'"
+    <n-flex :size="12">
+      <div style="flex: 1; min-width: 150px;">
+        <label style="display: block; margin-bottom: 4px; font-size: 14px;">Memory Type</label>
+        <n-select 
+          v-model:value="localProduct.type"
+          :options="memoryTypeOptions"
+          :disabled="!editable"
+        />
+      </div>
+      <div style="flex: 1; min-width: 150px;">
+        <label style="display: block; margin-bottom: 4px; font-size: 14px;">Configuration</label>
+        <n-input 
+          v-model:value="localProduct.configuration"
+          :disabled="!editable"
           placeholder="e.g., 2x16GB"
-        ></v-text-field>
-      </v-col>
-    </v-row>
+        />
+      </div>
+    </n-flex>
 
     <!-- Capacity and Speed - Side by side -->
-    <v-row>
-      <v-col cols="12" md="6">
+    <n-flex :size="12">
+      <div style="flex: 1; min-width: 150px;">
         <StorageCapacityInput 
           v-model="localProduct.capacity"
           label="Total Capacity"
           :editable="editable"
         />
-      </v-col>
-      <v-col cols="12" md="6">
+      </div>
+      <div style="flex: 1; min-width: 150px;">
         <FrequencyInput 
           v-model="localProduct.speed"
           label="Speed (MHz)"
           :editable="editable"
         />
-      </v-col>
-    </v-row>
+      </div>
+    </n-flex>
 
     <!-- CAS Latency and Voltage - Side by side -->
-    <v-row>
-      <v-col cols="12" md="6">
-        <v-text-field 
-          v-model="localProduct.casLatency"
-          label="CAS Latency"
-          :readonly="!editable"
-          :variant="editable ? 'filled' : 'outlined'"
+    <n-flex :size="12">
+      <div style="flex: 1; min-width: 150px;">
+        <label style="display: block; margin-bottom: 4px; font-size: 14px;">CAS Latency</label>
+        <n-input 
+          v-model:value="localProduct.casLatency"
+          :disabled="!editable"
           placeholder="e.g., CL16"
-        ></v-text-field>
-      </v-col>
-      <v-col cols="12" md="6">
+        />
+      </div>
+      <div style="flex: 1; min-width: 150px;">
         <VoltageInput 
           v-model="localProduct.voltage"
           label="Voltage"
           :editable="editable"
         />
-      </v-col>
-    </v-row>
-  </v-container>
+      </div>
+    </n-flex>
+  </n-flex>
 </template>
 
 <script setup lang="ts">
 import { ref, watch } from 'vue';
+import { NFlex, NInput, NSelect } from 'naive-ui';
 import type { RamProductRequest, RamProductResponse, MemoryType } from '@/types/products';
 import StorageCapacityInput from '@/components/ValueObjects/StorageCapacityInput.vue';
 import FrequencyInput from '@/components/ValueObjects/FrequencyInput.vue';
@@ -83,9 +81,9 @@ const emit = defineEmits<{
 }>();
 
 const memoryTypeOptions = [
-  { title: 'DDR3', value: 'DDR3' as MemoryType },
-  { title: 'DDR4', value: 'DDR4' as MemoryType },
-  { title: 'DDR5', value: 'DDR5' as MemoryType }
+  { label: 'DDR3', value: 'DDR3' as MemoryType },
+  { label: 'DDR4', value: 'DDR4' as MemoryType },
+  { label: 'DDR5', value: 'DDR5' as MemoryType }
 ];
 
 const localProduct = ref<Partial<RamProductRequest>>({

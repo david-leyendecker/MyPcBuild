@@ -69,7 +69,7 @@
 <script setup lang="ts">
 import { ref, onMounted, computed, h } from 'vue';
 import { useRouter } from 'vue-router';
-import { NCard, NInput, NDataTable, NTag, NFlex, NAlert, NButton } from 'naive-ui';
+import { NCard, NInput, NDataTable, NTag, NFlex, NAlert } from 'naive-ui';
 import type { DataTableColumns, PaginationProps } from 'naive-ui';
 import { useCatalogStore } from '@/stores/catalogStore';
 import { catalogApi, ProductCategory, categoryLabels } from '@/api/catalog';

@@ -1,59 +1,57 @@
 <template>
-  <v-card :color="buildStore.isValid ? 'success' : 'error'" variant="outlined">
-    <v-card-title>
-      <div class="d-flex align-center ga-2">
-        <v-icon :color="buildStore.isValid ? 'success' : 'error'">
-          {{ buildStore.isValid ? 'mdi-check-circle' : 'mdi-alert-circle' }}
-        </v-icon>
+  <n-card :bordered="true" :type="buildStore.isValid ? 'success' : 'error'">
+    <template #header>
+      <n-flex align="center" :size="8">
+        <span>{{ buildStore.isValid ? '✅' : '⚠️' }}</span>
         <span>Compatibility Status</span>
-      </div>
-    </v-card-title>
-    <v-card-text>
-      <div v-if="buildStore.isValid" class="text-success font-weight-medium d-flex align-center ga-2">
-        <v-icon color="success">mdi-check</v-icon>
-        <p class="ma-0">All components are compatible</p>
-      </div>
+      </n-flex>
+    </template>
 
-      <div v-else class="d-flex flex-column ga-3">
-        <div v-if="buildStore.errors.length > 0">
-          <h4 class="text-subtitle-2 text-error d-flex align-center ga-2 mb-2">
-            <v-icon color="error">mdi-alert</v-icon>
-            Errors
-          </h4>
-          <v-alert 
+    <div v-if="buildStore.isValid">
+      <n-flex align="center" :size="8" style="color: var(--n-color-success);">
+        <span>✅</span>
+        <p style="margin: 0; font-weight: 500;">All components are compatible</p>
+      </n-flex>
+    </div>
+
+    <n-flex v-else vertical :size="12">
+      <div v-if="buildStore.errors.length > 0">
+        <n-flex align="center" :size="8" style="margin-bottom: 8px; color: var(--n-color-error);">
+          <span>⚠️</span>
+          <h4 style="margin: 0; font-weight: 600; font-size: 14px;">Errors</h4>
+        </n-flex>
+        <n-flex vertical :size="8">
+          <n-alert 
             v-for="(issue, index) in buildStore.errors"
             :key="`error-${index}`"
             type="error"
-            density="compact"
-            variant="tonal"
-            class="mb-2"
           >
             {{ issue.message }}
-          </v-alert>
-        </div>
+          </n-alert>
+        </n-flex>
+      </div>
 
-        <div v-if="buildStore.warnings.length > 0">
-          <h4 class="text-subtitle-2 text-warning d-flex align-center ga-2 mb-2">
-            <v-icon color="warning">mdi-alert-outline</v-icon>
-            Warnings
-          </h4>
-          <v-alert 
+      <div v-if="buildStore.warnings.length > 0">
+        <n-flex align="center" :size="8" style="margin-bottom: 8px; color: var(--n-color-warning);">
+          <span>⚠️</span>
+          <h4 style="margin: 0; font-weight: 600; font-size: 14px;">Warnings</h4>
+        </n-flex>
+        <n-flex vertical :size="8">
+          <n-alert 
             v-for="(issue, index) in buildStore.warnings"
             :key="`warning-${index}`"
             type="warning"
-            density="compact"
-            variant="tonal"
-            class="mb-2"
           >
             {{ issue.message }}
-          </v-alert>
-        </div>
+          </n-alert>
+        </n-flex>
       </div>
-    </v-card-text>
-  </v-card>
+    </n-flex>
+  </n-card>
 </template>
 
 <script setup lang="ts">
+import { NCard, NFlex, NAlert } from 'naive-ui';
 import { useBuildStore } from '@/stores/buildStore';
 
 const buildStore = useBuildStore();

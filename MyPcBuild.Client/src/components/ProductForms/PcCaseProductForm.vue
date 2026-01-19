@@ -1,67 +1,63 @@
 <template>
-  <v-container fluid class="pa-0">
+  <n-flex vertical :size="12">
     <!-- Form Factor and Color - Side by side -->
-    <v-row>
-      <v-col cols="12" md="6">
-        <v-text-field 
-          v-model="localProduct.formFactor"
-          label="Form Factor"
-          :readonly="!editable"
-          :variant="editable ? 'filled' : 'outlined'"
+    <n-flex :size="12">
+      <div style="flex: 1; min-width: 150px;">
+        <label style="display: block; margin-bottom: 4px; font-size: 14px;">Form Factor</label>
+        <n-input 
+          v-model:value="localProduct.formFactor"
+          :disabled="!editable"
           placeholder="e.g., Mid Tower, Full Tower"
-        ></v-text-field>
-      </v-col>
-      <v-col cols="12" md="6">
-        <v-text-field 
-          v-model="localProduct.color"
-          label="Color"
-          :readonly="!editable"
-          :variant="editable ? 'filled' : 'outlined'"
+        />
+      </div>
+      <div style="flex: 1; min-width: 150px;">
+        <label style="display: block; margin-bottom: 4px; font-size: 14px;">Color</label>
+        <n-input 
+          v-model:value="localProduct.color"
+          :disabled="!editable"
           placeholder="e.g., Black, White"
-        ></v-text-field>
-      </v-col>
-    </v-row>
+        />
+      </div>
+    </n-flex>
 
-    <v-row>
-      <v-col cols="12">
-        <!-- Side Panel Window -->
-        <v-text-field 
-          v-model="localProduct.sidePanelWindow"
-          label="Side Panel Window"
-          :readonly="!editable"
-          :variant="editable ? 'filled' : 'outlined'"
+    <!-- Side Panel Window -->
+    <n-flex :size="12">
+      <div style="flex: 1; min-width: 150px;">
+        <label style="display: block; margin-bottom: 4px; font-size: 14px;">Side Panel Window</label>
+        <n-input 
+          v-model:value="localProduct.sidePanelWindow"
+          :disabled="!editable"
           placeholder="e.g., Tempered Glass, Acrylic, None"
-        ></v-text-field>
-      </v-col>
-    </v-row>
+        />
+      </div>
+    </n-flex>
 
-    <v-row>
-      <v-col cols="12">
-        <!-- Dimensions -->
-        <div class="mb-2">
-          <label class="text-subtitle-2 font-weight-semibold mb-2 d-block">Dimensions</label>
-          <DimensionsInput 
-            v-model="localProduct.dimensions"
-            :editable="editable"
-          />
-        </div>
-      </v-col>
-    </v-row>
+    <!-- Dimensions -->
+    <n-flex :size="12">
+      <div style="flex: 1; min-width: 150px;">
+        <label style="display: block; margin-bottom: 4px; font-size: 14px;">Dimensions</label>
+        <DimensionsInput 
+          v-model="localProduct.dimensions"
+          :editable="editable"
+        />
+      </div>
+    </n-flex>
 
-    <v-row>
-      <v-col cols="12">
-        <!-- Chambers -->
+    <!-- Chambers -->
+    <n-flex :size="12">
+      <div style="flex: 1; min-width: 150px;">
         <ChambersInput 
           v-model="localProduct.chambers"
           :editable="editable"
         />
-      </v-col>
-    </v-row>
-  </v-container>
+      </div>
+    </n-flex>
+  </n-flex>
 </template>
 
 <script setup lang="ts">
 import { ref, watch } from 'vue';
+import { NFlex, NInput } from 'naive-ui';
 import type { PcCaseProductRequest, PcCaseProductResponse } from '@/types/products';
 import DimensionsInput from '@/components/ValueObjects/DimensionsInput.vue';
 import ChambersInput from '@/components/ValueObjects/ChambersInput.vue';

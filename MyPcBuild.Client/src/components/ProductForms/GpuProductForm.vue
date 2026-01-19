@@ -1,135 +1,130 @@
 <template>
-  <v-container fluid class="pa-0">
+  <n-flex vertical :size="12">
     <!-- Chipset Manufacturer and Series - Side by side -->
-    <v-row>
-      <v-col cols="12" md="6">
-        <v-text-field 
-          v-model="localProduct.chipsetManufacturer"
-          label="Chipset Manufacturer"
-          :readonly="!editable"
-          :variant="editable ? 'filled' : 'outlined'"
+    <n-flex :size="12">
+      <div style="flex: 1; min-width: 150px;">
+        <label style="display: block; margin-bottom: 4px; font-size: 14px;">Chipset Manufacturer</label>
+        <n-input 
+          v-model:value="localProduct.chipsetManufacturer"
+          :disabled="!editable"
           placeholder="e.g., NVIDIA, AMD"
-        ></v-text-field>
-      </v-col>
-      <v-col cols="12" md="6">
-        <v-text-field 
-          v-model="localProduct.series"
-          label="Series"
-          :readonly="!editable"
-          :variant="editable ? 'filled' : 'outlined'"
+        />
+      </div>
+      <div style="flex: 1; min-width: 150px;">
+        <label style="display: block; margin-bottom: 4px; font-size: 14px;">Series</label>
+        <n-input 
+          v-model:value="localProduct.series"
+          :disabled="!editable"
           placeholder="e.g., RTX 4090, RX 7900 XTX"
-        ></v-text-field>
-      </v-col>
-    </v-row>
+        />
+      </div>
+    </n-flex>
 
     <!-- VRAM and Memory Type - Side by side -->
-    <v-row>
-      <v-col cols="12" md="6">
+    <n-flex :size="12">
+      <div style="flex: 1; min-width: 150px;">
         <StorageCapacityInput 
           v-model="localProduct.vram"
           label="VRAM"
           :editable="editable"
         />
-      </v-col>
-      <v-col cols="12" md="6">
-        <v-select 
-          v-model="localProduct.memoryType"
-          :items="memoryTypeOptions"
-          label="Memory Type"
-          :readonly="!editable"
-          :variant="editable ? 'filled' : 'outlined'"
-        ></v-select>
-      </v-col>
-    </v-row>
+      </div>
+      <div style="flex: 1; min-width: 150px;">
+        <label style="display: block; margin-bottom: 4px; font-size: 14px;">Memory Type</label>
+        <n-select 
+          v-model:value="localProduct.memoryType"
+          :options="memoryTypeOptions"
+          :disabled="!editable"
+        />
+      </div>
+    </n-flex>
 
     <!-- Core Clock and Boost Clock - Side by side -->
-    <v-row>
-      <v-col cols="12" md="6">
+    <n-flex :size="12">
+      <div style="flex: 1; min-width: 150px;">
         <FrequencyInput 
           v-model="localProduct.coreClock"
           label="Core Clock"
           :editable="editable"
         />
-      </v-col>
-      <v-col cols="12" md="6">
+      </div>
+      <div style="flex: 1; min-width: 150px;">
         <FrequencyInput 
           v-model="localProduct.boostClock"
           label="Boost Clock"
           :editable="editable"
         />
-      </v-col>
-    </v-row>
+      </div>
+    </n-flex>
 
     <!-- TDP and Length - Side by side -->
-    <v-row>
-      <v-col cols="12" md="6">
+    <n-flex :size="12">
+      <div style="flex: 1; min-width: 150px;">
         <PowerInput 
           v-model="localProduct.tdp"
           label="TDP"
           :editable="editable"
         />
-      </v-col>
-      <v-col cols="12" md="6">
+      </div>
+      <div style="flex: 1; min-width: 150px;">
         <LengthInput 
           v-model="localProduct.length"
           label="Card Length"
           :editable="editable"
         />
-      </v-col>
-    </v-row>
+      </div>
+    </n-flex>
 
-    <v-row>
-      <v-col cols="12">
-        <!-- Power Connectors -->
-        <v-select 
-          v-model="localProduct.powerConnectors"
-          :items="powerConnectorOptions"
-          label="Power Connectors"
-          :readonly="!editable"
-          :variant="editable ? 'filled' : 'outlined'"
-        ></v-select>
-      </v-col>
-    </v-row>
-
-    <v-row>
-      <v-col cols="12">
-        <!-- Ray Tracing -->
-        <v-checkbox 
-          v-model="localProduct.rayTracing"
-          label="Ray Tracing Support"
-          :readonly="!editable"
+    <!-- Power Connectors -->
+    <n-flex :size="12">
+      <div style="flex: 1; min-width: 150px;">
+        <label style="display: block; margin-bottom: 4px; font-size: 14px;">Power Connectors</label>
+        <n-select 
+          v-model:value="localProduct.powerConnectors"
+          :options="powerConnectorOptions"
           :disabled="!editable"
-        ></v-checkbox>
-      </v-col>
-    </v-row>
+        />
+      </div>
+    </n-flex>
 
-    <v-row>
-      <v-col cols="12">
-        <!-- Dimensions -->
-        <div class="mb-2">
-          <label class="text-subtitle-2 font-weight-semibold mb-2 d-block">Dimensions</label>
-          <DimensionsInput 
-            v-model="localProduct.dimensions"
-            :editable="editable"
-          />
-        </div>
-      </v-col>
-    </v-row>
+    <!-- Ray Tracing -->
+    <n-flex :size="12">
+      <div style="flex: 1; min-width: 150px;">
+        <n-checkbox 
+          v-model:checked="localProduct.rayTracing"
+          :disabled="!editable"
+        >
+          Ray Tracing Support
+        </n-checkbox>
+      </div>
+    </n-flex>
 
-    <v-row>
-      <v-col cols="12">
-        <!-- Slots -->
+    <!-- Dimensions -->
+    <n-flex :size="12">
+      <div style="flex: 1; min-width: 150px;">
+        <label style="display: block; margin-bottom: 4px; font-size: 14px;">Dimensions</label>
+        <DimensionsInput 
+          v-model="localProduct.dimensions"
+          :editable="editable"
+        />
+      </div>
+    </n-flex>
+
+    <!-- Slots -->
+    <n-flex :size="12">
+      <div style="flex: 1; min-width: 150px;">
         <SlotsInput 
           v-model="localProduct.slots"
           :editable="editable"
         />
-      </v-col>
-    </v-row>
-  </v-container>
+      </div>
+    </n-flex>
+  </n-flex>
 </template>
 
 <script setup lang="ts">
 import { ref, watch } from 'vue';
+import { NFlex, NInput, NSelect, NCheckbox } from 'naive-ui';
 import type { GpuProductRequest, GpuProductResponse, MemoryType, GpuPowerConnector } from '@/types/products';
 import FrequencyInput from '@/components/ValueObjects/FrequencyInput.vue';
 import PowerInput from '@/components/ValueObjects/PowerInput.vue';
@@ -152,19 +147,19 @@ const emit = defineEmits<{
 }>();
 
 const memoryTypeOptions = [
-  { title: 'GDDR5', value: 'GDDR5' as MemoryType },
-  { title: 'GDDR5X', value: 'GDDR5X' as MemoryType },
-  { title: 'GDDR6', value: 'GDDR6' as MemoryType },
-  { title: 'GDDR6X', value: 'GDDR6X' as MemoryType },
-  { title: 'HBM2', value: 'HBM2' as MemoryType },
-  { title: 'HBM2E', value: 'HBM2E' as MemoryType },
-  { title: 'HBM3', value: 'HBM3' as MemoryType }
+  { label: 'GDDR5', value: 'GDDR5' as MemoryType },
+  { label: 'GDDR5X', value: 'GDDR5X' as MemoryType },
+  { label: 'GDDR6', value: 'GDDR6' as MemoryType },
+  { label: 'GDDR6X', value: 'GDDR6X' as MemoryType },
+  { label: 'HBM2', value: 'HBM2' as MemoryType },
+  { label: 'HBM2E', value: 'HBM2E' as MemoryType },
+  { label: 'HBM3', value: 'HBM3' as MemoryType }
 ];
 
 const powerConnectorOptions = [
-  { title: 'Dual 8-Pin', value: 'Dual8Pin' as GpuPowerConnector },
-  { title: 'Triple 8-Pin', value: 'Triple8Pin' as GpuPowerConnector },
-  { title: '1x 16-Pin', value: 'One16Pin' as GpuPowerConnector }
+  { label: 'Dual 8-Pin', value: 'Dual8Pin' as GpuPowerConnector },
+  { label: 'Triple 8-Pin', value: 'Triple8Pin' as GpuPowerConnector },
+  { label: '1x 16-Pin', value: 'One16Pin' as GpuPowerConnector }
 ];
 
 const localProduct = ref<Partial<GpuProductRequest>>({

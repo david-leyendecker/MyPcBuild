@@ -1,69 +1,67 @@
 <template>
-  <v-container fluid class="pa-0">
+  <n-flex vertical :size="12">
     <!-- Type and Interface - Side by side -->
-    <v-row>
-      <v-col cols="12" md="6">
-        <v-text-field 
-          v-model="localProduct.type"
-          label="Storage Type"
-          :readonly="!editable"
-          :variant="editable ? 'filled' : 'outlined'"
+    <n-flex :size="12">
+      <div style="flex: 1; min-width: 150px;">
+        <label style="display: block; margin-bottom: 4px; font-size: 14px;">Storage Type</label>
+        <n-input 
+          v-model:value="localProduct.type"
+          :disabled="!editable"
           placeholder="e.g., SSD, HDD"
-        ></v-text-field>
-      </v-col>
-      <v-col cols="12" md="6">
-        <v-text-field 
-          v-model="localProduct.interface"
-          label="Interface"
-          :readonly="!editable"
-          :variant="editable ? 'filled' : 'outlined'"
+        />
+      </div>
+      <div style="flex: 1; min-width: 150px;">
+        <label style="display: block; margin-bottom: 4px; font-size: 14px;">Interface</label>
+        <n-input 
+          v-model:value="localProduct.interface"
+          :disabled="!editable"
           placeholder="e.g., NVMe, SATA"
-        ></v-text-field>
-      </v-col>
-    </v-row>
+        />
+      </div>
+    </n-flex>
 
     <!-- Form Factor and Capacity - Side by side -->
-    <v-row>
-      <v-col cols="12" md="6">
-        <v-text-field 
-          v-model="localProduct.storageFormFactor"
-          label="Form Factor"
-          :readonly="!editable"
-          :variant="editable ? 'filled' : 'outlined'"
+    <n-flex :size="12">
+      <div style="flex: 1; min-width: 150px;">
+        <label style="display: block; margin-bottom: 4px; font-size: 14px;">Form Factor</label>
+        <n-input 
+          v-model:value="localProduct.storageFormFactor"
+          :disabled="!editable"
           placeholder="e.g., M.2 2280, 2.5 inch"
-        ></v-text-field>
-      </v-col>
-      <v-col cols="12" md="6">
+        />
+      </div>
+      <div style="flex: 1; min-width: 150px;">
         <StorageCapacityInput 
           v-model="localProduct.capacity"
           label="Capacity"
           :editable="editable"
         />
-      </v-col>
-    </v-row>
+      </div>
+    </n-flex>
 
     <!-- Read Speed and Write Speed - Side by side -->
-    <v-row>
-      <v-col cols="12" md="6">
+    <n-flex :size="12">
+      <div style="flex: 1; min-width: 150px;">
         <DataSpeedInput 
           v-model="localProduct.readSpeed"
           label="Read Speed"
           :editable="editable"
         />
-      </v-col>
-      <v-col cols="12" md="6">
+      </div>
+      <div style="flex: 1; min-width: 150px;">
         <DataSpeedInput 
           v-model="localProduct.writeSpeed"
           label="Write Speed"
           :editable="editable"
         />
-      </v-col>
-    </v-row>
-  </v-container>
+      </div>
+    </n-flex>
+  </n-flex>
 </template>
 
 <script setup lang="ts">
 import { ref, watch } from 'vue';
+import { NFlex, NInput } from 'naive-ui';
 import type { StorageProductRequest, StorageProductResponse } from '@/types/products';
 import StorageCapacityInput from '@/components/ValueObjects/StorageCapacityInput.vue';
 import DataSpeedInput from '@/components/ValueObjects/DataSpeedInput.vue';

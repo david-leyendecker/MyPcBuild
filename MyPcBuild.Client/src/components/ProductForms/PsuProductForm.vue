@@ -1,71 +1,67 @@
 <template>
-  <v-container fluid class="pa-0">
+  <n-flex vertical :size="12">
     <!-- Wattage and Efficiency - Side by side -->
-    <v-row>
-      <v-col cols="12" md="6">
+    <n-flex :size="12">
+      <div style="flex: 1; min-width: 150px;">
         <PowerInput 
           v-model="localProduct.wattage"
           label="Wattage"
           :editable="editable"
         />
-      </v-col>
-      <v-col cols="12" md="6">
-        <v-text-field 
-          v-model="localProduct.efficiency"
-          label="Efficiency Rating"
-          :readonly="!editable"
-          :variant="editable ? 'filled' : 'outlined'"
+      </div>
+      <div style="flex: 1; min-width: 150px;">
+        <label style="display: block; margin-bottom: 4px; font-size: 14px;">Efficiency Rating</label>
+        <n-input 
+          v-model:value="localProduct.efficiency"
+          :disabled="!editable"
           placeholder="e.g., 80+ Gold, 80+ Platinum"
-        ></v-text-field>
-      </v-col>
-    </v-row>
+        />
+      </div>
+    </n-flex>
 
     <!-- Modular and Form Factor - Side by side -->
-    <v-row>
-      <v-col cols="12" md="6">
-        <v-text-field 
-          v-model="localProduct.modular"
-          label="Modularity"
-          :readonly="!editable"
-          :variant="editable ? 'filled' : 'outlined'"
+    <n-flex :size="12">
+      <div style="flex: 1; min-width: 150px;">
+        <label style="display: block; margin-bottom: 4px; font-size: 14px;">Modularity</label>
+        <n-input 
+          v-model:value="localProduct.modular"
+          :disabled="!editable"
           placeholder="e.g., Fully Modular, Semi-Modular"
-        ></v-text-field>
-      </v-col>
-      <v-col cols="12" md="6">
-        <v-text-field 
-          v-model="localProduct.formFactor"
-          label="Form Factor"
-          :readonly="!editable"
-          :variant="editable ? 'filled' : 'outlined'"
+        />
+      </div>
+      <div style="flex: 1; min-width: 150px;">
+        <label style="display: block; margin-bottom: 4px; font-size: 14px;">Form Factor</label>
+        <n-input 
+          v-model:value="localProduct.formFactor"
+          :disabled="!editable"
           placeholder="e.g., ATX, SFX"
-        ></v-text-field>
-      </v-col>
-    </v-row>
+        />
+      </div>
+    </n-flex>
 
     <!-- Length and PCIe 8-Pin Connectors - Side by side -->
-    <v-row>
-      <v-col cols="12" md="6">
+    <n-flex :size="12">
+      <div style="flex: 1; min-width: 150px;">
         <LengthInput 
           v-model="localProduct.length"
           label="Length"
           :editable="editable"
         />
-      </v-col>
-      <v-col cols="12" md="6">
-        <v-text-field 
-          v-model.number="localProduct.pcie8Pin"
-          label="PCIe 8-Pin Connectors"
-          :readonly="!editable"
-          type="number"
-          :variant="editable ? 'filled' : 'outlined'"
-        ></v-text-field>
-      </v-col>
-    </v-row>
-  </v-container>
+      </div>
+      <div style="flex: 1; min-width: 150px;">
+        <label style="display: block; margin-bottom: 4px; font-size: 14px;">PCIe 8-Pin Connectors</label>
+        <n-input-number 
+          v-model:value="localProduct.pcie8Pin"
+          :disabled="!editable"
+        />
+      </div>
+    </n-flex>
+  </n-flex>
 </template>
 
 <script setup lang="ts">
 import { ref, watch } from 'vue';
+import { NFlex, NInput, NInputNumber } from 'naive-ui';
 import type { PsuProductRequest, PsuProductResponse } from '@/types/products';
 import PowerInput from '@/components/ValueObjects/PowerInput.vue';
 import LengthInput from '@/components/ValueObjects/LengthInput.vue';
