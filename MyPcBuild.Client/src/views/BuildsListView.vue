@@ -9,95 +9,90 @@
       }"
     />
 
-    <div v-if="buildStore.isLoading" class="d-flex justify-center py-8">
-      <v-progress-circular indeterminate color="primary"></v-progress-circular>
-    </div>
+    <n-flex v-if="buildStore.isLoading" justify="center" style="padding: 32px 0;">
+      <n-spin size="large" />
+    </n-flex>
 
-    <v-alert v-else-if="buildStore.error" type="error" class="mb-3">
+    <n-alert v-else-if="buildStore.error" type="error" style="margin-bottom: 12px;">
       {{ buildStore.error }}
-    </v-alert>
+    </n-alert>
 
-    <div v-else-if="buildStore.builds.length === 0" class="text-center py-8">
-      <p class="text-h6 text-medium-emphasis">No builds yet. Create your first PC build!</p>
-    </div>
+    <n-flex v-else-if="buildStore.builds.length === 0" vertical align="center" style="padding: 32px 0;">
+      <p style="font-size: 18px; opacity: 0.6;">No builds yet. Create your first PC build!</p>
+    </n-flex>
 
-    <v-row v-else>
-      <v-col 
+    <n-grid v-else :cols="1" :x-gap="16" :y-gap="16" responsive="screen" :item-responsive="true">
+      <n-gi 
         v-for="build in buildStore.builds" 
         :key="build.id"
-        cols="12" md="6" lg="4"
+        :span="24" :suffix="true"
+        :xs="24" :sm="24" :md="12" :lg="8" :xl="8"
       >
-        <v-card class="build-card">
-          <v-card-text>
-            <router-link :to="`/builds/${build.id}`" class="build-link text-decoration-none">
-              <h3 class="text-h5 mb-3">{{ build.name }}</h3>
-            </router-link>
-            <div class="text-body-2 text-medium-emphasis">
-              <p class="my-2"><strong>Parts:</strong> {{ build.parts.length }}</p>
-              <p class="my-2"><strong>Total Cost:</strong> ${{ build.parts.reduce((sum, p) => sum + p.pricePaid, 0).toFixed(2) }}</p>
-            </div>
-          </v-card-text>
-          <v-card-actions>
-            <v-btn 
-              prepend-icon="mdi-arrow-right"
-              size="small"
-              class="flex-grow-1"
-              @click="$router.push(`/builds/${build.id}`)"
-            >
-              View Details
-            </v-btn>
-            <v-btn 
-              icon="mdi-delete"
-              size="small"
-              color="error"
-              variant="text"
-              @click="deleteBuild(build.id)"
-            ></v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-col>
-    </v-row>
+        <n-card class="build-card">
+          <router-link :to="`/builds/${build.id}`" class="build-link" style="text-decoration: none;">
+            <h3 style="font-size: 20px; margin-bottom: 12px; color: var(--n-text-color);">{{ build.name }}</h3>
+          </router-link>
+          <div style="font-size: 14px; opacity: 0.7;">
+            <p style="margin: 8px 0;"><strong>Parts:</strong> {{ build.parts.length }}</p>
+            <p style="margin: 8px 0;"><strong>Total Cost:</strong> ${{ build.parts.reduce((sum, p) => sum + p.pricePaid, 0).toFixed(2) }}</p>
+          </div>
+          <template #footer>
+            <n-flex justify="space-between">
+              <n-button 
+                type="primary"
+                style="flex: 1;"
+                @click="$router.push(`/builds/${build.id}`)"
+              >
+                View Details →
+              </n-button>
+              <n-button 
+                type="error"
+                text
+                @click="deleteBuild(build.id)"
+              >
+                🗑
+              </n-button>
+            </n-flex>
+          </template>
+        </n-card>
+      </n-gi>
+    </n-grid>
 
     <!-- New Build Dialog -->
-    <v-dialog 
-      v-model="showNewBuildDialog"
-      max-width="500"
+    <n-modal 
+      v-model:show="showNewBuildDialog"
+      preset="card"
+      title="Create New Build"
+      style="width: 500px;"
     >
-      <v-card>
-        <v-card-title>Create New Build</v-card-title>
-        <v-card-text>
-          <v-text-field 
-            v-model="newBuildName"
-            label="Build Name"
-            placeholder="My Gaming PC"
-          ></v-text-field>
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn 
-            prepend-icon="mdi-close"
-            variant="text"
+      <n-input 
+        v-model:value="newBuildName"
+        placeholder="My Gaming PC"
+      />
+      <template #footer>
+        <n-flex justify="end" :size="12">
+          <n-button 
             @click="showNewBuildDialog = false"
           >
             Cancel
-          </v-btn>
-          <v-btn 
-            prepend-icon="mdi-check"
-            color="primary"
+          </n-button>
+          <n-button 
+            type="primary"
             :loading="buildStore.isLoading"
             @click="handleCreateBuild"
           >
             Create
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
+          </n-button>
+        </n-flex>
+      </template>
+    </n-modal>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
+import { NGrid, NGi, NCard, NButton, NFlex, NSpin, NAlert, NModal, NInput } from 'naive-ui';
 import { useBuildStore } from '@/stores/buildStore';
 import ViewHeader from '@/components/ViewHeader.vue';
 import { MY_BUILDS } from '@/config/navigation';
@@ -148,14 +143,12 @@ async function deleteBuild(id: string) {
 }
 
 .build-card:hover {
-  border-color: rgb(var(--v-theme-primary));
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   transform: translateY(-2px);
 }
 
 .build-link {
-  color: rgb(var(--v-theme-primary));
-  transition: color 0.3s ease;
+  transition: opacity 0.3s ease;
 }
 
 .build-link:hover {

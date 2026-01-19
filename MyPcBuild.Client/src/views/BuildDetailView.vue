@@ -1,172 +1,119 @@
 <template>
-  <v-container class="fade-in" fluid>
+  <div class="fade-in" style="max-width: 100%;">
     <!-- Loading State -->
-    <v-row v-if="buildStore.isLoading" justify="center" align="center" style="min-height: 50vh">
-      <v-col cols="12" class="text-center">
-        <v-progress-circular indeterminate color="primary"></v-progress-circular>
-      </v-col>
-    </v-row>
+    <n-flex v-if="buildStore.isLoading" justify="center" align="center" style="min-height: 50vh;">
+      <n-spin size="large" />
+    </n-flex>
 
     <!-- Error State -->
-    <v-row v-else-if="buildStore.error">
-      <v-col cols="12">
-        <v-alert type="error">
-          {{ buildStore.error }}
-        </v-alert>
-      </v-col>
-    </v-row>
+    <n-alert v-else-if="buildStore.error" type="error">
+      {{ buildStore.error }}
+    </n-alert>
 
     <!-- Main Content -->
     <template v-else-if="buildStore.currentBuild">
       <!-- Header Section -->
-      <v-row justify="space-between">
-        <v-col cols="10">
-          <h2 class="text-h4 text-primary">{{ buildStore.currentBuild.name }}</h2>
-          <p class="text-medium-emphasis text-body-2 mt-2">
+      <n-flex justify="space-between" style="margin-bottom: 16px;">
+        <div>
+          <h2 style="font-size: 28px; font-weight: 600; margin-bottom: 8px;">{{ buildStore.currentBuild.name }}</h2>
+          <p style="opacity: 0.7; font-size: 14px;">
             Created: {{ new Date(buildStore.currentBuild.createdAt).toLocaleDateString() }}
           </p>
-        </v-col>
-        <v-col cols="1" class="text-right">
-          <v-btn 
-            prepend-icon="mdi-arrow-left"
-            variant="text"
-            @click="$router.back()"
-          >
-            Back
-          </v-btn>
-        </v-col>
-      </v-row>
+        </div>
+        <n-button text @click="$router.back()">
+          ← Back
+        </n-button>
+      </n-flex>
 
       <!-- Compatibility Status Section -->
-      <v-row>
-        <v-col cols="12">
-          <CompatibilityPanel />
-        </v-col>
-      </v-row>
+      <div style="margin-bottom: 16px;">
+        <CompatibilityPanel />
+      </div>
 
       <!-- 3D Visualization Section -->
-      <v-row v-if="hasSpatialParts">
-        <v-col cols="12">
-          <v-card>
-            <v-card-title class="d-flex justify-space-between align-center">
-              <span>3D Build Visualization</span>
-              <v-btn
-                prepend-icon="mdi-open-in-new"
-                variant="text"
-                size="small"
-                @click="open3DInPopout"
-              >
-                Open in Popout
-              </v-btn>
-            </v-card-title>
-            <v-card-text>
-              <Viewer3D 
-                :parts="buildStore.currentBuild.parts"
-                :collisions="collidingPartIds"
-              />
-            </v-card-text>
-          </v-card>
-        </v-col>
-      </v-row>
+      <n-card v-if="hasSpatialParts" style="margin-bottom: 16px;">
+        <template #header>
+          <n-flex justify="space-between" align="center">
+            <span>3D Build Visualization</span>
+            <n-button text size="small" @click="open3DInPopout">
+              Open in Popout
+            </n-button>
+          </n-flex>
+        </template>
+        <Viewer3D 
+          :parts="buildStore.currentBuild.parts"
+          :collisions="collidingPartIds"
+        />
+      </n-card>
 
       <!-- Parts List Section -->
-      <v-row>
-        <v-col cols="12">
-          <v-card>
-            <v-card-title>PC Components</v-card-title>
-            <v-card-text>
-              <v-row v-if="buildStore.currentBuild.parts.length === 0" justify="center">
-                <v-col cols="12" class="text-center py-6">
-                  <p class="text-medium-emphasis mb-4">No components added yet.</p>
-                  <v-btn 
-                    prepend-icon="mdi-plus"
-                    color="primary"
-                    @click="showAddPartDialog = true"
-                  >
-                    Add Component
-                  </v-btn>
-                </v-col>
-              </v-row>
+      <n-card>
+        <template #header>PC Components</template>
+        
+        <n-flex v-if="buildStore.currentBuild.parts.length === 0" vertical align="center" style="padding: 24px 0;">
+          <p style="opacity: 0.6; margin-bottom: 16px;">No components added yet.</p>
+          <n-button type="primary" @click="showAddPartDialog = true">
+            + Add Component
+          </n-button>
+        </n-flex>
 
-              <v-row v-else>
-                <v-col cols="12">
-                  <v-row>
-                    <v-col 
-                      v-for="part in buildStore.currentBuild.parts"
-                      :key="part.id"
-                      cols="12"
-                    >
-                      <v-card variant="outlined">
-                        <v-card-text>
-                          <v-row justify="space-between">
-                            <v-col cols="10">
-                              <h4 class="text-h6 mb-1">{{ part.name }}</h4>
-                              <p class="text-primary text-body-2 my-1">{{ part.category }}</p>
-                              <p class="text-medium-emphasis font-weight-medium mt-2">${{ part.pricePaid.toFixed(2) }}</p>
-                            </v-col>
-                            <v-col cols="1" class="text-right">
-                              <v-btn 
-                                icon="mdi-delete"
-                                size="small"
-                                color="error"
-                                variant="text"
-                                @click="removePart(part.id)"
-                              ></v-btn>
-                            </v-col>
-                          </v-row>
-                        </v-card-text>
-                      </v-card>
-                    </v-col>
-                  </v-row>
+        <template v-else>
+          <n-flex vertical :size="12">
+            <n-card 
+              v-for="part in buildStore.currentBuild.parts"
+              :key="part.id"
+              size="small"
+              :bordered="true"
+            >
+              <n-flex justify="space-between" align="center">
+                <div style="flex: 1;">
+                  <h4 style="font-size: 18px; margin-bottom: 4px;">{{ part.name }}</h4>
+                  <p style="font-size: 14px; margin: 4px 0; opacity: 0.8;">{{ part.category }}</p>
+                  <p style="font-weight: 600; margin-top: 8px; color: #18a058;">${{ part.pricePaid.toFixed(2) }}</p>
+                </div>
+                <n-button text type="error" @click="removePart(part.id)">
+                  🗑
+                </n-button>
+              </n-flex>
+            </n-card>
+          </n-flex>
 
-                  <v-divider class="my-4"></v-divider>
+          <n-divider />
 
-                  <v-row class="pt-3">
-                    <v-col cols="12">
-                      <p class="text-h6"><strong>Total Cost:</strong> ${{ totalCost.toFixed(2) }}</p>
-                    </v-col>
-                  </v-row>
-                </v-col>
-              </v-row>
-            </v-card-text>
-            <v-card-actions>
-              <v-btn 
-                prepend-icon="mdi-plus"
-                color="primary"
-                block
-                @click="showAddPartDialog = true"
-              >
-                Add Component
-              </v-btn>
-            </v-card-actions>
-          </v-card>
-        </v-col>
-      </v-row>
+          <p style="font-size: 18px; font-weight: 600; padding-top: 12px;">
+            Total Cost: ${{ totalCost.toFixed(2) }}
+          </p>
+        </template>
+
+        <template #footer>
+          <n-button type="primary" block @click="showAddPartDialog = true">
+            + Add Component
+          </n-button>
+        </template>
+      </n-card>
 
       <!-- Add Part Dialog -->
-      <v-dialog 
-        v-model="showAddPartDialog"
-        max-width="600"
+      <n-modal 
+        v-model:show="showAddPartDialog"
+        preset="card"
+        title="Add Component"
+        style="width: 600px;"
       >
-        <v-card>
-          <v-card-title>Add Component</v-card-title>
-          <v-card-text>
-            <AddPartDialogWithSlots 
-              :build-id="buildStore.currentBuild.id"
-              @part-selected="handleAddPart"
-              @part-selected-with-slot="handleAddPartToSlot"
-              @close="showAddPartDialog = false"
-            />
-          </v-card-text>
-        </v-card>
-      </v-dialog>
+        <AddPartDialogWithSlots 
+          :build-id="buildStore.currentBuild.id"
+          @part-selected="handleAddPart"
+          @part-selected-with-slot="handleAddPartToSlot"
+          @close="showAddPartDialog = false"
+        />
+      </n-modal>
     </template>
-  </v-container>
+  </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
+import { NCard, NButton, NFlex, NSpin, NAlert, NDivider, NModal } from 'naive-ui';
 import { useBuildStore } from '@/stores/buildStore';
 import { useCatalogStore } from '@/stores/catalogStore';
 import { use3DPopout } from '@/composables/use3DPopout';

@@ -1,16 +1,19 @@
 <template>
-  <v-app>
-    <AppHeader />
-    <v-main>
-      <v-container>
+  <n-config-provider :theme="darkTheme">
+    <n-layout style="height: 100vh;">
+      <n-layout-header bordered>
+        <AppHeader />
+      </n-layout-header>
+      <n-layout-content content-style="padding: 24px;">
         <RouterView />
-      </v-container>
-    </v-main>
+      </n-layout-content>
+    </n-layout>
     <GlobalPopoutContainer />
-  </v-app>
+  </n-config-provider>
 </template>
 
 <script setup lang="ts">
+import { darkTheme, NConfigProvider, NLayout, NLayoutHeader, NLayoutContent } from 'naive-ui';
 import { RouterView } from 'vue-router';
 import AppHeader from '@/components/AppHeader.vue';
 import GlobalPopoutContainer from '@/components/GlobalPopoutContainer.vue';

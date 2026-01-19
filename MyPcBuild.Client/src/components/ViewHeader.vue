@@ -1,12 +1,18 @@
 <template>
-    <div class="mb-4">
-        <div class="d-flex justify-space-between align-center mb-3">
-            <h2 class="text-h4 text-primary">{{ title }}</h2>
-            <v-btn v-if="actionButton" :prepend-icon="actionButton.icon" :color="actionButton.color || 'primary'"
-                :rounded="actionButton.rounded || true" @click="actionButton.onClick">
+    <div style="margin-bottom: 16px;">
+        <n-flex justify="space-between" align="center" style="margin-bottom: 12px;">
+            <h2 style="font-size: 28px; font-weight: 600; color: var(--n-text-color);">{{ title }}</h2>
+            <n-button 
+                v-if="actionButton" 
+                :type="actionButton.color === 'primary' ? 'primary' : 'default'"
+                @click="actionButton.onClick"
+            >
+                <template v-if="actionButton.icon" #icon>
+                    <span>{{ getIcon(actionButton.icon) }}</span>
+                </template>
                 {{ actionButton.text }}
-            </v-btn>
-        </div>
+            </n-button>
+        </n-flex>
 
         <!-- Optional slot for additional header content (e.g., search bars, filters) -->
         <slot></slot>
@@ -14,6 +20,8 @@
 </template>
 
 <script setup lang="ts">
+import { NButton, NFlex } from 'naive-ui';
+
 interface ActionButton {
     text: string;
     icon?: string;
@@ -28,6 +36,20 @@ interface Props {
 }
 
 defineProps<Props>();
+
+function getIcon(iconName: string): string {
+    const iconMap: Record<string, string> = {
+        'mdi-plus': '+',
+        'mdi-arrow-right': '→',
+        'mdi-arrow-left': '←',
+        'mdi-delete': '🗑',
+        'mdi-pencil': '✏',
+        'mdi-check': '✓',
+        'mdi-close': '✕',
+        'mdi-magnify': '🔍'
+    };
+    return iconMap[iconName] || '';
+}
 </script>
 
 <style scoped></style>
