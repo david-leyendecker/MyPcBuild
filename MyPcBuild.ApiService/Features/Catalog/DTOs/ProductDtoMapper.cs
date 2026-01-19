@@ -33,7 +33,7 @@ public static class ProductDtoMapper
     public static Product ToDomain(ProductRequest request, Guid? id = null)
     {
         Guid productId = id ?? Guid.NewGuid();
-        
+
         return request switch
         {
             CpuProductRequest cpu => ToCpuDomain(cpu, productId),
@@ -87,8 +87,8 @@ public static class ProductDtoMapper
             FormFactor = ToApiFormFactor(mb.FormFactor),
             MemoryType = ToApiMemoryType(mb.MemoryType),
             MaxMemory = ApiStorageCapacity.FromGB(mb.MaxMemory.ValueInGB),
-            Dimensions = ToDimensionsModel(mb.Dimensions),
-            Slots = mb.Slots.Select(ToSlotModel).ToList()
+            Dimensions = mb.Dimensions.ToDimensionsModel(),
+            Slots = [.. mb.Slots.Select(s => s.ToSlotModel())]
         };
     }
 
@@ -113,8 +113,8 @@ public static class ProductDtoMapper
             Length = ApiLength.FromMm(gpu.Length.ValueInMm),
             PowerConnectors = ToApiGpuPowerConnector(gpu.PowerConnectors),
             RayTracing = gpu.RayTracing,
-            Dimensions = ToDimensionsModel(gpu.Dimensions),
-            Slots = gpu.Slots.Select(ToSlotModel).ToList()
+            Dimensions = gpu.Dimensions.ToDimensionsModel(),
+            Slots = [.. gpu.Slots.Select(s => s.ToSlotModel())]
         };
     }
 
@@ -152,8 +152,8 @@ public static class ProductDtoMapper
             FormFactor = pcCase.FormFactor,
             Color = pcCase.Color,
             SidePanelWindow = pcCase.SidePanelWindow,
-            Dimensions = ToDimensionsModel(pcCase.Dimensions),
-            Chambers = pcCase.Chambers.Select(ToChamberModel).ToList()
+            Dimensions = pcCase.Dimensions.ToDimensionsModel(),
+            Chambers = [.. pcCase.Chambers.Select(c => c.ToChamberModel())]
         };
     }
 
@@ -212,7 +212,7 @@ public static class ProductDtoMapper
             Height = ApiLength.FromMm(cooler.Height.ValueInMm),
             TDP = ApiPower.FromWatts(cooler.TDP.ValueInWatts),
             Sockets = cooler.Sockets.Select(ToApiCpuSocket).ToList(),
-            Dimensions = ToDimensionsModel(cooler.Dimensions)
+            Dimensions = cooler.Dimensions.ToDimensionsModel()
         };
     }
 
@@ -242,8 +242,8 @@ public static class ProductDtoMapper
             request.Name,
             request.Price,
             request.Manufacturer,
-            ToDomainDimensions(request.Dimensions),
-            request.Slots?.Select(ToDomainSlot).ToList() ?? [],
+            request.Dimensions.ToDomainDimensions(),
+            request.Slots?.Select(s => s.ToDomainSlot()).ToList() ?? [],
             ToDomainCpuSocket(request.Socket),
             request.Chipset,
             ToDomainFormFactor(request.FormFactor),
@@ -259,8 +259,8 @@ public static class ProductDtoMapper
             request.Name,
             request.Price,
             request.Manufacturer,
-            ToDomainDimensions(request.Dimensions),
-            request.Slots?.Select(ToDomainSlot).ToList() ?? [],
+            request.Dimensions.ToDomainDimensions(),
+            request.Slots?.Select(s => s.ToDomainSlot()).ToList() ?? [],
             request.ChipsetManufacturer,
             request.Series,
             StorageCapacity.FromGB(request.VRAM.ValueInGB),
@@ -297,8 +297,8 @@ public static class ProductDtoMapper
             request.Name,
             request.Price,
             request.Manufacturer,
-            ToDomainDimensions(request.Dimensions),
-            request.Chambers?.Select(ToDomainChamber).ToList() ?? [],
+            request.Dimensions.ToDomainDimensions(),
+            request.Chambers?.Select(c => c.ToDomainChamber()).ToList() ?? [],
             request.FormFactor,
             request.Color,
             request.SidePanelWindow
@@ -344,7 +344,7 @@ public static class ProductDtoMapper
             request.Name,
             request.Price,
             request.Manufacturer,
-            ToDomainDimensions(request.Dimensions),
+            request.Dimensions.ToDomainDimensions(),
             ToDomainCoolerType(request.CoolerType),
             Length.FromMm(request.Height.ValueInMm),
             Power.FromWatts(request.TDP.ValueInWatts),
@@ -459,8 +459,56 @@ public static class ProductDtoMapper
         ApiGpuPowerConnector.One16Pin => GpuPowerConnector.One16Pin,
         _ => throw new ArgumentException($"Unknown API GPU power connector: {connector}")
     };
+}
 
-    private static DimensionsModel ToDimensionsModel(Dimensions dimensions)
+public static class MapperExtensions
+{
+    public static Vector3Model ToVector3Model(this Vector3? relativePosition)
+    {
+        return relativePosition is null
+            ? new Vector3Model { X = 0, Y = 0, Z = 0 }
+            : new Vector3Model
+            {
+                X = relativePosition.X,
+                Y = relativePosition.Y,
+                Z = relativePosition.Z
+            };
+    }
+
+    public static Vector3 ToDomainVector3(this Vector3Model? model)
+    {
+        return model is null
+            ? Vector3.Zero
+            : new Vector3(
+                model.X,
+                model.Y,
+                model.Z
+            );
+    }
+
+    public static ChamberModel ToChamberModel(this Chamber chamber)
+    {
+        return new ChamberModel
+        {
+            Name = chamber.Name,
+            RelativePosition = chamber.RelativePosition.ToVector3Model(),
+            Dimensions = chamber.Dimensions.ToDimensionsModel(),
+            Slots = chamber.Slots.Select(ToSlotModel).ToList() ?? []
+        };
+    }
+
+    public static Chamber ToDomainChamber(this ChamberModel chamber)
+    {
+        return new Chamber(
+            Guid.NewGuid(),
+            chamber.Name,
+            chamber.RelativePosition.ToDomainVector3(),
+            chamber.Dimensions.ToDomainDimensions(),
+            [.. chamber.Slots.Select(ToDomainSlot)]
+        );
+    }
+
+    public static DimensionsModel ToDimensionsModel(this Dimensions dimensions)
     {
         return new DimensionsModel
         {
@@ -470,97 +518,49 @@ public static class ProductDtoMapper
         };
     }
 
-    private static Dimensions ToDomainDimensions(DimensionsModel dimensions)
+    public static Dimensions ToDomainDimensions(this DimensionsModel dimensions)
     {
         return new Dimensions(dimensions.Length, dimensions.Width, dimensions.Height);
     }
 
-    private static SlotModel ToSlotModel(Slot slot)
+    public static SlotModel ToSlotModel(this Slot slot)
     {
         return new SlotModel
         {
             Name = slot.Name,
             AllowedCategory = slot.AllowedProductCategory.ToString(),
-            RelativePosition = new Vector3Model
-            {
-                X = slot.RelativePosition.X,
-                Y = slot.RelativePosition.Y,
-                Z = slot.RelativePosition.Z
-            },
-            MaxDimensions = new DimensionsModel
-            {
-                Length = slot.MaxDimensions.Length,
-                Width = slot.MaxDimensions.Width,
-                Height = slot.MaxDimensions.Height
-            },
-            Rotation = slot.Rotation != Rotation.Identity 
-                ? new RotationModel 
-                { 
-                    X = slot.Rotation.X, 
-                    Y = slot.Rotation.Y, 
-                    Z = slot.Rotation.Z 
-                } 
+            RelativePosition = slot.RelativePosition.ToVector3Model(),
+            MaxDimensions = slot.MaxDimensions.ToDimensionsModel(),
+            Rotation = slot.Rotation != Rotation.Identity
+                ? new RotationModel
+                {
+                    X = slot.Rotation.X,
+                    Y = slot.Rotation.Y,
+                    Z = slot.Rotation.Z
+                }
                 : null,
             SubSlots = slot.SubSlots?.Select(ToSlotModel).ToList()
         };
     }
 
-    private static Slot ToDomainSlot(SlotModel slot)
+    public static Slot ToDomainSlot(this SlotModel slot)
     {
         ProductCategory category = Enum.Parse<ProductCategory>(slot.AllowedCategory, ignoreCase: true);
-        Vector3 position = new Vector3(
-            slot.RelativePosition.X, 
-            slot.RelativePosition.Y, 
-            slot.RelativePosition.Z
-        );
-        Dimensions maxDimensions = new Dimensions(
-            slot.MaxDimensions.Length,
-            slot.MaxDimensions.Width,
-            slot.MaxDimensions.Height
-        );
-        Rotation rotation = slot.Rotation != null
-            ? new Rotation(slot.Rotation.X, slot.Rotation.Y, slot.Rotation.Z)
-            : Rotation.Identity;
-
         return new Slot(
             Guid.NewGuid(),
             slot.Name,
             category,
-            position,
-            maxDimensions,
-            rotation,
+            slot.RelativePosition.ToDomainVector3(),
+            slot.MaxDimensions.ToDomainDimensions(),
+            slot.Rotation.ToDomainRotation(),
             slot.SubSlots?.Select(ToDomainSlot).ToList()
         );
     }
 
-    private static ChamberModel ToChamberModel(Chamber chamber)
+    public static Rotation ToDomainRotation(this RotationModel? rotation)
     {
-        return new ChamberModel
-        {
-            Name = chamber.Name,
-            RelativePosition = new Vector3Model
-            {
-                X = chamber.RelativePosition.X,
-                Y = chamber.RelativePosition.Y,
-                Z = chamber.RelativePosition.Z
-            },
-            Dimensions = ToDimensionsModel(chamber.Dimensions),
-            Slots = chamber.Slots.Select(ToSlotModel).ToList()
-        };
-    }
-
-    private static Chamber ToDomainChamber(ChamberModel chamber)
-    {
-        return new Chamber(
-            Guid.NewGuid(),
-            chamber.Name,
-            new Vector3(
-                chamber.RelativePosition.X,
-                chamber.RelativePosition.Y,
-                chamber.RelativePosition.Z
-            ),
-            ToDomainDimensions(chamber.Dimensions),
-            chamber.Slots.Select(ToDomainSlot).ToList()
-        );
+        return rotation is null ?
+            Rotation.Identity :
+            new Rotation(rotation.X, rotation.Y, rotation.Z);
     }
 }

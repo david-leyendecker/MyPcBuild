@@ -15,132 +15,141 @@
       <p style="font-size: 14px;">No slots defined</p>
     </div>
 
-    <n-flex v-else vertical :size="12">
-      <n-card
+    <n-collapse
+      v-else
+      :expanded-names="expandedNames"
+      @update:expanded-names="handleExpandedChange"
+    >
+      <n-collapse-item
         v-for="(slot, index) in localSlots"
         :key="index"
-        :bordered="true"
-        size="small"
+        :name="index"
       >
-        <n-flex justify="space-between" align="center" style="margin-bottom: 8px;">
-          <h4 style="font-weight: 600; font-size: 14px; margin: 0;">Slot {{ index + 1 }}</h4>
-          <n-button
-            v-if="editable"
-            size="small"
-            text
-            type="error"
-            @click="removeSlot(index)"
-          >
-            🗑️
-          </n-button>
-        </n-flex>
+        <template #header>
+          <n-flex justify="space-between" align="center" :size="8" style="width: 100%;">
+            <span style="font-weight: 600; font-size: 14px;">
+              Slot {{ index + 1 }} — {{ slot.name || 'Unnamed' }} ({{ slot.allowedCategory || 'Unknown' }})
+            </span>
+            <n-button
+              v-if="editable"
+              size="small"
+              text
+              type="error"
+              @click.stop="removeSlot(index)"
+            >
+              🗑️
+            </n-button>
+          </n-flex>
+        </template>
 
-        <n-flex :size="12" style="margin-bottom: 12px;">
-          <n-input
-            v-model:value="slot.name"
-            placeholder="Slot Name *"
-            :readonly="!editable"
-            style="flex: 1; min-width: 150px;"
-            @update:value="emitUpdate"
-          />
-          <n-select
-            v-model:value="slot.allowedCategory"
-            :options="categoryOptions"
-            placeholder="Allowed Category *"
-            :disabled="!editable"
-            style="flex: 1; min-width: 150px;"
-            @update:value="emitUpdate"
-          />
-        </n-flex>
-
-        <div style="margin-bottom: 12px;">
-          <label style="font-size: 12px; font-weight: 600; display: block; margin-bottom: 4px;">Relative Position (mm)</label>
-          <n-flex :size="8">
-            <n-input-number
-              v-model:value="slot.relativePosition.x"
-              placeholder="X"
+        <n-card :bordered="true" size="small">
+          <n-flex :size="12" style="margin-bottom: 12px;">
+            <n-input
+              v-model:value="slot.name"
+              placeholder="Slot Name *"
               :readonly="!editable"
-              style="flex: 1; min-width: 80px;"
+              style="flex: 1; min-width: 150px;"
               @update:value="emitUpdate"
             />
-            <n-input-number
-              v-model:value="slot.relativePosition.y"
-              placeholder="Y"
-              :readonly="!editable"
-              style="flex: 1; min-width: 80px;"
-              @update:value="emitUpdate"
-            />
-            <n-input-number
-              v-model:value="slot.relativePosition.z"
-              placeholder="Z"
-              :readonly="!editable"
-              style="flex: 1; min-width: 80px;"
+            <n-select
+              v-model:value="slot.allowedCategory"
+              :options="categoryOptions"
+              placeholder="Allowed Category *"
+              :disabled="!editable"
+              style="flex: 1; min-width: 150px;"
               @update:value="emitUpdate"
             />
           </n-flex>
-        </div>
 
-        <div style="margin-bottom: 12px;">
-          <label style="font-size: 12px; font-weight: 600; display: block; margin-bottom: 4px;">Max Dimensions (mm)</label>
-          <n-flex :size="8">
-            <n-input-number
-              v-model:value="slot.maxDimensions.length"
-              placeholder="Length"
-              :readonly="!editable"
-              style="flex: 1; min-width: 80px;"
-              @update:value="emitUpdate"
-            />
-            <n-input-number
-              v-model:value="slot.maxDimensions.width"
-              placeholder="Width"
-              :readonly="!editable"
-              style="flex: 1; min-width: 80px;"
-              @update:value="emitUpdate"
-            />
-            <n-input-number
-              v-model:value="slot.maxDimensions.height"
-              placeholder="Height"
-              :readonly="!editable"
-              style="flex: 1; min-width: 80px;"
-              @update:value="emitUpdate"
-            />
-          </n-flex>
-        </div>
+          <div style="margin-bottom: 12px;">
+            <label style="font-size: 12px; font-weight: 600; display: block; margin-bottom: 4px;">Relative Position (mm)</label>
+            <n-flex :size="8">
+              <n-input-number
+                v-model:value="slot.relativePosition.x"
+                placeholder="X"
+                :readonly="!editable"
+                style="flex: 1; min-width: 80px;"
+                @update:value="emitUpdate"
+              />
+              <n-input-number
+                v-model:value="slot.relativePosition.y"
+                placeholder="Y"
+                :readonly="!editable"
+                style="flex: 1; min-width: 80px;"
+                @update:value="emitUpdate"
+              />
+              <n-input-number
+                v-model:value="slot.relativePosition.z"
+                placeholder="Z"
+                :readonly="!editable"
+                style="flex: 1; min-width: 80px;"
+                @update:value="emitUpdate"
+              />
+            </n-flex>
+          </div>
 
-        <div>
-          <label style="font-size: 12px; font-weight: 600; display: block; margin-bottom: 4px;">Rotation (degrees, optional)</label>
-          <n-flex :size="8">
-            <n-input-number
-              :value="slot.rotation?.x ?? 0"
-              @update:value="updateRotation(slot, 'x', $event)"
-              placeholder="X (Pitch)"
-              :readonly="!editable"
-              style="flex: 1; min-width: 80px;"
-            />
-            <n-input-number
-              :value="slot.rotation?.y ?? 0"
-              @update:value="updateRotation(slot, 'y', $event)"
-              placeholder="Y (Yaw)"
-              :readonly="!editable"
-              style="flex: 1; min-width: 80px;"
-            />
-            <n-input-number
-              :value="slot.rotation?.z ?? 0"
-              @update:value="updateRotation(slot, 'z', $event)"
-              placeholder="Z (Roll)"
-              :readonly="!editable"
-              style="flex: 1; min-width: 80px;"
-            />
-          </n-flex>
-        </div>
-      </n-card>
-    </n-flex>
+          <div style="margin-bottom: 12px;">
+            <label style="font-size: 12px; font-weight: 600; display: block; margin-bottom: 4px;">Max Dimensions (mm)</label>
+            <n-flex :size="8">
+              <n-input-number
+                v-model:value="slot.maxDimensions.length"
+                placeholder="Length"
+                :readonly="!editable"
+                style="flex: 1; min-width: 80px;"
+                @update:value="emitUpdate"
+              />
+              <n-input-number
+                v-model:value="slot.maxDimensions.width"
+                placeholder="Width"
+                :readonly="!editable"
+                style="flex: 1; min-width: 80px;"
+                @update:value="emitUpdate"
+              />
+              <n-input-number
+                v-model:value="slot.maxDimensions.height"
+                placeholder="Height"
+                :readonly="!editable"
+                style="flex: 1; min-width: 80px;"
+                @update:value="emitUpdate"
+              />
+            </n-flex>
+          </div>
+
+          <div>
+            <label style="font-size: 12px; font-weight: 600; display: block; margin-bottom: 4px;">Rotation (degrees, optional)</label>
+            <n-flex :size="8">
+              <n-input-number
+                :value="slot.rotation?.x ?? 0"
+                @update:value="updateRotation(slot, 'x', $event)"
+                placeholder="X (Pitch)"
+                :readonly="!editable"
+                style="flex: 1; min-width: 80px;"
+              />
+              <n-input-number
+                :value="slot.rotation?.y ?? 0"
+                @update:value="updateRotation(slot, 'y', $event)"
+                placeholder="Y (Yaw)"
+                :readonly="!editable"
+                style="flex: 1; min-width: 80px;"
+              />
+              <n-input-number
+                :value="slot.rotation?.z ?? 0"
+                @update:value="updateRotation(slot, 'z', $event)"
+                placeholder="Z (Roll)"
+                :readonly="!editable"
+                style="flex: 1; min-width: 80px;"
+              />
+            </n-flex>
+          </div>
+        </n-card>
+      </n-collapse-item>
+    </n-collapse>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, watch } from 'vue';
-import { NCard, NButton, NFlex, NInput, NSelect, NInputNumber } from 'naive-ui';
+import { NButton, NCard, NCollapse, NCollapseItem, NFlex, NInput, NSelect, NInputNumber } from 'naive-ui';
 import type { Slot } from '@/types/products';
 
 interface Props {
@@ -180,6 +189,7 @@ const localSlots = ref<Slot[]>(props.modelValue.map(slot => ({
   maxDimensions: slot.maxDimensions || { ...DEFAULT_DIMENSIONS },
   rotation: slot.rotation ? { ...slot.rotation } : { ...DEFAULT_ROTATION }
 })));
+const expandedNames = ref<(number | string)[]>(props.modelValue.map((_, index) => index));
 
 watch(
   () => props.modelValue,
@@ -190,6 +200,7 @@ watch(
       maxDimensions: slot.maxDimensions || { ...DEFAULT_DIMENSIONS },
       rotation: slot.rotation ? { ...slot.rotation } : { ...DEFAULT_ROTATION }
     }));
+    expandedNames.value = newValue.map((_, index) => index);
   },
   { deep: true }
 );
@@ -203,11 +214,15 @@ function addSlot() {
     rotation: { ...DEFAULT_ROTATION },
     subSlots: []
   });
+  expandedNames.value.push(localSlots.value.length - 1);
   emitUpdate();
 }
 
 function removeSlot(index: number) {
   localSlots.value.splice(index, 1);
+  expandedNames.value = expandedNames.value
+    .filter(name => name !== index)
+    .map(name => (typeof name === 'number' && name > index ? name - 1 : name));
   emitUpdate();
 }
 
@@ -221,5 +236,9 @@ function updateRotation(slot: Slot, axis: 'x' | 'y' | 'z', value: number | null)
 
 function emitUpdate() {
   emit('update:modelValue', localSlots.value);
+}
+
+function handleExpandedChange(names: Array<string | number> | string | number) {
+  expandedNames.value = Array.isArray(names) ? names : [names];
 }
 </script>

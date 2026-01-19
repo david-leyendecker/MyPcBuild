@@ -5,57 +5,34 @@
       :style="viewerStyle"
       class="popout-viewer"
       :class="{ 'maximized': isMaximized }"
-      :bordered="false"
+      :bordered="true"
+      :title="title"
+      closable
+      @close="close"
+      :header-style="{ cursor: 'move' }"
+      @mousedown="onHeaderMouseDown"
     >
-      <div style="display: flex; flex-direction: column; height: 100%;">
-        <!-- Header -->
-        <n-flex 
-          class="popout-header" 
-          :class="{ 'dragging': isDragging }" 
-          @mousedown="startDrag"
-          justify="space-between"
-          align="center"
-          style="padding: 8px; flex-shrink: 0;"
-        >
-          <n-flex align="center" :size="8">
-            <span>📦</span>
-            <span style="font-size: 14px; font-weight: 500;">{{ title }}</span>
-          </n-flex>
-          <n-flex :size="4">
-            <n-button
-              text
-              size="tiny"
-              @click.stop="toggleMinimize"
-              :title="isMinimized ? 'Restore' : 'Minimize'"
-            >
-              {{ isMinimized ? '🗗' : '🗕' }}
-            </n-button>
-            <n-button
-              text
-              size="tiny"
-              @click.stop="toggleMaximize"
-              :title="isMaximized ? 'Restore' : 'Maximize'"
-            >
-              {{ isMaximized ? '🗗' : '🗖' }}
-            </n-button>
-            <n-button
-              text
-              size="tiny"
-              @click.stop="close"
-              title="Close"
-            >
-              ✕
-            </n-button>
-          </n-flex>
+      <template #header-extra>
+        <n-flex :size="4" @mousedown.stop>
+          <n-button
+            text
+            @click.stop="toggleMinimize"
+            :title="isMinimized ? 'Restore' : 'Minimize'"
+          >
+            {{ isMinimized ? '🗗' : '🗕' }}
+          </n-button>
+          <n-button
+            text
+            @click.stop="toggleMaximize"
+            :title="isMaximized ? 'Restore' : 'Maximize'"
+          >
+            {{ isMaximized ? '🗗' : '🗖' }}
+          </n-button>
         </n-flex>
-
-        <!-- Divider -->
-        <n-divider v-if="!isMinimized" style="margin: 0;" />
-
-        <!-- Content -->
-        <div v-show="!isMinimized" class="popout-content" style="flex-grow: 1; overflow: hidden;">
-          <slot></slot>
-        </div>
+      </template>
+      
+      <div v-show="!isMinimized" class="popout-content" style="height: 100%; overflow: hidden;">
+        <slot></slot>
       </div>
 
       <!-- Resize Handle (bottom-right corner) -->
@@ -184,9 +161,17 @@ function close() {
   emit('close');
 }
 
+function onHeaderMouseDown(event: MouseEvent) {
+  // Only start drag if clicking on the header itself
+  const target = event.target as HTMLElement;
+  if (target.closest('.n-card-header__extra') || target.closest('.n-card-header__close')) {
+    return;
+  }
+  startDrag(event);
+}
+
 function startDrag(event: MouseEvent) {
   if (isMaximized.value || isMinimized.value) return;
-  if ((event.target as HTMLElement).closest('.popout-controls')) return;
   if ((event.target as HTMLElement).closest('.resize-handle')) return;
   
   isDragging.value = true;
@@ -287,6 +272,7 @@ defineExpose({
   overflow: hidden;
   transition: box-shadow 0.2s;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  padding:0;
 }
 
 .popout-viewer:hover {
@@ -307,17 +293,12 @@ defineExpose({
   box-shadow: none;
 }
 
-.popout-header {
+.popout-viewer :deep(.n-card-header) {
   cursor: move;
   user-select: none;
-  padding: 8px 12px !important;
-  background-color: rgba(0, 0, 0, 0.15);
-  align-items: center;
-  flex-shrink: 0;
-  height: 48px;
 }
 
-.popout-header.dragging {
+.popout-viewer.dragging :deep(.n-card-header) {
   opacity: 0.9;
 }
 
