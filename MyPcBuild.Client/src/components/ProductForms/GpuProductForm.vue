@@ -115,6 +115,16 @@
         </div>
       </v-col>
     </v-row>
+
+    <v-row>
+      <v-col cols="12">
+        <!-- Slots -->
+        <SlotsInput 
+          v-model="localProduct.slots"
+          :editable="editable"
+        />
+      </v-col>
+    </v-row>
   </v-container>
 </template>
 
@@ -126,6 +136,7 @@ import PowerInput from '@/components/ValueObjects/PowerInput.vue';
 import LengthInput from '@/components/ValueObjects/LengthInput.vue';
 import StorageCapacityInput from '@/components/ValueObjects/StorageCapacityInput.vue';
 import DimensionsInput from '@/components/ValueObjects/DimensionsInput.vue';
+import SlotsInput from '@/components/ValueObjects/SlotsInput.vue';
 
 interface Props {
   modelValue: Partial<GpuProductRequest> | Partial<GpuProductResponse>;
@@ -167,7 +178,8 @@ const localProduct = ref<Partial<GpuProductRequest>>({
   length: props.modelValue.length ?? { valueInMm: 300 },
   powerConnectors: props.modelValue.powerConnectors,
   rayTracing: props.modelValue.rayTracing ?? false,
-  dimensions: props.modelValue.dimensions ?? { length: 300, width: 130, height: 50 }
+  dimensions: props.modelValue.dimensions ?? { length: 300, width: 130, height: 50 },
+  slots: props.modelValue.slots ?? []
 });
 
 watch(
@@ -184,7 +196,8 @@ watch(
       length: newValue.length ?? { valueInMm: 300 },
       powerConnectors: newValue.powerConnectors,
       rayTracing: newValue.rayTracing ?? false,
-      dimensions: newValue.dimensions ?? { length: 300, width: 130, height: 50 }
+      dimensions: newValue.dimensions ?? { length: 300, width: 130, height: 50 },
+      slots: newValue.slots ?? []
     });
   },
   { deep: true }

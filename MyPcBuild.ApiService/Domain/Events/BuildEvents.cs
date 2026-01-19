@@ -26,6 +26,7 @@ public record PartAddedToSlot : BuildEvent
     public required decimal PricePaid { get; init; }
     public required Guid SlotId { get; init; }
     public required Vector3 Position { get; init; }
+    public Rotation? Rotation { get; init; }
 }
 
 public record PartRemoved : BuildEvent

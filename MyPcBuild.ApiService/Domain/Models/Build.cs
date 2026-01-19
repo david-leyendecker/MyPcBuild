@@ -21,7 +21,7 @@ public class Build
 
     public void Apply(PartAdded @event)
     {
-        Parts.Add(new BuildPart(@event.ProductId, @event.PricePaid, null, null));
+        Parts.Add(new BuildPart(@event.ProductId, @event.PricePaid, null, null, null));
     }
 
     public void Apply(PartAddedToSlot @event)
@@ -30,7 +30,8 @@ public class Build
             @event.ProductId,
             @event.PricePaid,
             @event.SlotId,
-            @event.Position
+            @event.Position,
+            @event.Rotation
         ));
     }
 
@@ -49,5 +50,6 @@ public record BuildPart(
     Guid ProductId,
     decimal PricePaid,
     Guid? SlotId = null,
-    Vector3? Position = null
+    Vector3? Position = null,
+    Rotation? Rotation = null
 );

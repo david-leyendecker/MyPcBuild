@@ -15,9 +15,11 @@ public record Slot(
     ProductCategory AllowedProductCategory,
     Vector3 RelativePosition,
     Dimensions MaxDimensions,
+    Rotation? Rotation = null,
     List<Slot>? SubSlots = null
 )
 {
+    public Rotation Rotation { get; init; } = Rotation ?? Spatial.Rotation.Identity;
     public List<Slot> SubSlots { get; init; } = SubSlots ?? [];
 
     /// <summary>

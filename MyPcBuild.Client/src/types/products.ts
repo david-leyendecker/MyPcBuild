@@ -55,15 +55,28 @@ export interface Vector3 {
   z: number;
 }
 
+export interface Rotation {
+  x: number;
+  y: number;
+  z: number;
+}
+
 export interface Slot {
+  id?: string;
   name: string;
   allowedCategory: string;
-  location?: Vector3;
+  relativePosition: Vector3;
+  maxDimensions: Dimensions;
+  rotation?: Rotation | null;
+  subSlots?: Slot[];
 }
 
 export interface Chamber {
+  id?: string;
   name: string;
+  relativePosition: Vector3;
   dimensions: Dimensions;
+  slots: Slot[];
 }
 
 // ========== Product Base ==========

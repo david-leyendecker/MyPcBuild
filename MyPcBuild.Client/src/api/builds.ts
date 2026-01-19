@@ -1,5 +1,39 @@
 import apiClient from './client';
 
+export interface Vector3 {
+  x: number;
+  y: number;
+  z: number;
+}
+
+export interface Rotation {
+  x: number;
+  y: number;
+  z: number;
+}
+
+export interface Dimensions {
+  length: number;
+  width: number;
+  height: number;
+}
+
+export interface Slot {
+  id: string;
+  name: string;
+  allowedCategory: string;
+  relativePosition: Vector3;
+  maxDimensions: Dimensions;
+  rotation?: Rotation | null;
+}
+
+export interface Chamber {
+  id: string;
+  name: string;
+  dimensions: Dimensions;
+  slots: Slot[];
+}
+
 export interface Build {
   id: string;
   name: string;
@@ -34,8 +68,15 @@ export interface BuildPart {
   id: string;
   name: string;
   category: string;
+  categoryName: string;
   manufacturer: string;
   pricePaid: number;
+  slotId?: string | null;
+  position?: Vector3 | null;
+  rotation?: Rotation | null;
+  dimensions?: Dimensions | null;
+  slots?: Slot[] | null;
+  chambers?: Chamber[] | null;
 }
 
 export interface CompatibilityIssue {
@@ -52,6 +93,26 @@ export interface BuildValidation {
   hasWarnings: boolean;
   issues: CompatibilityIssue[];
   products: BuildPart[];
+}
+
+export interface AvailableSlot {
+  id: string;
+  name: string;
+  allowedCategory: string;
+  absolutePosition: Vector3;
+  maxDimensions: Dimensions;
+  rotation?: Rotation | null;
+  isOccupied: boolean;
+  parentProductId: string;
+  parentProductName: string;
+}
+
+export interface AddPartToSlotRequest {
+  productId: string;
+  pricePaid: number;
+  slotId: string;
+  position: Vector3;
+  rotation?: Rotation | null;
 }
 
 export const buildsApi = {
@@ -78,6 +139,10 @@ export const buildsApi = {
     await apiClient.post(`/builds/${buildId}/parts`, { productId, pricePaid });
   },
 
+  async addPartToSlot(buildId: string, request: AddPartToSlotRequest): Promise<void> {
+    await apiClient.post(`/builds/${buildId}/parts/slot`, request);
+  },
+
   async removePart(buildId: string, productId: string): Promise<void> {
     await apiClient.delete(`/builds/${buildId}/parts/${productId}`);
   },
@@ -85,5 +150,11 @@ export const buildsApi = {
   async validateBuild(buildId: string): Promise<BuildValidation> {
     const response = await apiClient.get<BuildValidation>(`/builds/${buildId}/compatibility`);
     return response.data;
+  },
+
+  async getAvailableSlots(buildId: string): Promise<AvailableSlot[]> {
+    const response = await apiClient.get<AvailableSlot[]>(`/builds/${buildId}/slots`);
+    return response.data;
   }
 };
+

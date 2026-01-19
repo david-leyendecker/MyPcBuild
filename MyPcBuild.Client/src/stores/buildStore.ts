@@ -101,6 +101,16 @@ export const useBuildStore = defineStore('builds', () => {
     }
   }
 
+  async function addPartToSlot(buildId: string, request: { productId: string; pricePaid: number; slotId: string; position: { x: number; y: number; z: number }; rotation?: { x: number; y: number; z: number } }) {
+    try {
+      await buildsApi.addPartToSlot(buildId, request);
+      await loadBuild(buildId);
+    } catch (err) {
+      error.value = err instanceof Error ? err.message : 'Failed to add part to slot';
+      throw err;
+    }
+  }
+
   async function removePart(buildId: string, productId: string) {
     try {
       await buildsApi.removePart(buildId, productId);
@@ -138,6 +148,7 @@ export const useBuildStore = defineStore('builds', () => {
     createBuild,
     updateBuild,
     addPart,
+    addPartToSlot,
     removePart,
     validateBuild,
     clearError

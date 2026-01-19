@@ -11,6 +11,7 @@ namespace MyPcBuild.ApiService.Domain.Models.Spatial;
 public record Chamber(
     Guid Id,
     string Name,
+    Vector3 RelativePosition,
     Dimensions Dimensions,
     List<Slot> Slots
 )
@@ -32,7 +33,7 @@ public record Chamber(
 
         foreach (Slot slot in Slots)
         {
-            result.AddRange(slot.FlattenSlots(Vector3.Zero));
+            result.AddRange(slot.FlattenSlots(RelativePosition));
         }
 
         return result;

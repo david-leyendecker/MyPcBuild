@@ -106,6 +106,30 @@
             :editable="isEditMode"
           />
 
+          <!-- 3D Preview for products with spatial data -->
+          <div v-if="hasSpatialData" class="mt-6">
+            <v-divider class="mb-4"></v-divider>
+            <div class="d-flex justify-space-between align-center mb-3">
+              <h3 class="text-h5">3D Preview</h3>
+              <v-btn
+                prepend-icon="mdi-open-in-new"
+                variant="text"
+                size="small"
+                @click="open3DInPopout"
+              >
+                Open in Popout
+              </v-btn>
+            </div>
+            <p class="text-body-2 text-medium-emphasis mb-3">
+              Interactive visualization of slots and chambers
+            </p>
+            <ProductViewer3D 
+              :dimensions="(productFormData as any).dimensions"
+              :slots="(productFormData as any).slots"
+              :chambers="(productFormData as any).chambers"
+            />
+          </div>
+
           <v-alert v-if="publishError || updateError" type="error" class="mt-3">
             {{ publishError || updateError }}
           </v-alert>
@@ -154,15 +178,18 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { catalogApi } from '@/api/catalog';
 import { getTypedProduct, updateTypedProduct } from '@/api/catalogTyped';
+import { use3DPopout } from '@/composables/use3DPopout';
 import ProductFormSelector from '@/components/ProductFormSelector.vue';
+import ProductViewer3D from '@/components/ProductViewer3D.vue';
 import type { ProductRequest, ProductResponse } from '@/types/products';
 
 const route = useRoute();
 const router = useRouter();
+const { openPopout } = use3DPopout();
 
 const product = ref<ProductResponse | null>(null);
 const isLoading = ref(true);
@@ -191,6 +218,13 @@ const originalFormData = ref({
 
 const productFormData = ref<Partial<ProductRequest>>({});
 const originalProductFormData = ref<Partial<ProductRequest>>({});
+
+const hasSpatialData = computed(() => {
+  const data = productFormData.value as any;
+  const hasSlots = data.slots && data.slots.length > 0;
+  const hasChambers = data.chambers && data.chambers.length > 0;
+  return hasSlots || hasChambers;
+});
 
 onMounted(async () => {
   await loadProduct();
@@ -306,6 +340,19 @@ async function saveProduct() {
   } finally {
     isUpdating.value = false;
   }
+}
+
+function open3DInPopout() {
+  const data = productFormData.value as any;
+  openPopout({
+    component: ProductViewer3D,
+    props: {
+      dimensions: data.dimensions,
+      slots: data.slots,
+      chambers: data.chambers,
+    },
+    title: `3D Preview - ${formData.value.name}`,
+  });
 }
 </script>
 

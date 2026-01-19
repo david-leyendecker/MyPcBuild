@@ -282,6 +282,7 @@ public class SpatialValidatorTests
                 new Chamber(
                     Guid.NewGuid(),
                     "Main Chamber",
+                    Vector3.Zero, // Position at origin
                     new Dimensions(400, 260, 450), // Big enough for ATX (305x244) at offset (10,10)
                     [
                         new Slot(

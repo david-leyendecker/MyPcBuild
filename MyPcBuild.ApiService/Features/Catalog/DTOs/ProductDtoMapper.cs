@@ -481,29 +481,55 @@ public static class ProductDtoMapper
         {
             Name = slot.Name,
             AllowedCategory = slot.AllowedProductCategory.ToString(),
-            Location = new Vector3Model
+            RelativePosition = new Vector3Model
             {
                 X = slot.RelativePosition.X,
                 Y = slot.RelativePosition.Y,
                 Z = slot.RelativePosition.Z
-            }
+            },
+            MaxDimensions = new DimensionsModel
+            {
+                Length = slot.MaxDimensions.Length,
+                Width = slot.MaxDimensions.Width,
+                Height = slot.MaxDimensions.Height
+            },
+            Rotation = slot.Rotation != Rotation.Identity 
+                ? new RotationModel 
+                { 
+                    X = slot.Rotation.X, 
+                    Y = slot.Rotation.Y, 
+                    Z = slot.Rotation.Z 
+                } 
+                : null,
+            SubSlots = slot.SubSlots?.Select(ToSlotModel).ToList()
         };
     }
 
     private static Slot ToDomainSlot(SlotModel slot)
     {
         ProductCategory category = Enum.Parse<ProductCategory>(slot.AllowedCategory, ignoreCase: true);
-        Vector3 position = slot.Location != null
-            ? new Vector3(slot.Location.X, slot.Location.Y, slot.Location.Z)
-            : Vector3.Zero;
+        Vector3 position = new Vector3(
+            slot.RelativePosition.X, 
+            slot.RelativePosition.Y, 
+            slot.RelativePosition.Z
+        );
+        Dimensions maxDimensions = new Dimensions(
+            slot.MaxDimensions.Length,
+            slot.MaxDimensions.Width,
+            slot.MaxDimensions.Height
+        );
+        Rotation rotation = slot.Rotation != null
+            ? new Rotation(slot.Rotation.X, slot.Rotation.Y, slot.Rotation.Z)
+            : Rotation.Identity;
 
         return new Slot(
             Guid.NewGuid(),
             slot.Name,
             category,
             position,
-            new Dimensions(100, 100, 50), // Default dimensions
-            null
+            maxDimensions,
+            rotation,
+            slot.SubSlots?.Select(ToDomainSlot).ToList()
         );
     }
 
@@ -512,7 +538,14 @@ public static class ProductDtoMapper
         return new ChamberModel
         {
             Name = chamber.Name,
-            Dimensions = ToDimensionsModel(chamber.Dimensions)
+            RelativePosition = new Vector3Model
+            {
+                X = chamber.RelativePosition.X,
+                Y = chamber.RelativePosition.Y,
+                Z = chamber.RelativePosition.Z
+            },
+            Dimensions = ToDimensionsModel(chamber.Dimensions),
+            Slots = chamber.Slots.Select(ToSlotModel).ToList()
         };
     }
 
@@ -521,8 +554,13 @@ public static class ProductDtoMapper
         return new Chamber(
             Guid.NewGuid(),
             chamber.Name,
+            new Vector3(
+                chamber.RelativePosition.X,
+                chamber.RelativePosition.Y,
+                chamber.RelativePosition.Z
+            ),
             ToDomainDimensions(chamber.Dimensions),
-            []
+            chamber.Slots.Select(ToDomainSlot).ToList()
         );
     }
 }

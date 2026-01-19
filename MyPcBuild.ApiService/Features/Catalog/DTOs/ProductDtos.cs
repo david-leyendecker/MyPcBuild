@@ -962,7 +962,24 @@ public record SlotModel
     /// <summary>
     /// Relative position.
     /// </summary>
-    public Vector3Model? Location { get; init; }
+    [Required]
+    public required Vector3Model RelativePosition { get; init; }
+
+    /// <summary>
+    /// Maximum dimensions that can fit in this slot.
+    /// </summary>
+    [Required]
+    public required DimensionsModel MaxDimensions { get; init; }
+
+    /// <summary>
+    /// Rotation to apply to parts placed in this slot (optional).
+    /// </summary>
+    public RotationModel? Rotation { get; init; }
+
+    /// <summary>
+    /// Sub-slots (optional, for nested slot hierarchies).
+    /// </summary>
+    public List<SlotModel>? SubSlots { get; init; }
 }
 
 /// <summary>
@@ -1005,10 +1022,22 @@ public record ChamberModel
     public required string Name { get; init; }
 
     /// <summary>
+    /// Relative position of the chamber within its parent (e.g., PC case).
+    /// </summary>
+    [Required]
+    public required Vector3Model RelativePosition { get; init; }
+
+    /// <summary>
     /// Chamber dimensions.
     /// </summary>
     [Required]
     public required DimensionsModel Dimensions { get; init; }
+
+    /// <summary>
+    /// Slots within this chamber.
+    /// </summary>
+    [Required]
+    public required List<SlotModel> Slots { get; init; }
 }
 
 /// <summary>
@@ -1061,4 +1090,25 @@ public record Vector3Model
     /// </summary>
     [Required]
     public required decimal Z { get; init; }
+}
+
+/// <summary>
+/// 3D rotation model using Euler angles (in degrees).
+/// </summary>
+public record RotationModel
+{
+    /// <summary>
+    /// X rotation (pitch) in degrees.
+    /// </summary>
+    public decimal X { get; init; }
+
+    /// <summary>
+    /// Y rotation (yaw) in degrees.
+    /// </summary>
+    public decimal Y { get; init; }
+
+    /// <summary>
+    /// Z rotation (roll) in degrees.
+    /// </summary>
+    public decimal Z { get; init; }
 }

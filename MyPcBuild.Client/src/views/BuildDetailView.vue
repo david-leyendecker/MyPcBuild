@@ -44,6 +44,31 @@
         </v-col>
       </v-row>
 
+      <!-- 3D Visualization Section -->
+      <v-row v-if="hasSpatialParts">
+        <v-col cols="12">
+          <v-card>
+            <v-card-title class="d-flex justify-space-between align-center">
+              <span>3D Build Visualization</span>
+              <v-btn
+                prepend-icon="mdi-open-in-new"
+                variant="text"
+                size="small"
+                @click="open3DInPopout"
+              >
+                Open in Popout
+              </v-btn>
+            </v-card-title>
+            <v-card-text>
+              <Viewer3D 
+                :parts="buildStore.currentBuild.parts"
+                :collisions="collidingPartIds"
+              />
+            </v-card-text>
+          </v-card>
+        </v-col>
+      </v-row>
+
       <!-- Parts List Section -->
       <v-row>
         <v-col cols="12">
@@ -126,8 +151,10 @@
         <v-card>
           <v-card-title>Add Component</v-card-title>
           <v-card-text>
-            <AddPartDialog 
+            <AddPartDialogWithSlots 
+              :build-id="buildStore.currentBuild.id"
               @part-selected="handleAddPart"
+              @part-selected-with-slot="handleAddPartToSlot"
               @close="showAddPartDialog = false"
             />
           </v-card-text>
@@ -141,8 +168,11 @@
 import { ref, computed, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import { useBuildStore } from '@/stores/buildStore';
+import { useCatalogStore } from '@/stores/catalogStore';
+import { use3DPopout } from '@/composables/use3DPopout';
 import CompatibilityPanel from '@/components/CompatibilityPanel.vue';
-import AddPartDialog from '@/components/AddPartDialog.vue';
+import AddPartDialogWithSlots from '@/components/AddPartDialogWithSlots.vue';
+import Viewer3D from '@/components/Viewer3D.vue';
 
 interface Props {
   id: string;
@@ -152,10 +182,42 @@ withDefaults(defineProps<Props>(), {});
 
 const route = useRoute();
 const buildStore = useBuildStore();
+const catalogStore = useCatalogStore();
 const showAddPartDialog = ref(false);
+const { openPopout } = use3DPopout();
 
 const totalCost = computed(() => {
   return buildStore.currentBuild?.parts.reduce((sum, part) => sum + part.pricePaid, 0) ?? 0;
+});
+
+const hasSpatialParts = computed(() => {
+  return buildStore.currentBuild?.parts.some(p => p.dimensions) ?? false;
+});
+
+const collidingPartIds = computed(() => {
+  // Extract part IDs from collision-related compatibility issues
+  const collisionIssues = buildStore.validationIssues.filter(
+    issue => issue.category.toLowerCase().includes('collision') || 
+             issue.message.toLowerCase().includes('collision')
+  );
+  
+  const partIds: string[] = [];
+  
+  // Try to extract part IDs from issue messages
+  // Messages typically contain part names like "Collision detected between 'Part A' and 'Part B'"
+  collisionIssues.forEach(issue => {
+    // For now, mark all parts as potentially colliding if there are any collision issues
+    // A more sophisticated implementation would parse the message to extract specific part IDs
+    if (buildStore.currentBuild?.parts) {
+      buildStore.currentBuild.parts.forEach(part => {
+        if (issue.message.includes(part.name) && !partIds.includes(part.id)) {
+          partIds.push(part.id);
+        }
+      });
+    }
+  });
+  
+  return partIds;
 });
 
 onMounted(() => {
@@ -173,6 +235,27 @@ async function handleAddPart(productId: string) {
   }
 }
 
+async function handleAddPartToSlot(productId: string, slotId: string, position: { x: number; y: number; z: number }, rotation?: { x: number; y: number; z: number } | null) {
+  if (!buildStore.currentBuild) return;
+  
+  try {
+    // Get product to fetch the actual price
+    const product = catalogStore.products.find(p => p.id === productId);
+    const pricePaid = product?.price ?? 0;
+    
+    await buildStore.addPartToSlot(buildStore.currentBuild.id, {
+      productId,
+      pricePaid,
+      slotId,
+      position,
+      rotation: rotation || undefined
+    });
+    showAddPartDialog.value = false;
+  } catch (error) {
+    console.error('Failed to add part to slot:', error);
+  }
+}
+
 async function removePart(productId: string) {
   if (!buildStore.currentBuild) return;
   
@@ -181,6 +264,19 @@ async function removePart(productId: string) {
   } catch (error) {
     console.error('Failed to remove part:', error);
   }
+}
+
+function open3DInPopout() {
+  if (!buildStore.currentBuild) return;
+  
+  openPopout({
+    component: Viewer3D,
+    props: {
+      parts: buildStore.currentBuild.parts,
+      collisions: collidingPartIds.value,
+    },
+    title: `3D Preview - ${buildStore.currentBuild.name}`,
+  });
 }
 </script>
 
