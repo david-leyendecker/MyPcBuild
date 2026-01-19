@@ -4,35 +4,38 @@
     
     <!-- Controls Overlay -->
     <div class="controls-overlay">
-      <v-btn-group density="compact" variant="outlined">
-        <v-btn @click="resetCamera" size="small" prepend-icon="mdi-crop-free">
-          Reset View
-        </v-btn>
-        <v-btn @click="toggleGrid" size="small" :prepend-icon="showGrid ? 'mdi-grid-off' : 'mdi-grid'">
-          {{ showGrid ? 'Hide Grid' : 'Show Grid' }}
-        </v-btn>
-      </v-btn-group>
+      <n-flex :size="4">
+        <n-button @click="resetCamera" size="small">
+          ⊡ Reset View
+        </n-button>
+        <n-button @click="toggleGrid" size="small">
+          {{ showGrid ? '☷ Hide Grid' : '☷ Show Grid' }}
+        </n-button>
+      </n-flex>
     </div>
 
     <!-- Part Info Overlay -->
     <div v-if="hoveredPart" class="part-info-overlay" :style="{ left: mousePos.x + 'px', top: mousePos.y + 'px' }">
-      <v-card>
-        <v-card-title class="text-caption">{{ hoveredPart.name }}</v-card-title>
-        <v-card-text class="text-caption">
+      <n-card size="small" :bordered="true">
+        <template #header>
+          <span style="font-size: 12px;">{{ hoveredPart.name }}</span>
+        </template>
+        <div style="font-size: 12px;">
           <div><strong>Category:</strong> {{ hoveredPart.categoryName }}</div>
           <div><strong>Manufacturer:</strong> {{ hoveredPart.manufacturer }}</div>
           <div v-if="hoveredPart.dimensions">
             <strong>Dimensions:</strong> 
             {{ hoveredPart.dimensions.length }} × {{ hoveredPart.dimensions.width }} × {{ hoveredPart.dimensions.height }} mm
           </div>
-        </v-card-text>
-      </v-card>
+        </div>
+      </n-card>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, watch } from 'vue';
+import { NButton, NFlex, NCard } from 'naive-ui';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import type { BuildPart } from '@/api/builds';

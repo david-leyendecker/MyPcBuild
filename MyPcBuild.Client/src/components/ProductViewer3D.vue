@@ -3,37 +3,46 @@
     <div ref="viewerEl" class="viewer-canvas"></div>
     
     <div class="viewer-controls">
-      <v-btn 
+      <n-button 
         size="small" 
-        icon 
-        variant="tonal"
+        text
         @click="showGrid = !showGrid"
-        :color="showGrid ? 'primary' : undefined"
+        :type="showGrid ? 'primary' : 'default'"
       >
-        <v-icon>mdi-grid</v-icon>
-        <v-tooltip activator="parent" location="top">Toggle Grid</v-tooltip>
-      </v-btn>
+        <n-tooltip>
+          <template #trigger>
+            <span>☷</span>
+          </template>
+          Toggle Grid
+        </n-tooltip>
+      </n-button>
       
-      <v-btn 
+      <n-button 
         size="small" 
-        icon 
-        variant="tonal"
+        text
         @click="showAxes = !showAxes"
-        :color="showAxes ? 'primary' : undefined"
+        :type="showAxes ? 'primary' : 'default'"
       >
-        <v-icon>mdi-axis-arrow</v-icon>
-        <v-tooltip activator="parent" location="top">Toggle Axes</v-tooltip>
-      </v-btn>
+        <n-tooltip>
+          <template #trigger>
+            <span>⚏</span>
+          </template>
+          Toggle Axes
+        </n-tooltip>
+      </n-button>
       
-      <v-btn 
+      <n-button 
         size="small" 
-        icon 
-        variant="tonal"
+        text
         @click="resetCamera"
       >
-        <v-icon>mdi-restore</v-icon>
-        <v-tooltip activator="parent" location="top">Reset View</v-tooltip>
-      </v-btn>
+        <n-tooltip>
+          <template #trigger>
+            <span>↻</span>
+          </template>
+          Reset View
+        </n-tooltip>
+      </n-button>
     </div>
 
     <div v-if="hoveredSlot" class="slot-tooltip">
@@ -50,6 +59,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, watch } from 'vue';
+import { NButton, NTooltip } from 'naive-ui';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import type { Slot, Chamber, Dimensions, Vector3 } from '@/types/products';

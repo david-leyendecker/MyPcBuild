@@ -1,67 +1,62 @@
 <template>
   <Teleport to="body">
-    <v-card
+    <n-card
       v-if="isOpen"
       :style="viewerStyle"
       class="popout-viewer"
       :class="{ 'maximized': isMaximized }"
-      flat
+      :bordered="false"
     >
-      <v-container fluid class="pa-0 ma-0 h-100">
-        <!-- Header Row -->
-        <v-row no-gutters class="popout-header" :class="{ 'dragging': isDragging }" @mousedown="startDrag">
-          <v-col class="d-flex align-center">
-            <v-icon size="small" class="mr-2">mdi-cube-outline</v-icon>
-            <span class="text-subtitle-2">{{ title }}</span>
-          </v-col>
-          <v-col cols="auto" class="d-flex gap-1">
-            <v-btn
-              icon
-              size="x-small"
-              variant="text"
-              density="compact"
+      <div style="display: flex; flex-direction: column; height: 100%;">
+        <!-- Header -->
+        <n-flex 
+          class="popout-header" 
+          :class="{ 'dragging': isDragging }" 
+          @mousedown="startDrag"
+          justify="space-between"
+          align="center"
+          style="padding: 8px; flex-shrink: 0;"
+        >
+          <n-flex align="center" :size="8">
+            <span>📦</span>
+            <span style="font-size: 14px; font-weight: 500;">{{ title }}</span>
+          </n-flex>
+          <n-flex :size="4">
+            <n-button
+              text
+              size="tiny"
               @click.stop="toggleMinimize"
               :title="isMinimized ? 'Restore' : 'Minimize'"
             >
-              <v-icon size="small">{{ isMinimized ? 'mdi-window-restore' : 'mdi-window-minimize' }}</v-icon>
-            </v-btn>
-            <v-btn
-              icon
-              size="x-small"
-              variant="text"
-              density="compact"
+              {{ isMinimized ? '🗗' : '🗕' }}
+            </n-button>
+            <n-button
+              text
+              size="tiny"
               @click.stop="toggleMaximize"
               :title="isMaximized ? 'Restore' : 'Maximize'"
             >
-              <v-icon size="small">{{ isMaximized ? 'mdi-window-maximize' : 'mdi-fullscreen' }}</v-icon>
-            </v-btn>
-            <v-btn
-              icon
-              size="x-small"
-              variant="text"
-              density="compact"
+              {{ isMaximized ? '🗗' : '🗖' }}
+            </n-button>
+            <n-button
+              text
+              size="tiny"
               @click.stop="close"
               title="Close"
             >
-              <v-icon size="small">mdi-close</v-icon>
-            </v-btn>
-          </v-col>
-        </v-row>
+              ✕
+            </n-button>
+          </n-flex>
+        </n-flex>
 
         <!-- Divider -->
-        <v-row v-if="!isMinimized" no-gutters class="flex-shrink-0">
-          <v-col class="pa-0">
-            <v-divider />
-          </v-col>
-        </v-row>
+        <n-divider v-if="!isMinimized" style="margin: 0;" />
 
-        <!-- Content Row -->
-        <v-row v-show="!isMinimized" no-gutters class="popout-content flex-grow-1">
-          <v-col class="pa-0">
-            <slot></slot>
-          </v-col>
-        </v-row>
-      </v-container>
+        <!-- Content -->
+        <div v-show="!isMinimized" class="popout-content" style="flex-grow: 1; overflow: hidden;">
+          <slot></slot>
+        </div>
+      </div>
 
       <!-- Resize Handle (bottom-right corner) -->
       <div 
@@ -69,14 +64,15 @@
         class="resize-handle"
         @mousedown.stop="startResize"
       >
-        <v-icon size="x-small">mdi-resize-bottom-right</v-icon>
+        <span style="font-size: 10px;">⇲</span>
       </div>
-    </v-card>
+    </n-card>
   </Teleport>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue';
+import { NCard, NButton, NFlex, NDivider } from 'naive-ui';
 
 interface Props {
   title?: string;
@@ -348,11 +344,5 @@ defineExpose({
 
 .resize-handle:hover {
   color: rgba(255, 255, 255, 0.8);
-}
-
-/* Ensure container fills available space */
-:deep(.popout-viewer .v-container) {
-  height: 100%;
-  width: 100%;
 }
 </style>
