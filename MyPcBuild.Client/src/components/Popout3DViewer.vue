@@ -1,52 +1,67 @@
 <template>
   <Teleport to="body">
-    <div 
+    <v-card
       v-if="isOpen"
-      :class="['popout-viewer', { 'minimized': isMinimized, 'maximized': isMaximized, 'dragging': isDragging }]"
       :style="viewerStyle"
-      @mousedown="startDrag"
+      class="popout-viewer"
+      :class="{ 'maximized': isMaximized }"
+      flat
     >
-      <!-- Header -->
-      <div class="popout-header">
-        <div class="popout-title">
-          <v-icon size="small" class="mr-2">mdi-cube-outline</v-icon>
-          <span>{{ title }}</span>
-        </div>
-        <div class="popout-controls">
-          <v-btn
-            icon
-            size="x-small"
-            variant="text"
-            @click.stop="toggleMinimize"
-            :title="isMinimized ? 'Restore' : 'Minimize'"
-          >
-            <v-icon size="small">{{ isMinimized ? 'mdi-window-restore' : 'mdi-window-minimize' }}</v-icon>
-          </v-btn>
-          <v-btn
-            icon
-            size="x-small"
-            variant="text"
-            @click.stop="toggleMaximize"
-            :title="isMaximized ? 'Restore' : 'Maximize'"
-          >
-            <v-icon size="small">{{ isMaximized ? 'mdi-window-maximize' : 'mdi-fullscreen' }}</v-icon>
-          </v-btn>
-          <v-btn
-            icon
-            size="x-small"
-            variant="text"
-            @click.stop="close"
-            title="Close"
-          >
-            <v-icon size="small">mdi-close</v-icon>
-          </v-btn>
-        </div>
-      </div>
+      <v-container fluid class="pa-0 ma-0 h-100">
+        <!-- Header Row -->
+        <v-row no-gutters class="popout-header" :class="{ 'dragging': isDragging }" @mousedown="startDrag">
+          <v-col class="d-flex align-center">
+            <v-icon size="small" class="mr-2">mdi-cube-outline</v-icon>
+            <span class="text-subtitle-2">{{ title }}</span>
+          </v-col>
+          <v-col cols="auto" class="d-flex gap-1">
+            <v-btn
+              icon
+              size="x-small"
+              variant="text"
+              density="compact"
+              @click.stop="toggleMinimize"
+              :title="isMinimized ? 'Restore' : 'Minimize'"
+            >
+              <v-icon size="small">{{ isMinimized ? 'mdi-window-restore' : 'mdi-window-minimize' }}</v-icon>
+            </v-btn>
+            <v-btn
+              icon
+              size="x-small"
+              variant="text"
+              density="compact"
+              @click.stop="toggleMaximize"
+              :title="isMaximized ? 'Restore' : 'Maximize'"
+            >
+              <v-icon size="small">{{ isMaximized ? 'mdi-window-maximize' : 'mdi-fullscreen' }}</v-icon>
+            </v-btn>
+            <v-btn
+              icon
+              size="x-small"
+              variant="text"
+              density="compact"
+              @click.stop="close"
+              title="Close"
+            >
+              <v-icon size="small">mdi-close</v-icon>
+            </v-btn>
+          </v-col>
+        </v-row>
 
-      <!-- Content -->
-      <div v-show="!isMinimized" class="popout-content">
-        <slot></slot>
-      </div>
+        <!-- Divider -->
+        <v-row v-if="!isMinimized" no-gutters class="flex-shrink-0">
+          <v-col class="pa-0">
+            <v-divider />
+          </v-col>
+        </v-row>
+
+        <!-- Content Row -->
+        <v-row v-show="!isMinimized" no-gutters class="popout-content flex-grow-1">
+          <v-col class="pa-0">
+            <slot></slot>
+          </v-col>
+        </v-row>
+      </v-container>
 
       <!-- Resize Handle (bottom-right corner) -->
       <div 
@@ -54,9 +69,9 @@
         class="resize-handle"
         @mousedown.stop="startResize"
       >
-        <v-icon size="small">mdi-resize-bottom-right</v-icon>
+        <v-icon size="x-small">mdi-resize-bottom-right</v-icon>
       </div>
-    </div>
+    </v-card>
   </Teleport>
 </template>
 
@@ -270,15 +285,12 @@ defineExpose({
 <style scoped>
 .popout-viewer {
   position: fixed;
-  background: #1e1e1e;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 8px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
   z-index: 9999;
   display: flex;
   flex-direction: column;
   overflow: hidden;
   transition: box-shadow 0.2s;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
 }
 
 .popout-viewer:hover {
@@ -291,41 +303,33 @@ defineExpose({
 }
 
 .popout-viewer.maximized {
-  border-radius: 0;
-}
-
-.popout-viewer.minimized {
-  height: auto !important;
+  border-radius: 0 !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  box-shadow: none;
 }
 
 .popout-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 8px 12px;
-  background: #2a2a2a;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   cursor: move;
   user-select: none;
-}
-
-.popout-title {
-  display: flex;
+  padding: 8px 12px !important;
+  background-color: rgba(0, 0, 0, 0.15);
   align-items: center;
-  font-size: 14px;
-  font-weight: 500;
-  color: rgba(255, 255, 255, 0.87);
+  flex-shrink: 0;
+  height: 48px;
 }
 
-.popout-controls {
-  display: flex;
-  gap: 4px;
+.popout-header.dragging {
+  opacity: 0.9;
 }
 
 .popout-content {
-  flex: 1;
   overflow: hidden;
   position: relative;
+  width: 100%;
+  height: 100%;
 }
 
 .resize-handle {
@@ -344,5 +348,11 @@ defineExpose({
 
 .resize-handle:hover {
   color: rgba(255, 255, 255, 0.8);
+}
+
+/* Ensure container fills available space */
+:deep(.popout-viewer .v-container) {
+  height: 100%;
+  width: 100%;
 }
 </style>

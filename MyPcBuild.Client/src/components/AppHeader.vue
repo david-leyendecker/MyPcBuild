@@ -1,5 +1,5 @@
 <template>
-  <v-app-bar elevation="1" style="background-color: var(--v-theme-surface)">
+  <v-app-bar elevation="1">
     
     <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon>
 
