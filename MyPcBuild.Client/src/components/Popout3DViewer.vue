@@ -1,16 +1,19 @@
 <template>
-  <Teleport to="body">
+  <n-modal
+    v-model:show="isOpen"
+    :mask-closable="false"
+    :show-mask="false"
+    :style="modalStyle"
+    :content-style="contentStyle"
+    transform-origin="center"
+  >
     <n-card
-      v-if="isOpen"
-      :style="viewerStyle"
-      class="popout-viewer"
-      :class="{ 'maximized': isMaximized }"
-      :bordered="true"
       :title="title"
       closable
       @close="close"
-      :header-style="{ cursor: 'move' }"
-      @mousedown="onHeaderMouseDown"
+      :bordered="true"
+      class="popout-viewer"
+      :class="{ 'maximized': isMaximized }"
     >
       <template #header-extra>
         <n-flex :size="4" @mousedown.stop>
@@ -19,19 +22,23 @@
             @click.stop="toggleMinimize"
             :title="isMinimized ? 'Restore' : 'Minimize'"
           >
-            {{ isMinimized ? '🗗' : '🗕' }}
+            <template #icon>
+              <n-icon :component="isMinimized ? Icons.Expand : Icons.Minus" />
+            </template>
           </n-button>
           <n-button
             text
             @click.stop="toggleMaximize"
             :title="isMaximized ? 'Restore' : 'Maximize'"
           >
-            {{ isMaximized ? '🗗' : '🗖' }}
+            <template #icon>
+              <n-icon :component="isMaximized ? Icons.Contract : Icons.Expand" />
+            </template>
           </n-button>
         </n-flex>
       </template>
       
-      <div v-show="!isMinimized" class="popout-content" style="height: 100%; overflow: hidden;">
+      <div v-show="!isMinimized" class="popout-content" :style="contentInnerStyle">
         <slot></slot>
       </div>
 
@@ -41,15 +48,16 @@
         class="resize-handle"
         @mousedown.stop="startResize"
       >
-        <span style="font-size: 10px;">⇲</span>
+        <n-icon :component="Icons.Resize" style="font-size: 16px;" />
       </div>
     </n-card>
-  </Teleport>
+  </n-modal>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue';
-import { NCard, NButton, NFlex, NDivider } from 'naive-ui';
+import { NModal, NCard, NButton, NFlex, NIcon } from 'naive-ui';
+import { Icons } from '@/utils/icons';
 
 interface Props {
   title?: string;
@@ -79,7 +87,6 @@ const emit = defineEmits<{
 const isOpen = ref(true);
 const isMinimized = ref(false);
 const isMaximized = ref(false);
-const isDragging = ref(false);
 const isResizing = ref(false);
 
 const width = ref(props.initialWidth);
@@ -87,8 +94,6 @@ const height = ref(props.initialHeight);
 const x = ref(props.initialX ?? window.innerWidth - props.initialWidth - 20);
 const y = ref(props.initialY ?? 20);
 
-const dragStartX = ref(0);
-const dragStartY = ref(0);
 const resizeStartWidth = ref(0);
 const resizeStartHeight = ref(0);
 const resizeStartX = ref(0);
@@ -102,32 +107,46 @@ const preMaximizeState = ref({
   y: y.value,
 });
 
-const viewerStyle = computed(() => {
+const modalStyle = computed(() => ({
+  position: 'fixed' as const,
+  top: `${y.value}px`,
+  left: `${x.value}px`,
+  zIndex: 9999,
+  padding: 0,
+  margin: 0
+}));
+
+const contentStyle = computed(() => {
   if (isMaximized.value) {
     return {
-      top: '0px',
-      left: '0px',
       width: '100vw',
       height: '100vh',
+      top: '0',
+      left: '0',
+      padding: 0,
+      margin: 0
     };
   }
   
   if (isMinimized.value) {
     return {
-      top: `${y.value}px`,
-      left: `${x.value}px`,
       width: '250px',
-      height: 'auto',
+      height: 'auto'
     };
   }
 
   return {
-    top: `${y.value}px`,
-    left: `${x.value}px`,
     width: `${width.value}px`,
     height: `${height.value}px`,
+    padding: 0,
+    margin: 0
   };
 });
+
+const contentInnerStyle = computed(() => ({
+  height: '100%',
+  overflow: 'hidden' as const
+}));
 
 function toggleMinimize() {
   isMinimized.value = !isMinimized.value;
@@ -159,45 +178,6 @@ function toggleMaximize() {
 function close() {
   isOpen.value = false;
   emit('close');
-}
-
-function onHeaderMouseDown(event: MouseEvent) {
-  // Only start drag if clicking on the header itself
-  const target = event.target as HTMLElement;
-  if (target.closest('.n-card-header__extra') || target.closest('.n-card-header__close')) {
-    return;
-  }
-  startDrag(event);
-}
-
-function startDrag(event: MouseEvent) {
-  if (isMaximized.value || isMinimized.value) return;
-  if ((event.target as HTMLElement).closest('.resize-handle')) return;
-  
-  isDragging.value = true;
-  dragStartX.value = event.clientX - x.value;
-  dragStartY.value = event.clientY - y.value;
-  
-  document.addEventListener('mousemove', onDrag);
-  document.addEventListener('mouseup', stopDrag);
-  event.preventDefault();
-}
-
-function onDrag(event: MouseEvent) {
-  if (!isDragging.value) return;
-  
-  x.value = event.clientX - dragStartX.value;
-  y.value = event.clientY - dragStartY.value;
-  
-  // Keep within viewport
-  x.value = Math.max(0, Math.min(x.value, window.innerWidth - width.value));
-  y.value = Math.max(0, Math.min(y.value, window.innerHeight - 50));
-}
-
-function stopDrag() {
-  isDragging.value = false;
-  document.removeEventListener('mousemove', onDrag);
-  document.removeEventListener('mouseup', stopDrag);
 }
 
 function startResize(event: MouseEvent) {
@@ -248,8 +228,6 @@ onMounted(() => {
 });
 
 onUnmounted(() => {
-  document.removeEventListener('mousemove', onDrag);
-  document.removeEventListener('mouseup', stopDrag);
   document.removeEventListener('mousemove', onResize);
   document.removeEventListener('mouseup', stopResize);
 });
@@ -265,41 +243,22 @@ defineExpose({
 
 <style scoped>
 .popout-viewer {
-  position: fixed;
-  z-index: 9999;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  transition: box-shadow 0.2s;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
-  padding:0;
+  transition: box-shadow 0.2s;
 }
 
 .popout-viewer:hover {
   box-shadow: 0 12px 48px rgba(0, 0, 0, 0.7);
 }
 
-.popout-viewer.dragging {
-  cursor: move;
-  user-select: none;
-}
-
 .popout-viewer.maximized {
   border-radius: 0 !important;
-  top: 0 !important;
-  left: 0 !important;
-  width: 100vw !important;
-  height: 100vh !important;
   box-shadow: none;
 }
 
 .popout-viewer :deep(.n-card-header) {
   cursor: move;
   user-select: none;
-}
-
-.popout-viewer.dragging :deep(.n-card-header) {
-  opacity: 0.9;
 }
 
 .popout-content {
@@ -311,16 +270,15 @@ defineExpose({
 
 .resize-handle {
   position: absolute;
-  bottom: 0;
-  right: 0;
+  bottom: 4px;
+  right: 4px;
   width: 24px;
   height: 24px;
   cursor: nwse-resize;
   display: flex;
-  align-items: flex-end;
-  justify-content: flex-end;
+  align-items: center;
+  justify-content: center;
   color: rgba(255, 255, 255, 0.5);
-  padding: 2px;
 }
 
 .resize-handle:hover {

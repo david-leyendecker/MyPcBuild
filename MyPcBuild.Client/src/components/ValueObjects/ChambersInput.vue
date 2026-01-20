@@ -7,7 +7,10 @@
         size="small"
         @click="addChamber"
       >
-        ➕ Add Chamber
+        <template #icon>
+          <n-icon :component="Icons.Add" />
+        </template>
+        Add Chamber
       </n-button>
     </n-flex>
 
@@ -37,7 +40,9 @@
               type="error"
               @click.stop="removeChamber(index)"
             >
-              🗑️
+              <template #icon>
+                <n-icon :component="Icons.Trash" />
+              </template>
             </n-button>
           </n-flex>
         </template>
@@ -120,9 +125,10 @@
 
 <script setup lang="ts">
 import { ref, watch } from 'vue';
-import { NButton, NCard, NCollapse, NCollapseItem, NFlex, NInput, NInputNumber } from 'naive-ui';
+import { NButton, NCard, NCollapse, NCollapseItem, NFlex, NInput, NInputNumber, NIcon } from 'naive-ui';
 import type { Chamber } from '@/types/products';
 import SlotsInput from './SlotsInput.vue';
+import { Icons } from '@/utils/icons';
 
 interface Props {
   modelValue?: Chamber[];

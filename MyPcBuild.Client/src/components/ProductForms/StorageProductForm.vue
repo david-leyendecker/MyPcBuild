@@ -1,67 +1,61 @@
 <template>
-  <n-flex vertical :size="12">
-    <!-- Type and Interface - Side by side -->
-    <n-flex :size="12">
-      <div style="flex: 1; min-width: 150px;">
-        <label style="display: block; margin-bottom: 4px; font-size: 14px;">Storage Type</label>
+  <n-form>
+    <!-- Type and Interface -->
+    <n-grid :cols="2" :x-gap="12">
+      <n-form-item label="Storage Type">
         <n-input 
           v-model:value="localProduct.type"
           :disabled="!editable"
           placeholder="e.g., SSD, HDD"
         />
-      </div>
-      <div style="flex: 1; min-width: 150px;">
-        <label style="display: block; margin-bottom: 4px; font-size: 14px;">Interface</label>
+      </n-form-item>
+      <n-form-item label="Interface">
         <n-input 
           v-model:value="localProduct.interface"
           :disabled="!editable"
           placeholder="e.g., NVMe, SATA"
         />
-      </div>
-    </n-flex>
+      </n-form-item>
+    </n-grid>
 
-    <!-- Form Factor and Capacity - Side by side -->
-    <n-flex :size="12">
-      <div style="flex: 1; min-width: 150px;">
-        <label style="display: block; margin-bottom: 4px; font-size: 14px;">Form Factor</label>
+    <!-- Form Factor and Capacity -->
+    <n-grid :cols="2" :x-gap="12">
+      <n-form-item label="Form Factor">
         <n-input 
           v-model:value="localProduct.storageFormFactor"
           :disabled="!editable"
           placeholder="e.g., M.2 2280, 2.5 inch"
         />
-      </div>
-      <div style="flex: 1; min-width: 150px;">
+      </n-form-item>
+      <n-form-item label="Capacity">
         <StorageCapacityInput 
           v-model="localProduct.capacity"
-          label="Capacity"
           :editable="editable"
         />
-      </div>
-    </n-flex>
+      </n-form-item>
+    </n-grid>
 
-    <!-- Read Speed and Write Speed - Side by side -->
-    <n-flex :size="12">
-      <div style="flex: 1; min-width: 150px;">
+    <!-- Read Speed and Write Speed -->
+    <n-grid :cols="2" :x-gap="12">
+      <n-form-item label="Read Speed">
         <DataSpeedInput 
           v-model="localProduct.readSpeed"
-          label="Read Speed"
           :editable="editable"
         />
-      </div>
-      <div style="flex: 1; min-width: 150px;">
+      </n-form-item>
+      <n-form-item label="Write Speed">
         <DataSpeedInput 
           v-model="localProduct.writeSpeed"
-          label="Write Speed"
           :editable="editable"
         />
-      </div>
-    </n-flex>
-  </n-flex>
+      </n-form-item>
+    </n-grid>
+  </n-form>
 </template>
 
 <script setup lang="ts">
 import { ref, watch } from 'vue';
-import { NFlex, NInput } from 'naive-ui';
+import { NForm, NFormItem, NGrid, NInput } from 'naive-ui';
 import type { StorageProductRequest, StorageProductResponse } from '@/types/products';
 import StorageCapacityInput from '@/components/ValueObjects/StorageCapacityInput.vue';
 import DataSpeedInput from '@/components/ValueObjects/DataSpeedInput.vue';

@@ -11,6 +11,19 @@
     </n-flex>
 
     <n-card>
+      <!-- Step Indicator -->
+      <n-steps :current="currentStep" style="margin-bottom: 24px;">
+        <n-step title="Creation Mode" description="Choose how to create" />
+        <n-step 
+          :title="creationMode === 'ai' ? 'AI Generation' : 'Basic Info'" 
+          :description="creationMode === 'ai' ? 'Generate with AI' : 'Enter details'"
+        />
+        <n-step 
+          :title="creationMode === 'ai' ? 'Review' : 'Product Details'" 
+          :description="creationMode === 'ai' ? 'Review and edit' : 'Category-specific'"
+        />
+      </n-steps>
+
       <div style="display: flex; flex-direction: column; gap: 16px;">
           <!-- Step 1: Creation Mode Selection -->
           <div v-if="currentStep === 1">
@@ -24,7 +37,9 @@
                 @click="selectCreationMode('manual')"
               >
                 <div style="text-align: center;">
-                  <div style="font-size: 48px; margin-bottom: 8px;">✏️</div>
+                  <div style="font-size: 48px; margin-bottom: 8px;">
+                    <n-icon :component="Icons.Pencil" :size="48" />
+                  </div>
                   <h4 class="text-h6" style="margin-bottom: 8px;">Manual Entry</h4>
                   <p class="text-body-2">Enter all product details manually</p>
                 </div>
@@ -37,7 +52,9 @@
                 @click="selectCreationMode('ai')"
               >
                 <div style="text-align: center;">
-                  <div style="font-size: 48px; margin-bottom: 8px;">🤖</div>
+                  <div style="font-size: 48px; margin-bottom: 8px;">
+                    <n-icon :component="Icons.Bulb" :size="48" />
+                  </div>
                   <h4 class="text-h6" style="margin-bottom: 8px;">AI-Assisted</h4>
                   <p class="text-body-2">Generate product details from a description using AI</p>
                 </div>
@@ -85,7 +102,10 @@
                   text
                   @click="currentStep = 1"
                 >
-                  ← Back
+                  <template #icon>
+                    <n-icon :component="Icons.ArrowBack" />
+                  </template>
+                  Back
                 </n-button>
                 <n-button 
                   type="primary"
@@ -93,7 +113,10 @@
                   :disabled="!formData.category || !aiDescription"
                   @click="generateWithAi"
                 >
-                  🤖 Generate Product
+                  <template #icon>
+                    <n-icon :component="Icons.Bulb" />
+                  </template>
+                  Generate Product
                 </n-button>
               </n-flex>
             </div>
@@ -135,14 +158,20 @@
                   text
                   @click="currentStep = 1"
                 >
-                  ← Back
+                  <template #icon>
+                    <n-icon :component="Icons.ArrowBack" />
+                  </template>
+                  Back
                 </n-button>
                 <n-button 
                   type="primary"
                   :disabled="!canProceedToStep3"
                   @click="nextStep"
                 >
-                  Next: Product Details →
+                  <template #icon>
+                    <n-icon :component="Icons.ArrowForward" />
+                  </template>
+                  Next: Product Details
                 </n-button>
               </n-flex>
             </div>
@@ -192,7 +221,10 @@
                       text
                       @click="open3DInPopout"
                     >
-                      ↗ Open in Popout
+                      <template #icon>
+                      <n-icon :component="Icons.Open" />
+                    </template>
+                    Open in Popout
                     </n-button>
                   </n-flex>
                   <p class="text-body-2" style="margin-bottom: 12px;">
@@ -214,14 +246,20 @@
                     text
                     @click="currentStep = 2"
                   >
-                    ← Back
+                    <template #icon>
+                      <n-icon :component="Icons.ArrowBack" />
+                    </template>
+                    Back
                   </n-button>
                   <n-button 
                     type="primary"
                     :loading="isCreating"
                     @click="createProduct"
                   >
-                    ✓ Create as Draft
+                    <template #icon>
+                      <n-icon :component="Icons.Check" />
+                    </template>
+                    Create as Draft
                   </n-button>
                 </n-flex>
               </n-flex>
@@ -247,7 +285,10 @@
                       text
                       @click="open3DInPopout"
                     >
-                      ↗ Open in Popout
+                      <template #icon>
+                      <n-icon :component="Icons.Open" />
+                    </template>
+                    Open in Popout
                     </n-button>
                   </n-flex>
                   <p class="text-body-2" style="margin-bottom: 12px;">
@@ -269,14 +310,20 @@
                     text
                     @click="currentStep = 2"
                   >
-                    ← Back
+                    <template #icon>
+                      <n-icon :component="Icons.ArrowBack" />
+                    </template>
+                    Back
                   </n-button>
                   <n-button 
                     type="primary"
                     :loading="isCreating"
                     @click="createProduct"
                   >
-                    ✓ Create Product
+                    <template #icon>
+                      <n-icon :component="Icons.Check" />
+                    </template>
+                    Create Product
                   </n-button>
                 </n-flex>
               </n-flex>
@@ -290,7 +337,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
-import { NCard, NButton, NInput, NInputNumber, NSelect, NAlert, NFlex, NDivider } from 'naive-ui';
+import { NCard, NButton, NInput, NInputNumber, NSelect, NAlert, NFlex, NDivider, NSteps, NStep, NIcon } from 'naive-ui';
 import { catalogApi, ProductCategory, categoryLabels, type GenerateProductResponse } from '@/api/catalog';
 import { createTypedProduct } from '@/api/catalogTyped';
 import { use3DPopout } from '@/composables/use3DPopout';
@@ -298,6 +345,7 @@ import ProductFormSelector from '@/components/ProductFormSelector.vue';
 import ProductViewer3D from '@/components/ProductViewer3D.vue';
 import { fieldsToTypedProduct } from '@/utils/productFieldConverters';
 import type { ProductRequest } from '@/types/products';
+import { Icons } from '@/utils/icons';
 
 const router = useRouter();
 const { openPopout } = use3DPopout();

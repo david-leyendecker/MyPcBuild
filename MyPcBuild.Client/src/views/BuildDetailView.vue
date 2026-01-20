@@ -50,12 +50,16 @@
       <n-card>
         <template #header>PC Components</template>
         
-        <n-flex v-if="buildStore.currentBuild.parts.length === 0" vertical align="center" style="padding: 24px 0;">
-          <p style="opacity: 0.6; margin-bottom: 16px;">No components added yet.</p>
-          <n-button type="primary" @click="showAddPartDialog = true">
-            + Add Component
-          </n-button>
-        </n-flex>
+        <n-empty v-if="buildStore.currentBuild.parts.length === 0" description="No components added yet">
+          <template #extra>
+            <n-button type="primary" @click="showAddPartDialog = true">
+              <template #icon>
+                <n-icon :component="Icons.Add" />
+              </template>
+              Add Component
+            </n-button>
+          </template>
+        </n-empty>
 
         <template v-else>
           <n-flex vertical :size="12">
@@ -72,7 +76,9 @@
                   <p style="font-weight: 600; margin-top: 8px; color: #18a058;">${{ part.pricePaid.toFixed(2) }}</p>
                 </div>
                 <n-button text type="error" @click="removePart(part.id)">
-                  🗑
+                  <template #icon>
+                    <n-icon :component="Icons.Trash" />
+                  </template>
                 </n-button>
               </n-flex>
             </n-card>
@@ -87,7 +93,10 @@
 
         <template #footer>
           <n-button type="primary" block @click="showAddPartDialog = true">
-            + Add Component
+            <template #icon>
+              <n-icon :component="Icons.Add" />
+            </template>
+            Add Component
           </n-button>
         </template>
       </n-card>
@@ -113,13 +122,14 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
-import { NCard, NButton, NFlex, NSpin, NAlert, NDivider, NModal } from 'naive-ui';
+import { NCard, NButton, NFlex, NSpin, NAlert, NDivider, NModal, NIcon, NEmpty } from 'naive-ui';
 import { useBuildStore } from '@/stores/buildStore';
 import { useCatalogStore } from '@/stores/catalogStore';
 import { use3DPopout } from '@/composables/use3DPopout';
 import CompatibilityPanel from '@/components/CompatibilityPanel.vue';
 import AddPartDialogWithSlots from '@/components/AddPartDialogWithSlots.vue';
 import Viewer3D from '@/components/Viewer3D.vue';
+import { Icons } from '@/utils/icons';
 
 interface Props {
   id: string;

@@ -1,72 +1,74 @@
 <template>
-  <n-flex vertical :size="16">
+  <n-form>
     <!-- CPU Socket -->
-    <n-select 
-      v-model:value="localProduct.socket"
-      :options="socketOptions"
-      placeholder="CPU Socket"
-      :disabled="!editable"
-    />
-
-    <!-- Cores and Threads - Side by side -->
-    <n-flex :size="12">
-      <n-input-number 
-        v-model:value="localProduct.cores"
-        placeholder="Cores"
-        :readonly="!editable"
-        style="flex: 1; min-width: 150px;"
+    <n-form-item label="CPU Socket">
+      <n-select 
+        v-model:value="localProduct.socket"
+        :options="socketOptions"
+        placeholder="Select socket"
+        :disabled="!editable"
       />
-      <n-input-number 
-        v-model:value="localProduct.threads"
-        placeholder="Threads"
-        :readonly="!editable"
-        style="flex: 1; min-width: 150px;"
-      />
-    </n-flex>
+    </n-form-item>
 
-    <!-- Base Clock and Boost Clock - Side by side -->
-    <n-flex :size="12">
-      <div style="flex: 1; min-width: 150px;">
-        <label style="display: block; margin-bottom: 4px; font-size: 14px;">Base Clock</label>
+    <!-- Cores and Threads -->
+    <n-grid :cols="2" :x-gap="12">
+      <n-form-item label="Cores">
+        <n-input-number 
+          v-model:value="localProduct.cores"
+          placeholder="Number of cores"
+          :readonly="!editable"
+          style="width: 100%;"
+        />
+      </n-form-item>
+      <n-form-item label="Threads">
+        <n-input-number 
+          v-model:value="localProduct.threads"
+          placeholder="Number of threads"
+          :readonly="!editable"
+          style="width: 100%;"
+        />
+      </n-form-item>
+    </n-grid>
+
+    <!-- Base Clock and Boost Clock -->
+    <n-grid :cols="2" :x-gap="12">
+      <n-form-item label="Base Clock">
         <FrequencyInput 
           v-model="localProduct.baseClock"
-          label="Base Clock"
           :editable="editable"
         />
-      </div>
-      <div style="flex: 1; min-width: 150px;">
-        <label style="display: block; margin-bottom: 4px; font-size: 14px;">Boost Clock</label>
+      </n-form-item>
+      <n-form-item label="Boost Clock">
         <FrequencyInput 
           v-model="localProduct.boostClock"
-          label="Boost Clock"
           :editable="editable"
         />
-      </div>
-    </n-flex>
+      </n-form-item>
+    </n-grid>
 
     <!-- TDP -->
-    <div>
-      <label style="display: block; margin-bottom: 4px; font-size: 14px;">TDP (Thermal Design Power)</label>
+    <n-form-item label="TDP (Thermal Design Power)">
       <PowerInput 
         v-model="localProduct.tdp"
-        label="TDP (Thermal Design Power)"
         :editable="editable"
       />
-    </div>
+    </n-form-item>
 
     <!-- Integrated Graphics -->
-    <n-checkbox 
-      v-model:checked="localProduct.integratedGraphics"
-      :disabled="!editable"
-    >
-      Integrated Graphics
-    </n-checkbox>
-  </n-flex>
+    <n-form-item label="Integrated Graphics">
+      <n-checkbox 
+        v-model:checked="localProduct.integratedGraphics"
+        :disabled="!editable"
+      >
+        Has Integrated Graphics
+      </n-checkbox>
+    </n-form-item>
+  </n-form>
 </template>
 
 <script setup lang="ts">
 import { ref, watch } from 'vue';
-import { NFlex, NSelect, NInputNumber, NCheckbox } from 'naive-ui';
+import { NForm, NFormItem, NGrid, NSelect, NInputNumber, NCheckbox } from 'naive-ui';
 import type { CpuProductRequest, CpuProductResponse, CpuSocket } from '@/types/products';
 import FrequencyInput from '@/components/ValueObjects/FrequencyInput.vue';
 import PowerInput from '@/components/ValueObjects/PowerInput.vue';

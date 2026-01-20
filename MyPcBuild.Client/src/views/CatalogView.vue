@@ -44,12 +44,27 @@
           @update:value="handleSearchDebounced"
         >
           <template #prefix>
-            🔍
+            <n-icon :component="Icons.SearchIcon" />
           </template>
         </n-input>
       </template>
 
+      <n-empty 
+        v-if="!catalogStore.isLoading && catalogStore.products.length === 0"
+        description="No products found"
+      >
+        <template #extra>
+          <n-button type="primary" @click="() => $router.push('/catalog/create')">
+            <template #icon>
+              <n-icon :component="Icons.Add" />
+            </template>
+            Create Product
+          </n-button>
+        </template>
+      </n-empty>
+
       <n-data-table
+        v-else
         :columns="columns"
         :data="catalogStore.products"
         :loading="catalogStore.isLoading"
@@ -69,12 +84,13 @@
 <script setup lang="ts">
 import { ref, onMounted, computed, h } from 'vue';
 import { useRouter } from 'vue-router';
-import { NCard, NInput, NDataTable, NTag, NFlex, NAlert } from 'naive-ui';
+import { NCard, NInput, NDataTable, NTag, NFlex, NAlert, NIcon, NButton, NEmpty } from 'naive-ui';
 import type { DataTableColumns, PaginationProps } from 'naive-ui';
 import { useCatalogStore } from '@/stores/catalogStore';
 import { catalogApi, ProductCategory, categoryLabels } from '@/api/catalog';
 import ViewHeader from '@/components/ViewHeader.vue';
 import { PRODUCT_CATALOG } from '@/config/navigation';
+import { Icons } from '@/utils/icons';
 
 const router = useRouter();
 
@@ -124,8 +140,18 @@ const columns: DataTableColumns<any> = [
     key: 'isDraft',
     sorter: 'default',
     render: (row) => row.isDraft 
-      ? h(NTag, { type: 'warning', bordered: false, size: 'small' }, { default: () => '✏ Draft' })
-      : h(NTag, { type: 'success', bordered: false, size: 'small' }, { default: () => '✓ Published' })
+      ? h(NTag, { type: 'warning', bordered: false, size: 'small' }, { 
+          default: () => [
+            h(NIcon, { component: Icons.Pencil, style: 'margin-right: 4px;' }),
+            'Draft'
+          ]
+        })
+      : h(NTag, { type: 'success', bordered: false, size: 'small' }, { 
+          default: () => [
+            h(NIcon, { component: Icons.Check, style: 'margin-right: 4px;' }),
+            'Published'
+          ]
+        })
   },
   {
     title: 'Actions',
@@ -137,31 +163,32 @@ const columns: DataTableColumns<any> = [
       {
         default: () => [
           row.isDraft ? h(
-            'span',
+            NButton,
             {
-              style: 'cursor: pointer; font-size: 16px;',
+              text: true,
               title: 'Publish product',
               onClick: () => publish(row.id)
             },
-            '✓'
+            { icon: () => h(NIcon, { component: Icons.Check }) }
           ) : null,
           h(
-            'span',
+            NButton,
             {
-              style: 'cursor: pointer; font-size: 16px;',
+              text: true,
               title: 'Edit',
               onClick: () => edit(row.id)
             },
-            '✏'
+            { icon: () => h(NIcon, { component: Icons.Edit }) }
           ),
           h(
-            'span',
+            NButton,
             {
-              style: 'cursor: pointer; font-size: 16px; color: #d03050;',
+              text: true,
+              type: 'error',
               title: 'Delete',
               onClick: () => remove(row.id)
             },
-            '🗑'
+            { icon: () => h(NIcon, { component: Icons.Trash }) }
           )
         ]
       }

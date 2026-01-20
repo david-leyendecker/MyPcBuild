@@ -27,9 +27,13 @@
         <n-spin size="medium" />
       </n-flex>
 
-      <div v-else-if="filteredProducts.length === 0" style="text-align: center; padding: 16px 0;">
-        <p style="opacity: 0.7;">No components found</p>
-      </div>
+      <n-empty v-else-if="filteredProducts.length === 0" description="No components found">
+        <template #extra>
+          <n-button @click="searchQuery = ''; selectedCategory = null">
+            Clear Filters
+          </n-button>
+        </template>
+      </n-empty>
 
       <div 
         v-else 
@@ -57,7 +61,10 @@
           text
           @click="$emit('close')"
         >
-          ✕ Cancel
+          <template #icon>
+            <n-icon :component="Icons.Close" />
+          </template>
+          Cancel
         </n-button>
       </n-flex>
     </div>
@@ -101,7 +108,9 @@
                     </n-tag>
                   </p>
                 </div>
-                <span v-if="selectedSlotId === slot.id">✓</span>
+                <span v-if="selectedSlotId === slot.id">
+                  <n-icon :component="Icons.Check" />
+                </span>
               </n-flex>
             </div>
           </div>
@@ -134,34 +143,49 @@
           text
           @click="selectedProductId = null"
         >
-          ← Back
+          <template #icon>
+            <n-icon :component="Icons.ArrowBack" />
+          </template>
+          Back
         </n-button>
         <n-flex :size="8">
           <n-button 
             text
             @click="$emit('close')"
           >
-            ✕ Cancel
+            <template #icon>
+              <n-icon :component="Icons.Close" />
+            </template>
+            Cancel
           </n-button>
           <n-button 
             v-if="availableSlots.length > 0"
             @click="confirmAddWithoutSlot"
           >
-            ➕ Add Without Slot
+            <template #icon>
+              <n-icon :component="Icons.Add" />
+            </template>
+            Add Without Slot
           </n-button>
           <n-button 
             v-if="selectedSlotId"
             type="primary"
             @click="confirmAddToSlot"
           >
-            ➕ Add to Slot
+            <template #icon>
+              <n-icon :component="Icons.Add" />
+            </template>
+            Add to Slot
           </n-button>
           <n-button 
             v-else-if="availableSlots.length === 0"
             type="primary"
             @click="confirmAddWithoutSlot"
           >
-            ➕ Add Component
+            <template #icon>
+              <n-icon :component="Icons.Add" />
+            </template>
+            Add Component
           </n-button>
         </n-flex>
       </n-flex>
@@ -171,10 +195,11 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue';
-import { NFlex, NButton, NInput, NSpin, NCard, NTag, NInputNumber } from 'naive-ui';
+import { NFlex, NButton, NInput, NSpin, NCard, NTag, NInputNumber, NEmpty, NIcon } from 'naive-ui';
 import { useCatalogStore } from '@/stores/catalogStore';
 import { ProductCategory, categoryLabels, getCategoryFromBackend } from '@/api/catalog';
 import { buildsApi, type AvailableSlot } from '@/api/builds';
+import { Icons } from '@/utils/icons';
 
 interface Props {
   buildId: string;

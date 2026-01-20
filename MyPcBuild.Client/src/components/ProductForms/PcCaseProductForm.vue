@@ -1,63 +1,53 @@
 <template>
-  <n-flex vertical :size="12">
-    <!-- Form Factor and Color - Side by side -->
-    <n-flex :size="12">
-      <div style="flex: 1; min-width: 150px;">
-        <label style="display: block; margin-bottom: 4px; font-size: 14px;">Form Factor</label>
+  <n-form>
+    <!-- Form Factor and Color -->
+    <n-grid :cols="2" :x-gap="12">
+      <n-form-item label="Form Factor">
         <n-input 
           v-model:value="localProduct.formFactor"
           :disabled="!editable"
           placeholder="e.g., Mid Tower, Full Tower"
         />
-      </div>
-      <div style="flex: 1; min-width: 150px;">
-        <label style="display: block; margin-bottom: 4px; font-size: 14px;">Color</label>
+      </n-form-item>
+      <n-form-item label="Color">
         <n-input 
           v-model:value="localProduct.color"
           :disabled="!editable"
           placeholder="e.g., Black, White"
         />
-      </div>
-    </n-flex>
+      </n-form-item>
+    </n-grid>
 
     <!-- Side Panel Window -->
-    <n-flex :size="12">
-      <div style="flex: 1; min-width: 150px;">
-        <label style="display: block; margin-bottom: 4px; font-size: 14px;">Side Panel Window</label>
-        <n-input 
-          v-model:value="localProduct.sidePanelWindow"
-          :disabled="!editable"
-          placeholder="e.g., Tempered Glass, Acrylic, None"
-        />
-      </div>
-    </n-flex>
+    <n-form-item label="Side Panel Window">
+      <n-input 
+        v-model:value="localProduct.sidePanelWindow"
+        :disabled="!editable"
+        placeholder="e.g., Tempered Glass, Acrylic, None"
+      />
+    </n-form-item>
 
     <!-- Dimensions -->
-    <n-flex :size="12">
-      <div style="flex: 1; min-width: 150px;">
-        <label style="display: block; margin-bottom: 4px; font-size: 14px;">Dimensions</label>
-        <DimensionsInput 
-          v-model="localProduct.dimensions"
-          :editable="editable"
-        />
-      </div>
-    </n-flex>
+    <n-form-item label="Dimensions">
+      <DimensionsInput 
+        v-model="localProduct.dimensions"
+        :editable="editable"
+      />
+    </n-form-item>
 
     <!-- Chambers -->
-    <n-flex :size="12">
-      <div style="flex: 1; min-width: 150px;">
-        <ChambersInput 
-          v-model="localProduct.chambers"
-          :editable="editable"
-        />
-      </div>
-    </n-flex>
-  </n-flex>
+    <n-form-item label="Chambers">
+      <ChambersInput 
+        v-model="localProduct.chambers"
+        :editable="editable"
+      />
+    </n-form-item>
+  </n-form>
 </template>
 
 <script setup lang="ts">
 import { ref, watch } from 'vue';
-import { NFlex, NInput } from 'naive-ui';
+import { NForm, NFormItem, NGrid, NInput } from 'naive-ui';
 import type { PcCaseProductRequest, PcCaseProductResponse } from '@/types/products';
 import DimensionsInput from '@/components/ValueObjects/DimensionsInput.vue';
 import ChambersInput from '@/components/ValueObjects/ChambersInput.vue';

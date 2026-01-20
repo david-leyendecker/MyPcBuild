@@ -1,64 +1,53 @@
 <template>
-  <n-flex vertical :size="12">
-    <!-- Cooler Type and Height - Side by side -->
-    <n-flex :size="12">
-      <div style="flex: 1; min-width: 150px;">
-        <label style="display: block; margin-bottom: 4px; font-size: 14px;">Cooler Type</label>
+  <n-form>
+    <!-- Cooler Type and Height -->
+    <n-grid :cols="2" :x-gap="12">
+      <n-form-item label="Cooler Type">
         <n-select 
           v-model:value="localProduct.coolerType"
           :options="coolerTypeOptions"
           :disabled="!editable"
         />
-      </div>
-      <div style="flex: 1; min-width: 150px;">
+      </n-form-item>
+      <n-form-item label="Height">
         <LengthInput 
           v-model="localProduct.height"
-          label="Height"
           :editable="editable"
         />
-      </div>
-    </n-flex>
+      </n-form-item>
+    </n-grid>
 
     <!-- TDP -->
-    <n-flex :size="12">
-      <div style="flex: 1; min-width: 150px;">
-        <PowerInput 
-          v-model="localProduct.tdp"
-          label="TDP Rating"
-          :editable="editable"
-        />
-      </div>
-    </n-flex>
+    <n-form-item label="TDP Rating">
+      <PowerInput 
+        v-model="localProduct.tdp"
+        :editable="editable"
+      />
+    </n-form-item>
 
     <!-- Compatible Sockets -->
-    <n-flex :size="12">
-      <div style="flex: 1; min-width: 150px;">
-        <label style="display: block; margin-bottom: 4px; font-size: 14px;">Compatible CPU Sockets</label>
-        <n-select 
-          v-model:value="localProduct.sockets"
-          :options="socketOptions"
-          :disabled="!editable"
-          multiple
-        />
-      </div>
-    </n-flex>
+    <n-form-item label="Compatible CPU Sockets">
+      <n-select 
+        v-model:value="localProduct.sockets"
+        :options="socketOptions"
+        :disabled="!editable"
+        multiple
+      />
+    </n-form-item>
 
     <!-- Dimensions -->
-    <n-flex :size="12">
-      <div style="flex: 1; min-width: 150px;">
-        <label style="display: block; margin-bottom: 4px; font-size: 14px;">Dimensions</label>
-        <DimensionsInput 
-          v-model="localProduct.dimensions"
-          :editable="editable"
-        />
-      </div>
-    </n-flex>
-  </n-flex>
+    <n-form-item label="Dimensions">
+      <DimensionsInput 
+        v-model="localProduct.dimensions"
+        :editable="editable"
+      />
+    </n-form-item>
+  </n-form>
 </template>
 
 <script setup lang="ts">
 import { ref, watch } from 'vue';
-import { NFlex, NSelect } from 'naive-ui';
+import { NForm, NFormItem, NGrid, NSelect } from 'naive-ui';
 import type { CoolerProductRequest, CoolerProductResponse, CoolerType, CpuSocket } from '@/types/products';
 import PowerInput from '@/components/ValueObjects/PowerInput.vue';
 import LengthInput from '@/components/ValueObjects/LengthInput.vue';

@@ -25,9 +25,13 @@
       <n-spin />
     </n-flex>
 
-    <n-flex v-else-if="filteredProducts.length === 0" vertical align="center" style="padding: 16px 0;">
-      <p style="opacity: 0.6;">No components found</p>
-    </n-flex>
+    <n-empty v-else-if="filteredProducts.length === 0" description="No components found">
+      <template #extra>
+        <n-button @click="searchQuery = ''; selectedCategory = null">
+          Clear Filters
+        </n-button>
+      </template>
+    </n-empty>
 
     <n-scrollbar 
       v-else 
@@ -62,7 +66,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
-import { NInput, NButton, NFlex, NSpin, NScrollbar } from 'naive-ui';
+import { NInput, NButton, NFlex, NSpin, NScrollbar, NEmpty } from 'naive-ui';
 import { useCatalogStore } from '@/stores/catalogStore';
 import { ProductCategory, categoryLabels, getCategoryFromBackend } from '@/api/catalog';
 

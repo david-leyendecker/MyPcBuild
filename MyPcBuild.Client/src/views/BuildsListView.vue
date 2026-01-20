@@ -17,9 +17,20 @@
       {{ buildStore.error }}
     </n-alert>
 
-    <n-flex v-else-if="buildStore.builds.length === 0" vertical align="center" style="padding: 32px 0;">
-      <p style="font-size: 18px; opacity: 0.6;">No builds yet. Create your first PC build!</p>
-    </n-flex>
+    <n-empty 
+      v-else-if="buildStore.builds.length === 0" 
+      description="No builds yet. Create your first PC build!"
+      style="padding: 64px 0;"
+    >
+      <template #extra>
+        <n-button type="primary" @click="showNewBuildDialog = true">
+          <template #icon>
+            <n-icon><Add /></n-icon>
+          </template>
+          Create First Build
+        </n-button>
+      </template>
+    </n-empty>
 
     <n-grid v-else :cols="1" :x-gap="16" :y-gap="16" responsive="screen" :item-responsive="true">
       <n-gi 
@@ -43,14 +54,19 @@
                 style="flex: 1;"
                 @click="$router.push(`/builds/${build.id}`)"
               >
-                View Details →
+                <template #icon>
+                  <n-icon><ArrowForward /></n-icon>
+                </template>
+                View Details
               </n-button>
               <n-button 
                 type="error"
                 text
                 @click="deleteBuild(build.id)"
               >
-                🗑
+                <template #icon>
+                  <n-icon><Trash /></n-icon>
+                </template>
               </n-button>
             </n-flex>
           </template>
@@ -65,15 +81,20 @@
       title="Create New Build"
       style="width: 500px;"
     >
-      <n-input 
-        v-model:value="newBuildName"
-        placeholder="My Gaming PC"
-      />
+      <n-form-item label="Build Name">
+        <n-input 
+          v-model:value="newBuildName"
+          placeholder="My Gaming PC"
+        />
+      </n-form-item>
       <template #footer>
         <n-flex justify="end" :size="12">
           <n-button 
             @click="showNewBuildDialog = false"
           >
+            <template #icon>
+              <n-icon><Close /></n-icon>
+            </template>
             Cancel
           </n-button>
           <n-button 
@@ -81,6 +102,9 @@
             :loading="buildStore.isLoading"
             @click="handleCreateBuild"
           >
+            <template #icon>
+              <n-icon><Check /></n-icon>
+            </template>
             Create
           </n-button>
         </n-flex>
@@ -92,7 +116,8 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
-import { NGrid, NGi, NCard, NButton, NFlex, NSpin, NAlert, NModal, NInput } from 'naive-ui';
+import { NGrid, NGi, NCard, NButton, NFlex, NSpin, NAlert, NModal, NInput, NEmpty, NIcon, NFormItem } from 'naive-ui';
+import { Add, ArrowForward, TrashOutline as Trash, CheckmarkOutline as Check, Close } from '@vicons/ionicons5';
 import { useBuildStore } from '@/stores/buildStore';
 import ViewHeader from '@/components/ViewHeader.vue';
 import { MY_BUILDS } from '@/config/navigation';

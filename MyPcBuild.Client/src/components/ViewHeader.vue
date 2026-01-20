@@ -8,7 +8,9 @@
                 @click="actionButton.onClick"
             >
                 <template v-if="actionButton.icon" #icon>
-                    <span>{{ getIcon(actionButton.icon) }}</span>
+                    <n-icon>
+                        <component :is="getIconComponent(actionButton.icon)" />
+                    </n-icon>
                 </template>
                 {{ actionButton.text }}
             </n-button>
@@ -20,7 +22,9 @@
 </template>
 
 <script setup lang="ts">
-import { NButton, NFlex } from 'naive-ui';
+import type { Component } from 'vue';
+import { NButton, NFlex, NIcon } from 'naive-ui';
+import { Icons } from '@/utils/icons';
 
 interface ActionButton {
     text: string;
@@ -37,18 +41,18 @@ interface Props {
 
 defineProps<Props>();
 
-function getIcon(iconName: string): string {
-    const iconMap: Record<string, string> = {
-        'mdi-plus': '+',
-        'mdi-arrow-right': '→',
-        'mdi-arrow-left': '←',
-        'mdi-delete': '🗑',
-        'mdi-pencil': '✏',
-        'mdi-check': '✓',
-        'mdi-close': '✕',
-        'mdi-magnify': '🔍'
+function getIconComponent(iconName: string): Component {
+    const iconMap: Record<string, Component> = {
+        'mdi-plus': Icons.Add,
+        'mdi-arrow-right': Icons.ArrowForward,
+        'mdi-arrow-left': Icons.ArrowBack,
+        'mdi-delete': Icons.Trash,
+        'mdi-pencil': Icons.Edit,
+        'mdi-check': Icons.Check,
+        'mdi-close': Icons.Close,
+        'mdi-magnify': Icons.Search
     };
-    return iconMap[iconName] || '';
+    return iconMap[iconName] || Icons.Info;
 }
 </script>
 
