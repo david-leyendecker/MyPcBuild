@@ -32,24 +32,17 @@
 
       <!-- 3D Visualization Section -->
       <n-card v-if="hasSpatialParts" style="margin-bottom: 16px;">
-        <template #header>
-          <n-flex justify="space-between" align="center">
-            <span>3D Build Visualization</span>
-            <n-button text size="small" @click="open3DInPopout">
-              Open in Popout
-            </n-button>
-          </n-flex>
-        </template>
-        <Viewer3D 
+        <BuildViewer3D
           :parts="buildStore.currentBuild.parts"
           :collisions="collidingPartIds"
+          :title="`3D Preview - ${buildStore.currentBuild.name}`"
         />
       </n-card>
 
       <!-- Parts List Section -->
       <n-card>
         <template #header>PC Components</template>
-        
+
         <n-empty v-if="buildStore.currentBuild.parts.length === 0" description="No components added yet">
           <template #extra>
             <n-button type="primary" @click="showAddPartDialog = true">
@@ -63,7 +56,7 @@
 
         <template v-else>
           <n-flex vertical :size="12">
-            <n-card 
+            <n-card
               v-for="part in buildStore.currentBuild.parts"
               :key="part.id"
               size="small"
@@ -102,13 +95,13 @@
       </n-card>
 
       <!-- Add Part Dialog -->
-      <n-modal 
+      <n-modal
         v-model:show="showAddPartDialog"
         preset="card"
         title="Add Component"
         style="width: 600px;"
       >
-        <AddPartDialogWithSlots 
+        <AddPartDialogWithSlots
           :build-id="buildStore.currentBuild.id"
           @part-selected="handleAddPart"
           @part-selected-with-slot="handleAddPartToSlot"
@@ -125,10 +118,9 @@ import { useRoute } from 'vue-router';
 import { NCard, NButton, NFlex, NSpin, NAlert, NDivider, NModal, NIcon, NEmpty } from 'naive-ui';
 import { useBuildStore } from '@/stores/buildStore';
 import { useCatalogStore } from '@/stores/catalogStore';
-import { use3DPopout } from '@/composables/use3DPopout';
 import CompatibilityPanel from '@/components/CompatibilityPanel.vue';
 import AddPartDialogWithSlots from '@/components/AddPartDialogWithSlots.vue';
-import Viewer3D from '@/components/Viewer3D.vue';
+import BuildViewer3D from '@/components/BuildViewer3D.vue';
 import { Icons } from '@/utils/icons';
 
 interface Props {
@@ -141,7 +133,6 @@ const route = useRoute();
 const buildStore = useBuildStore();
 const catalogStore = useCatalogStore();
 const showAddPartDialog = ref(false);
-const { openPopout } = use3DPopout();
 
 const totalCost = computed(() => {
   return buildStore.currentBuild?.parts.reduce((sum, part) => sum + part.pricePaid, 0) ?? 0;
@@ -154,12 +145,12 @@ const hasSpatialParts = computed(() => {
 const collidingPartIds = computed(() => {
   // Extract part IDs from collision-related compatibility issues
   const collisionIssues = buildStore.validationIssues.filter(
-    issue => issue.category.toLowerCase().includes('collision') || 
+    issue => issue.category.toLowerCase().includes('collision') ||
              issue.message.toLowerCase().includes('collision')
   );
-  
+
   const partIds: string[] = [];
-  
+
   // Try to extract part IDs from issue messages
   // Messages typically contain part names like "Collision detected between 'Part A' and 'Part B'"
   collisionIssues.forEach(issue => {
@@ -173,7 +164,7 @@ const collidingPartIds = computed(() => {
       });
     }
   });
-  
+
   return partIds;
 });
 
@@ -183,7 +174,7 @@ onMounted(() => {
 
 async function handleAddPart(productId: string) {
   if (!buildStore.currentBuild) return;
-  
+
   try {
     await buildStore.addPart(buildStore.currentBuild.id, productId);
     showAddPartDialog.value = false;
@@ -194,12 +185,12 @@ async function handleAddPart(productId: string) {
 
 async function handleAddPartToSlot(productId: string, slotId: string, position: { x: number; y: number; z: number }, rotation?: { x: number; y: number; z: number } | null) {
   if (!buildStore.currentBuild) return;
-  
+
   try {
     // Get product to fetch the actual price
     const product = catalogStore.products.find(p => p.id === productId);
     const pricePaid = product?.price ?? 0;
-    
+
     await buildStore.addPartToSlot(buildStore.currentBuild.id, {
       productId,
       pricePaid,
@@ -215,25 +206,12 @@ async function handleAddPartToSlot(productId: string, slotId: string, position: 
 
 async function removePart(productId: string) {
   if (!buildStore.currentBuild) return;
-  
+
   try {
     await buildStore.removePart(buildStore.currentBuild.id, productId);
   } catch (error) {
     console.error('Failed to remove part:', error);
   }
-}
-
-function open3DInPopout() {
-  if (!buildStore.currentBuild) return;
-  
-  openPopout({
-    component: Viewer3D,
-    props: {
-      parts: buildStore.currentBuild.parts,
-      collisions: collidingPartIds.value,
-    },
-    title: `3D Preview - ${buildStore.currentBuild.name}`,
-  });
 }
 </script>
 

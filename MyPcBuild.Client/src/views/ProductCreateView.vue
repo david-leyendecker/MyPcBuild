@@ -2,7 +2,7 @@
   <div class="fade-in">
     <n-flex :gap="16" style="margin-bottom: 16px; justify-content: space-between; align-items: center;">
       <h2 class="text-h4">Create New Product</h2>
-      <n-button 
+      <n-button
         text
         @click="$router.push('/catalog')"
       >
@@ -14,12 +14,12 @@
       <!-- Step Indicator -->
       <n-steps :current="currentStep" style="margin-bottom: 24px;">
         <n-step title="Creation Mode" description="Choose how to create" />
-        <n-step 
-          :title="creationMode === 'ai' ? 'AI Generation' : 'Basic Info'" 
+        <n-step
+          :title="creationMode === 'ai' ? 'AI Generation' : 'Basic Info'"
           :description="creationMode === 'ai' ? 'Generate with AI' : 'Enter details'"
         />
-        <n-step 
-          :title="creationMode === 'ai' ? 'Review' : 'Product Details'" 
+        <n-step
+          :title="creationMode === 'ai' ? 'Review' : 'Product Details'"
           :description="creationMode === 'ai' ? 'Review and edit' : 'Category-specific'"
         />
       </n-steps>
@@ -28,9 +28,9 @@
           <!-- Step 1: Creation Mode Selection -->
           <div v-if="currentStep === 1">
             <h3 class="text-h5" style="margin-bottom: 12px;">How would you like to create this product?</h3>
-            
+
             <n-flex :gap="16" style="margin-bottom: 16px;">
-              <n-card 
+              <n-card
                 :bordered="true"
                 style="flex: 1; cursor: pointer; padding: 16px; border: 2px solid transparent;"
                 :style="creationMode === 'manual' ? { borderColor: 'var(--n-primary-color)' } : {}"
@@ -44,8 +44,8 @@
                   <p class="text-body-2">Enter all product details manually</p>
                 </div>
               </n-card>
-              
-              <n-card 
+
+              <n-card
                 :bordered="true"
                 style="flex: 1; cursor: pointer; padding: 16px; border: 2px solid transparent;"
                 :style="creationMode === 'ai' ? { borderColor: 'var(--n-primary-color)' } : {}"
@@ -62,7 +62,7 @@
             </n-flex>
 
             <n-flex justify="flex-end" style="margin-top: 16px;">
-              <n-button 
+              <n-button
                 type="primary"
                 :disabled="!creationMode"
                 @click="nextStep"
@@ -77,9 +77,9 @@
             <!-- AI Mode -->
             <div v-if="creationMode === 'ai'">
               <h3 class="text-h5" style="margin-bottom: 12px;">Generate Product with AI</h3>
-              
+
               <n-flex vertical :gap="12">
-                <n-select 
+                <n-select
                   v-model:value="formData.category"
                   :options="categories"
                   label="Category *"
@@ -98,7 +98,7 @@
               </n-alert>
 
               <n-flex justify="space-between" style="margin-top: 16px;">
-                <n-button 
+                <n-button
                   text
                   @click="currentStep = 1"
                 >
@@ -107,7 +107,7 @@
                   </template>
                   Back
                 </n-button>
-                <n-button 
+                <n-button
                   type="primary"
                   :loading="isGenerating"
                   :disabled="!formData.category || !aiDescription"
@@ -124,29 +124,29 @@
             <!-- Manual Mode -->
             <div v-else>
               <h3 class="text-h5" style="margin-bottom: 12px;">Basic Information</h3>
-              
+
               <n-flex vertical :gap="12">
-                <n-select 
+                <n-select
                   v-model:value="formData.category"
                   :options="categories"
                   label="Category *"
                 ></n-select>
 
-                <n-input 
+                <n-input
                   v-model:value="formData.name"
                   placeholder="e.g., AMD Ryzen 9 7950X"
                 >
                   <template #prefix>Product Name *</template>
                 </n-input>
 
-                <n-input 
+                <n-input
                   v-model:value="formData.manufacturer"
                   placeholder="e.g., AMD"
                 >
                   <template #prefix>Manufacturer *</template>
                 </n-input>
 
-                <n-input-number 
+                <n-input-number
                   v-model:value="formData.price"
                 >
                   <template #prefix>Price * ($)</template>
@@ -154,7 +154,7 @@
               </n-flex>
 
               <n-flex justify="space-between" style="margin-top: 16px;">
-                <n-button 
+                <n-button
                   text
                   @click="currentStep = 1"
                 >
@@ -163,7 +163,7 @@
                   </template>
                   Back
                 </n-button>
-                <n-button 
+                <n-button
                   type="primary"
                   :disabled="!canProceedToStep3"
                   @click="nextStep"
@@ -187,26 +187,26 @@
               </n-alert>
 
               <n-flex vertical :gap="12">
-                <n-input 
+                <n-input
                   v-model:value="formData.name"
                 >
                   <template #prefix>Product Name *</template>
                 </n-input>
 
-                <n-input 
+                <n-input
                   v-model:value="formData.manufacturer"
                 >
                   <template #prefix>Manufacturer *</template>
                 </n-input>
 
-                <n-input-number 
+                <n-input-number
                   v-model:value="formData.price"
                 >
                   <template #prefix>Price * ($)</template>
                 </n-input-number>
 
                 <!-- Use ProductFormSelector -->
-                <ProductFormSelector 
+                <ProductFormSelector
                   v-model="productFormData"
                   :category="formData.category"
                   :editable="true"
@@ -215,22 +215,8 @@
                 <!-- 3D Preview for products with spatial data -->
                 <div v-if="hasSpatialData" style="margin-top: 24px;">
                   <n-divider style="margin-bottom: 16px;"></n-divider>
-                  <n-flex justify="space-between" align="center" style="margin-bottom: 12px;">
-                    <h4 class="text-h6">3D Preview</h4>
-                    <n-button
-                      text
-                      @click="open3DInPopout"
-                    >
-                      <template #icon>
-                      <n-icon :component="Icons.Open" />
-                    </template>
-                    Open in Popout
-                    </n-button>
-                  </n-flex>
-                  <p class="text-body-2" style="margin-bottom: 12px;">
-                    Interactive visualization of slots and chambers
-                  </p>
-                  <ProductViewer3D 
+
+                  <ProductViewer3D
                     :dimensions="(productFormData as any).dimensions"
                     :slots="(productFormData as any).slots"
                     :chambers="(productFormData as any).chambers"
@@ -242,7 +228,7 @@
                 </n-alert>
 
                 <n-flex justify="space-between" style="margin-top: 16px;">
-                  <n-button 
+                  <n-button
                     text
                     @click="currentStep = 2"
                   >
@@ -251,7 +237,7 @@
                     </template>
                     Back
                   </n-button>
-                  <n-button 
+                  <n-button
                     type="primary"
                     :loading="isCreating"
                     @click="createProduct"
@@ -270,7 +256,7 @@
 
               <n-flex vertical :gap="12">
                 <!-- Use ProductFormSelector -->
-                <ProductFormSelector 
+                <ProductFormSelector
                   v-model="productFormData"
                   :category="formData.category"
                   :editable="true"
@@ -279,22 +265,8 @@
                 <!-- 3D Preview for products with spatial data -->
                 <div v-if="hasSpatialData" style="margin-top: 24px;">
                   <n-divider style="margin-bottom: 16px;"></n-divider>
-                  <n-flex justify="space-between" align="center" style="margin-bottom: 12px;">
-                    <h4 class="text-h6">3D Preview</h4>
-                    <n-button
-                      text
-                      @click="open3DInPopout"
-                    >
-                      <template #icon>
-                      <n-icon :component="Icons.Open" />
-                    </template>
-                    Open in Popout
-                    </n-button>
-                  </n-flex>
-                  <p class="text-body-2" style="margin-bottom: 12px;">
-                    Interactive visualization of slots and chambers
-                  </p>
-                  <ProductViewer3D 
+
+                  <ProductViewer3D
                     :dimensions="(productFormData as any).dimensions"
                     :slots="(productFormData as any).slots"
                     :chambers="(productFormData as any).chambers"
@@ -306,7 +278,7 @@
                 </n-alert>
 
                 <n-flex justify="space-between" style="margin-top: 16px;">
-                  <n-button 
+                  <n-button
                     text
                     @click="currentStep = 2"
                   >
@@ -315,7 +287,7 @@
                     </template>
                     Back
                   </n-button>
-                  <n-button 
+                  <n-button
                     type="primary"
                     :loading="isCreating"
                     @click="createProduct"
@@ -340,7 +312,6 @@ import { useRouter } from 'vue-router';
 import { NCard, NButton, NInput, NInputNumber, NSelect, NAlert, NFlex, NDivider, NSteps, NStep, NIcon } from 'naive-ui';
 import { catalogApi, ProductCategory, categoryLabels, type GenerateProductResponse } from '@/api/catalog';
 import { createTypedProduct } from '@/api/catalogTyped';
-import { use3DPopout } from '@/composables/use3DPopout';
 import ProductFormSelector from '@/components/ProductFormSelector.vue';
 import ProductViewer3D from '@/components/ProductViewer3D.vue';
 import { fieldsToTypedProduct } from '@/utils/productFieldConverters';
@@ -348,9 +319,8 @@ import type { ProductRequest } from '@/types/products';
 import { Icons } from '@/utils/icons';
 
 const router = useRouter();
-const { openPopout } = use3DPopout();
 
-const categories = computed(() => 
+const categories = computed(() =>
   Object.values(ProductCategory).map(value => ({
     label: categoryLabels[value],
     value
@@ -381,9 +351,9 @@ const hasSpatialData = computed(() => {
 });
 
 const canProceedToStep3 = computed(() => {
-  return formData.value.category && 
-         formData.value.name && 
-         formData.value.manufacturer && 
+  return formData.value.category &&
+         formData.value.name &&
+         formData.value.manufacturer &&
          formData.value.price > 0;
 });
 
@@ -398,7 +368,7 @@ async function generateWithAi() {
 
   isGenerating.value = true;
   error.value = null;
-  
+
   try {
     generatedProduct.value = await catalogApi.generateProductWithAi({
       category: formData.value.category as any,
@@ -409,13 +379,13 @@ async function generateWithAi() {
     const product = generatedProduct.value.product;
     formData.value.name = product.name;
     formData.value.price = product.price;
-    
+
     // Get manufacturer from specifications or use a default
-    const manufacturer = product.specifications && 'Manufacturer' in product.specifications 
+    const manufacturer = product.specifications && 'Manufacturer' in product.specifications
       ? String(product.specifications.Manufacturer)
       : '';
     formData.value.manufacturer = manufacturer;
-    
+
     // Convert specifications to typed product form data
     if (product.specifications) {
       const fields = Object.entries(product.specifications)
@@ -424,7 +394,7 @@ async function generateWithAi() {
           acc[key] = String(value);
           return acc;
         }, {} as Record<string, string>);
-      
+
       productFormData.value = fieldsToTypedProduct(fields, formData.value.category);
     }
 
@@ -448,7 +418,7 @@ function nextStep() {
 async function createProduct() {
   isCreating.value = true;
   error.value = null;
-  
+
   try {
     // Build the complete typed product request
     const productRequest: any = {
@@ -475,18 +445,7 @@ async function createProduct() {
   }
 }
 
-function open3DInPopout() {
-  const data = productFormData.value as any;
-  openPopout({
-    component: ProductViewer3D,
-    props: {
-      dimensions: data.dimensions,
-      slots: data.slots,
-      chambers: data.chambers,
-    },
-    title: `3D Preview - ${formData.value.name || 'New Product'}`,
-  });
-}
+// Popout opening handled within ProductViewer3D component
 </script>
 
 <style scoped>

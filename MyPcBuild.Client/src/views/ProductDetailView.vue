@@ -6,14 +6,14 @@
           {{ isEditMode ? 'Edit Product' : (product?.isDraft ? 'Review Draft Product' : 'Product Details') }}
         </h2>
         <n-flex :gap="8">
-          <n-button 
+          <n-button
             v-if="!isEditMode && !product?.isDraft"
             type="primary"
             @click="enterEditMode"
           >
             ✏️ Edit Product
           </n-button>
-          <n-button 
+          <n-button
             text
             @click="$router.push('/catalog')"
           >
@@ -46,30 +46,30 @@
         <n-flex vertical :gap="12">
           <div>
             <h3 class="text-h5" style="margin-bottom: 12px;">Basic Information</h3>
-            
+
             <n-flex vertical :gap="12">
-              <n-input 
+              <n-input
                 v-model:value="formData.name"
                 :disabled="!isEditMode"
               >
                 <template #prefix>Product Name *</template>
               </n-input>
 
-              <n-input 
+              <n-input
                 v-model:value="formData.manufacturer"
                 :disabled="!isEditMode"
               >
                 <template #prefix>Manufacturer *</template>
               </n-input>
 
-              <n-input-number 
+              <n-input-number
                 v-model:value="formData.price"
                 :disabled="!isEditMode"
               >
                 <template #prefix>Price * ($)</template>
               </n-input-number>
 
-              <n-input 
+              <n-input
                 v-model:value="formData.category"
                 disabled
               >
@@ -84,7 +84,7 @@
             <h3 class="text-h5" style="margin-bottom: 12px;">{{ formData.category }} Details</h3>
 
             <!-- Use ProductFormSelector -->
-            <ProductFormSelector 
+            <ProductFormSelector
               v-model="productFormData"
               :category="formData.category"
               :editable="isEditMode"
@@ -94,19 +94,8 @@
           <!-- 3D Preview for products with spatial data -->
           <div v-if="hasSpatialData">
             <n-divider></n-divider>
-            <n-flex justify="space-between" align="center" style="margin-bottom: 12px;">
-              <h3 class="text-h5">3D Preview</h3>
-              <n-button
-                text
-                @click="open3DInPopout"
-              >
-                ↗ Open in Popout
-              </n-button>
-            </n-flex>
-            <p class="text-body-2" style="margin-bottom: 12px;">
-              Interactive visualization of slots and chambers
-            </p>
-            <ProductViewer3D 
+
+            <ProductViewer3D
               :dimensions="(productFormData as any).dimensions"
               :slots="(productFormData as any).slots"
               :chambers="(productFormData as any).chambers"
@@ -122,15 +111,15 @@
           </n-alert>
 
           <n-flex justify="space-between" style="margin-top: 16px;">
-            <n-button 
+            <n-button
               text
               @click="isEditMode ? cancelEdit() : $router.push('/catalog')"
             >
               {{ isEditMode ? '← Cancel' : '← Back to Catalog' }}
             </n-button>
-            
+
             <n-flex :gap="8">
-              <n-button 
+              <n-button
                 v-if="isEditMode"
                 type="primary"
                 :loading="isUpdating"
@@ -138,8 +127,8 @@
               >
                 💾 Save Changes
               </n-button>
-              
-              <n-button 
+
+              <n-button
                 v-if="product?.isDraft && !isEditMode"
                 type="success"
                 :loading="isPublishing"
@@ -161,14 +150,12 @@ import { useRoute, useRouter } from 'vue-router';
 import { NCard, NButton, NInput, NInputNumber, NAlert, NFlex, NDivider, NSpin } from 'naive-ui';
 import { catalogApi } from '@/api/catalog';
 import { getTypedProduct, updateTypedProduct } from '@/api/catalogTyped';
-import { use3DPopout } from '@/composables/use3DPopout';
 import ProductFormSelector from '@/components/ProductFormSelector.vue';
 import ProductViewer3D from '@/components/ProductViewer3D.vue';
 import type { ProductRequest, ProductResponse } from '@/types/products';
 
 const route = useRoute();
 const router = useRouter();
-const { openPopout } = use3DPopout();
 
 const product = ref<ProductResponse | null>(null);
 const isLoading = ref(true);
@@ -211,7 +198,7 @@ onMounted(async () => {
 
 async function loadProduct() {
   const productId = route.params.id as string;
-  
+
   if (!productId) {
     error.value = 'Product ID is required';
     isLoading.value = false;
@@ -220,17 +207,17 @@ async function loadProduct() {
 
   try {
     product.value = await getTypedProduct(productId);
-    
+
     // Populate form data from product
     formData.value.name = product.value.name;
     formData.value.price = product.value.price;
     formData.value.category = product.value.category;
     formData.value.manufacturer = product.value.manufacturer;
-    
+
     // Extract category-specific data (remove base ProductBase fields)
     const { id, isDraft, publishedAt, category, name, price, manufacturer, ...categoryData } = product.value;
     productFormData.value = categoryData as Partial<ProductRequest>;
-    
+
     // Store original values for cancel operation
     originalFormData.value = JSON.parse(JSON.stringify(formData.value));
     originalProductFormData.value = JSON.parse(JSON.stringify(productFormData.value));
@@ -249,14 +236,14 @@ async function publishProduct() {
   isPublishing.value = true;
   publishError.value = null;
   publishSuccess.value = false;
-  
+
   try {
     await catalogApi.publishProduct(product.value.id);
     publishSuccess.value = true;
-    
+
     // Reload product to get updated status
     await loadProduct();
-    
+
     // Redirect to catalog after a short delay
     setTimeout(() => {
       router.push('/catalog');
@@ -291,7 +278,7 @@ async function saveProduct() {
   isUpdating.value = true;
   updateError.value = null;
   updateSuccess.value = false;
-  
+
   try {
     // Build the complete typed product request
     const productRequest: any = {
@@ -303,12 +290,12 @@ async function saveProduct() {
     };
 
     await updateTypedProduct(product.value.id, productRequest);
-    
+
     updateSuccess.value = true;
-    
+
     // Reload product to get updated data
     await loadProduct();
-    
+
     // Exit edit mode after a short delay
     setTimeout(() => {
       isEditMode.value = false;
@@ -321,18 +308,7 @@ async function saveProduct() {
   }
 }
 
-function open3DInPopout() {
-  const data = productFormData.value as any;
-  openPopout({
-    component: ProductViewer3D,
-    props: {
-      dimensions: data.dimensions,
-      slots: data.slots,
-      chambers: data.chambers,
-    },
-    title: `3D Preview - ${formData.value.name}`,
-  });
-}
+// Popout opening handled within ProductViewer3D component
 </script>
 
 <style scoped>
