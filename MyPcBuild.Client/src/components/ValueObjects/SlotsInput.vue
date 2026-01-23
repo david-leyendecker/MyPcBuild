@@ -1,196 +1,162 @@
 <template>
   <div>
-    <div class="d-flex justify-space-between align-center mb-3">
-      <label class="text-subtitle-2 font-weight-semibold">{{ label }}</label>
-      <v-btn
+    <n-flex justify="space-between" align="center" style="margin-bottom: 12px;">
+      <label style="font-weight: 600; font-size: 14px;">{{ label }}</label>
+      <n-button
         v-if="editable"
         size="small"
-        prepend-icon="mdi-plus"
-        variant="outlined"
         @click="addSlot"
       >
+        <template #icon>
+          <n-icon :component="Icons.Add" />
+        </template>
         Add Slot
-      </v-btn>
+      </n-button>
+    </n-flex>
+
+    <div v-if="localSlots.length === 0" style="text-align: center; padding: 16px 0; opacity: 0.6;">
+      <p style="font-size: 14px;">No slots defined</p>
     </div>
 
-    <div v-if="localSlots.length === 0" class="text-center py-4 text-medium-emphasis">
-      <p class="text-body-2">No slots defined</p>
-    </div>
-
-    <div v-else class="d-flex flex-column ga-3">
-      <v-card
+    <n-collapse
+      v-else
+      :expanded-names="expandedNames"
+      @update:expanded-names="handleExpandedChange"
+    >
+      <n-collapse-item
         v-for="(slot, index) in localSlots"
         :key="index"
-        variant="outlined"
-        class="pa-3"
+        :name="index"
       >
-        <div class="d-flex justify-space-between align-center mb-2">
-          <h4 class="text-subtitle-2 font-weight-semibold">Slot {{ index + 1 }}</h4>
-          <v-btn
-            v-if="editable"
-            size="small"
-            icon="mdi-delete"
-            variant="text"
-            color="error"
-            @click="removeSlot(index)"
-          ></v-btn>
-        </div>
+        <template #header>
+          <n-flex justify="space-between" align="center" :size="8" style="width: 100%;">
+            <span style="font-weight: 600; font-size: 14px;">
+              Slot {{ index + 1 }} — {{ slot.name || 'Unnamed' }} ({{ slot.allowedCategory || 'Unknown' }})
+            </span>
+            <n-button
+              v-if="editable"
+              size="small"
+              text
+              type="error"
+              @click.stop="removeSlot(index)"
+            >
+              <template #icon>
+                <n-icon :component="Icons.Trash" />
+              </template>
+            </n-button>
+          </n-flex>
+        </template>
 
-        <v-row dense>
-          <v-col cols="12" md="6">
-            <v-text-field
-              v-model="slot.name"
-              label="Slot Name *"
+        <n-card :bordered="true" size="small">
+          <n-flex :size="12" style="margin-bottom: 12px;">
+            <n-input
+              v-model:value="slot.name"
+              placeholder="Slot Name *"
               :readonly="!editable"
-              :variant="editable ? 'filled' : 'outlined'"
-              density="compact"
-              placeholder="e.g., CPU Socket, RAM Slot 1"
-              @update:model-value="emitUpdate"
-            ></v-text-field>
-          </v-col>
-          <v-col cols="12" md="6">
-            <v-select
-              v-model="slot.allowedCategory"
-              :items="categoryOptions"
-              label="Allowed Category *"
-              :readonly="!editable"
-              :variant="editable ? 'filled' : 'outlined'"
-              density="compact"
-              @update:model-value="emitUpdate"
-            ></v-select>
-          </v-col>
-        </v-row>
+              style="flex: 1; min-width: 150px;"
+              @update:value="emitUpdate"
+            />
+            <n-select
+              v-model:value="slot.allowedCategory"
+              :options="categoryOptions"
+              placeholder="Allowed Category *"
+              :disabled="!editable"
+              style="flex: 1; min-width: 150px;"
+              @update:value="emitUpdate"
+            />
+          </n-flex>
 
-        <v-row dense>
-          <v-col cols="12">
-            <label class="text-caption font-weight-semibold mb-1 d-block">Relative Position (mm)</label>
-            <v-row dense>
-              <v-col cols="4">
-                <v-text-field
-                  v-model.number="slot.relativePosition.x"
-                  label="X"
-                  type="number"
-                  :readonly="!editable"
-                  :variant="editable ? 'filled' : 'outlined'"
-                  density="compact"
-                  @update:model-value="emitUpdate"
-                ></v-text-field>
-              </v-col>
-              <v-col cols="4">
-                <v-text-field
-                  v-model.number="slot.relativePosition.y"
-                  label="Y"
-                  type="number"
-                  :readonly="!editable"
-                  :variant="editable ? 'filled' : 'outlined'"
-                  density="compact"
-                  @update:model-value="emitUpdate"
-                ></v-text-field>
-              </v-col>
-              <v-col cols="4">
-                <v-text-field
-                  v-model.number="slot.relativePosition.z"
-                  label="Z"
-                  type="number"
-                  :readonly="!editable"
-                  :variant="editable ? 'filled' : 'outlined'"
-                  density="compact"
-                  @update:model-value="emitUpdate"
-                ></v-text-field>
-              </v-col>
-            </v-row>
-          </v-col>
-        </v-row>
+          <div style="margin-bottom: 12px;">
+            <label style="font-size: 12px; font-weight: 600; display: block; margin-bottom: 4px;">Relative Position (mm)</label>
+            <n-flex :size="8">
+              <n-input-number
+                v-model:value="slot.relativePosition.x"
+                placeholder="X"
+                :readonly="!editable"
+                style="flex: 1; min-width: 80px;"
+                @update:value="emitUpdate"
+              />
+              <n-input-number
+                v-model:value="slot.relativePosition.y"
+                placeholder="Y"
+                :readonly="!editable"
+                style="flex: 1; min-width: 80px;"
+                @update:value="emitUpdate"
+              />
+              <n-input-number
+                v-model:value="slot.relativePosition.z"
+                placeholder="Z"
+                :readonly="!editable"
+                style="flex: 1; min-width: 80px;"
+                @update:value="emitUpdate"
+              />
+            </n-flex>
+          </div>
 
-        <v-row dense>
-          <v-col cols="12">
-            <label class="text-caption font-weight-semibold mb-1 d-block">Max Dimensions (mm)</label>
-            <v-row dense>
-              <v-col cols="4">
-                <v-text-field
-                  v-model.number="slot.maxDimensions.length"
-                  label="Length"
-                  type="number"
-                  :readonly="!editable"
-                  :variant="editable ? 'filled' : 'outlined'"
-                  density="compact"
-                  @update:model-value="emitUpdate"
-                ></v-text-field>
-              </v-col>
-              <v-col cols="4">
-                <v-text-field
-                  v-model.number="slot.maxDimensions.width"
-                  label="Width"
-                  type="number"
-                  :readonly="!editable"
-                  :variant="editable ? 'filled' : 'outlined'"
-                  density="compact"
-                  @update:model-value="emitUpdate"
-                ></v-text-field>
-              </v-col>
-              <v-col cols="4">
-                <v-text-field
-                  v-model.number="slot.maxDimensions.height"
-                  label="Height"
-                  type="number"
-                  :readonly="!editable"
-                  :variant="editable ? 'filled' : 'outlined'"
-                  density="compact"
-                  @update:model-value="emitUpdate"
-                ></v-text-field>
-              </v-col>
-            </v-row>
-          </v-col>
-        </v-row>
+          <div style="margin-bottom: 12px;">
+            <label style="font-size: 12px; font-weight: 600; display: block; margin-bottom: 4px;">Max Dimensions (mm)</label>
+            <n-flex :size="8">
+              <n-input-number
+                v-model:value="slot.maxDimensions.length"
+                placeholder="Length"
+                :readonly="!editable"
+                style="flex: 1; min-width: 80px;"
+                @update:value="emitUpdate"
+              />
+              <n-input-number
+                v-model:value="slot.maxDimensions.width"
+                placeholder="Width"
+                :readonly="!editable"
+                style="flex: 1; min-width: 80px;"
+                @update:value="emitUpdate"
+              />
+              <n-input-number
+                v-model:value="slot.maxDimensions.height"
+                placeholder="Height"
+                :readonly="!editable"
+                style="flex: 1; min-width: 80px;"
+                @update:value="emitUpdate"
+              />
+            </n-flex>
+          </div>
 
-        <v-row dense>
-          <v-col cols="12">
-            <label class="text-caption font-weight-semibold mb-1 d-block">Rotation (degrees, optional)</label>
-            <v-row dense>
-              <v-col cols="4">
-                <v-text-field
-                  :model-value="slot.rotation?.x ?? 0"
-                  @update:model-value="updateRotation(slot, 'x', $event)"
-                  label="X (Pitch)"
-                  type="number"
-                  :readonly="!editable"
-                  :variant="editable ? 'filled' : 'outlined'"
-                  density="compact"
-                ></v-text-field>
-              </v-col>
-              <v-col cols="4">
-                <v-text-field
-                  :model-value="slot.rotation?.y ?? 0"
-                  @update:model-value="updateRotation(slot, 'y', $event)"
-                  label="Y (Yaw)"
-                  type="number"
-                  :readonly="!editable"
-                  :variant="editable ? 'filled' : 'outlined'"
-                  density="compact"
-                ></v-text-field>
-              </v-col>
-              <v-col cols="4">
-                <v-text-field
-                  :model-value="slot.rotation?.z ?? 0"
-                  @update:model-value="updateRotation(slot, 'z', $event)"
-                  label="Z (Roll)"
-                  type="number"
-                  :readonly="!editable"
-                  :variant="editable ? 'filled' : 'outlined'"
-                  density="compact"
-                ></v-text-field>
-              </v-col>
-            </v-row>
-          </v-col>
-        </v-row>
-      </v-card>
-    </div>
+          <div>
+            <label style="font-size: 12px; font-weight: 600; display: block; margin-bottom: 4px;">Rotation (degrees, optional)</label>
+            <n-flex :size="8">
+              <n-input-number
+                :value="slot.rotation?.x ?? 0"
+                @update:value="updateRotation(slot, 'x', $event)"
+                placeholder="X (Pitch)"
+                :readonly="!editable"
+                style="flex: 1; min-width: 80px;"
+              />
+              <n-input-number
+                :value="slot.rotation?.y ?? 0"
+                @update:value="updateRotation(slot, 'y', $event)"
+                placeholder="Y (Yaw)"
+                :readonly="!editable"
+                style="flex: 1; min-width: 80px;"
+              />
+              <n-input-number
+                :value="slot.rotation?.z ?? 0"
+                @update:value="updateRotation(slot, 'z', $event)"
+                placeholder="Z (Roll)"
+                :readonly="!editable"
+                style="flex: 1; min-width: 80px;"
+              />
+            </n-flex>
+          </div>
+        </n-card>
+      </n-collapse-item>
+    </n-collapse>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, watch } from 'vue';
+import { NButton, NCard, NCollapse, NCollapseItem, NFlex, NInput, NSelect, NInputNumber, NIcon } from 'naive-ui';
 import type { Slot } from '@/types/products';
+import { Icons } from '@/utils/icons';
 
 interface Props {
   modelValue?: Slot[];
@@ -209,14 +175,14 @@ const emit = defineEmits<{
 }>();
 
 const categoryOptions = [
-  { title: 'CPU', value: 'CPU' },
-  { title: 'GPU', value: 'GPU' },
-  { title: 'Motherboard', value: 'Motherboard' },
-  { title: 'RAM', value: 'RAM' },
-  { title: 'Storage', value: 'Storage' },
-  { title: 'PowerSupply', value: 'PowerSupply' },
-  { title: 'Cooler', value: 'Cooler' },
-  { title: 'Case', value: 'Case' }
+  { label: 'CPU', value: 'CPU' },
+  { label: 'GPU', value: 'GPU' },
+  { label: 'Motherboard', value: 'Motherboard' },
+  { label: 'RAM', value: 'RAM' },
+  { label: 'Storage', value: 'Storage' },
+  { label: 'PowerSupply', value: 'PowerSupply' },
+  { label: 'Cooler', value: 'Cooler' },
+  { label: 'Case', value: 'Case' }
 ];
 
 const DEFAULT_POSITION = { x: 0, y: 0, z: 0 };
@@ -229,6 +195,7 @@ const localSlots = ref<Slot[]>(props.modelValue.map(slot => ({
   maxDimensions: slot.maxDimensions || { ...DEFAULT_DIMENSIONS },
   rotation: slot.rotation ? { ...slot.rotation } : { ...DEFAULT_ROTATION }
 })));
+const expandedNames = ref<(number | string)[]>(props.modelValue.map((_, index) => index));
 
 watch(
   () => props.modelValue,
@@ -239,6 +206,7 @@ watch(
       maxDimensions: slot.maxDimensions || { ...DEFAULT_DIMENSIONS },
       rotation: slot.rotation ? { ...slot.rotation } : { ...DEFAULT_ROTATION }
     }));
+    expandedNames.value = newValue.map((_, index) => index);
   },
   { deep: true }
 );
@@ -252,29 +220,31 @@ function addSlot() {
     rotation: { ...DEFAULT_ROTATION },
     subSlots: []
   });
+  expandedNames.value.push(localSlots.value.length - 1);
   emitUpdate();
 }
 
 function removeSlot(index: number) {
   localSlots.value.splice(index, 1);
+  expandedNames.value = expandedNames.value
+    .filter(name => name !== index)
+    .map(name => (typeof name === 'number' && name > index ? name - 1 : name));
   emitUpdate();
 }
 
-function updateRotation(slot: Slot, axis: 'x' | 'y' | 'z', value: string | number) {
+function updateRotation(slot: Slot, axis: 'x' | 'y' | 'z', value: number | null) {
   if (!slot.rotation) {
     slot.rotation = { ...DEFAULT_ROTATION };
   }
-  slot.rotation[axis] = typeof value === 'string' ? parseFloat(value) || 0 : value;
+  slot.rotation[axis] = value || 0;
   emitUpdate();
 }
 
 function emitUpdate() {
   emit('update:modelValue', localSlots.value);
 }
-</script>
 
-<style scoped>
-.v-card {
-  transition: all 0.2s ease;
+function handleExpandedChange(names: Array<string | number> | string | number) {
+  expandedNames.value = Array.isArray(names) ? names : [names];
 }
-</style>
+</script>

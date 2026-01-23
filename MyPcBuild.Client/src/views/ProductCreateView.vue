@@ -1,342 +1,328 @@
 <template>
   <div class="fade-in">
-    <div class="mb-4 d-flex justify-space-between align-center">
-      <h2 class="text-h4 text-primary">Create New Product</h2>
-      <v-btn 
-        prepend-icon="mdi-arrow-left"
-        variant="text"
+    <n-flex :gap="16" style="margin-bottom: 16px; justify-content: space-between; align-items: center;">
+      <h2 class="text-h4">Create New Product</h2>
+      <n-button
+        text
         @click="$router.push('/catalog')"
       >
-        Back to Catalog
-      </v-btn>
-    </div>
+        ← Back to Catalog
+      </n-button>
+    </n-flex>
 
-    <v-card>
-      <v-card-text>
-        <div class="d-flex flex-column ga-4">
+    <n-card>
+      <!-- Step Indicator -->
+      <n-steps :current="currentStep" style="margin-bottom: 24px;">
+        <n-step title="Creation Mode" description="Choose how to create" />
+        <n-step
+          :title="creationMode === 'ai' ? 'AI Generation' : 'Basic Info'"
+          :description="creationMode === 'ai' ? 'Generate with AI' : 'Enter details'"
+        />
+        <n-step
+          :title="creationMode === 'ai' ? 'Review' : 'Product Details'"
+          :description="creationMode === 'ai' ? 'Review and edit' : 'Category-specific'"
+        />
+      </n-steps>
+
+      <div style="display: flex; flex-direction: column; gap: 16px;">
           <!-- Step 1: Creation Mode Selection -->
           <div v-if="currentStep === 1">
-            <h3 class="text-h5 mb-3">How would you like to create this product?</h3>
-            
-            <v-row>
-              <v-col cols="12" md="6">
-                <v-card 
-                  variant="outlined"
-                  hover
-                  @click="selectCreationMode('manual')"
-                  class="cursor-pointer pa-4"
-                  :class="creationMode === 'manual' ? 'border-primary' : ''"
-                >
-                  <v-icon size="48" color="primary" class="mb-2">mdi-pencil</v-icon>
-                  <h4 class="text-h6 mb-2">Manual Entry</h4>
-                  <p class="text-body-2">Enter all product details manually</p>
-                </v-card>
-              </v-col>
-              
-              <v-col cols="12" md="6">
-                <v-card 
-                  variant="outlined"
-                  hover
-                  @click="selectCreationMode('ai')"
-                  class="cursor-pointer pa-4"
-                  :class="creationMode === 'ai' ? 'border-primary' : ''"
-                >
-                  <v-icon size="48" color="primary" class="mb-2">mdi-robot</v-icon>
-                  <h4 class="text-h6 mb-2">AI-Assisted</h4>
-                  <p class="text-body-2">Generate product details from a description using AI</p>
-                </v-card>
-              </v-col>
-            </v-row>
+            <h3 class="text-h5" style="margin-bottom: 12px;">How would you like to create this product?</h3>
 
-            <div class="d-flex justify-end mt-4">
-              <v-btn 
-                append-icon="mdi-arrow-right"
-                color="primary"
+            <n-flex :gap="16" style="margin-bottom: 16px;">
+              <n-card
+                :bordered="true"
+                style="flex: 1; cursor: pointer; padding: 16px; border: 2px solid transparent;"
+                :style="creationMode === 'manual' ? { borderColor: 'var(--n-primary-color)' } : {}"
+                @click="selectCreationMode('manual')"
+              >
+                <div style="text-align: center;">
+                  <div style="font-size: 48px; margin-bottom: 8px;">
+                    <n-icon :component="Icons.Pencil" :size="48" />
+                  </div>
+                  <h4 class="text-h6" style="margin-bottom: 8px;">Manual Entry</h4>
+                  <p class="text-body-2">Enter all product details manually</p>
+                </div>
+              </n-card>
+
+              <n-card
+                :bordered="true"
+                style="flex: 1; cursor: pointer; padding: 16px; border: 2px solid transparent;"
+                :style="creationMode === 'ai' ? { borderColor: 'var(--n-primary-color)' } : {}"
+                @click="selectCreationMode('ai')"
+              >
+                <div style="text-align: center;">
+                  <div style="font-size: 48px; margin-bottom: 8px;">
+                    <n-icon :component="Icons.Bulb" :size="48" />
+                  </div>
+                  <h4 class="text-h6" style="margin-bottom: 8px;">AI-Assisted</h4>
+                  <p class="text-body-2">Generate product details from a description using AI</p>
+                </div>
+              </n-card>
+            </n-flex>
+
+            <n-flex justify="flex-end" style="margin-top: 16px;">
+              <n-button
+                type="primary"
                 :disabled="!creationMode"
                 @click="nextStep"
               >
-                Continue
-              </v-btn>
-            </div>
+                Continue →
+              </n-button>
+            </n-flex>
           </div>
 
           <!-- Step 2: AI Generation or Basic Information -->
           <div v-else-if="currentStep === 2">
             <!-- AI Mode -->
             <div v-if="creationMode === 'ai'">
-              <h3 class="text-h5 mb-3">Generate Product with AI</h3>
-              
-              <div class="d-flex flex-column ga-3">
-                <v-select 
-                  v-model="formData.category"
-                  :items="categories"
+              <h3 class="text-h5" style="margin-bottom: 12px;">Generate Product with AI</h3>
+
+              <n-flex vertical :gap="12">
+                <n-select
+                  v-model:value="formData.category"
+                  :options="categories"
                   label="Category *"
-                ></v-select>
+                ></n-select>
 
-                <v-textarea
-                  v-model="aiDescription"
-                  label="Product Description *"
+                <n-input
+                  v-model:value="aiDescription"
+                  type="textarea"
                   placeholder="e.g., High-performance AMD Ryzen processor with 16 cores, 32 threads, 5.7 GHz boost clock"
-                  rows="4"
-                  auto-grow
-                ></v-textarea>
-              </div>
+                  :rows="4"
+                ></n-input>
+              </n-flex>
 
-              <v-alert v-if="error" type="error" class="mt-3">
+              <n-alert v-if="error" type="error" style="margin-top: 12px;">
                 {{ error }}
-              </v-alert>
+              </n-alert>
 
-              <div class="d-flex justify-space-between mt-4">
-                <v-btn 
-                  prepend-icon="mdi-arrow-left"
-                  variant="text"
+              <n-flex justify="space-between" style="margin-top: 16px;">
+                <n-button
+                  text
                   @click="currentStep = 1"
                 >
+                  <template #icon>
+                    <n-icon :component="Icons.ArrowBack" />
+                  </template>
                   Back
-                </v-btn>
-                <v-btn 
-                  prepend-icon="mdi-robot"
-                  color="primary"
+                </n-button>
+                <n-button
+                  type="primary"
                   :loading="isGenerating"
                   :disabled="!formData.category || !aiDescription"
                   @click="generateWithAi"
                 >
+                  <template #icon>
+                    <n-icon :component="Icons.Bulb" />
+                  </template>
                   Generate Product
-                </v-btn>
-              </div>
+                </n-button>
+              </n-flex>
             </div>
 
             <!-- Manual Mode -->
             <div v-else>
-              <h3 class="text-h5 mb-3">Basic Information</h3>
-              
-              <div class="d-flex flex-column ga-3">
-                <v-select 
-                  v-model="formData.category"
-                  :items="categories"
+              <h3 class="text-h5" style="margin-bottom: 12px;">Basic Information</h3>
+
+              <n-flex vertical :gap="12">
+                <n-select
+                  v-model:value="formData.category"
+                  :options="categories"
                   label="Category *"
-                ></v-select>
+                ></n-select>
 
-                <v-text-field 
-                  v-model="formData.name"
-                  label="Product Name *"
+                <n-input
+                  v-model:value="formData.name"
                   placeholder="e.g., AMD Ryzen 9 7950X"
-                ></v-text-field>
+                >
+                  <template #prefix>Product Name *</template>
+                </n-input>
 
-                <v-text-field 
-                  v-model="formData.manufacturer"
-                  label="Manufacturer *"
+                <n-input
+                  v-model:value="formData.manufacturer"
                   placeholder="e.g., AMD"
-                ></v-text-field>
+                >
+                  <template #prefix>Manufacturer *</template>
+                </n-input>
 
-                <v-text-field 
-                  v-model.number="formData.price"
-                  label="Price *"
-                  type="number"
-                  prefix="$"
-                ></v-text-field>
-              </div>
+                <n-input-number
+                  v-model:value="formData.price"
+                >
+                  <template #prefix>Price * ($)</template>
+                </n-input-number>
+              </n-flex>
 
-              <div class="d-flex justify-space-between mt-4">
-                <v-btn 
-                  prepend-icon="mdi-arrow-left"
-                  variant="text"
+              <n-flex justify="space-between" style="margin-top: 16px;">
+                <n-button
+                  text
                   @click="currentStep = 1"
                 >
+                  <template #icon>
+                    <n-icon :component="Icons.ArrowBack" />
+                  </template>
                   Back
-                </v-btn>
-                <v-btn 
-                  append-icon="mdi-arrow-right"
-                  color="primary"
+                </n-button>
+                <n-button
+                  type="primary"
                   :disabled="!canProceedToStep3"
                   @click="nextStep"
                 >
+                  <template #icon>
+                    <n-icon :component="Icons.ArrowForward" />
+                  </template>
                   Next: Product Details
-                </v-btn>
-              </div>
+                </n-button>
+              </n-flex>
             </div>
           </div>
 
           <!-- Step 3: Category-Specific Fields or AI Review -->
           <div v-else-if="currentStep === 3">
             <div v-if="creationMode === 'ai' && generatedProduct">
-              <h3 class="text-h5 mb-3">Review AI-Generated Product</h3>
+              <h3 class="text-h5" style="margin-bottom: 12px;">Review AI-Generated Product</h3>
 
-              <v-alert type="info" class="mb-3">
+              <n-alert type="info" style="margin-bottom: 12px;">
                 This product has been generated by AI. Review the details and make any necessary edits before creating it as a draft.
-              </v-alert>
+              </n-alert>
 
-              <v-container fluid class="pa-0">
-                <v-row>
-                  <v-col cols="12">
-                    <v-text-field 
-                      v-model="formData.name"
-                      label="Product Name *"
-                    ></v-text-field>
-                  </v-col>
-                </v-row>
+              <n-flex vertical :gap="12">
+                <n-input
+                  v-model:value="formData.name"
+                >
+                  <template #prefix>Product Name *</template>
+                </n-input>
 
-                <v-row>
-                  <v-col cols="12">
-                    <v-text-field 
-                      v-model="formData.manufacturer"
-                      label="Manufacturer *"
-                    ></v-text-field>
-                  </v-col>
-                </v-row>
+                <n-input
+                  v-model:value="formData.manufacturer"
+                >
+                  <template #prefix>Manufacturer *</template>
+                </n-input>
 
-                <v-row>
-                  <v-col cols="12">
-                    <v-text-field 
-                      v-model.number="formData.price"
-                      label="Price *"
-                      type="number"
-                      prefix="$"
-                    ></v-text-field>
-                  </v-col>
-                </v-row>
+                <n-input-number
+                  v-model:value="formData.price"
+                >
+                  <template #prefix>Price * ($)</template>
+                </n-input-number>
 
                 <!-- Use ProductFormSelector -->
-                <ProductFormSelector 
+                <ProductFormSelector
                   v-model="productFormData"
                   :category="formData.category"
                   :editable="true"
                 />
 
                 <!-- 3D Preview for products with spatial data -->
-                <div v-if="hasSpatialData" class="mt-6">
-                  <v-divider class="mb-4"></v-divider>
-                  <div class="d-flex justify-space-between align-center mb-3">
-                    <h4 class="text-h6">3D Preview</h4>
-                    <v-btn
-                      prepend-icon="mdi-open-in-new"
-                      variant="text"
-                      size="small"
-                      @click="open3DInPopout"
-                    >
-                      Open in Popout
-                    </v-btn>
-                  </div>
-                  <p class="text-body-2 text-medium-emphasis mb-3">
-                    Interactive visualization of slots and chambers
-                  </p>
-                  <ProductViewer3D 
+                <div v-if="hasSpatialData" style="margin-top: 24px;">
+                  <n-divider style="margin-bottom: 16px;"></n-divider>
+
+                  <ProductViewer3D
                     :dimensions="(productFormData as any).dimensions"
                     :slots="(productFormData as any).slots"
                     :chambers="(productFormData as any).chambers"
                   />
                 </div>
 
-                <v-alert v-if="error" type="error" class="mt-3">
+                <n-alert v-if="error" type="error" style="margin-top: 12px;">
                   {{ error }}
-                </v-alert>
+                </n-alert>
 
-                <v-row class="mt-4">
-                  <v-col cols="12" class="d-flex justify-space-between">
-                    <v-btn 
-                      prepend-icon="mdi-arrow-left"
-                      variant="text"
-                      @click="currentStep = 2"
-                    >
-                      Back
-                    </v-btn>
-                    <v-btn 
-                      prepend-icon="mdi-check"
-                      color="primary"
-                      :loading="isCreating"
-                      @click="createProduct"
-                    >
-                      Create as Draft
-                    </v-btn>
-                  </v-col>
-                </v-row>
-              </v-container>
+                <n-flex justify="space-between" style="margin-top: 16px;">
+                  <n-button
+                    text
+                    @click="currentStep = 2"
+                  >
+                    <template #icon>
+                      <n-icon :component="Icons.ArrowBack" />
+                    </template>
+                    Back
+                  </n-button>
+                  <n-button
+                    type="primary"
+                    :loading="isCreating"
+                    @click="createProduct"
+                  >
+                    <template #icon>
+                      <n-icon :component="Icons.Check" />
+                    </template>
+                    Create as Draft
+                  </n-button>
+                </n-flex>
+              </n-flex>
             </div>
 
             <div v-else>
-              <h3 class="text-h5 mb-3">{{ formData.category }} Details</h3>
+              <h3 class="text-h5" style="margin-bottom: 12px;">{{ formData.category }} Details</h3>
 
-              <v-container fluid class="pa-0">
+              <n-flex vertical :gap="12">
                 <!-- Use ProductFormSelector -->
-                <ProductFormSelector 
+                <ProductFormSelector
                   v-model="productFormData"
                   :category="formData.category"
                   :editable="true"
                 />
 
                 <!-- 3D Preview for products with spatial data -->
-                <div v-if="hasSpatialData" class="mt-6">
-                  <v-divider class="mb-4"></v-divider>
-                  <div class="d-flex justify-space-between align-center mb-3">
-                    <h4 class="text-h6">3D Preview</h4>
-                    <v-btn
-                      prepend-icon="mdi-open-in-new"
-                      variant="text"
-                      size="small"
-                      @click="open3DInPopout"
-                    >
-                      Open in Popout
-                    </v-btn>
-                  </div>
-                  <p class="text-body-2 text-medium-emphasis mb-3">
-                    Interactive visualization of slots and chambers
-                  </p>
-                  <ProductViewer3D 
+                <div v-if="hasSpatialData" style="margin-top: 24px;">
+                  <n-divider style="margin-bottom: 16px;"></n-divider>
+
+                  <ProductViewer3D
                     :dimensions="(productFormData as any).dimensions"
                     :slots="(productFormData as any).slots"
                     :chambers="(productFormData as any).chambers"
                   />
                 </div>
 
-                <v-alert v-if="error" type="error" class="mt-3">
+                <n-alert v-if="error" type="error" style="margin-top: 12px;">
                   {{ error }}
-                </v-alert>
+                </n-alert>
 
-                <v-row class="mt-4">
-                  <v-col cols="12" class="d-flex justify-space-between">
-                    <v-btn 
-                      prepend-icon="mdi-arrow-left"
-                      variant="text"
-                      @click="currentStep = 2"
-                    >
-                      Back
-                    </v-btn>
-                    <v-btn 
-                      prepend-icon="mdi-check"
-                      color="primary"
-                      :loading="isCreating"
-                      @click="createProduct"
-                    >
-                      Create Product
-                    </v-btn>
-                  </v-col>
-                </v-row>
-              </v-container>
+                <n-flex justify="space-between" style="margin-top: 16px;">
+                  <n-button
+                    text
+                    @click="currentStep = 2"
+                  >
+                    <template #icon>
+                      <n-icon :component="Icons.ArrowBack" />
+                    </template>
+                    Back
+                  </n-button>
+                  <n-button
+                    type="primary"
+                    :loading="isCreating"
+                    @click="createProduct"
+                  >
+                    <template #icon>
+                      <n-icon :component="Icons.Check" />
+                    </template>
+                    Create Product
+                  </n-button>
+                </n-flex>
+              </n-flex>
             </div>
           </div>
         </div>
-      </v-card-text>
-    </v-card>
+      </n-card>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
+import { NCard, NButton, NInput, NInputNumber, NSelect, NAlert, NFlex, NDivider, NSteps, NStep, NIcon } from 'naive-ui';
 import { catalogApi, ProductCategory, categoryLabels, type GenerateProductResponse } from '@/api/catalog';
 import { createTypedProduct } from '@/api/catalogTyped';
-import { use3DPopout } from '@/composables/use3DPopout';
 import ProductFormSelector from '@/components/ProductFormSelector.vue';
 import ProductViewer3D from '@/components/ProductViewer3D.vue';
 import { fieldsToTypedProduct } from '@/utils/productFieldConverters';
 import type { ProductRequest } from '@/types/products';
+import { Icons } from '@/utils/icons';
 
 const router = useRouter();
-const { openPopout } = use3DPopout();
 
-const categories = computed(() => 
+const categories = computed(() =>
   Object.values(ProductCategory).map(value => ({
-    title: categoryLabels[value],
+    label: categoryLabels[value],
     value
   }))
 );
@@ -365,9 +351,9 @@ const hasSpatialData = computed(() => {
 });
 
 const canProceedToStep3 = computed(() => {
-  return formData.value.category && 
-         formData.value.name && 
-         formData.value.manufacturer && 
+  return formData.value.category &&
+         formData.value.name &&
+         formData.value.manufacturer &&
          formData.value.price > 0;
 });
 
@@ -382,7 +368,7 @@ async function generateWithAi() {
 
   isGenerating.value = true;
   error.value = null;
-  
+
   try {
     generatedProduct.value = await catalogApi.generateProductWithAi({
       category: formData.value.category as any,
@@ -393,13 +379,13 @@ async function generateWithAi() {
     const product = generatedProduct.value.product;
     formData.value.name = product.name;
     formData.value.price = product.price;
-    
+
     // Get manufacturer from specifications or use a default
-    const manufacturer = product.specifications && 'Manufacturer' in product.specifications 
+    const manufacturer = product.specifications && 'Manufacturer' in product.specifications
       ? String(product.specifications.Manufacturer)
       : '';
     formData.value.manufacturer = manufacturer;
-    
+
     // Convert specifications to typed product form data
     if (product.specifications) {
       const fields = Object.entries(product.specifications)
@@ -408,7 +394,7 @@ async function generateWithAi() {
           acc[key] = String(value);
           return acc;
         }, {} as Record<string, string>);
-      
+
       productFormData.value = fieldsToTypedProduct(fields, formData.value.category);
     }
 
@@ -432,7 +418,7 @@ function nextStep() {
 async function createProduct() {
   isCreating.value = true;
   error.value = null;
-  
+
   try {
     // Build the complete typed product request
     const productRequest: any = {
@@ -459,18 +445,7 @@ async function createProduct() {
   }
 }
 
-function open3DInPopout() {
-  const data = productFormData.value as any;
-  openPopout({
-    component: ProductViewer3D,
-    props: {
-      dimensions: data.dimensions,
-      slots: data.slots,
-      chambers: data.chambers,
-    },
-    title: `3D Preview - ${formData.value.name || 'New Product'}`,
-  });
-}
+// Popout opening handled within ProductViewer3D component
 </script>
 
 <style scoped>
@@ -483,12 +458,22 @@ function open3DInPopout() {
   to { opacity: 1; }
 }
 
-.cursor-pointer {
-  cursor: pointer;
+.text-h4 {
+  font-size: 2.125rem;
+  font-weight: 500;
 }
 
-.border-primary {
-  border-color: rgb(var(--v-theme-primary)) !important;
-  border-width: 2px !important;
+.text-h5 {
+  font-size: 1.5rem;
+  font-weight: 500;
+}
+
+.text-h6 {
+  font-size: 1.25rem;
+  font-weight: 500;
+}
+
+.text-body-2 {
+  font-size: 0.875rem;
 }
 </style>

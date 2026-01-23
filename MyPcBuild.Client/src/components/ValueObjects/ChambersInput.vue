@@ -1,155 +1,134 @@
 <template>
   <div>
-    <div class="d-flex justify-space-between align-center mb-3">
-      <label class="text-subtitle-2 font-weight-semibold">Chambers</label>
-      <v-btn
+    <n-flex justify="space-between" align="center" style="margin-bottom: 12px;">
+      <label style="font-weight: 600; font-size: 14px;">Chambers</label>
+      <n-button
         v-if="editable"
         size="small"
-        prepend-icon="mdi-plus"
-        variant="outlined"
         @click="addChamber"
       >
+        <template #icon>
+          <n-icon :component="Icons.Add" />
+        </template>
         Add Chamber
-      </v-btn>
+      </n-button>
+    </n-flex>
+
+    <div v-if="localChambers.length === 0" style="text-align: center; padding: 16px 0; opacity: 0.6;">
+      <p style="font-size: 14px;">No chambers defined</p>
     </div>
 
-    <div v-if="localChambers.length === 0" class="text-center py-4 text-medium-emphasis">
-      <p class="text-body-2">No chambers defined</p>
-    </div>
-
-    <div v-else class="d-flex flex-column ga-3">
-      <v-card
+    <n-collapse
+      v-else
+      :expanded-names="expandedNames"
+      @update:expanded-names="handleExpandedChange"
+    >
+      <n-collapse-item
         v-for="(chamber, index) in localChambers"
         :key="index"
-        variant="outlined"
-        class="pa-3"
+        :name="index"
       >
-        <div class="d-flex justify-space-between align-center mb-3">
-          <h4 class="text-subtitle-1 font-weight-semibold">Chamber {{ index + 1 }}</h4>
-          <v-btn
-            v-if="editable"
-            size="small"
-            icon="mdi-delete"
-            variant="text"
-            color="error"
-            @click="removeChamber(index)"
-          ></v-btn>
-        </div>
+        <template #header>
+          <n-flex justify="space-between" align="center" :size="8" style="width: 100%;">
+            <span style="font-weight: 600; font-size: 14px;">
+              Chamber {{ index + 1 }} — {{ chamber.name || 'Unnamed' }}
+            </span>
+            <n-button
+              v-if="editable"
+              size="small"
+              text
+              type="error"
+              @click.stop="removeChamber(index)"
+            >
+              <template #icon>
+                <n-icon :component="Icons.Trash" />
+              </template>
+            </n-button>
+          </n-flex>
+        </template>
 
-        <v-row dense>
-          <v-col cols="12">
-            <v-text-field
-              v-model="chamber.name"
-              label="Chamber Name *"
+        <n-card :bordered="true" size="small">
+          <div style="margin-bottom: 12px;">
+            <n-input
+              v-model:value="chamber.name"
+              placeholder="Chamber Name *"
               :readonly="!editable"
-              :variant="editable ? 'filled' : 'outlined'"
-              density="compact"
-              placeholder="e.g., Main Chamber, PSU Chamber"
-              @update:model-value="emitUpdate"
-            ></v-text-field>
-          </v-col>
-        </v-row>
+              @update:value="emitUpdate"
+            />
+          </div>
 
-        <v-row dense>
-          <v-col cols="12">
-            <label class="text-caption font-weight-semibold mb-1 d-block">Chamber Position (mm)</label>
-            <v-row dense>
-              <v-col cols="4">
-                <v-text-field
-                  v-model.number="chamber.relativePosition.x"
-                  label="X"
-                  type="number"
-                  :readonly="!editable"
-                  :variant="editable ? 'filled' : 'outlined'"
-                  density="compact"
-                  @update:model-value="emitUpdate"
-                ></v-text-field>
-              </v-col>
-              <v-col cols="4">
-                <v-text-field
-                  v-model.number="chamber.relativePosition.y"
-                  label="Y"
-                  type="number"
-                  :readonly="!editable"
-                  :variant="editable ? 'filled' : 'outlined'"
-                  density="compact"
-                  @update:model-value="emitUpdate"
-                ></v-text-field>
-              </v-col>
-              <v-col cols="4">
-                <v-text-field
-                  v-model.number="chamber.relativePosition.z"
-                  label="Z"
-                  type="number"
-                  :readonly="!editable"
-                  :variant="editable ? 'filled' : 'outlined'"
-                  density="compact"
-                  @update:model-value="emitUpdate"
-                ></v-text-field>
-              </v-col>
-            </v-row>
-          </v-col>
-        </v-row>
+          <div style="margin-bottom: 12px;">
+            <label style="font-size: 12px; font-weight: 600; display: block; margin-bottom: 4px;">Chamber Position (mm)</label>
+            <n-flex :size="8">
+              <n-input-number
+                v-model:value="chamber.relativePosition.x"
+                placeholder="X"
+                :readonly="!editable"
+                style="flex: 1; min-width: 80px;"
+                @update:value="emitUpdate"
+              />
+              <n-input-number
+                v-model:value="chamber.relativePosition.y"
+                placeholder="Y"
+                :readonly="!editable"
+                style="flex: 1; min-width: 80px;"
+                @update:value="emitUpdate"
+              />
+              <n-input-number
+                v-model:value="chamber.relativePosition.z"
+                placeholder="Z"
+                :readonly="!editable"
+                style="flex: 1; min-width: 80px;"
+                @update:value="emitUpdate"
+              />
+            </n-flex>
+          </div>
 
-        <v-row dense>
-          <v-col cols="12">
-            <label class="text-caption font-weight-semibold mb-1 d-block">Chamber Dimensions (mm)</label>
-            <v-row dense>
-              <v-col cols="4">
-                <v-text-field
-                  v-model.number="chamber.dimensions.length"
-                  label="Length"
-                  type="number"
-                  :readonly="!editable"
-                  :variant="editable ? 'filled' : 'outlined'"
-                  density="compact"
-                  @update:model-value="emitUpdate"
-                ></v-text-field>
-              </v-col>
-              <v-col cols="4">
-                <v-text-field
-                  v-model.number="chamber.dimensions.width"
-                  label="Width"
-                  type="number"
-                  :readonly="!editable"
-                  :variant="editable ? 'filled' : 'outlined'"
-                  density="compact"
-                  @update:model-value="emitUpdate"
-                ></v-text-field>
-              </v-col>
-              <v-col cols="4">
-                <v-text-field
-                  v-model.number="chamber.dimensions.height"
-                  label="Height"
-                  type="number"
-                  :readonly="!editable"
-                  :variant="editable ? 'filled' : 'outlined'"
-                  density="compact"
-                  @update:model-value="emitUpdate"
-                ></v-text-field>
-              </v-col>
-            </v-row>
-          </v-col>
-        </v-row>
+          <div style="margin-bottom: 12px;">
+            <label style="font-size: 12px; font-weight: 600; display: block; margin-bottom: 4px;">Chamber Dimensions (mm)</label>
+            <n-flex :size="8">
+              <n-input-number
+                v-model:value="chamber.dimensions.length"
+                placeholder="Length"
+                :readonly="!editable"
+                style="flex: 1; min-width: 80px;"
+                @update:value="emitUpdate"
+              />
+              <n-input-number
+                v-model:value="chamber.dimensions.width"
+                placeholder="Width"
+                :readonly="!editable"
+                style="flex: 1; min-width: 80px;"
+                @update:value="emitUpdate"
+              />
+              <n-input-number
+                v-model:value="chamber.dimensions.height"
+                placeholder="Height"
+                :readonly="!editable"
+                style="flex: 1; min-width: 80px;"
+                @update:value="emitUpdate"
+              />
+            </n-flex>
+          </div>
 
-        <v-divider class="my-3"></v-divider>
-
-        <!-- Slots within the chamber -->
-        <SlotsInput
-          v-model="chamber.slots"
-          :editable="editable"
-          label="Slots in Chamber"
-          @update:model-value="emitUpdate"
-        />
-      </v-card>
-    </div>
+          <SlotsInput
+            v-model="chamber.slots"
+            :editable="editable"
+            label="Slots in Chamber"
+            @update:model-value="emitUpdate"
+          />
+        </n-card>
+      </n-collapse-item>
+    </n-collapse>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, watch } from 'vue';
+import { NButton, NCard, NCollapse, NCollapseItem, NFlex, NInput, NInputNumber, NIcon } from 'naive-ui';
 import type { Chamber } from '@/types/products';
 import SlotsInput from './SlotsInput.vue';
+import { Icons } from '@/utils/icons';
 
 interface Props {
   modelValue?: Chamber[];
@@ -171,20 +150,23 @@ const DEFAULT_SLOTS: never[] = [];
 
 const localChambers = ref<Chamber[]>(props.modelValue.map(chamber => ({
   ...chamber,
-  relativePosition: chamber.relativePosition || DEFAULT_POSITION,
-  dimensions: chamber.dimensions || DEFAULT_DIMENSIONS,
-  slots: chamber.slots || DEFAULT_SLOTS
+  relativePosition: chamber.relativePosition || { ...DEFAULT_POSITION },
+  dimensions: chamber.dimensions || { ...DEFAULT_DIMENSIONS },
+  slots: chamber.slots || [...DEFAULT_SLOTS]
 })));
+
+const expandedNames = ref<(number | string)[]>(props.modelValue.map((_, index) => index));
 
 watch(
   () => props.modelValue,
   (newValue) => {
     localChambers.value = newValue.map(chamber => ({
       ...chamber,
-      relativePosition: chamber.relativePosition || DEFAULT_POSITION,
-      dimensions: chamber.dimensions || DEFAULT_DIMENSIONS,
-      slots: chamber.slots || DEFAULT_SLOTS
+      relativePosition: chamber.relativePosition || { ...DEFAULT_POSITION },
+      dimensions: chamber.dimensions || { ...DEFAULT_DIMENSIONS },
+      slots: chamber.slots || [...DEFAULT_SLOTS]
     }));
+    expandedNames.value = newValue.map((_, index) => index);
   },
   { deep: true }
 );
@@ -196,21 +178,23 @@ function addChamber() {
     dimensions: { length: 400, width: 200, height: 400 },
     slots: []
   });
+  expandedNames.value.push(localChambers.value.length - 1);
   emitUpdate();
 }
 
 function removeChamber(index: number) {
   localChambers.value.splice(index, 1);
+  expandedNames.value = expandedNames.value
+    .filter(name => name !== index)
+    .map(name => (typeof name === 'number' && name > index ? name - 1 : name));
   emitUpdate();
 }
 
 function emitUpdate() {
   emit('update:modelValue', localChambers.value);
 }
-</script>
 
-<style scoped>
-.v-card {
-  transition: all 0.2s ease;
+function handleExpandedChange(names: Array<string | number> | string | number) {
+  expandedNames.value = Array.isArray(names) ? names : [names];
 }
-</style>
+</script>

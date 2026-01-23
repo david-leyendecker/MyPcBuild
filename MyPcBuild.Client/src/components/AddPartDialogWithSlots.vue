@@ -1,197 +1,205 @@
 <template>
-  <div class="d-flex flex-column ga-3">
-    <p class="text-body-2 text-medium-emphasis">Add a component to your build with optional slot placement</p>
+  <n-flex vertical :size="12">
+    <p style="font-size: 14px; opacity: 0.7;">Add a component to your build with optional slot placement</p>
 
     <!-- Product Selection -->
     <div v-if="!selectedProductId">
-      <div class="d-flex flex-column ga-3">
-        <v-text-field 
-          v-model="searchQuery"
+      <n-flex vertical :size="12">
+        <n-input 
+          v-model:value="searchQuery"
           placeholder="Search components..."
           @keyup.enter="handleSearch"
-        ></v-text-field>
-        <div class="d-flex flex-wrap ga-2">
-          <v-btn 
+        />
+        <n-flex :size="8" wrap>
+          <n-button 
             v-for="category in categories"
             :key="category"
-            :variant="selectedCategory === category ? 'elevated' : 'outlined'"
+            :type="selectedCategory === category ? 'primary' : 'default'"
             size="small"
             @click="selectCategory(category)"
           >
             {{ categoryDisplayMap[category] }}
-          </v-btn>
-        </div>
-      </div>
+          </n-button>
+        </n-flex>
+      </n-flex>
 
-      <div v-if="isLoading" class="d-flex justify-center py-4">
-        <v-progress-circular indeterminate color="primary"></v-progress-circular>
-      </div>
+      <n-flex v-if="isLoading" justify="center" style="padding: 16px 0;">
+        <n-spin size="medium" />
+      </n-flex>
 
-      <div v-else-if="filteredProducts.length === 0" class="text-center py-4">
-        <p class="text-medium-emphasis">No components found</p>
-      </div>
+      <n-empty v-else-if="filteredProducts.length === 0" description="No components found">
+        <template #extra>
+          <n-button @click="searchQuery = ''; selectedCategory = null">
+            Clear Filters
+          </n-button>
+        </template>
+      </n-empty>
 
       <div 
         v-else 
-        class="overflow-y-auto mt-3"
-        style="max-height: 400px; border: 1px solid rgba(var(--v-border-color), var(--v-border-opacity)); border-radius: 4px;"
+        style="max-height: 400px; overflow-y: auto; margin-top: 12px; border: 1px solid var(--n-border-color); border-radius: 4px;"
       >
         <div 
           v-for="product in filteredProducts"
           :key="product.id"
-          class="pa-3 product-item"
-          style="border-bottom: 1px solid rgba(var(--v-border-color), var(--v-border-opacity)); cursor: pointer;"
+          class="product-item"
+          style="padding: 12px; border-bottom: 1px solid var(--n-border-color); cursor: pointer;"
           @click="selectProduct(product.id)"
         >
-          <div class="d-flex justify-space-between align-center">
+          <n-flex justify="space-between" align="center">
             <div>
-              <h4 class="text-subtitle-1 mb-1">{{ product.name }}</h4>
-              <p class="text-success font-weight-semibold text-body-2">${{ product.price.toFixed(2) }}</p>
+              <h4 style="font-size: 16px; margin-bottom: 4px;">{{ product.name }}</h4>
+              <p style="color: var(--n-color-success); font-weight: 600; font-size: 14px; margin: 0;">${{ product.price.toFixed(2) }}</p>
             </div>
-            <v-icon>mdi-arrow-right</v-icon>
-          </div>
+            <span>→</span>
+          </n-flex>
         </div>
       </div>
 
-      <div class="d-flex justify-end ga-2 pt-3" style="border-top: 1px solid rgba(var(--v-border-color), var(--v-border-opacity));">
-        <v-btn 
-          prepend-icon="mdi-close"
-          variant="text"
+      <n-flex justify="flex-end" :size="8" style="padding-top: 12px; border-top: 1px solid var(--n-border-color);">
+        <n-button 
+          text
           @click="$emit('close')"
         >
+          <template #icon>
+            <n-icon :component="Icons.Close" />
+          </template>
           Cancel
-        </v-btn>
-      </div>
+        </n-button>
+      </n-flex>
     </div>
 
     <!-- Slot Selection (optional) -->
     <div v-else>
-      <div class="mb-3">
-        <h4 class="text-subtitle-1 mb-2">Selected: {{ selectedProduct?.name }}</h4>
-        <p class="text-body-2 text-medium-emphasis">
+      <div style="margin-bottom: 12px;">
+        <h4 style="font-size: 16px; margin-bottom: 8px;">Selected: {{ selectedProduct?.name }}</h4>
+        <p style="font-size: 14px; opacity: 0.7;">
           Choose a slot for placement (optional) or add without slot assignment
         </p>
       </div>
 
-      <v-card v-if="loadingSlots" class="pa-4">
-        <v-progress-circular indeterminate color="primary"></v-progress-circular>
-      </v-card>
+      <n-card v-if="loadingSlots" style="padding: 16px;">
+        <n-spin size="medium" />
+      </n-card>
 
       <div v-else>
-        <div v-if="availableSlots.length > 0" class="mb-4">
-          <h5 class="text-subtitle-2 mb-2">Available Slots</h5>
+        <div v-if="availableSlots.length > 0" style="margin-bottom: 16px;">
+          <h5 style="font-size: 14px; margin-bottom: 8px; font-weight: 600;">Available Slots</h5>
           <div 
-            class="overflow-y-auto"
-            style="max-height: 300px; border: 1px solid rgba(var(--v-border-color), var(--v-border-opacity)); border-radius: 4px;"
+            style="max-height: 300px; overflow-y: auto; border: 1px solid var(--n-border-color); border-radius: 4px;"
           >
             <div 
               v-for="slot in availableSlots"
               :key="slot.id"
-              class="pa-3 slot-item"
+              class="slot-item"
               :class="{ 'slot-selected': selectedSlotId === slot.id, 'slot-occupied': slot.isOccupied }"
-              style="border-bottom: 1px solid rgba(var(--v-border-color), var(--v-border-opacity)); cursor: pointer;"
+              style="padding: 12px; border-bottom: 1px solid var(--n-border-color); cursor: pointer;"
               @click="!slot.isOccupied && selectSlot(slot.id)"
             >
-              <div class="d-flex justify-space-between align-center">
+              <n-flex justify="space-between" align="center">
                 <div>
-                  <h5 class="text-subtitle-2 mb-1">{{ slot.name }}</h5>
-                  <p class="text-caption text-medium-emphasis">
+                  <h5 style="font-size: 14px; margin-bottom: 4px; font-weight: 600;">{{ slot.name }}</h5>
+                  <p style="font-size: 12px; opacity: 0.7; margin-bottom: 4px;">
                     Parent: {{ slot.parentProductName }}
                   </p>
-                  <p class="text-caption">
-                    <v-chip size="x-small" :color="slot.isOccupied ? 'error' : 'success'">
+                  <p style="font-size: 12px; margin: 0;">
+                    <n-tag size="small" :type="slot.isOccupied ? 'error' : 'success'">
                       {{ slot.isOccupied ? 'Occupied' : 'Available' }}
-                    </v-chip>
+                    </n-tag>
                   </p>
                 </div>
-                <v-icon v-if="selectedSlotId === slot.id">mdi-check-circle</v-icon>
-              </div>
+                <span v-if="selectedSlotId === slot.id">
+                  <n-icon :component="Icons.Check" />
+                </span>
+              </n-flex>
             </div>
           </div>
         </div>
 
         <div v-if="selectedSlotId">
-          <h5 class="text-subtitle-2 mb-2">Position (optional)</h5>
-          <v-row>
-            <v-col cols="4">
-              <v-text-field
-                v-model.number="position.x"
-                label="X (mm)"
-                type="number"
-                density="compact"
-              ></v-text-field>
-            </v-col>
-            <v-col cols="4">
-              <v-text-field
-                v-model.number="position.y"
-                label="Y (mm)"
-                type="number"
-                density="compact"
-              ></v-text-field>
-            </v-col>
-            <v-col cols="4">
-              <v-text-field
-                v-model.number="position.z"
-                label="Z (mm)"
-                type="number"
-                density="compact"
-              ></v-text-field>
-            </v-col>
-          </v-row>
+          <h5 style="font-size: 14px; margin-bottom: 8px; font-weight: 600;">Position (optional)</h5>
+          <n-flex :size="8">
+            <n-input-number
+              v-model:value="position.x"
+              placeholder="X (mm)"
+              style="flex: 1;"
+            />
+            <n-input-number
+              v-model:value="position.y"
+              placeholder="Y (mm)"
+              style="flex: 1;"
+            />
+            <n-input-number
+              v-model:value="position.z"
+              placeholder="Z (mm)"
+              style="flex: 1;"
+            />
+          </n-flex>
         </div>
       </div>
 
-      <div class="d-flex justify-space-between ga-2 pt-3" style="border-top: 1px solid rgba(var(--v-border-color), var(--v-border-opacity));">
-        <v-btn 
-          prepend-icon="mdi-arrow-left"
-          variant="text"
+      <n-flex justify="space-between" :size="8" style="padding-top: 12px; border-top: 1px solid var(--n-border-color);">
+        <n-button 
+          text
           @click="selectedProductId = null"
         >
+          <template #icon>
+            <n-icon :component="Icons.ArrowBack" />
+          </template>
           Back
-        </v-btn>
-        <div class="d-flex ga-2">
-          <v-btn 
-            prepend-icon="mdi-close"
-            variant="text"
+        </n-button>
+        <n-flex :size="8">
+          <n-button 
+            text
             @click="$emit('close')"
           >
+            <template #icon>
+              <n-icon :component="Icons.Close" />
+            </template>
             Cancel
-          </v-btn>
-          <v-btn 
+          </n-button>
+          <n-button 
             v-if="availableSlots.length > 0"
-            prepend-icon="mdi-plus"
-            variant="outlined"
             @click="confirmAddWithoutSlot"
           >
+            <template #icon>
+              <n-icon :component="Icons.Add" />
+            </template>
             Add Without Slot
-          </v-btn>
-          <v-btn 
+          </n-button>
+          <n-button 
             v-if="selectedSlotId"
-            prepend-icon="mdi-plus"
-            color="primary"
+            type="primary"
             @click="confirmAddToSlot"
           >
+            <template #icon>
+              <n-icon :component="Icons.Add" />
+            </template>
             Add to Slot
-          </v-btn>
-          <v-btn 
+          </n-button>
+          <n-button 
             v-else-if="availableSlots.length === 0"
-            prepend-icon="mdi-plus"
-            color="primary"
+            type="primary"
             @click="confirmAddWithoutSlot"
           >
+            <template #icon>
+              <n-icon :component="Icons.Add" />
+            </template>
             Add Component
-          </v-btn>
-        </div>
-      </div>
+          </n-button>
+        </n-flex>
+      </n-flex>
     </div>
-  </div>
+  </n-flex>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue';
+import { NFlex, NButton, NInput, NSpin, NCard, NTag, NInputNumber, NEmpty, NIcon } from 'naive-ui';
 import { useCatalogStore } from '@/stores/catalogStore';
 import { ProductCategory, categoryLabels, getCategoryFromBackend } from '@/api/catalog';
 import { buildsApi, type AvailableSlot } from '@/api/builds';
+import { Icons } from '@/utils/icons';
 
 interface Props {
   buildId: string;
@@ -309,7 +317,7 @@ function confirmAddToSlot() {
 }
 
 .product-item:hover {
-  background-color: rgba(var(--v-theme-on-surface), 0.05);
+  background-color: var(--n-color-hover);
 }
 
 .slot-item {
@@ -317,12 +325,12 @@ function confirmAddToSlot() {
 }
 
 .slot-item:not(.slot-occupied):hover {
-  background-color: rgba(var(--v-theme-on-surface), 0.05);
+  background-color: var(--n-color-hover);
 }
 
 .slot-selected {
-  background-color: rgba(var(--v-theme-primary), 0.1);
-  border-left: 3px solid rgb(var(--v-theme-primary));
+  background-color: var(--n-color-primary-hover);
+  border-left: 3px solid var(--n-color-primary);
 }
 
 .slot-occupied {

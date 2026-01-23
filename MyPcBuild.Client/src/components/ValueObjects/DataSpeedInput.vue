@@ -1,18 +1,17 @@
 <template>
-  <v-text-field 
-    :model-value="displayValue"
-    @update:model-value="handleInput"
-    :label="label"
+  <n-input-number 
+    :value="displayValue"
+    @update:value="handleInput"
+    :placeholder="label"
     :readonly="!editable"
-    type="number"
-    suffix="MB/s"
-    :variant="editable ? 'filled' : 'outlined'"
-    density="comfortable"
-  ></v-text-field>
+  >
+    <template #suffix>MB/s</template>
+  </n-input-number>
 </template>
 
 <script setup lang="ts">
 import { computed } from 'vue';
+import { NInputNumber } from 'naive-ui';
 import type { DataSpeed } from '@/types/products';
 
 interface Props {
@@ -34,8 +33,7 @@ const displayValue = computed(() => {
   return props.modelValue?.valueInMBps ?? 0;
 });
 
-function handleInput(value: string | number) {
-  const numValue = typeof value === 'string' ? parseInt(value) : value;
-  emit('update:modelValue', { valueInMBps: numValue || 0 });
+function handleInput(value: number | null) {
+  emit('update:modelValue', { valueInMBps: value || 0 });
 }
 </script>

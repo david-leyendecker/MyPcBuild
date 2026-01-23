@@ -1,50 +1,76 @@
 <template>
-  <div ref="containerRef" class="viewer-3d-container">
-    <canvas ref="canvasRef"></canvas>
-    
-    <!-- Controls Overlay -->
-    <div class="controls-overlay">
-      <v-btn-group density="compact" variant="outlined">
-        <v-btn @click="resetCamera" size="small" prepend-icon="mdi-crop-free">
-          Reset View
-        </v-btn>
-        <v-btn @click="toggleGrid" size="small" :prepend-icon="showGrid ? 'mdi-grid-off' : 'mdi-grid'">
-          {{ showGrid ? 'Hide Grid' : 'Show Grid' }}
-        </v-btn>
-      </v-btn-group>
+  <div v-if="!inPopout && isPopoutOpen" class="viewer-empty">
+    <n-empty
+      description="3D viewer is open in popout window"
+      style="padding: 80px 0;"
+    />
+  </div>
+  <div v-show="!(  !inPopout && isPopoutOpen )" class="viewer-root">
+    <div v-if="showHeader && !inPopout" class="viewer-header">
+      <n-flex justify="space-between" style="margin-bottom: 12px;">
+        <n-h3>{{ props.title || '3D Build Visualization' }}</n-h3>
+        <n-button text @click="openInPopout">
+          <template #icon>
+            <n-icon :component="Icons.Open" />
+          </template>
+          Open in Popout
+        </n-button>
+      </n-flex>
     </div>
+    <div ref="containerRef" class="viewer-3d-container">
+      <canvas ref="canvasRef"></canvas>
 
-    <!-- Part Info Overlay -->
-    <div v-if="hoveredPart" class="part-info-overlay" :style="{ left: mousePos.x + 'px', top: mousePos.y + 'px' }">
-      <v-card>
-        <v-card-title class="text-caption">{{ hoveredPart.name }}</v-card-title>
-        <v-card-text class="text-caption">
-          <div><strong>Category:</strong> {{ hoveredPart.categoryName }}</div>
-          <div><strong>Manufacturer:</strong> {{ hoveredPart.manufacturer }}</div>
-          <div v-if="hoveredPart.dimensions">
-            <strong>Dimensions:</strong> 
-            {{ hoveredPart.dimensions.length }} × {{ hoveredPart.dimensions.width }} × {{ hoveredPart.dimensions.height }} mm
+      <Viewer3DControls
+        :show-grid="showGrid"
+        @toggle-grid="toggleGrid"
+        @reset-camera="resetCamera"
+      />
+
+      <!-- Part Info Overlay -->
+      <div v-if="hoveredPart" class="part-info-overlay" :style="{ left: mousePos.x + 'px', top: mousePos.y + 'px' }">
+        <n-card size="small" :bordered="true">
+          <template #header>
+            <span style="font-size: 12px;">{{ hoveredPart.name }}</span>
+          </template>
+          <div style="font-size: 12px;">
+            <div><strong>Category:</strong> {{ hoveredPart.categoryName }}</div>
+            <div><strong>Manufacturer:</strong> {{ hoveredPart.manufacturer }}</div>
+            <div v-if="hoveredPart.dimensions">
+              <strong>Dimensions:</strong>
+              {{ hoveredPart.dimensions.length }} × {{ hoveredPart.dimensions.width }} × {{ hoveredPart.dimensions.height }} mm
+            </div>
           </div>
-        </v-card-text>
-      </v-card>
+        </n-card>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, watch } from 'vue';
+import { NButton, NFlex, NCard, NIcon, NEmpty, NH3 } from 'naive-ui';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import type { BuildPart } from '@/api/builds';
+import { Icons } from '@/utils/icons';
+import { use3DPopout } from '@/composables/use3DPopout';
+import Viewer3DControls from './Viewer3DControls.vue';
 
 interface Props {
   parts: BuildPart[];
   collisions?: string[];
+  inPopout?: boolean;
+  showHeader?: boolean;
+  title?: string;
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  collisions: () => []
+  collisions: () => [],
+  inPopout: false,
+  showHeader: true
 });
+
+const { isPopoutOpen, openPopout } = use3DPopout();
 
 const containerRef = ref<HTMLDivElement | null>(null);
 const canvasRef = ref<HTMLCanvasElement | null>(null);
@@ -62,17 +88,41 @@ let raycaster: THREE.Raycaster;
 let mouse: THREE.Vector2;
 
 const partMeshes = new Map<string, THREE.Mesh>();
+let resizeObserver: ResizeObserver | null = null;
+let resizeTimeout: number | null = null;
 
 onMounted(() => {
   initScene();
   animate();
   window.addEventListener('resize', onWindowResize);
   window.addEventListener('mousemove', onMouseMove);
+
+  // Watch for container resize with debouncing
+  if (containerRef.value) {
+    resizeObserver = new ResizeObserver(() => {
+      if (resizeTimeout !== null) {
+        clearTimeout(resizeTimeout);
+      }
+      resizeTimeout = window.setTimeout(() => {
+        onWindowResize();
+      }, 100);
+    });
+    resizeObserver.observe(containerRef.value);
+  }
 });
 
 onUnmounted(() => {
   window.removeEventListener('resize', onWindowResize);
   window.removeEventListener('mousemove', onMouseMove);
+
+  if (resizeTimeout !== null) {
+    clearTimeout(resizeTimeout);
+  }
+
+  if (resizeObserver) {
+    resizeObserver.disconnect();
+  }
+
   cancelAnimationFrame(animationId);
   renderer?.dispose();
   controls?.dispose();
@@ -176,21 +226,21 @@ function updateScene() {
     });
 
     const mesh = new THREE.Mesh(geometry, material);
-    
+
     // Set position (center of the box)
     mesh.position.set(
       position.x + part.dimensions.length / 2,
       position.y + part.dimensions.height / 2,
       position.z + part.dimensions.width / 2
     );
-    
+
     // Apply rotation (convert degrees to radians)
     mesh.rotation.set(
       (rotation.x * Math.PI) / 180,
       (rotation.y * Math.PI) / 180,
       (rotation.z * Math.PI) / 180
     );
-    
+
     // Add wireframe
     const edges = new THREE.EdgesGeometry(geometry);
     const lineMaterial = new THREE.LineBasicMaterial({ color: 0xffffff, linewidth: 1 });
@@ -216,7 +266,7 @@ function updateScene() {
           wireframe: false
         });
         const chamberMesh = new THREE.Mesh(chamberGeom, chamberMat);
-        
+
         chamberMesh.position.set(
           position.x + chamber.dimensions.length / 2,
           position.y + chamber.dimensions.height / 2,
@@ -296,7 +346,7 @@ function animate() {
 
 function onWindowResize() {
   if (!containerRef.value) return;
-  
+
   const width = containerRef.value.clientWidth;
   const height = containerRef.value.clientHeight;
 
@@ -308,35 +358,58 @@ function onWindowResize() {
 function resetCamera() {
   camera.position.set(500, 500, 500);
   camera.lookAt(0, 0, 0);
-  controls.reset();
 }
 
 function toggleGrid() {
   showGrid.value = !showGrid.value;
   gridHelper.visible = showGrid.value;
 }
+
+async function openInPopout() {
+  openPopout({
+    component: (await import('./BuildViewer3D.vue')).default,
+    props: {
+      parts: props.parts,
+      collisions: props.collisions,
+      inPopout: true,
+      showHeader: false,
+      title: props.title,
+    },
+    title: props.title || '3D Build Visualization',
+  });
+}
 </script>
 
 <style scoped>
+.viewer-root {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 400px;
+}
+
 .viewer-3d-container {
   position: relative;
   width: 100%;
-  height: 600px;
+  flex: 1;
+  height: 100%;
+  min-height: 0;
   border-radius: 8px;
   overflow: hidden;
 }
 
 .viewer-3d-container canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
   display: block;
   width: 100%;
   height: 100%;
 }
 
-.controls-overlay {
-  position: absolute;
-  top: 16px;
-  right: 16px;
-  z-index: 10;
+.viewer-header .text-h3 {
+  font-size: 1.5rem;
+  font-weight: 500;
 }
 
 .part-info-overlay {

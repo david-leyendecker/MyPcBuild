@@ -1,87 +1,82 @@
 <template>
-  <v-container fluid class="pa-0">
+  <n-flex vertical :size="12">
     <!-- Socket and Chipset - Side by side -->
-    <v-row>
-      <v-col cols="12" md="6">
-        <v-select 
-          v-model="localProduct.socket"
-          :items="socketOptions"
-          label="CPU Socket"
-          :readonly="!editable"
-          :variant="editable ? 'filled' : 'outlined'"
-        ></v-select>
-      </v-col>
-      <v-col cols="12" md="6">
-        <v-text-field 
-          v-model="localProduct.chipset"
-          label="Chipset"
-          :readonly="!editable"
-          :variant="editable ? 'filled' : 'outlined'"
+    <n-flex :size="12">
+      <div style="flex: 1; min-width: 150px;">
+        <label style="display: block; margin-bottom: 4px; font-size: 14px;">CPU Socket</label>
+        <n-select 
+          v-model:value="localProduct.socket"
+          :options="socketOptions"
+          :disabled="!editable"
+        />
+      </div>
+      <div style="flex: 1; min-width: 150px;">
+        <label style="display: block; margin-bottom: 4px; font-size: 14px;">Chipset</label>
+        <n-input 
+          v-model:value="localProduct.chipset"
+          :disabled="!editable"
           placeholder="e.g., Z790, X670E"
-        ></v-text-field>
-      </v-col>
-    </v-row>
+        />
+      </div>
+    </n-flex>
 
     <!-- Form Factor and Memory Type - Side by side -->
-    <v-row>
-      <v-col cols="12" md="6">
-        <v-select 
-          v-model="localProduct.formFactor"
-          :items="formFactorOptions"
-          label="Form Factor"
-          :readonly="!editable"
-          :variant="editable ? 'filled' : 'outlined'"
-        ></v-select>
-      </v-col>
-      <v-col cols="12" md="6">
-        <v-select 
-          v-model="localProduct.memoryType"
-          :items="memoryTypeOptions"
-          label="Memory Type"
-          :readonly="!editable"
-          :variant="editable ? 'filled' : 'outlined'"
-        ></v-select>
-      </v-col>
-    </v-row>
+    <n-flex :size="12">
+      <div style="flex: 1; min-width: 150px;">
+        <label style="display: block; margin-bottom: 4px; font-size: 14px;">Form Factor</label>
+        <n-select 
+          v-model:value="localProduct.formFactor"
+          :options="formFactorOptions"
+          :disabled="!editable"
+        />
+      </div>
+      <div style="flex: 1; min-width: 150px;">
+        <label style="display: block; margin-bottom: 4px; font-size: 14px;">Memory Type</label>
+        <n-select 
+          v-model:value="localProduct.memoryType"
+          :options="memoryTypeOptions"
+          :disabled="!editable"
+        />
+      </div>
+    </n-flex>
 
-    <v-row>
-      <v-col cols="12">
-        <!-- Max Memory -->
+    <!-- Max Memory -->
+    <n-flex :size="12">
+      <div style="flex: 1; min-width: 150px;">
         <StorageCapacityInput 
           v-model="localProduct.maxMemory"
           label="Maximum Memory Capacity"
           :editable="editable"
         />
-      </v-col>
-    </v-row>
+      </div>
+    </n-flex>
 
-    <v-row>
-      <v-col cols="12">
-        <!-- Dimensions -->
-        <div class="mb-2">
-          <label class="text-subtitle-2 font-weight-semibold mb-2 d-block">Dimensions</label>
-          <DimensionsInput 
-            v-model="localProduct.dimensions"
-            :editable="editable"
-          />
-        </div>
-      </v-col>
-    </v-row>
+    <!-- Dimensions -->
+    <n-flex :size="12">
+      <div style="flex: 1; min-width: 150px;">
+        <label style="display: block; margin-bottom: 4px; font-size: 14px;">Dimensions</label>
+        <DimensionsInput 
+          v-model="localProduct.dimensions"
+          :editable="editable"
+        />
+      </div>
+    </n-flex>
 
-    <v-row>
-      <v-col cols="12">
-        <!-- Slots -->
+    <!-- Slots -->
+    <n-flex :size="12">
+      <div style="flex: 1; min-width: 150px;">
         <SlotsInput 
           v-model="localProduct.slots"
           :editable="editable"
         />
-      </v-col>
-    </v-row>
-  </v-container>
+      </div>
+    </n-flex>
+  </n-flex>
 </template>
 
 <script setup lang="ts">
 import { ref, watch } from 'vue';
+import { NFlex, NInput, NSelect } from 'naive-ui';
 import type { MotherboardProductRequest, MotherboardProductResponse, CpuSocket, FormFactor, MemoryType } from '@/types/products';
 import StorageCapacityInput from '@/components/ValueObjects/StorageCapacityInput.vue';
 import DimensionsInput from '@/components/ValueObjects/DimensionsInput.vue';
@@ -101,27 +96,27 @@ const emit = defineEmits<{
 }>();
 
 const socketOptions = [
-  { title: 'LGA1700', value: 'LGA1700' as CpuSocket },
-  { title: 'LGA1200', value: 'LGA1200' as CpuSocket },
-  { title: 'LGA1151', value: 'LGA1151' as CpuSocket },
-  { title: 'LGA2066', value: 'LGA2066' as CpuSocket },
-  { title: 'AM5', value: 'AM5' as CpuSocket },
-  { title: 'AM4', value: 'AM4' as CpuSocket },
-  { title: 'sTRX4', value: 'sTRX4' as CpuSocket },
-  { title: 'TR4', value: 'TR4' as CpuSocket }
+  { label: 'LGA1700', value: 'LGA1700' as CpuSocket },
+  { label: 'LGA1200', value: 'LGA1200' as CpuSocket },
+  { label: 'LGA1151', value: 'LGA1151' as CpuSocket },
+  { label: 'LGA2066', value: 'LGA2066' as CpuSocket },
+  { label: 'AM5', value: 'AM5' as CpuSocket },
+  { label: 'AM4', value: 'AM4' as CpuSocket },
+  { label: 'sTRX4', value: 'sTRX4' as CpuSocket },
+  { label: 'TR4', value: 'TR4' as CpuSocket }
 ];
 
 const formFactorOptions = [
-  { title: 'ATX', value: 'ATX' as FormFactor },
-  { title: 'Micro ATX', value: 'MicroATX' as FormFactor },
-  { title: 'Mini ITX', value: 'MiniITX' as FormFactor },
-  { title: 'E-ATX', value: 'EATX' as FormFactor }
+  { label: 'ATX', value: 'ATX' as FormFactor },
+  { label: 'Micro ATX', value: 'MicroATX' as FormFactor },
+  { label: 'Mini ITX', value: 'MiniITX' as FormFactor },
+  { label: 'E-ATX', value: 'EATX' as FormFactor }
 ];
 
 const memoryTypeOptions = [
-  { title: 'DDR3', value: 'DDR3' as MemoryType },
-  { title: 'DDR4', value: 'DDR4' as MemoryType },
-  { title: 'DDR5', value: 'DDR5' as MemoryType }
+  { label: 'DDR3', value: 'DDR3' as MemoryType },
+  { label: 'DDR4', value: 'DDR4' as MemoryType },
+  { label: 'DDR5', value: 'DDR5' as MemoryType }
 ];
 
 const localProduct = ref<Partial<MotherboardProductRequest>>({

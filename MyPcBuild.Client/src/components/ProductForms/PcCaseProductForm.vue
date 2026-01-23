@@ -1,67 +1,53 @@
 <template>
-  <v-container fluid class="pa-0">
-    <!-- Form Factor and Color - Side by side -->
-    <v-row>
-      <v-col cols="12" md="6">
-        <v-text-field 
-          v-model="localProduct.formFactor"
-          label="Form Factor"
-          :readonly="!editable"
-          :variant="editable ? 'filled' : 'outlined'"
+  <n-form>
+    <!-- Form Factor and Color -->
+    <n-grid :cols="2" :x-gap="12">
+      <n-form-item label="Form Factor">
+        <n-input 
+          v-model:value="localProduct.formFactor"
+          :disabled="!editable"
           placeholder="e.g., Mid Tower, Full Tower"
-        ></v-text-field>
-      </v-col>
-      <v-col cols="12" md="6">
-        <v-text-field 
-          v-model="localProduct.color"
-          label="Color"
-          :readonly="!editable"
-          :variant="editable ? 'filled' : 'outlined'"
-          placeholder="e.g., Black, White"
-        ></v-text-field>
-      </v-col>
-    </v-row>
-
-    <v-row>
-      <v-col cols="12">
-        <!-- Side Panel Window -->
-        <v-text-field 
-          v-model="localProduct.sidePanelWindow"
-          label="Side Panel Window"
-          :readonly="!editable"
-          :variant="editable ? 'filled' : 'outlined'"
-          placeholder="e.g., Tempered Glass, Acrylic, None"
-        ></v-text-field>
-      </v-col>
-    </v-row>
-
-    <v-row>
-      <v-col cols="12">
-        <!-- Dimensions -->
-        <div class="mb-2">
-          <label class="text-subtitle-2 font-weight-semibold mb-2 d-block">Dimensions</label>
-          <DimensionsInput 
-            v-model="localProduct.dimensions"
-            :editable="editable"
-          />
-        </div>
-      </v-col>
-    </v-row>
-
-    <v-row>
-      <v-col cols="12">
-        <!-- Chambers -->
-        <ChambersInput 
-          v-model="localProduct.chambers"
-          :editable="editable"
         />
-      </v-col>
-    </v-row>
-  </v-container>
+      </n-form-item>
+      <n-form-item label="Color">
+        <n-input 
+          v-model:value="localProduct.color"
+          :disabled="!editable"
+          placeholder="e.g., Black, White"
+        />
+      </n-form-item>
+    </n-grid>
+
+    <!-- Side Panel Window -->
+    <n-form-item label="Side Panel Window">
+      <n-input 
+        v-model:value="localProduct.sidePanelWindow"
+        :disabled="!editable"
+        placeholder="e.g., Tempered Glass, Acrylic, None"
+      />
+    </n-form-item>
+
+    <!-- Dimensions -->
+    <n-form-item label="Dimensions">
+      <DimensionsInput 
+        v-model="localProduct.dimensions"
+        :editable="editable"
+      />
+    </n-form-item>
+
+    <!-- Chambers -->
+    <n-form-item label="Chambers">
+      <ChambersInput 
+        v-model="localProduct.chambers"
+        :editable="editable"
+      />
+    </n-form-item>
+  </n-form>
 </template>
 
 <script setup lang="ts">
 import { ref, watch } from 'vue';
+import { NForm, NFormItem, NGrid, NInput } from 'naive-ui';
 import type { PcCaseProductRequest, PcCaseProductResponse } from '@/types/products';
 import DimensionsInput from '@/components/ValueObjects/DimensionsInput.vue';
 import ChambersInput from '@/components/ValueObjects/ChambersInput.vue';

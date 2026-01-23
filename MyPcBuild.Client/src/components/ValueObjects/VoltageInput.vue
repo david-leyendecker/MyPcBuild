@@ -1,19 +1,18 @@
 <template>
-  <v-text-field 
-    :model-value="displayValue"
-    @update:model-value="handleInput"
-    :label="label"
+  <n-input-number 
+    :value="displayValue"
+    @update:value="handleInput"
+    :placeholder="label"
     :readonly="!editable"
-    type="number"
-    step="0.1"
-    suffix="V"
-    :variant="editable ? 'filled' : 'outlined'"
-    density="comfortable"
-  ></v-text-field>
+    :step="0.1"
+  >
+    <template #suffix>V</template>
+  </n-input-number>
 </template>
 
 <script setup lang="ts">
 import { computed } from 'vue';
+import { NInputNumber } from 'naive-ui';
 import type { Voltage } from '@/types/products';
 
 interface Props {
@@ -35,8 +34,7 @@ const displayValue = computed(() => {
   return props.modelValue?.valueInVolts ?? 0;
 });
 
-function handleInput(value: string | number) {
-  const numValue = typeof value === 'string' ? parseFloat(value) : value;
-  emit('update:modelValue', { valueInVolts: numValue || 0 });
+function handleInput(value: number | null) {
+  emit('update:modelValue', { valueInVolts: value || 0 });
 }
 </script>

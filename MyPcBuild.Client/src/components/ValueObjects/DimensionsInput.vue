@@ -1,48 +1,40 @@
 <template>
   <div class="dimensions-input">
-    <v-row>
-      <v-col cols="4">
-        <v-text-field 
-          :model-value="dimensions.length"
-          @update:model-value="updateLength"
-          label="Length"
-          :readonly="!editable"
-          type="number"
-          suffix="mm"
-          :variant="editable ? 'filled' : 'outlined'"
-          density="comfortable"
-        ></v-text-field>
-      </v-col>
-      <v-col cols="4">
-        <v-text-field 
-          :model-value="dimensions.width"
-          @update:model-value="updateWidth"
-          label="Width"
-          :readonly="!editable"
-          type="number"
-          suffix="mm"
-          :variant="editable ? 'filled' : 'outlined'"
-          density="comfortable"
-        ></v-text-field>
-      </v-col>
-      <v-col cols="4">
-        <v-text-field 
-          :model-value="dimensions.height"
-          @update:model-value="updateHeight"
-          label="Height"
-          :readonly="!editable"
-          type="number"
-          suffix="mm"
-          :variant="editable ? 'filled' : 'outlined'"
-          density="comfortable"
-        ></v-text-field>
-      </v-col>
-    </v-row>
+    <n-flex :size="12">
+      <n-input-number 
+        :value="dimensions.length"
+        @update:value="updateLength"
+        placeholder="Length"
+        :readonly="!editable"
+        style="flex: 1; min-width: 100px;"
+      >
+        <template #suffix>mm</template>
+      </n-input-number>
+      <n-input-number 
+        :value="dimensions.width"
+        @update:value="updateWidth"
+        placeholder="Width"
+        :readonly="!editable"
+        style="flex: 1; min-width: 100px;"
+      >
+        <template #suffix>mm</template>
+      </n-input-number>
+      <n-input-number 
+        :value="dimensions.height"
+        @update:value="updateHeight"
+        placeholder="Height"
+        :readonly="!editable"
+        style="flex: 1; min-width: 100px;"
+      >
+        <template #suffix>mm</template>
+      </n-input-number>
+    </n-flex>
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed } from 'vue';
+import { NInputNumber, NFlex } from 'naive-ui';
 import type { Dimensions } from '@/types/products';
 
 interface Props {
@@ -62,27 +54,24 @@ const dimensions = computed(() => {
   return props.modelValue ?? { length: 0, width: 0, height: 0 };
 });
 
-function updateLength(value: string | number) {
-  const numValue = typeof value === 'string' ? parseFloat(value) : value;
+function updateLength(value: number | null) {
   emit('update:modelValue', {
     ...dimensions.value,
-    length: numValue || 0
+    length: value || 0
   });
 }
 
-function updateWidth(value: string | number) {
-  const numValue = typeof value === 'string' ? parseFloat(value) : value;
+function updateWidth(value: number | null) {
   emit('update:modelValue', {
     ...dimensions.value,
-    width: numValue || 0
+    width: value || 0
   });
 }
 
-function updateHeight(value: string | number) {
-  const numValue = typeof value === 'string' ? parseFloat(value) : value;
+function updateHeight(value: number | null) {
   emit('update:modelValue', {
     ...dimensions.value,
-    height: numValue || 0
+    height: value || 0
   });
 }
 </script>

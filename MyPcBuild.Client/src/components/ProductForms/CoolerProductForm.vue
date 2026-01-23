@@ -1,68 +1,53 @@
 <template>
-  <v-container fluid class="pa-0">
-    <!-- Cooler Type and Height - Side by side -->
-    <v-row>
-      <v-col cols="12" md="6">
-        <v-select 
-          v-model="localProduct.coolerType"
-          :items="coolerTypeOptions"
-          label="Cooler Type"
-          :readonly="!editable"
-          :variant="editable ? 'filled' : 'outlined'"
-        ></v-select>
-      </v-col>
-      <v-col cols="12" md="6">
+  <n-form>
+    <!-- Cooler Type and Height -->
+    <n-grid :cols="2" :x-gap="12">
+      <n-form-item label="Cooler Type">
+        <n-select 
+          v-model:value="localProduct.coolerType"
+          :options="coolerTypeOptions"
+          :disabled="!editable"
+        />
+      </n-form-item>
+      <n-form-item label="Height">
         <LengthInput 
           v-model="localProduct.height"
-          label="Height"
           :editable="editable"
         />
-      </v-col>
-    </v-row>
+      </n-form-item>
+    </n-grid>
 
-    <v-row>
-      <v-col cols="12">
-        <!-- TDP -->
-        <PowerInput 
-          v-model="localProduct.tdp"
-          label="TDP Rating"
-          :editable="editable"
-        />
-      </v-col>
-    </v-row>
+    <!-- TDP -->
+    <n-form-item label="TDP Rating">
+      <PowerInput 
+        v-model="localProduct.tdp"
+        :editable="editable"
+      />
+    </n-form-item>
 
-    <v-row>
-      <v-col cols="12">
-        <!-- Compatible Sockets -->
-        <v-select 
-          v-model="localProduct.sockets"
-          :items="socketOptions"
-          label="Compatible CPU Sockets"
-          :readonly="!editable"
-          :variant="editable ? 'filled' : 'outlined'"
-          multiple
-          chips
-        ></v-select>
-      </v-col>
-    </v-row>
+    <!-- Compatible Sockets -->
+    <n-form-item label="Compatible CPU Sockets">
+      <n-select 
+        v-model:value="localProduct.sockets"
+        :options="socketOptions"
+        :disabled="!editable"
+        multiple
+      />
+    </n-form-item>
 
-    <v-row>
-      <v-col cols="12">
-        <!-- Dimensions -->
-        <div class="mb-2">
-          <label class="text-subtitle-2 font-weight-semibold mb-2 d-block">Dimensions</label>
-          <DimensionsInput 
-            v-model="localProduct.dimensions"
-            :editable="editable"
-          />
-        </div>
-      </v-col>
-    </v-row>
-  </v-container>
+    <!-- Dimensions -->
+    <n-form-item label="Dimensions">
+      <DimensionsInput 
+        v-model="localProduct.dimensions"
+        :editable="editable"
+      />
+    </n-form-item>
+  </n-form>
 </template>
 
 <script setup lang="ts">
 import { ref, watch } from 'vue';
+import { NForm, NFormItem, NGrid, NSelect } from 'naive-ui';
 import type { CoolerProductRequest, CoolerProductResponse, CoolerType, CpuSocket } from '@/types/products';
 import PowerInput from '@/components/ValueObjects/PowerInput.vue';
 import LengthInput from '@/components/ValueObjects/LengthInput.vue';
@@ -82,20 +67,20 @@ const emit = defineEmits<{
 }>();
 
 const coolerTypeOptions = [
-  { title: 'Air', value: 'Air' as CoolerType },
-  { title: 'AIO (All-in-One)', value: 'AIO' as CoolerType },
-  { title: 'Custom Loop', value: 'CustomLoop' as CoolerType }
+  { label: 'Air', value: 'Air' as CoolerType },
+  { label: 'AIO (All-in-One)', value: 'AIO' as CoolerType },
+  { label: 'Custom Loop', value: 'CustomLoop' as CoolerType }
 ];
 
 const socketOptions = [
-  { title: 'LGA1700', value: 'LGA1700' as CpuSocket },
-  { title: 'LGA1200', value: 'LGA1200' as CpuSocket },
-  { title: 'LGA1151', value: 'LGA1151' as CpuSocket },
-  { title: 'LGA2066', value: 'LGA2066' as CpuSocket },
-  { title: 'AM5', value: 'AM5' as CpuSocket },
-  { title: 'AM4', value: 'AM4' as CpuSocket },
-  { title: 'sTRX4', value: 'sTRX4' as CpuSocket },
-  { title: 'TR4', value: 'TR4' as CpuSocket }
+  { label: 'LGA1700', value: 'LGA1700' as CpuSocket },
+  { label: 'LGA1200', value: 'LGA1200' as CpuSocket },
+  { label: 'LGA1151', value: 'LGA1151' as CpuSocket },
+  { label: 'LGA2066', value: 'LGA2066' as CpuSocket },
+  { label: 'AM5', value: 'AM5' as CpuSocket },
+  { label: 'AM4', value: 'AM4' as CpuSocket },
+  { label: 'sTRX4', value: 'sTRX4' as CpuSocket },
+  { label: 'TR4', value: 'TR4' as CpuSocket }
 ];
 
 const localProduct = ref<Partial<CoolerProductRequest>>({

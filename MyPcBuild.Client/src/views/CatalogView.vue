@@ -9,148 +9,88 @@
       }"
     />
 
-    <v-row>
-      <!-- Category Filter -->
-      <v-col cols="12">
-        <h3 class="text-subtitle-1 font-weight-medium mb-3">Categories</h3>
-        <v-chip-group
-          :model-value="catalogStore.selectedCategory"
-          @update:model-value="handleCategorySelect"
+    <!-- Category Filter -->
+    <div style="margin-bottom: 16px;">
+      <h3 style="font-size: 14px; font-weight: 500; margin-bottom: 12px;">Categories</h3>
+      <n-flex :size="8" wrap>
+        <n-tag 
+          :type="catalogStore.selectedCategory === '' || catalogStore.selectedCategory === null ? 'primary' : 'default'"
+          :bordered="false"
+          style="cursor: pointer;"
+          @click="handleCategorySelect('')"
         >
-          <v-chip 
-            value=""
-            :color="catalogStore.selectedCategory === '' || catalogStore.selectedCategory === null ? 'primary' : undefined"
-          >
-            All Categories
-          </v-chip>
-          <v-chip 
-            v-for="category in categories"
-            :key="category"
-            :value="category"
-            :color="catalogStore.selectedCategory === category ? 'primary' : undefined"
-          >
-            {{ categoryDisplayNames[category] }}
-          </v-chip>
-        </v-chip-group>
-      </v-col>
+          All Categories
+        </n-tag>
+        <n-tag 
+          v-for="category in categories"
+          :key="category"
+          :type="catalogStore.selectedCategory === category ? 'primary' : 'default'"
+          :bordered="false"
+          style="cursor: pointer;"
+          @click="handleCategorySelect(category)"
+        >
+          {{ categoryDisplayNames[category] }}
+        </n-tag>
+      </n-flex>
+    </div>
 
-      <!-- Products Data Table -->
-      <v-col cols="12">
-        <v-card>
-          <v-card-title>
-            <v-text-field 
-              v-model="searchText"
-              placeholder="Search products by name or manufacturer..."
-              prepend-inner-icon="mdi-magnify"
-              variant="outlined"
-              density="compact"
-              hide-details
-              clearable
-              @update:model-value="handleSearchDebounced"
-            ></v-text-field>
-          </v-card-title>
+    <!-- Products Data Table -->
+    <n-card>
+      <template #header>
+        <n-input 
+          v-model:value="searchText"
+          placeholder="Search products by name or manufacturer..."
+          clearable
+          @update:value="handleSearchDebounced"
+        >
+          <template #prefix>
+            <n-icon :component="Icons.SearchIcon" />
+          </template>
+        </n-input>
+      </template>
 
-          <v-data-table
-            :headers="headers"
-            :items="catalogStore.products"
-            :items-length="catalogStore.totalProducts"
-            :loading="catalogStore.isLoading"
-            :items-per-page="catalogStore.itemsPerPage"
-            :page="catalogStore.currentPage"
-            :sort-by="[{ key: catalogStore.sortBy, order: catalogStore.sortDesc ? 'desc' : 'asc' }]"
-            class="elevation-0"
-            item-value="id"
-            @update:options="handleTableOptionsUpdate"
-          >
-            <template #item.name="{ item }">
-              <span 
-                class="font-weight-medium cursor-pointer text-primary" 
-                @click="viewProduct(item.id)"
-              >
-                {{ item.name }}
-              </span>
+      <n-empty 
+        v-if="!catalogStore.isLoading && catalogStore.products.length === 0"
+        description="No products found"
+      >
+        <template #extra>
+          <n-button type="primary" @click="() => $router.push('/catalog/create')">
+            <template #icon>
+              <n-icon :component="Icons.Add" />
             </template>
+            Create Product
+          </n-button>
+        </template>
+      </n-empty>
 
-            <template #item.isDraft="{ item }">
-              <v-chip 
-                v-if="item.isDraft" 
-                size="small" 
-                color="warning" 
-                variant="tonal"
-              >
-                <v-icon start icon="mdi-pencil"></v-icon>
-                Draft
-              </v-chip>
-              <v-chip 
-                v-else 
-                size="small" 
-                color="success" 
-                variant="tonal"
-              >
-                <v-icon start icon="mdi-check-circle"></v-icon>
-                Published
-              </v-chip>
-            </template>
+      <n-data-table
+        v-else
+        :columns="columns"
+        :data="catalogStore.products"
+        :loading="catalogStore.isLoading"
+        :pagination="paginationReactive"
+        :bordered="false"
+        @update:page="handlePageChange"
+        @update:page-size="handlePageSizeChange"
+      />
 
-            <template #item.price="{ item }">
-              <span class="text-success font-weight-semibold">${{ item.price.toFixed(2) }}</span>
-            </template>
-
-            <template #item.categoryName="{ item }">
-              <v-chip size="small" color="primary" variant="tonal">
-                {{ item.categoryName }}
-              </v-chip>
-            </template>
-
-            <template #item.actions="{ item }">
-              <div class="d-flex ga-2 justify-end">
-                <v-tooltip v-if="item.isDraft" text="Publish product">
-                  <template #activator="{ props }">
-                    <v-icon 
-                      v-bind="props"
-                      color="success" 
-                      icon="mdi-check-circle" 
-                      size="small" 
-                      @click="publish(item.id)"
-                    ></v-icon>
-                  </template>
-                </v-tooltip>
-                <v-icon color="medium-emphasis" icon="mdi-pencil" size="small" @click="edit(item.id)"></v-icon>
-                <v-icon color="medium-emphasis" icon="mdi-delete" size="small" @click="remove(item.id)"></v-icon>
-              </div>
-            </template>
-
-            <template #no-data>
-              <div class="text-center py-8">
-                <v-icon size="64" color="grey-lighten-1">mdi-package-variant</v-icon>
-                <p class="text-h6 text-medium-emphasis mt-4">No products found</p>
-                <p class="text-body-2 text-medium-emphasis">Try adjusting your search or filters</p>
-              </div>
-            </template>
-
-            <template #loading>
-              <div class="text-center py-8">
-                <v-progress-circular indeterminate color="primary"></v-progress-circular>
-              </div>
-            </template>
-          </v-data-table>
-        </v-card>
-
-        <v-alert v-if="catalogStore.error" type="error" class="mt-3">
-          {{ catalogStore.error }}
-        </v-alert>
-      </v-col>
-    </v-row>
+      <n-alert v-if="catalogStore.error" type="error" style="margin-top: 12px;">
+        {{ catalogStore.error }}
+      </n-alert>
+    </n-card>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted, computed, h } from 'vue';
 import { useRouter } from 'vue-router';
+import { NCard, NInput, NDataTable, NTag, NFlex, NAlert, NIcon, NButton, NEmpty } from 'naive-ui';
+import type { DataTableColumns, PaginationProps } from 'naive-ui';
 import { useCatalogStore } from '@/stores/catalogStore';
 import { catalogApi, ProductCategory, categoryLabels } from '@/api/catalog';
 import ViewHeader from '@/components/ViewHeader.vue';
 import { PRODUCT_CATALOG } from '@/config/navigation';
+import { Icons } from '@/utils/icons';
 
 const router = useRouter();
 
@@ -164,14 +104,106 @@ const categoryDisplayNames = computed(() =>
 );
 const searchText = ref('');
 
-const headers = [
-  { title: 'Name', key: 'name', sortable: true },
-  { title: 'Category', key: 'categoryName', sortable: true },
-  { title: 'Manufacturer', key: 'manufacturer', sortable: true },
-  { title: 'Price', key: 'price', sortable: true },
-  { title: 'Status', key: 'isDraft', sortable: true },
-  { title: 'Actions', key: 'actions', sortable: false, align: 'center' as const }
+const columns: DataTableColumns<any> = [
+  {
+    title: 'Name',
+    key: 'name',
+    sorter: 'default',
+    render: (row) => h(
+      'span',
+      {
+        style: 'cursor: pointer; font-weight: 500; color: var(--n-text-color);',
+        onClick: () => viewProduct(row.id)
+      },
+      row.name
+    )
+  },
+  {
+    title: 'Category',
+    key: 'categoryName',
+    sorter: 'default',
+    render: (row) => h(NTag, { type: 'primary', bordered: false, size: 'small' }, { default: () => row.categoryName })
+  },
+  {
+    title: 'Manufacturer',
+    key: 'manufacturer',
+    sorter: 'default'
+  },
+  {
+    title: 'Price',
+    key: 'price',
+    sorter: 'default',
+    render: (row) => h('span', { style: 'font-weight: 600; color: #18a058;' }, `$${row.price.toFixed(2)}`)
+  },
+  {
+    title: 'Status',
+    key: 'isDraft',
+    sorter: 'default',
+    render: (row) => row.isDraft 
+      ? h(NTag, { type: 'warning', bordered: false, size: 'small' }, { 
+          default: () => [
+            h(NIcon, { component: Icons.Pencil, style: 'margin-right: 4px;' }),
+            'Draft'
+          ]
+        })
+      : h(NTag, { type: 'success', bordered: false, size: 'small' }, { 
+          default: () => [
+            h(NIcon, { component: Icons.Check, style: 'margin-right: 4px;' }),
+            'Published'
+          ]
+        })
+  },
+  {
+    title: 'Actions',
+    key: 'actions',
+    width: 150,
+    render: (row) => h(
+      NFlex,
+      { justify: 'end', size: 8 },
+      {
+        default: () => [
+          row.isDraft ? h(
+            NButton,
+            {
+              text: true,
+              title: 'Publish product',
+              onClick: () => publish(row.id)
+            },
+            { icon: () => h(NIcon, { component: Icons.Check }) }
+          ) : null,
+          h(
+            NButton,
+            {
+              text: true,
+              title: 'Edit',
+              onClick: () => edit(row.id)
+            },
+            { icon: () => h(NIcon, { component: Icons.Edit }) }
+          ),
+          h(
+            NButton,
+            {
+              text: true,
+              type: 'error',
+              title: 'Delete',
+              onClick: () => remove(row.id)
+            },
+            { icon: () => h(NIcon, { component: Icons.Trash }) }
+          )
+        ]
+      }
+    )
+  }
 ];
+
+const paginationReactive = computed<PaginationProps>(() => ({
+  page: catalogStore.currentPage,
+  pageSize: catalogStore.itemsPerPage,
+  showSizePicker: true,
+  pageSizes: [10, 20, 30, 50],
+  itemCount: catalogStore.totalProducts,
+  prefix: ({ itemCount }) => `Total: ${itemCount}`
+}));
 
 onMounted(() => {
   catalogStore.loadProducts();
@@ -192,10 +224,17 @@ function handleCategorySelect(category: string | null) {
   catalogStore.setCategory(category === '' ? null : category);
 }
 
+function handlePageChange(page: number) {
+  catalogStore.setPage(page);
+}
+
+function handlePageSizeChange(pageSize: number) {
+  catalogStore.setItemsPerPage(pageSize);
+}
+
 async function publish(id: string) {
   try {
     await catalogApi.publishProduct(id);
-    // Reload products to show updated status
     await catalogStore.loadProducts();
   } catch (error) {
     console.error('Failed to publish product:', error);
@@ -214,36 +253,6 @@ function remove(id: string) {
   // TODO: Implement remove functionality
   console.log('Remove product:', id);
 }
-
-interface TableOptions {
-  page: number;
-  itemsPerPage: number;
-  sortBy?: Array<{ key: string; order: 'asc' | 'desc' }>;
-}
-
-function handleTableOptionsUpdate(options: TableOptions) {
-  const needsUpdate = 
-    options.page !== catalogStore.currentPage ||
-    options.itemsPerPage !== catalogStore.itemsPerPage ||
-    (options.sortBy && options.sortBy.length > 0 && options.sortBy[0] &&
-      (options.sortBy[0].key !== catalogStore.sortBy || 
-       (options.sortBy[0].order === 'desc') !== catalogStore.sortDesc));
-
-  if (!needsUpdate) {
-    return;
-  }
-
-  if (options.page !== catalogStore.currentPage) {
-    catalogStore.setPage(options.page);
-  } else if (options.itemsPerPage !== catalogStore.itemsPerPage) {
-    catalogStore.setItemsPerPage(options.itemsPerPage);
-  } else if (options.sortBy && options.sortBy.length > 0 && options.sortBy[0]) {
-    catalogStore.setSorting(
-      options.sortBy[0].key,
-      options.sortBy[0].order === 'desc'
-    );
-  }
-}
 </script>
 
 <style scoped>
@@ -254,9 +263,5 @@ function handleTableOptionsUpdate(options: TableOptions) {
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
-}
-
-.cursor-pointer {
-  cursor: pointer;
 }
 </style>

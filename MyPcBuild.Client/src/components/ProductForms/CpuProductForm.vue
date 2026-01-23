@@ -1,85 +1,74 @@
 <template>
-  <v-container fluid class="pa-0">
-    <v-row>
-      <v-col cols="12">
-        <!-- CPU Socket -->
-        <v-select 
-          v-model="localProduct.socket"
-          :items="socketOptions"
-          label="CPU Socket"
-          :readonly="!editable"
-          :variant="editable ? 'filled' : 'outlined'"
-        ></v-select>
-      </v-col>
-    </v-row>
+  <n-form>
+    <!-- CPU Socket -->
+    <n-form-item label="CPU Socket">
+      <n-select 
+        v-model:value="localProduct.socket"
+        :options="socketOptions"
+        placeholder="Select socket"
+        :disabled="!editable"
+      />
+    </n-form-item>
 
-    <!-- Cores and Threads - Side by side -->
-    <v-row>
-      <v-col cols="12" md="6">
-        <v-text-field 
-          v-model.number="localProduct.cores"
-          label="Cores"
+    <!-- Cores and Threads -->
+    <n-grid :cols="2" :x-gap="12">
+      <n-form-item label="Cores">
+        <n-input-number 
+          v-model:value="localProduct.cores"
+          placeholder="Number of cores"
           :readonly="!editable"
-          type="number"
-          :variant="editable ? 'filled' : 'outlined'"
-        ></v-text-field>
-      </v-col>
-      <v-col cols="12" md="6">
-        <v-text-field 
-          v-model.number="localProduct.threads"
-          label="Threads"
+          style="width: 100%;"
+        />
+      </n-form-item>
+      <n-form-item label="Threads">
+        <n-input-number 
+          v-model:value="localProduct.threads"
+          placeholder="Number of threads"
           :readonly="!editable"
-          type="number"
-          :variant="editable ? 'filled' : 'outlined'"
-        ></v-text-field>
-      </v-col>
-    </v-row>
+          style="width: 100%;"
+        />
+      </n-form-item>
+    </n-grid>
 
-    <!-- Base Clock and Boost Clock - Side by side -->
-    <v-row>
-      <v-col cols="12" md="6">
+    <!-- Base Clock and Boost Clock -->
+    <n-grid :cols="2" :x-gap="12">
+      <n-form-item label="Base Clock">
         <FrequencyInput 
           v-model="localProduct.baseClock"
-          label="Base Clock"
           :editable="editable"
         />
-      </v-col>
-      <v-col cols="12" md="6">
+      </n-form-item>
+      <n-form-item label="Boost Clock">
         <FrequencyInput 
           v-model="localProduct.boostClock"
-          label="Boost Clock"
           :editable="editable"
         />
-      </v-col>
-    </v-row>
+      </n-form-item>
+    </n-grid>
 
-    <v-row>
-      <v-col cols="12">
-        <!-- TDP -->
-        <PowerInput 
-          v-model="localProduct.tdp"
-          label="TDP (Thermal Design Power)"
-          :editable="editable"
-        />
-      </v-col>
-    </v-row>
+    <!-- TDP -->
+    <n-form-item label="TDP (Thermal Design Power)">
+      <PowerInput 
+        v-model="localProduct.tdp"
+        :editable="editable"
+      />
+    </n-form-item>
 
-    <v-row>
-      <v-col cols="12">
-        <!-- Integrated Graphics -->
-        <v-checkbox 
-          v-model="localProduct.integratedGraphics"
-          label="Integrated Graphics"
-          :readonly="!editable"
-          :disabled="!editable"
-        ></v-checkbox>
-      </v-col>
-    </v-row>
-  </v-container>
+    <!-- Integrated Graphics -->
+    <n-form-item label="Integrated Graphics">
+      <n-checkbox 
+        v-model:checked="localProduct.integratedGraphics"
+        :disabled="!editable"
+      >
+        Has Integrated Graphics
+      </n-checkbox>
+    </n-form-item>
+  </n-form>
 </template>
 
 <script setup lang="ts">
 import { ref, watch } from 'vue';
+import { NForm, NFormItem, NGrid, NSelect, NInputNumber, NCheckbox } from 'naive-ui';
 import type { CpuProductRequest, CpuProductResponse, CpuSocket } from '@/types/products';
 import FrequencyInput from '@/components/ValueObjects/FrequencyInput.vue';
 import PowerInput from '@/components/ValueObjects/PowerInput.vue';
@@ -98,14 +87,14 @@ const emit = defineEmits<{
 }>();
 
 const socketOptions = [
-  { title: 'LGA1700', value: 'LGA1700' as CpuSocket },
-  { title: 'LGA1200', value: 'LGA1200' as CpuSocket },
-  { title: 'LGA1151', value: 'LGA1151' as CpuSocket },
-  { title: 'LGA2066', value: 'LGA2066' as CpuSocket },
-  { title: 'AM5', value: 'AM5' as CpuSocket },
-  { title: 'AM4', value: 'AM4' as CpuSocket },
-  { title: 'sTRX4', value: 'sTRX4' as CpuSocket },
-  { title: 'TR4', value: 'TR4' as CpuSocket }
+  { label: 'LGA1700', value: 'LGA1700' as CpuSocket },
+  { label: 'LGA1200', value: 'LGA1200' as CpuSocket },
+  { label: 'LGA1151', value: 'LGA1151' as CpuSocket },
+  { label: 'LGA2066', value: 'LGA2066' as CpuSocket },
+  { label: 'AM5', value: 'AM5' as CpuSocket },
+  { label: 'AM4', value: 'AM4' as CpuSocket },
+  { label: 'sTRX4', value: 'sTRX4' as CpuSocket },
+  { label: 'TR4', value: 'TR4' as CpuSocket }
 ];
 
 const localProduct = ref<Partial<CpuProductRequest>>({
