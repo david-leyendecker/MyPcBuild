@@ -21,7 +21,10 @@
           </p>
         </div>
         <n-button text @click="$router.back()">
-          ← Back
+          <template #icon>
+            <n-icon :component="Icons.ArrowBack" />
+          </template>
+          Back
         </n-button>
       </n-flex>
 

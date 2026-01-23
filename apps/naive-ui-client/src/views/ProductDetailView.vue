@@ -11,23 +11,35 @@
             type="primary"
             @click="enterEditMode"
           >
-            ✏️ Edit Product
+            <template #icon>
+              <n-icon :component="Icons.Pencil" />
+            </template>
+            Edit Product
           </n-button>
           <n-button
             text
             @click="$router.push('/catalog')"
           >
-            ← Back to Catalog
+            <template #icon>
+              <n-icon :component="Icons.ArrowBack" />
+            </template>
+            Back to Catalog
           </n-button>
         </n-flex>
       </n-flex>
 
       <n-alert v-if="product?.isDraft" type="warning">
-        ⚠️ This product is a draft and cannot be added to builds until published.
+        <template #icon>
+          <n-icon :component="Icons.Warning" />
+        </template>
+        This product is a draft and cannot be added to builds until published.
       </n-alert>
 
       <n-alert v-if="isEditMode" type="info">
-        ✏️ You are editing this product. Make your changes and click "Save Changes" to update.
+        <template #icon>
+          <n-icon :component="Icons.Info" />
+        </template>
+        You are editing this product. Make your changes and click "Save Changes" to update.
       </n-alert>
 
       <n-card v-if="isLoading" style="padding: 32px;">
@@ -115,7 +127,10 @@
               text
               @click="isEditMode ? cancelEdit() : $router.push('/catalog')"
             >
-              {{ isEditMode ? '← Cancel' : '← Back to Catalog' }}
+              <template #icon>
+                <n-icon :component="Icons.ArrowBack" />
+              </template>
+              {{ isEditMode ? 'Cancel' : 'Back to Catalog' }}
             </n-button>
 
             <n-flex :gap="8">
@@ -125,7 +140,10 @@
                 :loading="isUpdating"
                 @click="saveProduct"
               >
-                💾 Save Changes
+                <template #icon>
+                  <n-icon :component="Icons.Save" />
+                </template>
+                Save Changes
               </n-button>
 
               <n-button
@@ -134,7 +152,10 @@
                 :loading="isPublishing"
                 @click="publishProduct"
               >
-                ✓ Publish Product
+                <template #icon>
+                  <n-icon :component="Icons.CheckCircle" />
+                </template>
+                Publish Product
               </n-button>
             </n-flex>
           </n-flex>
@@ -147,12 +168,13 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { NCard, NButton, NInput, NInputNumber, NAlert, NFlex, NDivider, NSpin } from 'naive-ui';
+import { NCard, NButton, NInput, NInputNumber, NAlert, NFlex, NDivider, NSpin, NIcon } from 'naive-ui';
 import { catalogApi } from '@/api/catalog';
 import { getTypedProduct, updateTypedProduct } from '@/api/catalogTyped';
 import ProductFormSelector from '@/components/ProductFormSelector.vue';
 import ProductViewer3D from '@/components/ProductViewer3D.vue';
 import type { ProductRequest, ProductResponse } from '@/types/products';
+import { Icons } from '@/utils/icons';
 
 const route = useRoute();
 const router = useRouter();

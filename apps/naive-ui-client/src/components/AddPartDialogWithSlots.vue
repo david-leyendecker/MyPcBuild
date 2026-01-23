@@ -51,7 +51,7 @@
               <h4 style="font-size: 16px; margin-bottom: 4px;">{{ product.name }}</h4>
               <p style="color: var(--n-color-success); font-weight: 600; font-size: 14px; margin: 0;">${{ product.price.toFixed(2) }}</p>
             </div>
-            <span>→</span>
+            <n-icon :component="Icons.ArrowForward" />
           </n-flex>
         </div>
       </div>

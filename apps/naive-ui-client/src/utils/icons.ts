@@ -37,7 +37,8 @@ import {
   PencilOutline,
   SearchOutline,
   SunnyOutline,
-  MoonOutline
+  MoonOutline,
+  RefreshOutline
 } from '@vicons/ionicons5';
 
 export const Icons = {
@@ -75,7 +76,8 @@ export const Icons = {
   Pencil: PencilOutline,
   SearchIcon: SearchOutline,
   Sun: SunnyOutline,
-  Moon: MoonOutline
+  Moon: MoonOutline,
+  Refresh: RefreshOutline
 };
 
 export type IconName = keyof typeof Icons;

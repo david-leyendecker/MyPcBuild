@@ -8,7 +8,7 @@
     >
       <n-tooltip>
         <template #trigger>
-          <span>☷</span>
+          <n-icon :component="Icons.Grid" />
         </template>
         Toggle Grid
       </n-tooltip>
@@ -23,7 +23,7 @@
     >
       <n-tooltip>
         <template #trigger>
-          <span>⚏</span>
+          <n-icon :component="Icons.Expand" />
         </template>
         Toggle Axes
       </n-tooltip>
@@ -36,7 +36,7 @@
     >
       <n-tooltip>
         <template #trigger>
-          <span>↻</span>
+          <n-icon :component="Icons.Refresh" />
         </template>
         Reset View
       </n-tooltip>
@@ -45,7 +45,8 @@
 </template>
 
 <script setup lang="ts">
-import { NButton, NTooltip } from 'naive-ui';
+import { NButton, NTooltip, NIcon } from 'naive-ui';
+import { Icons } from '@/utils/icons';
 
 interface Props {
   showGrid: boolean;

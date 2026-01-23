@@ -50,7 +50,7 @@
               <h4 style="font-size: 16px; margin-bottom: 4px;">{{ product.name }}</h4>
               <p style="color: #18a058; font-weight: 600; font-size: 14px;">${{ product.price.toFixed(2) }}</p>
             </div>
-            <span>→</span>
+            <n-icon :component="Icons.ArrowForward" />
           </n-flex>
         </div>
       </n-flex>
@@ -66,9 +66,10 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
-import { NInput, NButton, NFlex, NSpin, NScrollbar, NEmpty } from 'naive-ui';
+import { NInput, NButton, NFlex, NSpin, NScrollbar, NEmpty, NIcon } from 'naive-ui';
 import { useCatalogStore } from '@/stores/catalogStore';
 import { ProductCategory, categoryLabels, getCategoryFromBackend } from '@/api/catalog';
+import { Icons } from '@/utils/icons';
 
 const emit = defineEmits<{
   'part-selected': [productId: string];

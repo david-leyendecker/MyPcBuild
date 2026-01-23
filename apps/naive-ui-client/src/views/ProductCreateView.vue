@@ -66,8 +66,12 @@
                 type="primary"
                 :disabled="!creationMode"
                 @click="nextStep"
+                icon-placement="right"
               >
-                Continue →
+                <template #icon>
+                  <n-icon :component="Icons.ArrowForward" />
+                </template>
+                Continue
               </n-button>
             </n-flex>
           </div>
