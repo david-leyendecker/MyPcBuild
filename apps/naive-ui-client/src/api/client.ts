@@ -4,14 +4,8 @@ import axios, { type AxiosInstance } from 'axios';
 const httpsUrl = import.meta.env.services__apiservice__https__0;
 const httpUrl = import.meta.env.services__apiservice__http__0;
 
-// Prefer HTTPS, fallback to HTTP, or throw error if neither is available
-const serviceUrl = httpsUrl || httpUrl;
-
-if (!serviceUrl) {
-  throw new Error(
-    'API service URL not found. Please ensure either services__apiservice__https__0 or services__apiservice__http__0 environment variable is set.'
-  );
-}
+// Prefer HTTPS, fallback to HTTP, or use dev default
+const serviceUrl = httpsUrl || httpUrl || 'http://localhost:5000';
 
 const baseURL = `${serviceUrl}/api`;
 
