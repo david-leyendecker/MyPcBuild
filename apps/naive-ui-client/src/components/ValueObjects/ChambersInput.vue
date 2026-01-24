@@ -58,57 +58,21 @@
           </div>
 
           <div style="margin-bottom: 12px;">
-            <label style="font-size: 12px; font-weight: 600; display: block; margin-bottom: 4px;">Chamber Position (mm)</label>
-            <n-flex :size="8">
-              <n-input-number
-                v-model:value="chamber.relativePosition.x"
-                placeholder="X"
-                :readonly="!editable"
-                style="flex: 1; min-width: 80px;"
-                @update:value="emitUpdate"
-              />
-              <n-input-number
-                v-model:value="chamber.relativePosition.y"
-                placeholder="Y"
-                :readonly="!editable"
-                style="flex: 1; min-width: 80px;"
-                @update:value="emitUpdate"
-              />
-              <n-input-number
-                v-model:value="chamber.relativePosition.z"
-                placeholder="Z"
-                :readonly="!editable"
-                style="flex: 1; min-width: 80px;"
-                @update:value="emitUpdate"
-              />
-            </n-flex>
+            <Vector3Input
+              v-model:modelValue="chamber.relativePosition"
+              :editable="editable"
+              label="Chamber Position (mm)"
+              @update:modelValue="emitUpdate"
+            />
           </div>
 
           <div style="margin-bottom: 12px;">
             <label style="font-size: 12px; font-weight: 600; display: block; margin-bottom: 4px;">Chamber Dimensions (mm)</label>
-            <n-flex :size="8">
-              <n-input-number
-                v-model:value="chamber.dimensions.length"
-                placeholder="Length"
-                :readonly="!editable"
-                style="flex: 1; min-width: 80px;"
-                @update:value="emitUpdate"
-              />
-              <n-input-number
-                v-model:value="chamber.dimensions.width"
-                placeholder="Width"
-                :readonly="!editable"
-                style="flex: 1; min-width: 80px;"
-                @update:value="emitUpdate"
-              />
-              <n-input-number
-                v-model:value="chamber.dimensions.height"
-                placeholder="Height"
-                :readonly="!editable"
-                style="flex: 1; min-width: 80px;"
-                @update:value="emitUpdate"
-              />
-            </n-flex>
+            <DimensionsInput
+              v-model:modelValue="chamber.dimensions"
+              :editable="editable"
+              @update:modelValue="emitUpdate"
+            />
           </div>
 
           <SlotsInput
@@ -125,7 +89,9 @@
 
 <script setup lang="ts">
 import { ref, watch } from 'vue';
-import { NButton, NCard, NCollapse, NCollapseItem, NFlex, NInput, NInputNumber, NIcon } from 'naive-ui';
+import { NButton, NCard, NCollapse, NCollapseItem, NFlex, NInput, NIcon } from 'naive-ui';
+import Vector3Input from './Vector3Input.vue';
+import DimensionsInput from './DimensionsInput.vue';
 import type { Chamber } from '@/types/products';
 import SlotsInput from './SlotsInput.vue';
 import { Icons } from '@/utils/icons';

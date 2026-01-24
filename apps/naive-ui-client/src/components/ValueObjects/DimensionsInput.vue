@@ -1,6 +1,7 @@
 <template>
   <div class="dimensions-input">
-    <n-flex :size="12">
+    <n-input-group>
+      <n-input-group-label>Length</n-input-group-label>
       <n-input-number 
         :value="dimensions.length"
         @update:value="updateLength"
@@ -10,6 +11,7 @@
       >
         <template #suffix>mm</template>
       </n-input-number>
+      <n-input-group-label>Width</n-input-group-label>
       <n-input-number 
         :value="dimensions.width"
         @update:value="updateWidth"
@@ -19,6 +21,7 @@
       >
         <template #suffix>mm</template>
       </n-input-number>
+      <n-input-group-label>Height</n-input-group-label>
       <n-input-number 
         :value="dimensions.height"
         @update:value="updateHeight"
@@ -28,13 +31,13 @@
       >
         <template #suffix>mm</template>
       </n-input-number>
-    </n-flex>
+    </n-input-group>
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import { NInputNumber, NFlex } from 'naive-ui';
+import { NInputNumber, NInputGroup, NInputGroupLabel } from 'naive-ui';
 import type { Dimensions } from '@/types/products';
 
 interface Props {

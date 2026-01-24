@@ -67,84 +67,30 @@
           </n-flex>
 
           <div style="margin-bottom: 12px;">
-            <label style="font-size: 12px; font-weight: 600; display: block; margin-bottom: 4px;">Relative Position (mm)</label>
-            <n-flex :size="8">
-              <n-input-number
-                v-model:value="slot.relativePosition.x"
-                placeholder="X"
-                :readonly="!editable"
-                style="flex: 1; min-width: 80px;"
-                @update:value="emitUpdate"
-              />
-              <n-input-number
-                v-model:value="slot.relativePosition.y"
-                placeholder="Y"
-                :readonly="!editable"
-                style="flex: 1; min-width: 80px;"
-                @update:value="emitUpdate"
-              />
-              <n-input-number
-                v-model:value="slot.relativePosition.z"
-                placeholder="Z"
-                :readonly="!editable"
-                style="flex: 1; min-width: 80px;"
-                @update:value="emitUpdate"
-              />
-            </n-flex>
+            <Vector3Input
+              v-model:modelValue="slot.relativePosition"
+              :editable="editable"
+              label="Relative Position (mm)"
+              @update:modelValue="emitUpdate"
+            />
           </div>
 
           <div style="margin-bottom: 12px;">
             <label style="font-size: 12px; font-weight: 600; display: block; margin-bottom: 4px;">Max Dimensions (mm)</label>
-            <n-flex :size="8">
-              <n-input-number
-                v-model:value="slot.maxDimensions.length"
-                placeholder="Length"
-                :readonly="!editable"
-                style="flex: 1; min-width: 80px;"
-                @update:value="emitUpdate"
-              />
-              <n-input-number
-                v-model:value="slot.maxDimensions.width"
-                placeholder="Width"
-                :readonly="!editable"
-                style="flex: 1; min-width: 80px;"
-                @update:value="emitUpdate"
-              />
-              <n-input-number
-                v-model:value="slot.maxDimensions.height"
-                placeholder="Height"
-                :readonly="!editable"
-                style="flex: 1; min-width: 80px;"
-                @update:value="emitUpdate"
-              />
-            </n-flex>
+            <DimensionsInput
+              v-model:modelValue="slot.maxDimensions"
+              :editable="editable"
+              @update:modelValue="emitUpdate"
+            />
           </div>
 
           <div>
-            <label style="font-size: 12px; font-weight: 600; display: block; margin-bottom: 4px;">Rotation (degrees, optional)</label>
-            <n-flex :size="8">
-              <n-input-number
-                :value="slot.rotation?.x ?? 0"
-                @update:value="updateRotation(slot, 'x', $event)"
-                placeholder="X (Pitch)"
-                :readonly="!editable"
-                style="flex: 1; min-width: 80px;"
-              />
-              <n-input-number
-                :value="slot.rotation?.y ?? 0"
-                @update:value="updateRotation(slot, 'y', $event)"
-                placeholder="Y (Yaw)"
-                :readonly="!editable"
-                style="flex: 1; min-width: 80px;"
-              />
-              <n-input-number
-                :value="slot.rotation?.z ?? 0"
-                @update:value="updateRotation(slot, 'z', $event)"
-                placeholder="Z (Roll)"
-                :readonly="!editable"
-                style="flex: 1; min-width: 80px;"
-              />
-            </n-flex>
+            <RotationInput
+              v-model:modelValue="slot.rotation"
+              :editable="editable"
+              label="Rotation (degrees, optional)"
+              @update:modelValue="emitUpdate"
+            />
           </div>
         </n-card>
       </n-collapse-item>
@@ -154,7 +100,10 @@
 
 <script setup lang="ts">
 import { ref, watch } from 'vue';
-import { NButton, NCard, NCollapse, NCollapseItem, NFlex, NInput, NSelect, NInputNumber, NIcon } from 'naive-ui';
+import { NButton, NCard, NCollapse, NCollapseItem, NFlex, NInput, NSelect, NIcon } from 'naive-ui';
+import Vector3Input from './Vector3Input.vue';
+import RotationInput from './RotationInput.vue';
+import DimensionsInput from './DimensionsInput.vue';
 import type { Slot } from '@/types/products';
 import { Icons } from '@/utils/icons';
 
@@ -195,6 +144,7 @@ const localSlots = ref<Slot[]>(props.modelValue.map(slot => ({
   maxDimensions: slot.maxDimensions || { ...DEFAULT_DIMENSIONS },
   rotation: slot.rotation ? { ...slot.rotation } : { ...DEFAULT_ROTATION }
 })));
+
 const expandedNames = ref<(number | string)[]>(props.modelValue.map((_, index) => index));
 
 watch(
@@ -229,14 +179,6 @@ function removeSlot(index: number) {
   expandedNames.value = expandedNames.value
     .filter(name => name !== index)
     .map(name => (typeof name === 'number' && name > index ? name - 1 : name));
-  emitUpdate();
-}
-
-function updateRotation(slot: Slot, axis: 'x' | 'y' | 'z', value: number | null) {
-  if (!slot.rotation) {
-    slot.rotation = { ...DEFAULT_ROTATION };
-  }
-  slot.rotation[axis] = value || 0;
   emitUpdate();
 }
 

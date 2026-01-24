@@ -71,7 +71,7 @@ const props = withDefaults(defineProps<Props>(), {
   showHeader: true
 });
 
-const { isPopoutOpen, openPopout } = use3DPopout();
+const { isPopoutOpen, openPopout, updatePopoutProps } = use3DPopout();
 
 async function openInPopout() {
   openPopout({
@@ -150,6 +150,15 @@ onUnmounted(() => {
 
 watch(() => [props.dimensions, props.slots, props.chambers], () => {
   updateVisualization();
+  // Keep popout viewer props in sync when open
+  if (!props.inPopout && isPopoutOpen.value) {
+    updatePopoutProps({
+      dimensions: props.dimensions,
+      slots: props.slots,
+      chambers: props.chambers,
+      title: props.title
+    });
+  }
 }, { deep: true });
 
 watch(showGrid, (value) => {

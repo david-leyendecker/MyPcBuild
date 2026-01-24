@@ -70,7 +70,7 @@ const props = withDefaults(defineProps<Props>(), {
   showHeader: true
 });
 
-const { isPopoutOpen, openPopout } = use3DPopout();
+const { isPopoutOpen, openPopout, updatePopoutProps } = use3DPopout();
 
 const containerRef = ref<HTMLDivElement | null>(null);
 const canvasRef = ref<HTMLCanvasElement | null>(null);
@@ -130,10 +130,23 @@ onUnmounted(() => {
 
 watch(() => props.parts, () => {
   updateScene();
+  if (!props.inPopout && isPopoutOpen.value) {
+    updatePopoutProps({
+      parts: props.parts,
+      collisions: props.collisions,
+      title: props.title
+    });
+  }
 }, { deep: true });
 
 watch(() => props.collisions, () => {
   highlightCollisions();
+  if (!props.inPopout && isPopoutOpen.value) {
+    updatePopoutProps({
+      collisions: props.collisions,
+      title: props.title
+    });
+  }
 }, { deep: true });
 
 function initScene() {

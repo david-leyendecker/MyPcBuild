@@ -117,24 +117,11 @@
         </div>
 
         <div v-if="selectedSlotId">
-          <h5 style="font-size: 14px; margin-bottom: 8px; font-weight: 600;">Position (optional)</h5>
-          <n-flex :size="8">
-            <n-input-number
-              v-model:value="position.x"
-              placeholder="X (mm)"
-              style="flex: 1;"
-            />
-            <n-input-number
-              v-model:value="position.y"
-              placeholder="Y (mm)"
-              style="flex: 1;"
-            />
-            <n-input-number
-              v-model:value="position.z"
-              placeholder="Z (mm)"
-              style="flex: 1;"
-            />
-          </n-flex>
+          <Vector3Input
+            v-model:modelValue="position"
+            label="Position (optional)"
+            :placeholders="{ x: 'X (mm)', y: 'Y (mm)', z: 'Z (mm)' }"
+          />
         </div>
       </div>
 
@@ -195,7 +182,8 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue';
-import { NFlex, NButton, NInput, NSpin, NCard, NTag, NInputNumber, NEmpty, NIcon } from 'naive-ui';
+import { NFlex, NButton, NInput, NSpin, NCard, NTag, NEmpty, NIcon } from 'naive-ui';
+import Vector3Input from './ValueObjects/Vector3Input.vue';
 import { useCatalogStore } from '@/stores/catalogStore';
 import { ProductCategory, categoryLabels, getCategoryFromBackend } from '@/api/catalog';
 import { buildsApi, type AvailableSlot } from '@/api/builds';
