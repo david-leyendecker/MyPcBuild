@@ -1,74 +1,47 @@
 <template>
   <n-form>
-    <!-- CPU Socket -->
-    <n-form-item label="CPU Socket">
-      <n-select 
-        v-model:value="localProduct.socket"
-        :options="socketOptions"
-        placeholder="Select socket"
-        :disabled="!editable"
-      />
-    </n-form-item>
+    <n-grid :cols="2">
+      <!-- CPU Socket -->
+      <n-form-item-gi label="CPU Socket" :span="2">
+        <n-select v-model:value="localProduct.socket" :options="socketOptions" placeholder="Select socket"
+          :disabled="!editable" />
+      </n-form-item-gi>
 
-    <!-- Cores and Threads -->
-    <n-grid :cols="2" :x-gap="12">
-      <n-form-item label="Cores">
-        <n-input-number 
-          v-model:value="localProduct.cores"
-          placeholder="Number of cores"
-          :readonly="!editable"
-          style="width: 100%;"
-        />
-      </n-form-item>
-      <n-form-item label="Threads">
-        <n-input-number 
-          v-model:value="localProduct.threads"
-          placeholder="Number of threads"
-          :readonly="!editable"
-          style="width: 100%;"
-        />
-      </n-form-item>
+      <!-- Cores and Threads -->
+      <n-form-item-gi label="Cores">
+        <n-input-number v-model:value="localProduct.cores" placeholder="Number of cores" :readonly="!editable" />
+      </n-form-item-gi>
+      <n-form-item-gi label="Threads">
+        <n-input-number v-model:value="localProduct.threads" placeholder="Number of threads" :readonly="!editable" />
+      </n-form-item-gi>
+
+      <!-- Base Clock and Boost Clock -->
+      <n-form-item-gi label="Base Clock">
+        <FrequencyInput v-model="localProduct.baseClock" :editable="editable" />
+      </n-form-item-gi>
+      <n-form-item-gi label="Boost Clock">
+        <FrequencyInput v-model="localProduct.boostClock" :editable="editable" />
+      </n-form-item-gi>
+
+
+      <!-- TDP -->
+      <n-form-item-gi label="TDP (Thermal Design Power)">
+        <PowerInput v-model="localProduct.tdp" :editable="editable" />
+      </n-form-item-gi>
+
+      <!-- Integrated Graphics -->
+      <n-form-item-gi label="Integrated Graphics">
+        <n-checkbox v-model:checked="localProduct.integratedGraphics" :disabled="!editable">
+          Has Integrated Graphics
+        </n-checkbox>
+      </n-form-item-gi>
     </n-grid>
-
-    <!-- Base Clock and Boost Clock -->
-    <n-grid :cols="2" :x-gap="12">
-      <n-form-item label="Base Clock">
-        <FrequencyInput 
-          v-model="localProduct.baseClock"
-          :editable="editable"
-        />
-      </n-form-item>
-      <n-form-item label="Boost Clock">
-        <FrequencyInput 
-          v-model="localProduct.boostClock"
-          :editable="editable"
-        />
-      </n-form-item>
-    </n-grid>
-
-    <!-- TDP -->
-    <n-form-item label="TDP (Thermal Design Power)">
-      <PowerInput 
-        v-model="localProduct.tdp"
-        :editable="editable"
-      />
-    </n-form-item>
-
-    <!-- Integrated Graphics -->
-    <n-form-item label="Integrated Graphics">
-      <n-checkbox 
-        v-model:checked="localProduct.integratedGraphics"
-        :disabled="!editable"
-      >
-        Has Integrated Graphics
-      </n-checkbox>
-    </n-form-item>
   </n-form>
 </template>
 
 <script setup lang="ts">
 import { ref, watch } from 'vue';
-import { NForm, NFormItem, NGrid, NSelect, NInputNumber, NCheckbox } from 'naive-ui';
+import { NForm, NFormItemGi, NGrid, NSelect, NInputNumber, NCheckbox } from 'naive-ui';
 import type { CpuProductRequest, CpuProductResponse, CpuSocket } from '@/types/products';
 import FrequencyInput from '@/components/ValueObjects/FrequencyInput.vue';
 import PowerInput from '@/components/ValueObjects/PowerInput.vue';

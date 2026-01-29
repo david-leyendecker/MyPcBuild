@@ -1,12 +1,8 @@
 <template>
-  <div>
-    <n-flex justify="space-between" align="center" style="margin-bottom: 12px;">
-      <label style="font-weight: 600; font-size: 14px;">{{ label }}</label>
-      <n-button
-        v-if="editable"
-        size="small"
-        @click="addSlot"
-      >
+  <n-flex vertical>
+    <n-flex justify="space-between" align="center">
+      <n-text>{{ label }}</n-text>
+      <n-button v-if="editable" size="small" @click="addSlot">
         <template #icon>
           <n-icon :component="Icons.Add" />
         </template>
@@ -14,32 +10,16 @@
       </n-button>
     </n-flex>
 
-    <div v-if="localSlots.length === 0" style="text-align: center; padding: 16px 0; opacity: 0.6;">
-      <p style="font-size: 14px;">No slots defined</p>
-    </div>
+    <n-empty v-if="localSlots.length === 0" description="No slots defined" />
 
-    <n-collapse
-      v-else
-      :expanded-names="expandedNames"
-      @update:expanded-names="handleExpandedChange"
-    >
-      <n-collapse-item
-        v-for="(slot, index) in localSlots"
-        :key="index"
-        :name="index"
-      >
+    <n-collapse v-else :expanded-names="expandedNames" @update:expanded-names="handleExpandedChange">
+      <n-collapse-item v-for="(slot, index) in localSlots" :key="index" :name="index">
         <template #header>
           <n-flex justify="space-between" align="center" :size="8" style="width: 100%;">
-            <span style="font-weight: 600; font-size: 14px;">
+            <n-text>
               Slot {{ index + 1 }} — {{ slot.name || 'Unnamed' }} ({{ slot.allowedCategory || 'Unknown' }})
-            </span>
-            <n-button
-              v-if="editable"
-              size="small"
-              text
-              type="error"
-              @click.stop="removeSlot(index)"
-            >
+            </n-text>
+            <n-button v-if="editable" size="small" text type="error" @click.stop="removeSlot(index)">
               <template #icon>
                 <n-icon :component="Icons.Trash" />
               </template>
@@ -48,59 +28,41 @@
         </template>
 
         <n-card :bordered="true" size="small">
-          <n-flex :size="12" style="margin-bottom: 12px;">
-            <n-input
-              v-model:value="slot.name"
-              placeholder="Slot Name *"
-              :readonly="!editable"
-              style="flex: 1; min-width: 150px;"
-              @update:value="emitUpdate"
-            />
-            <n-select
-              v-model:value="slot.allowedCategory"
-              :options="categoryOptions"
-              placeholder="Allowed Category *"
-              :disabled="!editable"
-              style="flex: 1; min-width: 150px;"
-              @update:value="emitUpdate"
-            />
+          <n-flex vertical>
+
+            <n-form-item label="Slot Name">
+              <n-input v-model:value="slot.name" placeholder="Slot Name *" :readonly="!editable"
+                @update:value="emitUpdate" />
+            </n-form-item>
+
+            <n-form-item label="Allowed Category">
+              <n-select v-model:value="slot.allowedCategory" :options="categoryOptions" :disabled="!editable"
+                @update:value="emitUpdate" />
+            </n-form-item>
+
+            <n-form-item label="Relative Position (mm)">
+              <Vector3Input v-model:modelValue="slot.relativePosition" :editable="editable"
+                @update:modelValue="emitUpdate" />
+            </n-form-item>
+
+            <n-form-item label="Max Dimensions (mm)">
+              <DimensionsInput v-model:modelValue="slot.maxDimensions" :editable="editable"
+                @update:modelValue="emitUpdate" />
+            </n-form-item>
+
+            <n-form-item label="Rotation (degrees, optional)">
+              <RotationInput v-model:modelValue="slot.rotation" :editable="editable" @update:modelValue="emitUpdate" />
+            </n-form-item>
           </n-flex>
-
-          <div style="margin-bottom: 12px;">
-            <Vector3Input
-              v-model:modelValue="slot.relativePosition"
-              :editable="editable"
-              label="Relative Position (mm)"
-              @update:modelValue="emitUpdate"
-            />
-          </div>
-
-          <div style="margin-bottom: 12px;">
-            <label style="font-size: 12px; font-weight: 600; display: block; margin-bottom: 4px;">Max Dimensions (mm)</label>
-            <DimensionsInput
-              v-model:modelValue="slot.maxDimensions"
-              :editable="editable"
-              @update:modelValue="emitUpdate"
-            />
-          </div>
-
-          <div>
-            <RotationInput
-              v-model:modelValue="slot.rotation"
-              :editable="editable"
-              label="Rotation (degrees, optional)"
-              @update:modelValue="emitUpdate"
-            />
-          </div>
         </n-card>
       </n-collapse-item>
     </n-collapse>
-  </div>
+  </n-flex>
 </template>
 
 <script setup lang="ts">
 import { ref, watch } from 'vue';
-import { NButton, NCard, NCollapse, NCollapseItem, NFlex, NInput, NSelect, NIcon } from 'naive-ui';
+import { NText, NButton, NCard, NCollapse, NCollapseItem, NFlex, NInput, NSelect, NIcon, NEmpty, NFormItem } from 'naive-ui';
 import Vector3Input from './Vector3Input.vue';
 import RotationInput from './RotationInput.vue';
 import DimensionsInput from './DimensionsInput.vue';

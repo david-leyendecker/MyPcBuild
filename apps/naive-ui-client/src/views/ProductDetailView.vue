@@ -1,11 +1,11 @@
 <template>
   <div class="fade-in">
-    <n-flex vertical :gap="16">
-      <n-flex justify="space-between" align="center" style="flex-direction: row;">
-        <h2 class="text-h4">
+    <n-flex vertical>
+      <n-flex justify="space-between" align="center">
+        <n-h2>
           {{ isEditMode ? 'Edit Product' : (product?.isDraft ? 'Review Draft Product' : 'Product Details') }}
-        </h2>
-        <n-flex :gap="8">
+        </n-h2>
+        <n-flex align="center">
           <n-button
             v-if="!isEditMode && !product?.isDraft"
             type="primary"
@@ -43,9 +43,9 @@
       </n-alert>
 
       <n-card v-if="isLoading" style="padding: 32px;">
-        <div style="display: flex; justify-content: center;">
+        <n-flex justify="center">
           <n-spin></n-spin>
-        </div>
+        </n-flex>
       </n-card>
 
       <n-card v-else-if="error">
@@ -55,56 +55,34 @@
       </n-card>
 
       <n-card v-else-if="product">
-        <n-flex vertical :gap="12">
-          <div>
-            <h3 class="text-h5" style="margin-bottom: 12px;">Basic Information</h3>
+        <n-flex vertical>
+          <n-flex vertical>
+            <n-h3>Basic Information</n-h3>
 
-            <n-flex vertical :gap="12">
-              <n-input
-                v-model:value="formData.name"
-                :disabled="!isEditMode"
-              >
-                <template #prefix>Product Name *</template>
-              </n-input>
+            <n-form :model="formData" label-placement="top" :disabled="!isEditMode">
+                <n-form-item label="Product Name" required path="name">
+                  <n-input v-model:value="formData.name" />
+                </n-form-item>
+                <n-form-item label="Manufacturer" required path="manufacturer">
+                  <n-input v-model:value="formData.manufacturer" />
+                </n-form-item>
+                <n-form-item label="Price ($)" required path="price">
+                  <n-input-number v-model:value="formData.price" />
+                </n-form-item>
+            </n-form>
+          </n-flex>
 
-              <n-input
-                v-model:value="formData.manufacturer"
-                :disabled="!isEditMode"
-              >
-                <template #prefix>Manufacturer *</template>
-              </n-input>
+          <n-flex vertical>
+            <n-h3>Details</n-h3>
 
-              <n-input-number
-                v-model:value="formData.price"
-                :disabled="!isEditMode"
-              >
-                <template #prefix>Price * ($)</template>
-              </n-input-number>
-
-              <n-input
-                v-model:value="formData.category"
-                disabled
-              >
-                <template #prefix>Category</template>
-              </n-input>
-            </n-flex>
-          </div>
-
-          <n-divider></n-divider>
-
-          <div>
-            <h3 class="text-h5" style="margin-bottom: 12px;">{{ formData.category }} Details</h3>
-
-            <!-- Use ProductFormSelector -->
             <ProductFormSelector
               v-model="productFormData"
               :category="formData.category"
               :editable="isEditMode"
             />
-          </div>
+          </n-flex>
 
-          <!-- 3D Preview for products with spatial data -->
-          <div v-if="hasSpatialData">
+          <n-flex v-if="hasSpatialData" vertical>
             <n-divider></n-divider>
 
             <ProductViewer3D
@@ -112,7 +90,7 @@
               :slots="(productFormData as any).slots"
               :chambers="(productFormData as any).chambers"
             />
-          </div>
+          </n-flex>
 
           <n-alert v-if="publishError || updateError" type="error">
             {{ publishError || updateError }}
@@ -122,7 +100,7 @@
             {{ publishSuccess ? 'Product successfully published!' : 'Product successfully updated!' }}
           </n-alert>
 
-          <n-flex justify="space-between" style="margin-top: 16px;">
+          <n-flex justify="space-between" align="center">
             <n-button
               text
               @click="isEditMode ? cancelEdit() : $router.push('/catalog')"
@@ -133,7 +111,7 @@
               {{ isEditMode ? 'Cancel' : 'Back to Catalog' }}
             </n-button>
 
-            <n-flex :gap="8">
+            <n-flex align="center">
               <n-button
                 v-if="isEditMode"
                 type="primary"
@@ -168,7 +146,7 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { NCard, NButton, NInput, NInputNumber, NAlert, NFlex, NDivider, NSpin, NIcon } from 'naive-ui';
+import { NH2, NH3, NCard, NButton, NInput, NInputNumber, NAlert, NFlex, NDivider, NSpin, NIcon, NForm, NFormItem, NText } from 'naive-ui';
 import { catalogApi } from '@/api/catalog';
 import { getTypedProduct, updateTypedProduct } from '@/api/catalogTyped';
 import ProductFormSelector from '@/components/ProductFormSelector.vue';

@@ -117,11 +117,12 @@
         </div>
 
         <div v-if="selectedSlotId">
-          <Vector3Input
-            v-model:modelValue="position"
-            label="Position (optional)"
-            :placeholders="{ x: 'X (mm)', y: 'Y (mm)', z: 'Z (mm)' }"
-          />
+          <n-form-item label="Position (optional)">
+            <Vector3Input
+              v-model:modelValue="position"
+              :placeholders="{ x: 'X (mm)', y: 'Y (mm)', z: 'Z (mm)' }"
+            />
+          </n-form-item>
         </div>
       </div>
 
@@ -182,7 +183,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue';
-import { NFlex, NButton, NInput, NSpin, NCard, NTag, NEmpty, NIcon } from 'naive-ui';
+import { NFlex, NButton, NInput, NSpin, NCard, NTag, NEmpty, NIcon, NFormItem } from 'naive-ui';
 import Vector3Input from './ValueObjects/Vector3Input.vue';
 import { useCatalogStore } from '@/stores/catalogStore';
 import { ProductCategory, categoryLabels, getCategoryFromBackend } from '@/api/catalog';

@@ -1,12 +1,8 @@
 <template>
-  <div>
-    <n-flex justify="space-between" align="center" style="margin-bottom: 12px;">
-      <label style="font-weight: 600; font-size: 14px;">Chambers</label>
-      <n-button
-        v-if="editable"
-        size="small"
-        @click="addChamber"
-      >
+  <n-flex vertical style="width: 100%;" :size="12">
+    <n-flex justify="space-between" align="center">
+      <n-text depth="1">Chambers</n-text>
+      <n-button v-if="editable" size="small" @click="addChamber">
         <template #icon>
           <n-icon :component="Icons.Add" />
         </template>
@@ -14,32 +10,16 @@
       </n-button>
     </n-flex>
 
-    <div v-if="localChambers.length === 0" style="text-align: center; padding: 16px 0; opacity: 0.6;">
-      <p style="font-size: 14px;">No chambers defined</p>
-    </div>
+    <n-empty v-if="localChambers.length === 0" description="No chambers defined" />
 
-    <n-collapse
-      v-else
-      :expanded-names="expandedNames"
-      @update:expanded-names="handleExpandedChange"
-    >
-      <n-collapse-item
-        v-for="(chamber, index) in localChambers"
-        :key="index"
-        :name="index"
-      >
+    <n-collapse v-else :expanded-names="expandedNames" @update:expanded-names="handleExpandedChange">
+      <n-collapse-item v-for="(chamber, index) in localChambers" :key="index" :name="index">
         <template #header>
-          <n-flex justify="space-between" align="center" :size="8" style="width: 100%;">
-            <span style="font-weight: 600; font-size: 14px;">
+          <n-flex justify="space-between" align="center" style="width: 100%;">
+            <n-text depth="3">
               Chamber {{ index + 1 }} — {{ chamber.name || 'Unnamed' }}
-            </span>
-            <n-button
-              v-if="editable"
-              size="small"
-              text
-              type="error"
-              @click.stop="removeChamber(index)"
-            >
+            </n-text>
+            <n-button v-if="editable" size="small" text type="error" @click.stop="removeChamber(index)">
               <template #icon>
                 <n-icon :component="Icons.Trash" />
               </template>
@@ -48,48 +28,34 @@
         </template>
 
         <n-card :bordered="true" size="small">
-          <div style="margin-bottom: 12px;">
-            <n-input
-              v-model:value="chamber.name"
-              placeholder="Chamber Name *"
-              :readonly="!editable"
-              @update:value="emitUpdate"
-            />
-          </div>
+          <n-flex vertical>
+            <n-form-item label="Chamber Name">
+              <n-input v-model:value="chamber.name" placeholder="Chamber Name *" :readonly="!editable"
+                @update:value="emitUpdate" />
+            </n-form-item>
 
-          <div style="margin-bottom: 12px;">
-            <Vector3Input
-              v-model:modelValue="chamber.relativePosition"
-              :editable="editable"
-              label="Chamber Position (mm)"
-              @update:modelValue="emitUpdate"
-            />
-          </div>
+            <n-form-item label="Chamber Position (mm)">
+              <Vector3Input v-model:modelValue="chamber.relativePosition" :editable="editable"
+                @update:modelValue="emitUpdate" />
+            </n-form-item>
 
-          <div style="margin-bottom: 12px;">
-            <label style="font-size: 12px; font-weight: 600; display: block; margin-bottom: 4px;">Chamber Dimensions (mm)</label>
-            <DimensionsInput
-              v-model:modelValue="chamber.dimensions"
-              :editable="editable"
-              @update:modelValue="emitUpdate"
-            />
-          </div>
+            <n-form-item label="Chamber Dimensions (mm)">
+              <DimensionsInput v-model:modelValue="chamber.dimensions" :editable="editable"
+                @update:modelValue="emitUpdate" />
+            </n-form-item>
 
-          <SlotsInput
-            v-model="chamber.slots"
-            :editable="editable"
-            label="Slots in Chamber"
-            @update:model-value="emitUpdate"
-          />
+            <SlotsInput v-model="chamber.slots" :editable="editable" label="Slots in Chamber"
+              @update:model-value="emitUpdate" />
+          </n-flex>
         </n-card>
       </n-collapse-item>
     </n-collapse>
-  </div>
+  </n-flex>
 </template>
 
 <script setup lang="ts">
 import { ref, watch } from 'vue';
-import { NButton, NCard, NCollapse, NCollapseItem, NFlex, NInput, NIcon } from 'naive-ui';
+import { NButton, NCard, NCollapse, NCollapseItem, NFlex, NInput, NIcon, NEmpty, NFormItem } from 'naive-ui';
 import Vector3Input from './Vector3Input.vue';
 import DimensionsInput from './DimensionsInput.vue';
 import type { Chamber } from '@/types/products';

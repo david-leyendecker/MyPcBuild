@@ -14,12 +14,12 @@
     <template v-else-if="buildStore.currentBuild">
       <!-- Header Section -->
       <n-flex justify="space-between" style="margin-bottom: 16px;">
-        <div>
-          <h2 style="font-size: 28px; font-weight: 600; margin-bottom: 8px;">{{ buildStore.currentBuild.name }}</h2>
-          <p style="opacity: 0.7; font-size: 14px;">
+        <n-flex vertical>
+          <n-h2 style="margin: 0;">{{ buildStore.currentBuild.name }}</n-h2>
+          <n-text depth="3" style="font-size: 14px;">
             Created: {{ new Date(buildStore.currentBuild.createdAt).toLocaleDateString() }}
-          </p>
-        </div>
+          </n-text>
+        </n-flex>
         <n-button text @click="$router.back()">
           <template #icon>
             <n-icon :component="Icons.ArrowBack" />
@@ -66,11 +66,11 @@
               :bordered="true"
             >
               <n-flex justify="space-between" align="center">
-                <div style="flex: 1;">
-                  <h4 style="font-size: 18px; margin-bottom: 4px;">{{ part.name }}</h4>
-                  <p style="font-size: 14px; margin: 4px 0; opacity: 0.8;">{{ part.category }}</p>
-                  <p style="font-weight: 600; margin-top: 8px; color: #18a058;">${{ part.pricePaid.toFixed(2) }}</p>
-                </div>
+                <n-flex vertical style="flex: 1;">
+                  <n-text strong style="font-size: 18px;">{{ part.name }}</n-text>
+                  <n-text depth="3" style="font-size: 14px;">{{ part.category }}</n-text>
+                  <n-text strong style="margin-top: 8px; color: #18a058;">${{ part.pricePaid.toFixed(2) }}</n-text>
+                </n-flex>
                 <n-button text type="error" @click="removePart(part.id)">
                   <template #icon>
                     <n-icon :component="Icons.Trash" />
@@ -82,9 +82,9 @@
 
           <n-divider />
 
-          <p style="font-size: 18px; font-weight: 600; padding-top: 12px;">
+          <n-text strong style="font-size: 18px; padding-top: 12px;">
             Total Cost: ${{ totalCost.toFixed(2) }}
-          </p>
+          </n-text>
         </template>
 
         <template #footer>
@@ -118,7 +118,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
-import { NCard, NButton, NFlex, NSpin, NAlert, NDivider, NModal, NIcon, NEmpty } from 'naive-ui';
+import { NCard, NButton, NFlex, NSpin, NAlert, NDivider, NModal, NIcon, NEmpty, NH2, NH4, NP, NText } from 'naive-ui';
 import { useBuildStore } from '@/stores/buildStore';
 import { useCatalogStore } from '@/stores/catalogStore';
 import CompatibilityPanel from '@/components/CompatibilityPanel.vue';

@@ -5,15 +5,12 @@
     v-model="localValue"
     :editable="editable"
   />
-  <div v-else class="text-center pa-4">
-    <p class="text-body-1 text-medium-emphasis">
-      No form available for category: {{ category }}
-    </p>
-  </div>
+  <n-empty v-else :description="`No form available for category: ${category}`" />
 </template>
 
 <script setup lang="ts">
 import { ref, computed, watch, type Component } from 'vue';
+import { NEmpty } from 'naive-ui';
 import type { ProductRequest, ProductResponse } from '@/types/products';
 import CpuProductForm from './ProductForms/CpuProductForm.vue';
 import GpuProductForm from './ProductForms/GpuProductForm.vue';

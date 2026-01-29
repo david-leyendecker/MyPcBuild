@@ -1,43 +1,29 @@
 <template>
-  <div class="dimensions-input">
-    <n-input-group>
+  <n-flex justify="space-evenly">
+    <n-input-group style="flex: 1; min-width: 0;">
       <n-input-group-label>Length</n-input-group-label>
-      <n-input-number 
-        :value="dimensions.length"
-        @update:value="updateLength"
-        placeholder="Length"
-        :readonly="!editable"
-        style="flex: 1; min-width: 100px;"
-      >
-        <template #suffix>mm</template>
-      </n-input-number>
-      <n-input-group-label>Width</n-input-group-label>
-      <n-input-number 
-        :value="dimensions.width"
-        @update:value="updateWidth"
-        placeholder="Width"
-        :readonly="!editable"
-        style="flex: 1; min-width: 100px;"
-      >
-        <template #suffix>mm</template>
-      </n-input-number>
-      <n-input-group-label>Height</n-input-group-label>
-      <n-input-number 
-        :value="dimensions.height"
-        @update:value="updateHeight"
-        placeholder="Height"
-        :readonly="!editable"
-        style="flex: 1; min-width: 100px;"
-      >
+      <n-input-number :value="dimensions.length" @update:value="updateLength" placeholder="Length" :readonly="!editable">
         <template #suffix>mm</template>
       </n-input-number>
     </n-input-group>
-  </div>
+    <n-input-group style="flex: 1; min-width: 0;">
+      <n-input-group-label>Width</n-input-group-label>
+      <n-input-number :value="dimensions.width" @update:value="updateWidth" placeholder="Width" :readonly="!editable">
+        <template #suffix>mm</template>
+      </n-input-number>
+    </n-input-group>
+    <n-input-group style="flex: 1; min-width: 0;">
+      <n-input-group-label>Height</n-input-group-label>
+      <n-input-number :value="dimensions.height" @update:value="updateHeight" placeholder="Height" :readonly="!editable">
+        <template #suffix>mm</template>
+      </n-input-number>
+    </n-input-group>
+  </n-flex>
 </template>
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import { NInputNumber, NInputGroup, NInputGroupLabel } from 'naive-ui';
+import { NInputNumber, NInputGroup, NInputGroupLabel, NFlex } from 'naive-ui';
 import type { Dimensions } from '@/types/products';
 
 interface Props {

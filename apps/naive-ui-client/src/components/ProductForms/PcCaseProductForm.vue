@@ -1,53 +1,38 @@
 <template>
   <n-form>
     <!-- Form Factor and Color -->
-    <n-grid :cols="2" :x-gap="12">
-      <n-form-item label="Form Factor">
-        <n-input 
-          v-model:value="localProduct.formFactor"
-          :disabled="!editable"
-          placeholder="e.g., Mid Tower, Full Tower"
-        />
-      </n-form-item>
-      <n-form-item label="Color">
-        <n-input 
-          v-model:value="localProduct.color"
-          :disabled="!editable"
-          placeholder="e.g., Black, White"
-        />
-      </n-form-item>
+    <n-grid :cols="2">
+      <n-form-item-gi label="Form Factor">
+        <n-input v-model:value="localProduct.formFactor" :disabled="!editable"
+          placeholder="e.g., Mid Tower, Full Tower" />
+      </n-form-item-gi>
+      
+      <n-form-item-gi label="Color">
+        <n-input v-model:value="localProduct.color" :disabled="!editable" placeholder="e.g., Black, White" />
+      </n-form-item-gi>
+
+      <!-- Side Panel Window -->
+      <n-form-item-gi label="Side Panel Window">
+        <n-input v-model:value="localProduct.sidePanelWindow" :disabled="!editable"
+          placeholder="e.g., Tempered Glass, Acrylic, None" />
+      </n-form-item-gi>
+
+      <!-- Dimensions -->
+      <n-form-item-gi label="Dimensions" :span="2">
+        <DimensionsInput v-model="localProduct.dimensions" :editable="editable" />
+      </n-form-item-gi>
+
+      <!-- Chambers -->
+      <n-form-item-gi :span="2">
+        <ChambersInput v-model="localProduct.chambers" :editable="editable" />
+      </n-form-item-gi>
     </n-grid>
-
-    <!-- Side Panel Window -->
-    <n-form-item label="Side Panel Window">
-      <n-input 
-        v-model:value="localProduct.sidePanelWindow"
-        :disabled="!editable"
-        placeholder="e.g., Tempered Glass, Acrylic, None"
-      />
-    </n-form-item>
-
-    <!-- Dimensions -->
-    <n-form-item label="Dimensions">
-      <DimensionsInput 
-        v-model="localProduct.dimensions"
-        :editable="editable"
-      />
-    </n-form-item>
-
-    <!-- Chambers -->
-    <n-form-item label="Chambers">
-      <ChambersInput 
-        v-model="localProduct.chambers"
-        :editable="editable"
-      />
-    </n-form-item>
   </n-form>
 </template>
 
 <script setup lang="ts">
 import { ref, watch } from 'vue';
-import { NForm, NFormItem, NGrid, NInput } from 'naive-ui';
+import { NForm, NFormItem, NFormItemGi, NGrid, NInput } from 'naive-ui';
 import type { PcCaseProductRequest, PcCaseProductResponse } from '@/types/products';
 import DimensionsInput from '@/components/ValueObjects/DimensionsInput.vue';
 import ChambersInput from '@/components/ValueObjects/ChambersInput.vue';

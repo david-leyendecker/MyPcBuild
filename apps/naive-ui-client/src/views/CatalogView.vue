@@ -10,8 +10,8 @@
     />
 
     <!-- Category Filter -->
-    <div style="margin-bottom: 16px;">
-      <h3 style="font-size: 14px; font-weight: 500; margin-bottom: 12px;">Categories</h3>
+    <n-flex vertical style="margin-bottom: 16px;">
+      <n-text strong style="font-size: 14px; margin-bottom: 12px;">Categories</n-text>
       <n-flex :size="8" wrap>
         <n-tag 
           :type="catalogStore.selectedCategory === '' || catalogStore.selectedCategory === null ? 'primary' : 'default'"
@@ -32,7 +32,7 @@
           {{ categoryDisplayNames[category] }}
         </n-tag>
       </n-flex>
-    </div>
+    </n-flex>
 
     <!-- Products Data Table -->
     <n-card>
@@ -84,7 +84,7 @@
 <script setup lang="ts">
 import { ref, onMounted, computed, h } from 'vue';
 import { useRouter } from 'vue-router';
-import { NCard, NInput, NDataTable, NTag, NFlex, NAlert, NIcon, NButton, NEmpty } from 'naive-ui';
+import { NCard, NInput, NDataTable, NTag, NFlex, NAlert, NIcon, NButton, NEmpty, NH3, NText } from 'naive-ui';
 import type { DataTableColumns, PaginationProps } from 'naive-ui';
 import { useCatalogStore } from '@/stores/catalogStore';
 import { catalogApi, ProductCategory, categoryLabels } from '@/api/catalog';

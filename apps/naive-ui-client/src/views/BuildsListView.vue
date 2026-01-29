@@ -41,12 +41,12 @@
       >
         <n-card class="build-card">
           <router-link :to="`/builds/${build.id}`" class="build-link" style="text-decoration: none;">
-            <h3 style="font-size: 20px; margin-bottom: 12px; color: var(--n-text-color);">{{ build.name }}</h3>
+            <n-h3 style="margin: 0 0 12px 0;">{{ build.name }}</n-h3>
           </router-link>
-          <div style="font-size: 14px; opacity: 0.7;">
-            <p style="margin: 8px 0;"><strong>Parts:</strong> {{ build.parts.length }}</p>
-            <p style="margin: 8px 0;"><strong>Total Cost:</strong> ${{ build.parts.reduce((sum, p) => sum + p.pricePaid, 0).toFixed(2) }}</p>
-          </div>
+          <n-flex vertical style="font-size: 14px;">
+            <n-text depth="3"><n-text strong>Parts:</n-text> {{ build.parts.length }}</n-text>
+            <n-text depth="3"><n-text strong>Total Cost:</n-text> ${{ build.parts.reduce((sum, p) => sum + p.pricePaid, 0).toFixed(2) }}</n-text>
+          </n-flex>
           <template #footer>
             <n-flex justify="space-between">
               <n-button 
@@ -116,7 +116,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
-import { NGrid, NGi, NCard, NButton, NFlex, NSpin, NAlert, NModal, NInput, NEmpty, NIcon, NFormItem } from 'naive-ui';
+import { NGrid, NGi, NCard, NButton, NFlex, NSpin, NAlert, NModal, NInput, NEmpty, NIcon, NFormItem, NH3, NText } from 'naive-ui';
 import { Add, ArrowForward, TrashOutline as Trash, CheckmarkOutline as Check, Close } from '@vicons/ionicons5';
 import { useBuildStore } from '@/stores/buildStore';
 import ViewHeader from '@/components/ViewHeader.vue';
