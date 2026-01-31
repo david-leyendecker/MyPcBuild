@@ -174,8 +174,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue';
-import { NFlex, NButton, NInput, NSpin, NCard, NTag, NEmpty, NIcon, NFormItem } from 'naive-ui';
-import Vector3Input from './ValueObjects/Vector3Input.vue';
+import { NFlex, NButton, NInput, NSpin, NCard, NTag, NEmpty, NIcon } from 'naive-ui';
 import { useCatalogStore } from '@/stores/catalogStore';
 import { ProductCategory, categoryLabels, getCategoryFromBackend } from '@/api/catalog';
 import { buildsApi, type AvailableSlot } from '@/api/builds';
