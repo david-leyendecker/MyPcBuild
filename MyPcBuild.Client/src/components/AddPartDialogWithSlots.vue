@@ -115,27 +115,6 @@
             </div>
           </div>
         </div>
-
-        <div v-if="selectedSlotId">
-          <h5 style="font-size: 14px; margin-bottom: 8px; font-weight: 600;">Position (optional)</h5>
-          <n-flex :size="8">
-            <n-input-number
-              v-model:value="position.x"
-              placeholder="X (mm)"
-              style="flex: 1;"
-            />
-            <n-input-number
-              v-model:value="position.y"
-              placeholder="Y (mm)"
-              style="flex: 1;"
-            />
-            <n-input-number
-              v-model:value="position.z"
-              placeholder="Z (mm)"
-              style="flex: 1;"
-            />
-          </n-flex>
-        </div>
       </div>
 
       <n-flex justify="space-between" :size="8" style="padding-top: 12px; border-top: 1px solid var(--n-border-color);">
@@ -209,7 +188,7 @@ const props = defineProps<Props>();
 
 const emit = defineEmits<{
   'part-selected': [productId: string];
-  'part-selected-with-slot': [productId: string, slotId: string, position: { x: number; y: number; z: number }, rotation?: { x: number; y: number; z: number } | null];
+  'part-selected-with-slot': [productId: string, slotId: string, parentProductId: string];
   'close': [];
 }>();
 
@@ -224,7 +203,6 @@ const selectedProductId = ref<string | null>(null);
 const selectedSlotId = ref<string | null>(null);
 const loadingSlots = ref(false);
 const availableSlots = ref<AvailableSlot[]>([]);
-const position = ref({ x: 0, y: 0, z: 0 });
 
 const filteredProducts = computed(() => {
   return catalogStore.products.filter(p => {
@@ -285,16 +263,6 @@ function selectProduct(productId: string) {
 
 function selectSlot(slotId: string) {
   selectedSlotId.value = slotId;
-  
-  // Pre-fill position with slot's absolute position
-  const slot = availableSlots.value.find(s => s.id === slotId);
-  if (slot) {
-    position.value = {
-      x: slot.absolutePosition.x,
-      y: slot.absolutePosition.y,
-      z: slot.absolutePosition.z
-    };
-  }
 }
 
 function confirmAddWithoutSlot() {
@@ -306,7 +274,9 @@ function confirmAddWithoutSlot() {
 function confirmAddToSlot() {
   if (selectedProductId.value && selectedSlotId.value) {
     const selectedSlot = availableSlots.value.find(s => s.id === selectedSlotId.value);
-    emit('part-selected-with-slot', selectedProductId.value, selectedSlotId.value, position.value, selectedSlot?.rotation);
+    if (selectedSlot) {
+      emit('part-selected-with-slot', selectedProductId.value, selectedSlotId.value, selectedSlot.parentProductId);
+    }
   }
 }
 </script>

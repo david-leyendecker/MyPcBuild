@@ -101,7 +101,7 @@ export const useBuildStore = defineStore('builds', () => {
     }
   }
 
-  async function addPartToSlot(buildId: string, request: { productId: string; pricePaid: number; slotId: string; position: { x: number; y: number; z: number }; rotation?: { x: number; y: number; z: number } }) {
+  async function addPartToSlot(buildId: string, request: { productId: string; pricePaid: number; slotId: string; parentProductId: string }) {
     try {
       await buildsApi.addPartToSlot(buildId, request);
       await loadBuild(buildId);

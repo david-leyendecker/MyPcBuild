@@ -111,8 +111,7 @@ export interface AddPartToSlotRequest {
   productId: string;
   pricePaid: number;
   slotId: string;
-  position: Vector3;
-  rotation?: Rotation | null;
+  parentProductId: string;
 }
 
 export const buildsApi = {

@@ -186,7 +186,7 @@ async function handleAddPart(productId: string) {
   }
 }
 
-async function handleAddPartToSlot(productId: string, slotId: string, position: { x: number; y: number; z: number }, rotation?: { x: number; y: number; z: number } | null) {
+async function handleAddPartToSlot(productId: string, slotId: string, parentProductId: string) {
   if (!buildStore.currentBuild) return;
 
   try {
@@ -198,8 +198,7 @@ async function handleAddPartToSlot(productId: string, slotId: string, position: 
       productId,
       pricePaid,
       slotId,
-      position,
-      rotation: rotation || undefined
+      parentProductId
     });
     showAddPartDialog.value = false;
   } catch (error) {
