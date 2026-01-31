@@ -5,6 +5,7 @@
         :value="modelValue?.x ?? 0"
         :placeholder="placeholders.x"
         :disabled="!editable"
+        style="width: 100%"
         @update:value="onUpdate('x', $event)"
       />
     </n-form-item-gi>
@@ -13,6 +14,7 @@
         :value="modelValue?.y ?? 0"
         :placeholder="placeholders.y"
         :disabled="!editable"
+        style="width: 100%"
         @update:value="onUpdate('y', $event)"
       />
     </n-form-item-gi>
@@ -21,6 +23,7 @@
         :value="modelValue?.z ?? 0"
         :placeholder="placeholders.z"
         :disabled="!editable"
+        style="width: 100%"
         @update:value="onUpdate('z', $event)"
       />
     </n-form-item-gi>

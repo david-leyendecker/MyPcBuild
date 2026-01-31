@@ -1,6 +1,6 @@
 <template>
   <n-form>
-    <n-grid :cols="2">
+    <n-grid :cols="2" :x-gap="12">
       <!-- Chipset Manufacturer and Series -->
       <n-form-item-gi label="Chipset Manufacturer">
         <n-input 

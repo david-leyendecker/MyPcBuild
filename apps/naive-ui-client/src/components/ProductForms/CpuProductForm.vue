@@ -1,6 +1,6 @@
 <template>
   <n-form>
-    <n-grid :cols="2">
+    <n-grid :cols="2" :x-gap="12">
       <!-- CPU Socket -->
       <n-form-item-gi label="CPU Socket" :span="2">
         <n-select v-model:value="localProduct.socket" :options="socketOptions" placeholder="Select socket"
@@ -9,10 +9,10 @@
 
       <!-- Cores and Threads -->
       <n-form-item-gi label="Cores">
-        <n-input-number v-model:value="localProduct.cores" placeholder="Number of cores" :disabled="!editable" />
+        <n-input-number v-model:value="localProduct.cores" placeholder="Number of cores" :disabled="!editable" style="width: 100%" />
       </n-form-item-gi>
       <n-form-item-gi label="Threads">
-        <n-input-number v-model:value="localProduct.threads" placeholder="Number of threads" :disabled="!editable" />
+        <n-input-number v-model:value="localProduct.threads" placeholder="Number of threads" :disabled="!editable" style="width: 100%" />
       </n-form-item-gi>
 
       <!-- Base Clock and Boost Clock -->

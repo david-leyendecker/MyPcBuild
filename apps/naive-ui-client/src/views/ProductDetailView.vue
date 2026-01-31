@@ -70,7 +70,7 @@
                 </n-form-item-gi>
                 
                 <n-form-item-gi label="Price ($)">
-                  <n-input-number v-model:value="formData.price" />
+                  <n-input-number v-model:value="formData.price" style="width: 100%" />
                 </n-form-item-gi>
               </n-grid>
             </n-form>

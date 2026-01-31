@@ -1,6 +1,6 @@
 <template>
   <n-form>
-    <n-grid :cols="2">
+    <n-grid :cols="2" :x-gap="12">
       <!-- Type and Interface -->
       <n-form-item-gi label="Storage Type">
         <n-input 

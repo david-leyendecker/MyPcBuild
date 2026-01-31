@@ -1,6 +1,6 @@
 <template>
   <n-form>
-    <n-grid :cols="2">
+    <n-grid :cols="2" :x-gap="12">
       <!-- Wattage and Efficiency -->
       <n-form-item-gi label="Wattage">
         <PowerInput 
@@ -46,6 +46,7 @@
         <n-input-number 
           v-model:value="localProduct.pcie8Pin"
           :disabled="!editable"
+          style="width: 100%"
         />
       </n-form-item-gi>
     </n-grid>

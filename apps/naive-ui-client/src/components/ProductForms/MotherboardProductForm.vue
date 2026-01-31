@@ -1,6 +1,6 @@
 <template>
   <n-form>
-    <n-grid :cols="2">
+    <n-grid :cols="2" :x-gap="12">
       <!-- Socket and Chipset -->
       <n-form-item-gi label="CPU Socket">
         <n-select 

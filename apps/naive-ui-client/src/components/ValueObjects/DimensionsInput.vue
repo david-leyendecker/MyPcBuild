@@ -1,17 +1,17 @@
 <template>
   <n-grid :cols="3" :x-gap="12">
     <n-form-item-gi label="Length">
-      <n-input-number :value="dimensions.length" @update:value="updateLength" placeholder="Length" :disabled="!editable">
+      <n-input-number :value="dimensions.length" @update:value="updateLength" placeholder="Length" :disabled="!editable" style="width: 100%">
         <template #suffix>mm</template>
       </n-input-number>
     </n-form-item-gi>
     <n-form-item-gi label="Width">
-      <n-input-number :value="dimensions.width" @update:value="updateWidth" placeholder="Width" :disabled="!editable">
+      <n-input-number :value="dimensions.width" @update:value="updateWidth" placeholder="Width" :disabled="!editable" style="width: 100%">
         <template #suffix>mm</template>
       </n-input-number>
     </n-form-item-gi>
     <n-form-item-gi label="Height">
-      <n-input-number :value="dimensions.height" @update:value="updateHeight" placeholder="Height" :disabled="!editable">
+      <n-input-number :value="dimensions.height" @update:value="updateHeight" placeholder="Height" :disabled="!editable" style="width: 100%">
         <template #suffix>mm</template>
       </n-input-number>
     </n-form-item-gi>

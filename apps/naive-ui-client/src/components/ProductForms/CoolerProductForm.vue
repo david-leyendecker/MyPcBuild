@@ -1,6 +1,6 @@
 <template>
   <n-form>
-    <n-grid :cols="2">
+    <n-grid :cols="2" :x-gap="12">
       <!-- Cooler Type and Height -->
       <n-form-item-gi label="Cooler Type">
         <n-select 

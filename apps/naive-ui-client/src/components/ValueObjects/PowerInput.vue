@@ -4,6 +4,7 @@
     @update:value="handleInput"
     :placeholder="label"
     :readonly="!editable"
+    style="width: 100%"
   >
     <template #suffix>W</template>
   </n-input-number>

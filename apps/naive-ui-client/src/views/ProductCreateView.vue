@@ -111,7 +111,7 @@
                   <n-input v-model:value="formData.manufacturer" placeholder="e.g., AMD" />
                 </n-form-item-gi>
                 <n-form-item-gi label="Price * ($)" path="price">
-                  <n-input-number v-model:value="formData.price" />
+                  <n-input-number v-model:value="formData.price" style="width: 100%" />
                 </n-form-item-gi>
               </n-grid>
             </n-form>
@@ -154,7 +154,7 @@
                     <n-input v-model:value="formData.manufacturer" />
                   </n-form-item-gi>
                   <n-form-item-gi label="Price * ($)" path="price">
-                    <n-input-number v-model:value="formData.price" />
+                    <n-input-number v-model:value="formData.price" style="width: 100%" />
                   </n-form-item-gi>
                 </n-grid>
               </n-form>

@@ -5,6 +5,7 @@
     :placeholder="label"
     :readonly="!editable"
     :step="0.1"
+    style="width: 100%"
   >
     <template #suffix>V</template>
   </n-input-number>

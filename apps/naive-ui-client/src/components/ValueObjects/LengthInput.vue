@@ -4,6 +4,7 @@
     @update:value="handleInput"
     :placeholder="label"
     :readonly="!editable"
+    style="width: 100%"
   >
     <template #suffix>mm</template>
   </n-input-number>
