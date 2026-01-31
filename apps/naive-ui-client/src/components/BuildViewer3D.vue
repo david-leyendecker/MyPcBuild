@@ -21,9 +21,14 @@
       <canvas ref="canvasRef"></canvas>
 
       <Viewer3DControls
-        :show-grid="showGrid"
-        @toggle-grid="toggleGrid"
-        @reset-camera="resetCamera"
+        :show-grid="viewer3D.showGrid.value"
+        @toggle-grid="() => { viewer3D.showGrid.value = !viewer3D.showGrid.value }"
+        @reset-camera="() => {
+          const instance = (viewer3D as any)._instance;
+          if (instance) {
+            instance.resetCamera();
+          }
+        }"
       />
 
       <!-- Part Info Overlay -->
@@ -50,10 +55,16 @@
 import { ref, onMounted, onUnmounted, watch } from 'vue';
 import { NButton, NFlex, NCard, NIcon, NEmpty, NH3 } from 'naive-ui';
 import * as THREE from 'three';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import type { BuildPart } from '@/api/builds';
 import { Icons } from '@/utils/icons';
 import { use3DPopout } from '@/composables/use3DPopout';
+import { use3DViewer } from '@/composables/use3DViewer';
+import {
+  clearMeshMap,
+  createBoxMeshWithWireframeColor,
+  getBuildCategoryColor,
+  degreesToRadians
+} from '@/utils/viewer3d';
 import Viewer3DControls from './Viewer3DControls.vue';
 
 interface Props {
@@ -74,58 +85,50 @@ const { isPopoutOpen, openPopout, updatePopoutProps } = use3DPopout();
 
 const containerRef = ref<HTMLDivElement | null>(null);
 const canvasRef = ref<HTMLCanvasElement | null>(null);
-const showGrid = ref(true);
 const hoveredPart = ref<BuildPart | null>(null);
 const mousePos = ref({ x: 0, y: 0 });
 
-let scene: THREE.Scene;
-let camera: THREE.PerspectiveCamera;
-let renderer: THREE.WebGLRenderer;
-let controls: OrbitControls;
-let gridHelper: THREE.GridHelper;
-let animationId: number;
-let raycaster: THREE.Raycaster;
-let mouse: THREE.Vector2;
-
 const partMeshes = new Map<string, THREE.Mesh>();
-let resizeObserver: ResizeObserver | null = null;
-let resizeTimeout: number | null = null;
+let hasInitialFit = false;
+
+const viewer3D = use3DViewer({
+  containerElement: null as any,
+  canvasElement: undefined,
+  showGrid: true,
+  sceneBgColor: 0x1a1a1a
+});
 
 onMounted(() => {
-  initScene();
-  animate();
-  window.addEventListener('resize', onWindowResize);
-  window.addEventListener('mousemove', onMouseMove);
+  if (!containerRef.value || !canvasRef.value) return;
 
-  // Watch for container resize with debouncing
-  if (containerRef.value) {
-    resizeObserver = new ResizeObserver(() => {
-      if (resizeTimeout !== null) {
-        clearTimeout(resizeTimeout);
-      }
-      resizeTimeout = window.setTimeout(() => {
-        onWindowResize();
-      }, 100);
-    });
-    resizeObserver.observe(containerRef.value);
-  }
+  // Initialize viewer with the container element and canvas
+  const viewer3DInstance = use3DViewer({
+    containerElement: containerRef.value,
+    canvasElement: canvasRef.value,
+    showGrid: true,
+    sceneBgColor: 0x1a1a1a
+  });
+
+  const state = viewer3DInstance.mount();
+  Object.defineProperty(viewer3D, '_state', {
+    value: state,
+    configurable: true
+  });
+  Object.defineProperty(viewer3D, '_instance', {
+    value: viewer3DInstance,
+    configurable: true
+  });
+
+  updateScene();
+  window.addEventListener('mousemove', onMouseMove);
 });
 
 onUnmounted(() => {
-  window.removeEventListener('resize', onWindowResize);
   window.removeEventListener('mousemove', onMouseMove);
-
-  if (resizeTimeout !== null) {
-    clearTimeout(resizeTimeout);
+  const instance = (viewer3D as any)._instance;
+  if (instance) {
+    instance.unmount();
   }
-
-  if (resizeObserver) {
-    resizeObserver.disconnect();
-  }
-
-  cancelAnimationFrame(animationId);
-  renderer?.dispose();
-  controls?.dispose();
 });
 
 watch(() => props.parts, () => {
@@ -149,74 +152,12 @@ watch(() => props.collisions, () => {
   }
 }, { deep: true });
 
-function initScene() {
-  if (!containerRef.value || !canvasRef.value) return;
-
-  // Scene
-  scene = new THREE.Scene();
-  scene.background = new THREE.Color(0x1a1a1a);
-
-  // Camera
-  const width = containerRef.value.clientWidth;
-  const height = containerRef.value.clientHeight;
-  camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 10000);
-  camera.position.set(500, 500, 500);
-  camera.lookAt(0, 0, 0);
-
-  // Renderer
-  renderer = new THREE.WebGLRenderer({
-    canvas: canvasRef.value,
-    antialias: true
-  });
-  renderer.setSize(width, height);
-  renderer.setPixelRatio(window.devicePixelRatio);
-
-  // Controls
-  controls = new OrbitControls(camera, renderer.domElement);
-  controls.enableDamping = true;
-  controls.dampingFactor = 0.05;
-  controls.minDistance = 100;
-  controls.maxDistance = 2000;
-
-  // Lighting
-  const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
-  scene.add(ambientLight);
-
-  const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
-  directionalLight.position.set(500, 1000, 500);
-  scene.add(directionalLight);
-
-  const directionalLight2 = new THREE.DirectionalLight(0xffffff, 0.4);
-  directionalLight2.position.set(-500, -500, -500);
-  scene.add(directionalLight2);
-
-  // Grid
-  gridHelper = new THREE.GridHelper(1000, 20, 0x444444, 0x222222);
-  scene.add(gridHelper);
-
-  // Raycaster for hover detection
-  raycaster = new THREE.Raycaster();
-  mouse = new THREE.Vector2();
-
-  // Axes helper
-  const axesHelper = new THREE.AxesHelper(200);
-  scene.add(axesHelper);
-
-  updateScene();
-}
-
 function updateScene() {
+  const state = (viewer3D as any)._state;
+  if (!state) return;
+
   // Clear existing meshes
-  partMeshes.forEach(mesh => {
-    scene.remove(mesh);
-    mesh.geometry.dispose();
-    if (Array.isArray(mesh.material)) {
-      mesh.material.forEach(m => m.dispose());
-    } else {
-      mesh.material.dispose();
-    }
-  });
-  partMeshes.clear();
+  clearMeshMap(partMeshes, state.scene);
 
   // Add parts
   props.parts.forEach(part => {
@@ -226,42 +167,31 @@ function updateScene() {
     const position = part.position || { x: 0, y: 0, z: 0 };
     const rotation = part.rotation || { x: 0, y: 0, z: 0 };
 
-    const geometry = new THREE.BoxGeometry(
+    const mesh = createBoxMeshWithWireframeColor(
       part.dimensions.length,
       part.dimensions.height,
-      part.dimensions.width
+      part.dimensions.width,
+      getBuildCategoryColor(part.categoryName),
+      0xffffff,
+      part.categoryName === 'Case' ? 0.3 : 0.8
     );
 
-    const material = new THREE.MeshStandardMaterial({
-      color: getCategoryColor(part.categoryName),
-      transparent: true,
-      opacity: part.categoryName === 'Case' ? 0.3 : 0.8
-    });
-
-    const mesh = new THREE.Mesh(geometry, material);
-
-    // Set position (center of the box)
+    // Set position at the origin point
     mesh.position.set(
-      position.x + part.dimensions.length / 2,
-      position.y + part.dimensions.height / 2,
-      position.z + part.dimensions.width / 2
+      position.x,
+      position.y,
+      position.z
     );
 
     // Apply rotation (convert degrees to radians)
     mesh.rotation.set(
-      (rotation.x * Math.PI) / 180,
-      (rotation.y * Math.PI) / 180,
-      (rotation.z * Math.PI) / 180
+      degreesToRadians(rotation.x),
+      degreesToRadians(rotation.y),
+      degreesToRadians(rotation.z)
     );
 
-    // Add wireframe
-    const edges = new THREE.EdgesGeometry(geometry);
-    const lineMaterial = new THREE.LineBasicMaterial({ color: 0xffffff, linewidth: 1 });
-    const wireframe = new THREE.LineSegments(edges, lineMaterial);
-    mesh.add(wireframe);
-
-    mesh.userData = { part };
-    scene.add(mesh);
+    mesh.userData = { part, id: part.id };
+    state.scene.add(mesh);
     partMeshes.set(part.id, mesh);
 
     // Render chambers if this is a case
@@ -272,6 +202,12 @@ function updateScene() {
           chamber.dimensions.height,
           chamber.dimensions.width
         );
+        // Offset geometry so corner aligns with position
+        chamberGeom.translate(
+          chamber.dimensions.length / 2,
+          chamber.dimensions.height / 2,
+          chamber.dimensions.width / 2
+        );
         const chamberMat = new THREE.MeshStandardMaterial({
           color: 0x888888,
           transparent: true,
@@ -281,9 +217,9 @@ function updateScene() {
         const chamberMesh = new THREE.Mesh(chamberGeom, chamberMat);
 
         chamberMesh.position.set(
-          position.x + chamber.dimensions.length / 2,
-          position.y + chamber.dimensions.height / 2,
-          position.z + chamber.dimensions.width / 2
+          position.x,
+          position.y,
+          position.z
         );
 
         // Add chamber wireframe
@@ -294,54 +230,46 @@ function updateScene() {
         );
         chamberMesh.add(chamberWireframe);
 
-        scene.add(chamberMesh);
+        state.scene.add(chamberMesh);
       });
     }
   });
 
   highlightCollisions();
+
+  // Fit camera to content on initial load
+  if (!hasInitialFit) {
+    const instance = (viewer3D as any)._instance;
+    if (instance) {
+      instance.fitCameraToContent();
+    }
+    hasInitialFit = true;
+  }
 }
 
 function highlightCollisions() {
-  partMeshes.forEach((mesh, partId) => {
-    const isColliding = props.collisions.includes(partId);
-    if (Array.isArray(mesh.material)) {
-      mesh.material.forEach(m => {
-        if (m instanceof THREE.MeshStandardMaterial) {
-          m.color.set(isColliding ? 0xff0000 : getCategoryColor(mesh.userData.part.categoryName));
-        }
-      });
-    } else if (mesh.material instanceof THREE.MeshStandardMaterial) {
-      mesh.material.color.set(isColliding ? 0xff0000 : getCategoryColor(mesh.userData.part.categoryName));
-    }
-  });
-}
+  const instance = (viewer3D as any)._instance;
+  if (!instance) return;
 
-function getCategoryColor(category: string): number {
-  const colors: Record<string, number> = {
-    'CPU': 0x3b82f6,      // blue
-    'GPU': 0x10b981,      // green
-    'Motherboard': 0x8b5cf6, // purple
-    'RAM': 0xf59e0b,      // amber
-    'Storage': 0xef4444,  // red
-    'PowerSupply': 0x06b6d4, // cyan
-    'Cooler': 0xec4899,   // pink
-    'Case': 0x6b7280      // gray
-  };
-  return colors[category] || 0x9ca3af;
+  instance.highlightCollisions(
+    partMeshes,
+    props.collisions,
+    (mesh: THREE.Mesh) => getBuildCategoryColor((mesh.userData.part as BuildPart).categoryName)
+  );
 }
 
 function onMouseMove(event: MouseEvent) {
-  if (!containerRef.value || !canvasRef.value) return;
+  const state = (viewer3D as any)._state;
+  if (!containerRef.value || !state) return;
 
   const rect = containerRef.value.getBoundingClientRect();
-  mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-  mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+  state.mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+  state.mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
 
   mousePos.value = { x: event.clientX + 10, y: event.clientY + 10 };
 
-  raycaster.setFromCamera(mouse, camera);
-  const intersects = raycaster.intersectObjects(Array.from(partMeshes.values()));
+  state.raycaster.setFromCamera(state.mouse, state.camera);
+  const intersects = state.raycaster.intersectObjects(Array.from(partMeshes.values()));
 
   if (intersects.length > 0 && intersects[0]) {
     const intersectedMesh = intersects[0].object as THREE.Mesh;
@@ -349,33 +277,6 @@ function onMouseMove(event: MouseEvent) {
   } else {
     hoveredPart.value = null;
   }
-}
-
-function animate() {
-  animationId = requestAnimationFrame(animate);
-  controls.update();
-  renderer.render(scene, camera);
-}
-
-function onWindowResize() {
-  if (!containerRef.value) return;
-
-  const width = containerRef.value.clientWidth;
-  const height = containerRef.value.clientHeight;
-
-  camera.aspect = width / height;
-  camera.updateProjectionMatrix();
-  renderer.setSize(width, height);
-}
-
-function resetCamera() {
-  camera.position.set(500, 500, 500);
-  camera.lookAt(0, 0, 0);
-}
-
-function toggleGrid() {
-  showGrid.value = !showGrid.value;
-  gridHelper.visible = showGrid.value;
 }
 
 async function openInPopout() {

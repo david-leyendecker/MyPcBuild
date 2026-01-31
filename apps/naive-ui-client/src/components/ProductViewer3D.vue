@@ -24,12 +24,12 @@
     <div ref="viewerEl" class="viewer-canvas"></div>
 
     <Viewer3DControls
-      :show-grid="showGrid"
-      :show-axes="showAxes"
+      :show-grid="viewer3D.showGrid.value"
+      :show-axes="viewer3D.showAxes.value"
       show-axes-toggle
-      @toggle-grid="showGrid = !showGrid"
-      @toggle-axes="showAxes = !showAxes"
-      @reset-camera="resetCamera"
+      @toggle-grid="() => { viewer3D.showGrid.value = !viewer3D.showGrid.value }"
+      @toggle-axes="() => { viewer3D.showAxes.value = !viewer3D.showAxes.value }"
+      @reset-camera="() => viewer3D.resetCamera()"
     />
 
     <div v-if="hoveredSlot" class="slot-tooltip">
@@ -49,10 +49,17 @@
 import { ref, onMounted, onUnmounted, watch } from 'vue';
 import { NEmpty, NFlex, NIcon, NH3, NButton } from 'naive-ui';
 import * as THREE from 'three';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import type { Slot, Chamber, Dimensions, Vector3 } from '@/types/products';
 import { use3DPopout } from '@/composables/use3DPopout';
+import { use3DViewer } from '@/composables/use3DViewer';
 import { Icons } from '@/utils/icons';
+import {
+  clearMeshMap,
+  clearMeshArray,
+  createBoxMeshWithWireframeColor,
+  getProductCategoryColor,
+  degreesToRadians
+} from '@/utils/viewer3d';
 import Viewer3DControls from './Viewer3DControls.vue';
 
 interface Props {
@@ -90,61 +97,54 @@ async function openInPopout() {
 
 const viewerEl = ref<HTMLDivElement | null>(null);
 const hoveredSlot = ref<Slot | null>(null);
-const showGrid = ref(true);
-const showAxes = ref(true);
 
-let scene: THREE.Scene;
-let camera: THREE.PerspectiveCamera;
-let renderer: THREE.WebGLRenderer;
-let controls: OrbitControls;
-let gridHelper: THREE.GridHelper;
-let axesHelper: THREE.AxesHelper;
-let raycaster: THREE.Raycaster;
-let mouse: THREE.Vector2;
 let slotMeshes: Map<string, THREE.Mesh> = new Map();
 let productMeshes: THREE.Mesh[] = [];
-let resizeObserver: ResizeObserver | null = null;
-let resizeTimeout: number | null = null;
 let hasInitialFit = false;
+
+const viewer3D = use3DViewer({
+  containerElement: viewerEl.value as HTMLElement,
+  showGrid: true,
+  showAxes: true,
+  sceneBgColor: 0x1a1a1a,
+  onAnimate: () => {
+    // Animation is handled by the composable
+  }
+});
 
 onMounted(() => {
   if (!viewerEl.value) return;
 
-  initScene();
-  updateVisualization();
-  animate();
-
-  window.addEventListener('resize', onWindowResize);
-  viewerEl.value.addEventListener('mousemove', onMouseMove);
-
-  // Watch for container resize with debouncing
-  resizeObserver = new ResizeObserver(() => {
-    if (resizeTimeout !== null) {
-      clearTimeout(resizeTimeout);
-    }
-    resizeTimeout = window.setTimeout(() => {
-      onWindowResize();
-    }, 100);
+  // Initialize viewer with the container element
+  const container = viewerEl.value;
+  const viewer3DInstance = use3DViewer({
+    containerElement: container,
+    showGrid: true,
+    showAxes: true,
+    sceneBgColor: 0x1a1a1a
   });
-  resizeObserver.observe(viewerEl.value);
+
+  const state = viewer3DInstance.mount();
+  Object.defineProperty(viewer3D, '_state', {
+    value: state,
+    configurable: true
+  });
+  Object.defineProperty(viewer3D, '_instance', {
+    value: viewer3DInstance,
+    configurable: true
+  });
+
+  updateVisualization();
+  viewerEl.value.addEventListener('mousemove', onMouseMove);
 });
 
 onUnmounted(() => {
-  window.removeEventListener('resize', onWindowResize);
   if (viewerEl.value) {
     viewerEl.value.removeEventListener('mousemove', onMouseMove);
   }
-
-  if (resizeTimeout !== null) {
-    clearTimeout(resizeTimeout);
-  }
-
-  if (resizeObserver) {
-    resizeObserver.disconnect();
-  }
-
-  if (renderer) {
-    renderer.dispose();
+  const instance = (viewer3D as any)._instance;
+  if (instance) {
+    instance.unmount();
   }
 });
 
@@ -161,164 +161,50 @@ watch(() => [props.dimensions, props.slots, props.chambers], () => {
   }
 }, { deep: true });
 
-watch(showGrid, (value) => {
-  if (gridHelper) {
-    gridHelper.visible = value;
-  }
-});
-
-watch(showAxes, (value) => {
-  if (axesHelper) {
-    axesHelper.visible = value;
-  }
-});
-
-function initScene() {
-  if (!viewerEl.value) return;
-
-  // Scene
-  scene = new THREE.Scene();
-  scene.background = new THREE.Color(0x1a1a1a);
-
-  // Camera
-  camera = new THREE.PerspectiveCamera(
-    75,
-    viewerEl.value.clientWidth / viewerEl.value.clientHeight,
-    0.1,
-    10000
-  );
-  camera.position.set(400, 300, 400);
-
-  // Renderer
-  renderer = new THREE.WebGLRenderer({ antialias: true });
-  renderer.setSize(viewerEl.value.clientWidth, viewerEl.value.clientHeight);
-  renderer.setPixelRatio(window.devicePixelRatio);
-  viewerEl.value.appendChild(renderer.domElement);
-
-  // Controls
-  controls = new OrbitControls(camera, renderer.domElement);
-  controls.enableDamping = true;
-  controls.dampingFactor = 0.05;
-
-  // Lights
-  const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
-  scene.add(ambientLight);
-
-  const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
-  directionalLight.position.set(100, 200, 100);
-  scene.add(directionalLight);
-
-  // Grid
-  gridHelper = new THREE.GridHelper(1000, 20);
-  scene.add(gridHelper);
-
-  // Axes
-  axesHelper = new THREE.AxesHelper(150);
-  scene.add(axesHelper);
-
-  // Raycaster for hover detection
-  raycaster = new THREE.Raycaster();
-  mouse = new THREE.Vector2();
-}
-
 function updateVisualization() {
+  const state = (viewer3D as any)._state;
+  if (!state) return;
+
   // Clear existing slot meshes
-  slotMeshes.forEach(mesh => {
-    scene.remove(mesh);
-    mesh.geometry.dispose();
-    if (Array.isArray(mesh.material)) {
-      mesh.material.forEach(m => m.dispose());
-    } else {
-      mesh.material.dispose();
-    }
-  });
-  slotMeshes.clear();
+  clearMeshMap(slotMeshes, state.scene);
 
   // Clear existing product meshes (dimensions box and chambers)
-  productMeshes.forEach(mesh => {
-    scene.remove(mesh);
-    mesh.traverse((child) => {
-      if (child instanceof THREE.Mesh) {
-        child.geometry.dispose();
-        if (Array.isArray(child.material)) {
-          child.material.forEach(m => m.dispose());
-        } else {
-          child.material.dispose();
-        }
-      }
-      if (child instanceof THREE.LineSegments) {
-        child.geometry.dispose();
-        if (Array.isArray(child.material)) {
-          child.material.forEach(m => m.dispose());
-        } else {
-          child.material.dispose();
-        }
-      }
-    });
-  });
-  productMeshes = [];
+  clearMeshArray(productMeshes, state.scene);
 
   // Render main product dimensions if available
   if (props.dimensions) {
-    const geometry = new THREE.BoxGeometry(
+    const mesh = createBoxMeshWithWireframeColor(
       props.dimensions.length,
       props.dimensions.height,
-      props.dimensions.width
+      props.dimensions.width,
+      0x666666,
+      0xaaaaaa,
+      0.2
     );
+    mesh.position.set(0, 0, 0);
 
-    const material = new THREE.MeshStandardMaterial({
-      color: 0x666666,
-      transparent: true,
-      opacity: 0.2
-    });
-
-    const mesh = new THREE.Mesh(geometry, material);
-    mesh.position.set(
-      props.dimensions.length / 2,
-      props.dimensions.height / 2,
-      props.dimensions.width / 2
-    );
-
-    const edges = new THREE.EdgesGeometry(geometry);
-    const lineMaterial = new THREE.LineBasicMaterial({ color: 0xaaaaaa, linewidth: 2 });
-    const wireframe = new THREE.LineSegments(edges, lineMaterial);
-    mesh.add(wireframe);
-
-    scene.add(mesh);
+    state.scene.add(mesh);
     productMeshes.push(mesh);
   }
 
   // Render chambers
   if (props.chambers && props.chambers.length > 0) {
     props.chambers.forEach((chamber) => {
-      const chamberGeom = new THREE.BoxGeometry(
+      const chamberMesh = createBoxMeshWithWireframeColor(
         chamber.dimensions.length,
         chamber.dimensions.height,
-        chamber.dimensions.width
+        chamber.dimensions.width,
+        0x4444ff,
+        0x6666ff,
+        0.15
       );
-
-      const chamberMat = new THREE.MeshStandardMaterial({
-        color: 0x4444ff,
-        transparent: true,
-        opacity: 0.15,
-        wireframe: false
-      });
-
-      const chamberMesh = new THREE.Mesh(chamberGeom, chamberMat);
       chamberMesh.position.set(
-        chamber.relativePosition.x + chamber.dimensions.length / 2,
-        chamber.relativePosition.y + chamber.dimensions.height / 2,
-        chamber.relativePosition.z + chamber.dimensions.width / 2
+        chamber.relativePosition.x,
+        chamber.relativePosition.y,
+        chamber.relativePosition.z
       );
 
-      const chamberEdges = new THREE.EdgesGeometry(chamberGeom);
-      const chamberWireframe = new THREE.LineSegments(
-        chamberEdges,
-        new THREE.LineBasicMaterial({ color: 0x6666ff, linewidth: 2 })
-      );
-      chamberMesh.add(chamberWireframe);
-
-      scene.add(chamberMesh);
+      state.scene.add(chamberMesh);
       productMeshes.push(chamberMesh);
 
       // Render slots in chamber (offset by chamber position)
@@ -335,51 +221,45 @@ function updateVisualization() {
 
   // Adjust camera to fit content only on initial load
   if (!hasInitialFit) {
-    fitCameraToContent();
+    const instance = (viewer3D as any)._instance;
+    if (instance) {
+      instance.fitCameraToContent();
+    }
     hasInitialFit = true;
   }
 }
 
 function renderSlot(slot: Slot, offset: Vector3 = { x: 0, y: 0, z: 0 }) {
-  const slotGeom = new THREE.BoxGeometry(
+  const state = (viewer3D as any)._state;
+  if (!state) return;
+
+  const slotMesh = createBoxMeshWithWireframeColor(
     slot.maxDimensions.length,
     slot.maxDimensions.height,
-    slot.maxDimensions.width
+    slot.maxDimensions.width,
+    getProductCategoryColor(slot.allowedCategory),
+    0xffffff,
+    0.4
   );
-
-  const slotMat = new THREE.MeshStandardMaterial({
-    color: getSlotColor(slot.allowedCategory),
-    transparent: true,
-    opacity: 0.4
-  });
-
-  const slotMesh = new THREE.Mesh(slotGeom, slotMat);
 
   // Position (add chamber offset)
   slotMesh.position.set(
-    offset.x + slot.relativePosition.x + slot.maxDimensions.length / 2,
-    offset.y + slot.relativePosition.y + slot.maxDimensions.height / 2,
-    offset.z + slot.relativePosition.z + slot.maxDimensions.width / 2
+    offset.x + slot.relativePosition.x,
+    offset.y + slot.relativePosition.y,
+    offset.z + slot.relativePosition.z
   );
 
   // Rotation
   if (slot.rotation) {
     slotMesh.rotation.set(
-      (slot.rotation.x * Math.PI) / 180,
-      (slot.rotation.y * Math.PI) / 180,
-      (slot.rotation.z * Math.PI) / 180
+      degreesToRadians(slot.rotation.x),
+      degreesToRadians(slot.rotation.y),
+      degreesToRadians(slot.rotation.z)
     );
   }
 
-  const slotEdges = new THREE.EdgesGeometry(slotGeom);
-  const slotWireframe = new THREE.LineSegments(
-    slotEdges,
-    new THREE.LineBasicMaterial({ color: 0xffffff, linewidth: 1 })
-  );
-  slotMesh.add(slotWireframe);
-
   slotMesh.userData = { slot };
-  scene.add(slotMesh);
+  state.scene.add(slotMesh);
   slotMeshes.set(slot.name, slotMesh);
 
   // Render sub-slots (with accumulated offset)
@@ -393,77 +273,17 @@ function renderSlot(slot: Slot, offset: Vector3 = { x: 0, y: 0, z: 0 }) {
   }
 }
 
-function getSlotColor(category: string): number {
-  const colors: Record<string, number> = {
-    'CPU': 0xff6b6b,
-    'GPU': 0x4ecdc4,
-    'Motherboard': 0x45b7d1,
-    'RAM': 0x96ceb4,
-    'Storage': 0xffeaa7,
-    'PowerSupply': 0xfd79a8,
-    'Cooler': 0x74b9ff,
-    'Case': 0xa29bfe
-  };
-  return colors[category] || 0x888888;
-}
-
-function fitCameraToContent() {
-  // Calculate bounding box of all content
-  const box = new THREE.Box3();
-
-  scene.traverse((object) => {
-    if (object instanceof THREE.Mesh && !(object instanceof THREE.GridHelper) && !(object instanceof THREE.AxesHelper)) {
-      box.expandByObject(object);
-    }
-  });
-
-  if (box.isEmpty()) {
-    // Default view if no content
-    camera.position.set(400, 300, 400);
-    controls.target.set(0, 0, 0);
-  } else {
-    const center = box.getCenter(new THREE.Vector3());
-    const size = box.getSize(new THREE.Vector3());
-    const maxDim = Math.max(size.x, size.y, size.z);
-    const fov = camera.fov * (Math.PI / 180);
-    let cameraZ = Math.abs(maxDim / 2 / Math.tan(fov / 2));
-    cameraZ *= 1.5; // Add some padding
-
-    camera.position.set(center.x + cameraZ * 0.7, center.y + cameraZ * 0.5, center.z + cameraZ * 0.7);
-    controls.target.copy(center);
-  }
-
-  controls.update();
-}
-
-function resetCamera() {
-  fitCameraToContent();
-}
-
-function animate() {
-  requestAnimationFrame(animate);
-  controls.update();
-  renderer.render(scene, camera);
-}
-
-function onWindowResize() {
-  if (!viewerEl.value) return;
-
-  camera.aspect = viewerEl.value.clientWidth / viewerEl.value.clientHeight;
-  camera.updateProjectionMatrix();
-  renderer.setSize(viewerEl.value.clientWidth, viewerEl.value.clientHeight);
-}
-
 function onMouseMove(event: MouseEvent) {
-  if (!viewerEl.value) return;
+  const state = (viewer3D as any)._state;
+  if (!viewerEl.value || !state) return;
 
   const rect = viewerEl.value.getBoundingClientRect();
-  mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-  mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+  state.mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+  state.mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
 
-  raycaster.setFromCamera(mouse, camera);
+  state.raycaster.setFromCamera(state.mouse, state.camera);
 
-  const intersects = raycaster.intersectObjects(Array.from(slotMeshes.values()));
+  const intersects = state.raycaster.intersectObjects(Array.from(slotMeshes.values()));
 
   if (intersects.length > 0 && intersects[0]) {
     const intersected = intersects[0].object as THREE.Mesh;
