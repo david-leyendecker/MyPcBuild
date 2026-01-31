@@ -1,29 +1,26 @@
 <template>
-  <n-flex justify="space-evenly">
-    <n-input-group style="flex: 1; min-width: 0;">
-      <n-input-group-label>Length</n-input-group-label>
-      <n-input-number :value="dimensions.length" @update:value="updateLength" placeholder="Length" :readonly="!editable">
+  <n-grid :cols="3" :x-gap="12">
+    <n-form-item-gi label="Length">
+      <n-input-number :value="dimensions.length" @update:value="updateLength" placeholder="Length" :disabled="!editable">
         <template #suffix>mm</template>
       </n-input-number>
-    </n-input-group>
-    <n-input-group style="flex: 1; min-width: 0;">
-      <n-input-group-label>Width</n-input-group-label>
-      <n-input-number :value="dimensions.width" @update:value="updateWidth" placeholder="Width" :readonly="!editable">
+    </n-form-item-gi>
+    <n-form-item-gi label="Width">
+      <n-input-number :value="dimensions.width" @update:value="updateWidth" placeholder="Width" :disabled="!editable">
         <template #suffix>mm</template>
       </n-input-number>
-    </n-input-group>
-    <n-input-group style="flex: 1; min-width: 0;">
-      <n-input-group-label>Height</n-input-group-label>
-      <n-input-number :value="dimensions.height" @update:value="updateHeight" placeholder="Height" :readonly="!editable">
+    </n-form-item-gi>
+    <n-form-item-gi label="Height">
+      <n-input-number :value="dimensions.height" @update:value="updateHeight" placeholder="Height" :disabled="!editable">
         <template #suffix>mm</template>
       </n-input-number>
-    </n-input-group>
-  </n-flex>
+    </n-form-item-gi>
+  </n-grid>
 </template>
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import { NInputNumber, NInputGroup, NInputGroupLabel, NFlex } from 'naive-ui';
+import { NInputNumber, NFormItemGi, NGrid } from 'naive-ui';
 import type { Dimensions } from '@/types/products';
 
 interface Props {

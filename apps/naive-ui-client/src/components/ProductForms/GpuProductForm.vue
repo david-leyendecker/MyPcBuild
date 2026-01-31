@@ -1,130 +1,109 @@
 <template>
-  <n-flex vertical :size="12">
-    <!-- Chipset Manufacturer and Series - Side by side -->
-    <n-flex :size="12">
-      <div style="flex: 1; min-width: 150px;">
-        <label style="display: block; margin-bottom: 4px; font-size: 14px;">Chipset Manufacturer</label>
+  <n-form>
+    <n-grid :cols="2">
+      <!-- Chipset Manufacturer and Series -->
+      <n-form-item-gi label="Chipset Manufacturer">
         <n-input 
           v-model:value="localProduct.chipsetManufacturer"
           :disabled="!editable"
           placeholder="e.g., NVIDIA, AMD"
         />
-      </div>
-      <div style="flex: 1; min-width: 150px;">
-        <label style="display: block; margin-bottom: 4px; font-size: 14px;">Series</label>
+      </n-form-item-gi>
+      
+      <n-form-item-gi label="Series">
         <n-input 
           v-model:value="localProduct.series"
           :disabled="!editable"
           placeholder="e.g., RTX 4090, RX 7900 XTX"
         />
-      </div>
-    </n-flex>
+      </n-form-item-gi>
 
-    <!-- VRAM and Memory Type - Side by side -->
-    <n-flex :size="12">
-      <div style="flex: 1; min-width: 150px;">
+      <!-- VRAM and Memory Type -->
+      <n-form-item-gi label="VRAM">
         <StorageCapacityInput 
           v-model="localProduct.vram"
-          label="VRAM"
           :editable="editable"
         />
-      </div>
-      <div style="flex: 1; min-width: 150px;">
-        <label style="display: block; margin-bottom: 4px; font-size: 14px;">Memory Type</label>
+      </n-form-item-gi>
+      
+      <n-form-item-gi label="Memory Type">
         <n-select 
           v-model:value="localProduct.memoryType"
           :options="memoryTypeOptions"
           :disabled="!editable"
         />
-      </div>
-    </n-flex>
+      </n-form-item-gi>
 
-    <!-- Core Clock and Boost Clock - Side by side -->
-    <n-flex :size="12">
-      <div style="flex: 1; min-width: 150px;">
+      <!-- Core Clock and Boost Clock -->
+      <n-form-item-gi label="Core Clock">
         <FrequencyInput 
           v-model="localProduct.coreClock"
-          label="Core Clock"
           :editable="editable"
         />
-      </div>
-      <div style="flex: 1; min-width: 150px;">
+      </n-form-item-gi>
+      
+      <n-form-item-gi label="Boost Clock">
         <FrequencyInput 
           v-model="localProduct.boostClock"
-          label="Boost Clock"
           :editable="editable"
         />
-      </div>
-    </n-flex>
+      </n-form-item-gi>
 
-    <!-- TDP and Length - Side by side -->
-    <n-flex :size="12">
-      <div style="flex: 1; min-width: 150px;">
+      <!-- TDP and Card Length -->
+      <n-form-item-gi label="TDP">
         <PowerInput 
           v-model="localProduct.tdp"
-          label="TDP"
           :editable="editable"
         />
-      </div>
-      <div style="flex: 1; min-width: 150px;">
+      </n-form-item-gi>
+      
+      <n-form-item-gi label="Card Length">
         <LengthInput 
           v-model="localProduct.length"
-          label="Card Length"
           :editable="editable"
         />
-      </div>
-    </n-flex>
+      </n-form-item-gi>
 
-    <!-- Power Connectors -->
-    <n-flex :size="12">
-      <div style="flex: 1; min-width: 150px;">
-        <label style="display: block; margin-bottom: 4px; font-size: 14px;">Power Connectors</label>
+      <!-- Power Connectors and Ray Tracing -->
+      <n-form-item-gi label="Power Connectors">
         <n-select 
           v-model:value="localProduct.powerConnectors"
           :options="powerConnectorOptions"
           :disabled="!editable"
         />
-      </div>
-    </n-flex>
-
-    <!-- Ray Tracing -->
-    <n-flex :size="12">
-      <div style="flex: 1; min-width: 150px;">
+      </n-form-item-gi>
+      
+      <n-form-item-gi>
         <n-checkbox 
           v-model:checked="localProduct.rayTracing"
           :disabled="!editable"
         >
           Ray Tracing Support
         </n-checkbox>
-      </div>
-    </n-flex>
+      </n-form-item-gi>
 
-    <!-- Dimensions -->
-    <n-flex :size="12">
-      <div style="flex: 1; min-width: 150px;">
-        <label style="display: block; margin-bottom: 4px; font-size: 14px;">Dimensions</label>
+      <!-- Dimensions -->
+      <n-form-item-gi label="Dimensions" :span="2">
         <DimensionsInput 
           v-model="localProduct.dimensions"
           :editable="editable"
         />
-      </div>
-    </n-flex>
+      </n-form-item-gi>
 
-    <!-- Slots -->
-    <n-flex :size="12">
-      <div style="flex: 1; min-width: 150px;">
+      <!-- Slots -->
+      <n-form-item-gi :span="2">
         <SlotsInput 
           v-model="localProduct.slots"
           :editable="editable"
         />
-      </div>
-    </n-flex>
-  </n-flex>
+      </n-form-item-gi>
+    </n-grid>
+  </n-form>
 </template>
 
 <script setup lang="ts">
 import { ref, watch } from 'vue';
-import { NFlex, NInput, NSelect, NCheckbox } from 'naive-ui';
+import { NForm, NFormItemGi, NGrid, NInput, NSelect, NCheckbox } from 'naive-ui';
 import type { GpuProductRequest, GpuProductResponse, MemoryType, GpuPowerConnector } from '@/types/products';
 import FrequencyInput from '@/components/ValueObjects/FrequencyInput.vue';
 import PowerInput from '@/components/ValueObjects/PowerInput.vue';

@@ -1,7 +1,7 @@
 <template>
   <n-form>
     <!-- Form Factor and Color -->
-    <n-grid :cols="2">
+    <n-grid :cols="2" :x-gap="12">
       <n-form-item-gi label="Form Factor">
         <n-input v-model:value="localProduct.formFactor" :disabled="!editable"
           placeholder="e.g., Mid Tower, Full Tower" />

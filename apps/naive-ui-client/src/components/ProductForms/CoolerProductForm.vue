@@ -1,53 +1,54 @@
 <template>
   <n-form>
-    <!-- Cooler Type and Height -->
-    <n-grid :cols="2" :x-gap="12">
-      <n-form-item label="Cooler Type">
+    <n-grid :cols="2">
+      <!-- Cooler Type and Height -->
+      <n-form-item-gi label="Cooler Type">
         <n-select 
           v-model:value="localProduct.coolerType"
           :options="coolerTypeOptions"
           :disabled="!editable"
         />
-      </n-form-item>
-      <n-form-item label="Height">
+      </n-form-item-gi>
+      
+      <n-form-item-gi label="Height">
         <LengthInput 
           v-model="localProduct.height"
           :editable="editable"
         />
-      </n-form-item>
+      </n-form-item-gi>
+
+      <!-- TDP Rating -->
+      <n-form-item-gi label="TDP Rating">
+        <PowerInput 
+          v-model="localProduct.tdp"
+          :editable="editable"
+        />
+      </n-form-item-gi>
+
+      <!-- Compatible Sockets -->
+      <n-form-item-gi label="Compatible CPU Sockets">
+        <n-select 
+          v-model:value="localProduct.sockets"
+          :options="socketOptions"
+          :disabled="!editable"
+          multiple
+        />
+      </n-form-item-gi>
+
+      <!-- Dimensions -->
+      <n-form-item-gi label="Dimensions" :span="2">
+        <DimensionsInput 
+          v-model="localProduct.dimensions"
+          :editable="editable"
+        />
+      </n-form-item-gi>
     </n-grid>
-
-    <!-- TDP -->
-    <n-form-item label="TDP Rating">
-      <PowerInput 
-        v-model="localProduct.tdp"
-        :editable="editable"
-      />
-    </n-form-item>
-
-    <!-- Compatible Sockets -->
-    <n-form-item label="Compatible CPU Sockets">
-      <n-select 
-        v-model:value="localProduct.sockets"
-        :options="socketOptions"
-        :disabled="!editable"
-        multiple
-      />
-    </n-form-item>
-
-    <!-- Dimensions -->
-    <n-form-item label="Dimensions">
-      <DimensionsInput 
-        v-model="localProduct.dimensions"
-        :editable="editable"
-      />
-    </n-form-item>
   </n-form>
 </template>
 
 <script setup lang="ts">
 import { ref, watch } from 'vue';
-import { NForm, NFormItem, NGrid, NSelect } from 'naive-ui';
+import { NForm, NFormItemGi, NGrid, NSelect } from 'naive-ui';
 import type { CoolerProductRequest, CoolerProductResponse, CoolerType, CpuSocket } from '@/types/products';
 import PowerInput from '@/components/ValueObjects/PowerInput.vue';
 import LengthInput from '@/components/ValueObjects/LengthInput.vue';

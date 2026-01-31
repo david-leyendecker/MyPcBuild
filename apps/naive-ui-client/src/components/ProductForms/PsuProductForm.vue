@@ -1,67 +1,60 @@
 <template>
-  <n-flex vertical :size="12">
-    <!-- Wattage and Efficiency - Side by side -->
-    <n-flex :size="12">
-      <div style="flex: 1; min-width: 150px;">
+  <n-form>
+    <n-grid :cols="2">
+      <!-- Wattage and Efficiency -->
+      <n-form-item-gi label="Wattage">
         <PowerInput 
           v-model="localProduct.wattage"
-          label="Wattage"
           :editable="editable"
         />
-      </div>
-      <div style="flex: 1; min-width: 150px;">
-        <label style="display: block; margin-bottom: 4px; font-size: 14px;">Efficiency Rating</label>
+      </n-form-item-gi>
+      
+      <n-form-item-gi label="Efficiency Rating">
         <n-input 
           v-model:value="localProduct.efficiency"
           :disabled="!editable"
           placeholder="e.g., 80+ Gold, 80+ Platinum"
         />
-      </div>
-    </n-flex>
+      </n-form-item-gi>
 
-    <!-- Modular and Form Factor - Side by side -->
-    <n-flex :size="12">
-      <div style="flex: 1; min-width: 150px;">
-        <label style="display: block; margin-bottom: 4px; font-size: 14px;">Modularity</label>
+      <!-- Modular and Form Factor -->
+      <n-form-item-gi label="Modularity">
         <n-input 
           v-model:value="localProduct.modular"
           :disabled="!editable"
           placeholder="e.g., Fully Modular, Semi-Modular"
         />
-      </div>
-      <div style="flex: 1; min-width: 150px;">
-        <label style="display: block; margin-bottom: 4px; font-size: 14px;">Form Factor</label>
+      </n-form-item-gi>
+      
+      <n-form-item-gi label="Form Factor">
         <n-input 
           v-model:value="localProduct.formFactor"
           :disabled="!editable"
           placeholder="e.g., ATX, SFX"
         />
-      </div>
-    </n-flex>
+      </n-form-item-gi>
 
-    <!-- Length and PCIe 8-Pin Connectors - Side by side -->
-    <n-flex :size="12">
-      <div style="flex: 1; min-width: 150px;">
+      <!-- Length and PCIe 8-Pin Connectors -->
+      <n-form-item-gi label="Length">
         <LengthInput 
           v-model="localProduct.length"
-          label="Length"
           :editable="editable"
         />
-      </div>
-      <div style="flex: 1; min-width: 150px;">
-        <label style="display: block; margin-bottom: 4px; font-size: 14px;">PCIe 8-Pin Connectors</label>
+      </n-form-item-gi>
+      
+      <n-form-item-gi label="PCIe 8-Pin Connectors">
         <n-input-number 
           v-model:value="localProduct.pcie8Pin"
           :disabled="!editable"
         />
-      </div>
-    </n-flex>
-  </n-flex>
+      </n-form-item-gi>
+    </n-grid>
+  </n-form>
 </template>
 
 <script setup lang="ts">
 import { ref, watch } from 'vue';
-import { NFlex, NInput, NInputNumber } from 'naive-ui';
+import { NForm, NFormItemGi, NGrid, NInput, NInputNumber } from 'naive-ui';
 import type { PsuProductRequest, PsuProductResponse } from '@/types/products';
 import PowerInput from '@/components/ValueObjects/PowerInput.vue';
 import LengthInput from '@/components/ValueObjects/LengthInput.vue';

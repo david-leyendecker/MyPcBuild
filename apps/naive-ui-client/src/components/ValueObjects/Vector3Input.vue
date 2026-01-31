@@ -1,37 +1,34 @@
 <template>
-  <n-flex justify="space-evenly">
-    <n-input-group style="flex: 1; min-width: 0;">
-      <n-input-group-label>X</n-input-group-label>
+  <n-grid :cols="3" :x-gap="12">
+    <n-form-item-gi label="X">
       <n-input-number
         :value="modelValue?.x ?? 0"
         :placeholder="placeholders.x"
-        :readonly="!editable"
+        :disabled="!editable"
         @update:value="onUpdate('x', $event)"
       />
-    </n-input-group>
-    <n-input-group style="flex: 1; min-width: 0;">
-      <n-input-group-label>Y</n-input-group-label>
+    </n-form-item-gi>
+    <n-form-item-gi label="Y">
       <n-input-number
         :value="modelValue?.y ?? 0"
         :placeholder="placeholders.y"
-        :readonly="!editable"
+        :disabled="!editable"
         @update:value="onUpdate('y', $event)"
       />
-    </n-input-group>
-    <n-input-group style="flex: 1; min-width: 0;">
-      <n-input-group-label>Z</n-input-group-label>
+    </n-form-item-gi>
+    <n-form-item-gi label="Z">
       <n-input-number
         :value="modelValue?.z ?? 0"
         :placeholder="placeholders.z"
-        :readonly="!editable"
+        :disabled="!editable"
         @update:value="onUpdate('z', $event)"
       />
-    </n-input-group>
-  </n-flex>
+    </n-form-item-gi>
+  </n-grid>
 </template>
 
 <script setup lang="ts">
-import { NInputNumber, NInputGroup, NInputGroupLabel, NFlex } from 'naive-ui';
+import { NInputNumber, NFormItemGi, NGrid } from 'naive-ui';
 
 interface Vector3 { x: number; y: number; z: number }
 

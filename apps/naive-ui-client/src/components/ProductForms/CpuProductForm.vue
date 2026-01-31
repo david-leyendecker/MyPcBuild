@@ -9,10 +9,10 @@
 
       <!-- Cores and Threads -->
       <n-form-item-gi label="Cores">
-        <n-input-number v-model:value="localProduct.cores" placeholder="Number of cores" :readonly="!editable" />
+        <n-input-number v-model:value="localProduct.cores" placeholder="Number of cores" :disabled="!editable" />
       </n-form-item-gi>
       <n-form-item-gi label="Threads">
-        <n-input-number v-model:value="localProduct.threads" placeholder="Number of threads" :readonly="!editable" />
+        <n-input-number v-model:value="localProduct.threads" placeholder="Number of threads" :disabled="!editable" />
       </n-form-item-gi>
 
       <!-- Base Clock and Boost Clock -->

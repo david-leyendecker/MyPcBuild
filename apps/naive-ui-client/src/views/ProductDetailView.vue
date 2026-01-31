@@ -60,15 +60,19 @@
             <n-h3>Basic Information</n-h3>
 
             <n-form :model="formData" label-placement="top" :disabled="!isEditMode">
-                <n-form-item label="Product Name" required path="name">
+              <n-grid :cols="2">
+                <n-form-item-gi label="Product Name" :span="2">
                   <n-input v-model:value="formData.name" />
-                </n-form-item>
-                <n-form-item label="Manufacturer" required path="manufacturer">
+                </n-form-item-gi>
+                
+                <n-form-item-gi label="Manufacturer">
                   <n-input v-model:value="formData.manufacturer" />
-                </n-form-item>
-                <n-form-item label="Price ($)" required path="price">
+                </n-form-item-gi>
+                
+                <n-form-item-gi label="Price ($)">
                   <n-input-number v-model:value="formData.price" />
-                </n-form-item>
+                </n-form-item-gi>
+              </n-grid>
             </n-form>
           </n-flex>
 
@@ -146,7 +150,7 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { NH2, NH3, NCard, NButton, NInput, NInputNumber, NAlert, NFlex, NDivider, NSpin, NIcon, NForm, NFormItem } from 'naive-ui';
+import { NH2, NH3, NCard, NButton, NInput, NInputNumber, NAlert, NFlex, NDivider, NSpin, NIcon, NForm, NFormItemGi, NGrid } from 'naive-ui';
 import { catalogApi } from '@/api/catalog';
 import { getTypedProduct, updateTypedProduct } from '@/api/catalogTyped';
 import ProductFormSelector from '@/components/ProductFormSelector.vue';

@@ -1,82 +1,70 @@
 <template>
-  <n-flex vertical :size="12">
-    <!-- Socket and Chipset - Side by side -->
-    <n-flex :size="12">
-      <div style="flex: 1; min-width: 150px;">
-        <label style="display: block; margin-bottom: 4px; font-size: 14px;">CPU Socket</label>
+  <n-form>
+    <n-grid :cols="2">
+      <!-- Socket and Chipset -->
+      <n-form-item-gi label="CPU Socket">
         <n-select 
           v-model:value="localProduct.socket"
           :options="socketOptions"
           :disabled="!editable"
         />
-      </div>
-      <div style="flex: 1; min-width: 150px;">
-        <label style="display: block; margin-bottom: 4px; font-size: 14px;">Chipset</label>
+      </n-form-item-gi>
+      
+      <n-form-item-gi label="Chipset">
         <n-input 
           v-model:value="localProduct.chipset"
           :disabled="!editable"
           placeholder="e.g., Z790, X670E"
         />
-      </div>
-    </n-flex>
+      </n-form-item-gi>
 
-    <!-- Form Factor and Memory Type - Side by side -->
-    <n-flex :size="12">
-      <div style="flex: 1; min-width: 150px;">
-        <label style="display: block; margin-bottom: 4px; font-size: 14px;">Form Factor</label>
+      <!-- Form Factor and Memory Type -->
+      <n-form-item-gi label="Form Factor">
         <n-select 
           v-model:value="localProduct.formFactor"
           :options="formFactorOptions"
           :disabled="!editable"
         />
-      </div>
-      <div style="flex: 1; min-width: 150px;">
-        <label style="display: block; margin-bottom: 4px; font-size: 14px;">Memory Type</label>
+      </n-form-item-gi>
+      
+      <n-form-item-gi label="Memory Type">
         <n-select 
           v-model:value="localProduct.memoryType"
           :options="memoryTypeOptions"
           :disabled="!editable"
         />
-      </div>
-    </n-flex>
+      </n-form-item-gi>
 
-    <!-- Max Memory -->
-    <n-flex :size="12">
-      <div style="flex: 1; min-width: 150px;">
+      <!-- Max Memory -->
+      <n-form-item-gi label="Maximum Memory Capacity">
         <StorageCapacityInput 
           v-model="localProduct.maxMemory"
-          label="Maximum Memory Capacity"
           :editable="editable"
         />
-      </div>
-    </n-flex>
+      </n-form-item-gi>
 
-    <!-- Dimensions -->
-    <n-flex :size="12">
-      <div style="flex: 1; min-width: 150px;">
-        <label style="display: block; margin-bottom: 4px; font-size: 14px;">Dimensions</label>
+      <!-- Dimensions -->
+      <n-form-item-gi label="Dimensions" :span="2">
         <DimensionsInput 
           v-model="localProduct.dimensions"
           :editable="editable"
         />
-      </div>
-    </n-flex>
+      </n-form-item-gi>
 
-    <!-- Slots -->
-    <n-flex :size="12">
-      <div style="flex: 1; min-width: 150px;">
+      <!-- Slots -->
+      <n-form-item-gi :span="2">
         <SlotsInput 
           v-model="localProduct.slots"
           :editable="editable"
         />
-      </div>
-    </n-flex>
-  </n-flex>
+      </n-form-item-gi>
+    </n-grid>
+  </n-form>
 </template>
 
 <script setup lang="ts">
 import { ref, watch } from 'vue';
-import { NFlex, NInput, NSelect } from 'naive-ui';
+import { NForm, NFormItemGi, NGrid, NInput, NSelect } from 'naive-ui';
 import type { MotherboardProductRequest, MotherboardProductResponse, CpuSocket, FormFactor, MemoryType } from '@/types/products';
 import StorageCapacityInput from '@/components/ValueObjects/StorageCapacityInput.vue';
 import DimensionsInput from '@/components/ValueObjects/DimensionsInput.vue';

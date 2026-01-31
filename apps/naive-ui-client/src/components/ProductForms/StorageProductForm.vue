@@ -1,61 +1,60 @@
 <template>
   <n-form>
-    <!-- Type and Interface -->
-    <n-grid :cols="2" :x-gap="12">
-      <n-form-item label="Storage Type">
+    <n-grid :cols="2">
+      <!-- Type and Interface -->
+      <n-form-item-gi label="Storage Type">
         <n-input 
           v-model:value="localProduct.type"
           :disabled="!editable"
           placeholder="e.g., SSD, HDD"
         />
-      </n-form-item>
-      <n-form-item label="Interface">
+      </n-form-item-gi>
+      
+      <n-form-item-gi label="Interface">
         <n-input 
           v-model:value="localProduct.interface"
           :disabled="!editable"
           placeholder="e.g., NVMe, SATA"
         />
-      </n-form-item>
-    </n-grid>
+      </n-form-item-gi>
 
-    <!-- Form Factor and Capacity -->
-    <n-grid :cols="2" :x-gap="12">
-      <n-form-item label="Form Factor">
+      <!-- Form Factor and Capacity -->
+      <n-form-item-gi label="Form Factor">
         <n-input 
           v-model:value="localProduct.storageFormFactor"
           :disabled="!editable"
           placeholder="e.g., M.2 2280, 2.5 inch"
         />
-      </n-form-item>
-      <n-form-item label="Capacity">
+      </n-form-item-gi>
+      
+      <n-form-item-gi label="Capacity">
         <StorageCapacityInput 
           v-model="localProduct.capacity"
           :editable="editable"
         />
-      </n-form-item>
-    </n-grid>
+      </n-form-item-gi>
 
-    <!-- Read Speed and Write Speed -->
-    <n-grid :cols="2" :x-gap="12">
-      <n-form-item label="Read Speed">
+      <!-- Read Speed and Write Speed -->
+      <n-form-item-gi label="Read Speed">
         <DataSpeedInput 
           v-model="localProduct.readSpeed"
           :editable="editable"
         />
-      </n-form-item>
-      <n-form-item label="Write Speed">
+      </n-form-item-gi>
+      
+      <n-form-item-gi label="Write Speed">
         <DataSpeedInput 
           v-model="localProduct.writeSpeed"
           :editable="editable"
         />
-      </n-form-item>
+      </n-form-item-gi>
     </n-grid>
   </n-form>
 </template>
 
 <script setup lang="ts">
 import { ref, watch } from 'vue';
-import { NForm, NFormItem, NGrid, NInput } from 'naive-ui';
+import { NForm, NFormItemGi, NGrid, NInput } from 'naive-ui';
 import type { StorageProductRequest, StorageProductResponse } from '@/types/products';
 import StorageCapacityInput from '@/components/ValueObjects/StorageCapacityInput.vue';
 import DataSpeedInput from '@/components/ValueObjects/DataSpeedInput.vue';

@@ -1,7 +1,7 @@
 <template>
-  <n-flex vertical>
+  <n-flex vertical style="width: 100%;" :size="12">
     <n-flex justify="space-between" align="center">
-      <n-text>{{ label }}</n-text>
+      <n-text strong>{{ label }}</n-text>
       <n-button v-if="editable" size="small" @click="addSlot">
         <template #icon>
           <n-icon :component="Icons.Add" />
@@ -28,32 +28,31 @@
         </template>
 
         <n-card :bordered="true" size="small">
-          <n-flex vertical>
-
-            <n-form-item label="Slot Name">
-              <n-input v-model:value="slot.name" placeholder="Slot Name *" :readonly="!editable"
+          <n-grid :cols="2">
+            <n-form-item-gi label="Slot Name" :span="2">
+              <n-input v-model:value="slot.name" placeholder="Slot Name *" :disabled="!editable"
                 @update:value="emitUpdate" />
-            </n-form-item>
+            </n-form-item-gi>
 
-            <n-form-item label="Allowed Category">
+            <n-form-item-gi label="Allowed Category" :span="2">
               <n-select v-model:value="slot.allowedCategory" :options="categoryOptions" :disabled="!editable"
                 @update:value="emitUpdate" />
-            </n-form-item>
+            </n-form-item-gi>
 
-            <n-form-item label="Relative Position (mm)">
+            <n-form-item-gi label="Relative Position (mm)" :span="2">
               <Vector3Input v-model:modelValue="slot.relativePosition" :editable="editable"
                 @update:modelValue="emitUpdate" />
-            </n-form-item>
+            </n-form-item-gi>
 
-            <n-form-item label="Max Dimensions (mm)">
+            <n-form-item-gi label="Max Dimensions (mm)" :span="2">
               <DimensionsInput v-model:modelValue="slot.maxDimensions" :editable="editable"
                 @update:modelValue="emitUpdate" />
-            </n-form-item>
+            </n-form-item-gi>
 
-            <n-form-item label="Rotation (degrees, optional)">
+            <n-form-item-gi label="Rotation (degrees, optional)" :span="2">
               <RotationInput v-model:modelValue="slot.rotation" :editable="editable" @update:modelValue="emitUpdate" />
-            </n-form-item>
-          </n-flex>
+            </n-form-item-gi>
+          </n-grid>
         </n-card>
       </n-collapse-item>
     </n-collapse>
@@ -62,7 +61,7 @@
 
 <script setup lang="ts">
 import { ref, watch } from 'vue';
-import { NText, NButton, NCard, NCollapse, NCollapseItem, NFlex, NInput, NSelect, NIcon, NEmpty, NFormItem } from 'naive-ui';
+import { NButton, NCard, NCollapse, NCollapseItem, NFlex, NInput, NSelect, NIcon, NEmpty, NFormItemGi, NGrid, NText } from 'naive-ui';
 import Vector3Input from './Vector3Input.vue';
 import RotationInput from './RotationInput.vue';
 import DimensionsInput from './DimensionsInput.vue';

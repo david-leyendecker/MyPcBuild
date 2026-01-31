@@ -20,37 +20,30 @@
       <n-flex vertical>
         <!-- Step 1: Creation Mode Selection -->
         <n-flex vertical v-if="currentStep === 1">
-          <n-h3 style="margin: 0 0 12px 0;">How would you like to create this product?</n-h3>
+          <n-h3 style="margin: 0 0 20px 0;">How would you like to create this product?</n-h3>
 
-          <n-grid :cols="'1 s:1 m:2'">
-            <n-form-item-gi>
-              <n-card :bordered="true" style="cursor: pointer; padding: 16px; border: 2px solid transparent;"
-                :style="creationMode === 'manual' ? { borderColor: 'var(--n-primary-color)' } : {}"
-                @click="selectCreationMode('manual')">
-                <div style="text-align: center;">
-                  <div style="font-size: 48px; margin-bottom: 8px;">
-                    <n-icon :component="Icons.Pencil" :size="48" />
-                  </div>
-                  <h4 class="text-h6" style="margin-bottom: 8px;">Manual Entry</h4>
-                  <p class="text-body-2">Enter all product details manually</p>
-                </div>
-              </n-card>
-            </n-form-item-gi>
+          <n-flex align="center" :size="12" style="margin-bottom: 24px;">
+            <n-button :type="creationMode === 'manual' ? 'primary' : 'default'" @click="selectCreationMode('manual')"
+              style="flex: 1; padding: 12px 16px;">
+              <template #icon>
+                <n-icon :component="Icons.Pencil" />
+              </template>
+              Manual Entry
+            </n-button>
+            <n-button :type="creationMode === 'ai' ? 'primary' : 'default'" @click="selectCreationMode('ai')"
+              style="flex: 1; padding: 12px 16px;">
+              <template #icon>
+                <n-icon :component="Icons.Bulb" />
+              </template>
+              AI-Assisted
+            </n-button>
+          </n-flex>
 
-            <n-form-item-gi>
-              <n-card :bordered="true" style="cursor: pointer; padding: 16px; border: 2px solid transparent;"
-                :style="creationMode === 'ai' ? { borderColor: 'var(--n-primary-color)' } : {}"
-                @click="selectCreationMode('ai')">
-                <div style="text-align: center;">
-                  <div style="font-size: 48px; margin-bottom: 8px;">
-                    <n-icon :component="Icons.Bulb" :size="48" />
-                  </div>
-                  <h4 class="text-h6" style="margin-bottom: 8px;">AI-Assisted</h4>
-                  <p class="text-body-2">Generate product details from a description using AI</p>
-                </div>
-              </n-card>
-            </n-form-item-gi>
-          </n-grid>
+          <n-flex v-if="creationMode" style="margin-bottom: 24px; padding: 12px; border-radius: 4px; background-color: rgba(0, 0, 0, 0.05);">
+            <p style="margin: 0; font-size: 14px;">
+              {{ creationMode === 'manual' ? 'Enter all product details manually' : 'Generate product details from a description using AI' }}
+            </p>
+          </n-flex>
 
           <n-flex justify="end" align="center">
             <n-button type="primary" :disabled="!creationMode" @click="nextStep" icon-placement="right">
@@ -69,7 +62,7 @@
             <n-h3 style="margin: 0 0 12px 0;">Generate Product with AI</n-h3>
 
             <n-form :model="formData" label-placement="top">
-              <n-grid :cols="'1 s:1 m:2'" :x-gap="16" :y-gap="12">
+              <n-grid :cols="'1 s:1 m:2'">
                 <n-form-item-gi label="Category *" path="category" :span="2">
                   <n-select v-model:value="formData.category" :options="categories"></n-select>
                 </n-form-item-gi>
@@ -104,10 +97,10 @@
 
           <!-- Manual Mode -->
           <n-flex vertical v-else>
-            <n-h3 style="margin: 0 0 12px 0;">Basic Information</n-h3>
+            <n-h3>Basic Information</n-h3>
 
             <n-form :model="formData" label-placement="top">
-              <n-grid :cols="'1 s:1 m:2'" :x-gap="16" :y-gap="12">
+              <n-grid :cols="'1 s:1 m:2'">
                 <n-form-item-gi label="Category *" path="category" :span="2">
                   <n-select v-model:value="formData.category" :options="categories"></n-select>
                 </n-form-item-gi>
@@ -153,7 +146,7 @@
 
             <n-flex vertical>
               <n-form :model="formData" label-placement="top">
-                <n-grid :cols="'1 s:1 m:2'" :x-gap="16" :y-gap="12">
+                <n-grid :cols="'1 s:1 m:2'">
                   <n-form-item-gi label="Product Name *" path="name" :span="2">
                     <n-input v-model:value="formData.name" />
                   </n-form-item-gi>

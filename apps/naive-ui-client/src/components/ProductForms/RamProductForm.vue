@@ -1,67 +1,60 @@
 <template>
-  <n-flex vertical :size="12">
-    <!-- Type and Configuration - Side by side -->
-    <n-flex :size="12">
-      <div style="flex: 1; min-width: 150px;">
-        <label style="display: block; margin-bottom: 4px; font-size: 14px;">Memory Type</label>
+  <n-form>
+    <n-grid :cols="2">
+      <!-- Type and Configuration -->
+      <n-form-item-gi label="Memory Type">
         <n-select 
           v-model:value="localProduct.type"
           :options="memoryTypeOptions"
           :disabled="!editable"
         />
-      </div>
-      <div style="flex: 1; min-width: 150px;">
-        <label style="display: block; margin-bottom: 4px; font-size: 14px;">Configuration</label>
+      </n-form-item-gi>
+      
+      <n-form-item-gi label="Configuration">
         <n-input 
           v-model:value="localProduct.configuration"
           :disabled="!editable"
           placeholder="e.g., 2x16GB"
         />
-      </div>
-    </n-flex>
+      </n-form-item-gi>
 
-    <!-- Capacity and Speed - Side by side -->
-    <n-flex :size="12">
-      <div style="flex: 1; min-width: 150px;">
+      <!-- Capacity and Speed -->
+      <n-form-item-gi label="Total Capacity">
         <StorageCapacityInput 
           v-model="localProduct.capacity"
-          label="Total Capacity"
           :editable="editable"
         />
-      </div>
-      <div style="flex: 1; min-width: 150px;">
+      </n-form-item-gi>
+      
+      <n-form-item-gi label="Speed (MHz)">
         <FrequencyInput 
           v-model="localProduct.speed"
-          label="Speed (MHz)"
           :editable="editable"
         />
-      </div>
-    </n-flex>
+      </n-form-item-gi>
 
-    <!-- CAS Latency and Voltage - Side by side -->
-    <n-flex :size="12">
-      <div style="flex: 1; min-width: 150px;">
-        <label style="display: block; margin-bottom: 4px; font-size: 14px;">CAS Latency</label>
+      <!-- CAS Latency and Voltage -->
+      <n-form-item-gi label="CAS Latency">
         <n-input 
           v-model:value="localProduct.casLatency"
           :disabled="!editable"
           placeholder="e.g., CL16"
         />
-      </div>
-      <div style="flex: 1; min-width: 150px;">
+      </n-form-item-gi>
+      
+      <n-form-item-gi label="Voltage">
         <VoltageInput 
           v-model="localProduct.voltage"
-          label="Voltage"
           :editable="editable"
         />
-      </div>
-    </n-flex>
-  </n-flex>
+      </n-form-item-gi>
+    </n-grid>
+  </n-form>
 </template>
 
 <script setup lang="ts">
 import { ref, watch } from 'vue';
-import { NFlex, NInput, NSelect } from 'naive-ui';
+import { NForm, NFormItemGi, NGrid, NInput, NSelect } from 'naive-ui';
 import type { RamProductRequest, RamProductResponse, MemoryType } from '@/types/products';
 import StorageCapacityInput from '@/components/ValueObjects/StorageCapacityInput.vue';
 import FrequencyInput from '@/components/ValueObjects/FrequencyInput.vue';
