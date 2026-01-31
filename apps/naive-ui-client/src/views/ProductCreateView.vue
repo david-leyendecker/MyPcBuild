@@ -238,7 +238,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
-import { NCard, NButton, NInput, NInputNumber, NSelect, NAlert, NDivider, NSteps, NStep, NIcon, NForm, NFormItemGi, NGrid, NFlex, NH2, NH3, NText } from 'naive-ui';
+import { NCard, NButton, NInput, NInputNumber, NSelect, NAlert, NDivider, NSteps, NStep, NIcon, NForm, NFormItemGi, NGrid, NFlex, NH2, NH3 } from 'naive-ui';
 import { catalogApi, ProductCategory, categoryLabels, type GenerateProductResponse } from '@/api/catalog';
 import { createTypedProduct } from '@/api/catalogTyped';
 import ProductFormSelector from '@/components/ProductFormSelector.vue';

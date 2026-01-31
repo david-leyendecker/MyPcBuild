@@ -32,7 +32,7 @@
 
 <script setup lang="ts">
 import { ref, watch } from 'vue';
-import { NForm, NFormItem, NFormItemGi, NGrid, NInput } from 'naive-ui';
+import { NForm, NFormItemGi, NGrid, NInput } from 'naive-ui';
 import type { PcCaseProductRequest, PcCaseProductResponse } from '@/types/products';
 import DimensionsInput from '@/components/ValueObjects/DimensionsInput.vue';
 import ChambersInput from '@/components/ValueObjects/ChambersInput.vue';

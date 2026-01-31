@@ -146,7 +146,7 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { NH2, NH3, NCard, NButton, NInput, NInputNumber, NAlert, NFlex, NDivider, NSpin, NIcon, NForm, NFormItem, NText } from 'naive-ui';
+import { NH2, NH3, NCard, NButton, NInput, NInputNumber, NAlert, NFlex, NDivider, NSpin, NIcon, NForm, NFormItem } from 'naive-ui';
 import { catalogApi } from '@/api/catalog';
 import { getTypedProduct, updateTypedProduct } from '@/api/catalogTyped';
 import ProductFormSelector from '@/components/ProductFormSelector.vue';

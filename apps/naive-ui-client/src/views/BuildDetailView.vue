@@ -118,7 +118,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
-import { NCard, NButton, NFlex, NSpin, NAlert, NDivider, NModal, NIcon, NEmpty, NH2, NH4, NP, NText } from 'naive-ui';
+import { NCard, NButton, NFlex, NSpin, NAlert, NDivider, NModal, NIcon, NEmpty, NH2, NText } from 'naive-ui';
 import { useBuildStore } from '@/stores/buildStore';
 import { useCatalogStore } from '@/stores/catalogStore';
 import CompatibilityPanel from '@/components/CompatibilityPanel.vue';
