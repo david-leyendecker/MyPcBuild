@@ -21,8 +21,8 @@ IResourceBuilder<ProjectResource> apiService = builder.AddProject<Projects.MyPcB
     .WithHttpHealthCheck("/health")
     .WaitFor(postgres);
 
-// Add Vue.js client (Vite dev server)
-var client = builder.AddViteApp("client", "../MyPcBuild.Client")
+// Add new Naive UI client (Vite dev server)
+var client = builder.AddViteApp("client", "../apps/naive-ui-client")
     .WithExternalHttpEndpoints()
     .WithHttpsEndpoint(port: null, env: "PORT")
     .WithReference(apiService)
