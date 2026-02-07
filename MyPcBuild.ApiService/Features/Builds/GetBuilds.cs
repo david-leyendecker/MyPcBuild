@@ -13,25 +13,25 @@ public static class GetBuilds
         {
             IReadOnlyList<Build> builds = await session.Query<Build>().ToListAsync();
 
-            string baseUrl = GetBaseUrl(httpContextAccessor);
+            string baseUrl = httpContextAccessor.GetBaseUrl();
 
             IReadOnlyList<GetBuildsResponseItem> items = builds.Select(build => new GetBuildsResponseItem(
                 build.Id,
                 build.Name,
                 build.Parts.Sum(part => part.PricePaid),
                 [
-                    new HateoasLink($"{baseUrl}/api/builds/{build.Id}", "self", "GET"),
-                    new HateoasLink($"{baseUrl}/api/builds/{build.Id}/parts", "add-part", "POST"),
-                    new HateoasLink($"{baseUrl}/api/builds/{build.Id}/compatibility", "validate", "GET")
+                    new HateoasLink(new Uri($"{baseUrl}/api/builds/{build.Id}"), "self", Infrastructure.HttpMethod.GET),
+                    new HateoasLink(new Uri($"{baseUrl}/api/builds/{build.Id}/parts"), "add-part", Infrastructure.HttpMethod.POST),
+                    new HateoasLink(new Uri($"{baseUrl}/api/builds/{build.Id}/compatibility"), "validate", Infrastructure.HttpMethod.GET)
                 ]
             )).ToList();
 
             GetBuildsResponse response = new(
                 items,
                 [
-                    new HateoasLink($"{baseUrl}/api/builds", "self", "GET"),
-                    new HateoasLink($"{baseUrl}/api/builds", "create-build", "POST"),
-                    new HateoasLink($"{baseUrl}/api/catalog/products", "catalog", "GET")
+                    new HateoasLink(new Uri($"{baseUrl}/api/builds"), "self", Infrastructure.HttpMethod.GET),
+                    new HateoasLink(new Uri($"{baseUrl}/api/builds"), "create-build", Infrastructure.HttpMethod.POST),
+                    new HateoasLink(new Uri($"{baseUrl}/api/catalog/products"), "catalog", Infrastructure.HttpMethod.GET)
                 ]
             );
 
@@ -44,11 +44,6 @@ public static class GetBuilds
         return app;
     }
 
-    private static string GetBaseUrl(IHttpContextAccessor httpContextAccessor)
-    {
-        HttpRequest request = httpContextAccessor.HttpContext!.Request;
-        return $"{request.Scheme}://{request.Host}";
-    }
 }
 
 public record GetBuildsResponse(

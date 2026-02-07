@@ -34,18 +34,18 @@ public static class UpdateProduct
             session.Store(updatedProduct);
             await session.SaveChangesAsync();
 
-            string baseUrl = GetBaseUrl(httpContextAccessor);
+            string baseUrl = httpContextAccessor.GetBaseUrl();
 
             List<HateoasLink> links =
             [
-                new HateoasLink($"{baseUrl}/api/catalog/products/{updatedProduct.Id}", "self", "GET"),
-                new HateoasLink($"{baseUrl}/api/catalog/products/{updatedProduct.Id}", "update", "PUT"),
-                new HateoasLink($"{baseUrl}/api/catalog/products", "all-products", "GET")
+                new HateoasLink(new Uri($"{baseUrl}/api/catalog/products/{updatedProduct.Id}"), "self", Infrastructure.HttpMethod.GET),
+                new HateoasLink(new Uri($"{baseUrl}/api/catalog/products/{updatedProduct.Id}"), "update", Infrastructure.HttpMethod.PUT),
+                new HateoasLink(new Uri($"{baseUrl}/api/catalog/products"), "all-products", Infrastructure.HttpMethod.GET)
             ];
 
             if (updatedProduct.IsDraft)
             {
-                links.Add(new HateoasLink($"{baseUrl}/api/catalog/products/{updatedProduct.Id}/publish", "publish", "POST"));
+                links.Add(new HateoasLink(new Uri($"{baseUrl}/api/catalog/products/{updatedProduct.Id}/publish"), "publish", Infrastructure.HttpMethod.POST));
             }
 
             UpdateProductResponse response = new(updatedProduct.Id, links);
@@ -60,11 +60,6 @@ public static class UpdateProduct
         return app;
     }
 
-    private static string GetBaseUrl(IHttpContextAccessor httpContextAccessor)
-    {
-        HttpRequest request = httpContextAccessor.HttpContext!.Request;
-        return $"{request.Scheme}://{request.Host}";
-    }
 }
 
 public record UpdateProductResponse(

@@ -30,7 +30,7 @@ public static class ValidateBuildSpatial
             // Validate
             SpatialValidationResult result = validator.ValidateBuild(build, allProducts);
 
-            string baseUrl = GetBaseUrl(httpContextAccessor);
+            string baseUrl = httpContextAccessor.GetBaseUrl();
 
             ValidateBuildSpatialResponse response = new(
                 result.IsValid,
@@ -42,11 +42,11 @@ public static class ValidateBuildSpatial
                     i.Category
                 )).ToList(),
                 [
-                    new HateoasLink($"{baseUrl}/api/builds/{buildId}/validate", "self", "POST"),
-                    new HateoasLink($"{baseUrl}/api/builds/{buildId}", "build", "GET"),
-                    new HateoasLink($"{baseUrl}/api/builds/{buildId}/parts", "add-part", "POST"),
-                    new HateoasLink($"{baseUrl}/api/builds/{buildId}/slots", "available-slots", "GET"),
-                    new HateoasLink($"{baseUrl}/api/builds/{buildId}/compatibility", "validate-compatibility", "GET")
+                    new HateoasLink(new Uri($"{baseUrl}/api/builds/{buildId}/validate"), "self", Infrastructure.HttpMethod.POST),
+                    new HateoasLink(new Uri($"{baseUrl}/api/builds/{buildId}"), "build", Infrastructure.HttpMethod.GET),
+                    new HateoasLink(new Uri($"{baseUrl}/api/builds/{buildId}/parts"), "add-part", Infrastructure.HttpMethod.POST),
+                    new HateoasLink(new Uri($"{baseUrl}/api/builds/{buildId}/slots"), "available-slots", Infrastructure.HttpMethod.GET),
+                    new HateoasLink(new Uri($"{baseUrl}/api/builds/{buildId}/compatibility"), "validate-compatibility", Infrastructure.HttpMethod.GET)
                 ]
             );
 
@@ -59,11 +59,6 @@ public static class ValidateBuildSpatial
         return app;
     }
 
-    private static string GetBaseUrl(IHttpContextAccessor httpContextAccessor)
-    {
-        HttpRequest request = httpContextAccessor.HttpContext!.Request;
-        return $"{request.Scheme}://{request.Host}";
-    }
 }
 
 public record ValidateBuildSpatialResponse(

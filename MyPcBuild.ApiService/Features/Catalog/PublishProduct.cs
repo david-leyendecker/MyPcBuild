@@ -36,16 +36,16 @@ public static class PublishProduct
             session.Store(publishedProduct);
             await session.SaveChangesAsync(cancellationToken);
 
-            string baseUrl = GetBaseUrl(httpContextAccessor);
+            string baseUrl = httpContextAccessor.GetBaseUrl();
 
             PublishProductResponse response = new(
                 publishedProduct.Id,
                 publishedProduct,
                 [
-                    new HateoasLink($"{baseUrl}/api/catalog/products/{publishedProduct.Id}", "self", "GET"),
-                    new HateoasLink($"{baseUrl}/api/catalog/products/{publishedProduct.Id}", "update", "PUT"),
-                    new HateoasLink($"{baseUrl}/api/catalog/products", "all-products", "GET"),
-                    new HateoasLink($"{baseUrl}/api/catalog/categories", "categories", "GET")
+                    new HateoasLink(new Uri($"{baseUrl}/api/catalog/products/{publishedProduct.Id}"), "self", Infrastructure.HttpMethod.GET),
+                    new HateoasLink(new Uri($"{baseUrl}/api/catalog/products/{publishedProduct.Id}"), "update", Infrastructure.HttpMethod.PUT),
+                    new HateoasLink(new Uri($"{baseUrl}/api/catalog/products"), "all-products", Infrastructure.HttpMethod.GET),
+                    new HateoasLink(new Uri($"{baseUrl}/api/catalog/categories"), "categories", Infrastructure.HttpMethod.GET)
                 ]
             );
 
@@ -57,11 +57,6 @@ public static class PublishProduct
         return app;
     }
 
-    private static string GetBaseUrl(IHttpContextAccessor httpContextAccessor)
-    {
-        HttpRequest request = httpContextAccessor.HttpContext!.Request;
-        return $"{request.Scheme}://{request.Host}";
-    }
 }
 
 public record PublishProductResponse(

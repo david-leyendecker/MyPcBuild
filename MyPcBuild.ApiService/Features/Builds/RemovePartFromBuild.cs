@@ -24,15 +24,15 @@ public static class RemovePartFromBuild
             _ = session.Events.Append(buildId, @event);
             await session.SaveChangesAsync();
 
-            string baseUrl = GetBaseUrl(httpContextAccessor);
+            string baseUrl = httpContextAccessor.GetBaseUrl();
 
             RemovePartResponse response = new(
                 "Part removed successfully",
                 [
-                    new HateoasLink($"{baseUrl}/api/builds/{buildId}", "build", "GET"),
-                    new HateoasLink($"{baseUrl}/api/builds/{buildId}/parts", "add-part", "POST"),
-                    new HateoasLink($"{baseUrl}/api/builds/{buildId}/compatibility", "validate", "GET"),
-                    new HateoasLink($"{baseUrl}/api/catalog/products", "catalog", "GET")
+                    new HateoasLink(new Uri($"{baseUrl}/api/builds/{buildId}"), "build", Infrastructure.HttpMethod.GET),
+                    new HateoasLink(new Uri($"{baseUrl}/api/builds/{buildId}/parts"), "add-part", Infrastructure.HttpMethod.POST),
+                    new HateoasLink(new Uri($"{baseUrl}/api/builds/{buildId}/compatibility"), "validate", Infrastructure.HttpMethod.GET),
+                    new HateoasLink(new Uri($"{baseUrl}/api/catalog/products"), "catalog", Infrastructure.HttpMethod.GET)
                 ]
             );
 
@@ -44,11 +44,6 @@ public static class RemovePartFromBuild
         return app;
     }
 
-    private static string GetBaseUrl(IHttpContextAccessor httpContextAccessor)
-    {
-        HttpRequest request = httpContextAccessor.HttpContext!.Request;
-        return $"{request.Scheme}://{request.Host}";
-    }
 }
 
 public record RemovePartResponse(

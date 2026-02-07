@@ -38,7 +38,7 @@ public static class ValidateCompatibility
             // Validate compatibility
             CompatibilityResult result = await validator.ValidateBuild(products);
 
-            string baseUrl = GetBaseUrl(httpContextAccessor);
+            string baseUrl = httpContextAccessor.GetBaseUrl();
 
             // Map to response DTO
             ValidateCompatibilityResponse response = new(
@@ -55,12 +55,12 @@ public static class ValidateCompatibility
                     p.Name,
                     p.ProductCategory,
                     [
-                        new HateoasLink($"{baseUrl}/api/catalog/products/{p.Id}", "product", "GET")
+                        new HateoasLink(new Uri($"{baseUrl}/api/catalog/products/{p.Id}"), "product", Infrastructure.HttpMethod.GET)
                     ]
                 )).ToList(),
                 [
-                    new HateoasLink($"{baseUrl}/api/compatibility/validate", "self", "POST"),
-                    new HateoasLink($"{baseUrl}/api/catalog/products", "catalog", "GET")
+                    new HateoasLink(new Uri($"{baseUrl}/api/compatibility/validate"), "self", Infrastructure.HttpMethod.POST),
+                    new HateoasLink(new Uri($"{baseUrl}/api/catalog/products"), "catalog", Infrastructure.HttpMethod.GET)
                 ]
             );
 
@@ -72,11 +72,6 @@ public static class ValidateCompatibility
         return app;
     }
 
-    private static string GetBaseUrl(IHttpContextAccessor httpContextAccessor)
-    {
-        HttpRequest request = httpContextAccessor.HttpContext!.Request;
-        return $"{request.Scheme}://{request.Host}";
-    }
 }
 
 public record ValidateCompatibilityRequest(List<Guid> ProductIds);

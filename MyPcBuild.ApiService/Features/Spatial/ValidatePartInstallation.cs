@@ -37,7 +37,7 @@ public static class ValidatePartInstallation
                 request.Position
             );
 
-            string baseUrl = GetBaseUrl(httpContextAccessor);
+            string baseUrl = httpContextAccessor.GetBaseUrl();
 
             ValidatePartInstallationResponse response = new(
                 result.IsValid,
@@ -49,11 +49,11 @@ public static class ValidatePartInstallation
                     i.Category
                 )).ToList(),
                 [
-                    new HateoasLink($"{baseUrl}/api/builds/{buildId}/parts/validate", "self", "POST"),
-                    new HateoasLink($"{baseUrl}/api/builds/{buildId}", "build", "GET"),
-                    new HateoasLink($"{baseUrl}/api/builds/{buildId}/parts", "add-part", "POST"),
-                    new HateoasLink($"{baseUrl}/api/builds/{buildId}/slots", "available-slots", "GET"),
-                    new HateoasLink($"{baseUrl}/api/builds/{buildId}/validate", "validate-build", "POST")
+                    new HateoasLink(new Uri($"{baseUrl}/api/builds/{buildId}/parts/validate"), "self", Infrastructure.HttpMethod.POST),
+                    new HateoasLink(new Uri($"{baseUrl}/api/builds/{buildId}"), "build", Infrastructure.HttpMethod.GET),
+                    new HateoasLink(new Uri($"{baseUrl}/api/builds/{buildId}/parts"), "add-part", Infrastructure.HttpMethod.POST),
+                    new HateoasLink(new Uri($"{baseUrl}/api/builds/{buildId}/slots"), "available-slots", Infrastructure.HttpMethod.GET),
+                    new HateoasLink(new Uri($"{baseUrl}/api/builds/{buildId}/validate"), "validate-build", Infrastructure.HttpMethod.POST)
                 ]
             );
 
@@ -66,11 +66,6 @@ public static class ValidatePartInstallation
         return app;
     }
 
-    private static string GetBaseUrl(IHttpContextAccessor httpContextAccessor)
-    {
-        HttpRequest request = httpContextAccessor.HttpContext!.Request;
-        return $"{request.Scheme}://{request.Host}";
-    }
 }
 
 public record ValidatePartInstallationResponse(

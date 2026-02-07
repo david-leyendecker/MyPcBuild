@@ -24,18 +24,18 @@ public static class GetProductById
                 return Results.NotFound();
             }
 
-            string baseUrl = GetBaseUrl(httpContextAccessor);
+            string baseUrl = httpContextAccessor.GetBaseUrl();
 
             ProductResponse response = ProductDtoMapper.ToResponse(product);
 
             GetProductByIdResponse wrappedResponse = new(
                 response,
                 [
-                    new HateoasLink($"{baseUrl}/api/catalog/products/{id}", "self", "GET"),
-                    new HateoasLink($"{baseUrl}/api/catalog/products/{id}", "update", "PUT"),
-                    new HateoasLink($"{baseUrl}/api/catalog/products?filters=ProductCategory={product.ProductCategory}", "category", "GET"),
-                    new HateoasLink($"{baseUrl}/api/catalog/products", "all-products", "GET"),
-                    new HateoasLink($"{baseUrl}/api/catalog/categories", "categories", "GET")
+                    new HateoasLink(new Uri($"{baseUrl}/api/catalog/products/{id}"), "self", Infrastructure.HttpMethod.GET),
+                    new HateoasLink(new Uri($"{baseUrl}/api/catalog/products/{id}"), "update", Infrastructure.HttpMethod.PUT),
+                    new HateoasLink(new Uri($"{baseUrl}/api/catalog/products?filters=ProductCategory={product.ProductCategory}"), "category", Infrastructure.HttpMethod.GET),
+                    new HateoasLink(new Uri($"{baseUrl}/api/catalog/products"), "all-products", Infrastructure.HttpMethod.GET),
+                    new HateoasLink(new Uri($"{baseUrl}/api/catalog/categories"), "categories", Infrastructure.HttpMethod.GET)
                 ]
             );
 
@@ -49,11 +49,6 @@ public static class GetProductById
         return app;
     }
 
-    private static string GetBaseUrl(IHttpContextAccessor httpContextAccessor)
-    {
-        HttpRequest request = httpContextAccessor.HttpContext!.Request;
-        return $"{request.Scheme}://{request.Host}";
-    }
 }
 
 public record GetProductByIdResponse(

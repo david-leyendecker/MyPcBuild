@@ -35,7 +35,7 @@ public static class GetBuildCompatibility
             // Validate compatibility
             CompatibilityResult result = await validator.ValidateBuild(products);
 
-            string baseUrl = GetBaseUrl(httpContextAccessor);
+            string baseUrl = httpContextAccessor.GetBaseUrl();
 
             // Map to response DTO with build context
             GetBuildCompatibilityResponse response = new(
@@ -54,14 +54,14 @@ public static class GetBuildCompatibility
                     p.Name,
                     p.ProductCategory,
                     [
-                        new HateoasLink($"{baseUrl}/api/catalog/products/{p.Id}", "product", "GET")
+                        new HateoasLink(new Uri($"{baseUrl}/api/catalog/products/{p.Id}"), "product", Infrastructure.HttpMethod.GET)
                     ]
                 )).ToList(),
                 [
-                    new HateoasLink($"{baseUrl}/api/builds/{buildId}/compatibility", "self", "GET"),
-                    new HateoasLink($"{baseUrl}/api/builds/{buildId}", "build", "GET"),
-                    new HateoasLink($"{baseUrl}/api/builds/{buildId}/parts", "add-part", "POST"),
-                    new HateoasLink($"{baseUrl}/api/catalog/products", "catalog", "GET")
+                    new HateoasLink(new Uri($"{baseUrl}/api/builds/{buildId}/compatibility"), "self", Infrastructure.HttpMethod.GET),
+                    new HateoasLink(new Uri($"{baseUrl}/api/builds/{buildId}"), "build", Infrastructure.HttpMethod.GET),
+                    new HateoasLink(new Uri($"{baseUrl}/api/builds/{buildId}/parts"), "add-part", Infrastructure.HttpMethod.POST),
+                    new HateoasLink(new Uri($"{baseUrl}/api/catalog/products"), "catalog", Infrastructure.HttpMethod.GET)
                 ]
             );
 
@@ -73,11 +73,6 @@ public static class GetBuildCompatibility
         return app;
     }
 
-    private static string GetBaseUrl(IHttpContextAccessor httpContextAccessor)
-    {
-        HttpRequest request = httpContextAccessor.HttpContext!.Request;
-        return $"{request.Scheme}://{request.Host}";
-    }
 }
 
 public record GetBuildCompatibilityResponse(

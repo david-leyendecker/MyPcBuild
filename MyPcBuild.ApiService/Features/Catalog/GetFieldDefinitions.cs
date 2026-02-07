@@ -24,16 +24,16 @@ public static class GetFieldDefinitions
                 _ => throw new ArgumentException($"Unknown category: {category}")
             };
 
-            string baseUrl = GetBaseUrl(httpContextAccessor);
+            string baseUrl = httpContextAccessor.GetBaseUrl();
 
             GetFieldDefinitionsResponse response = new(
                 category,
                 fields,
                 [
-                    new HateoasLink($"{baseUrl}/api/catalog/field-definitions/{category}", "self", "GET"),
-                    new HateoasLink($"{baseUrl}/api/catalog/products?filters=ProductCategory={category}", "products", "GET"),
-                    new HateoasLink($"{baseUrl}/api/catalog/categories", "categories", "GET"),
-                    new HateoasLink($"{baseUrl}/api/catalog/products", "create-product", "POST")
+                    new HateoasLink(new Uri($"{baseUrl}/api/catalog/field-definitions/{category}"), "self", Infrastructure.HttpMethod.GET),
+                    new HateoasLink(new Uri($"{baseUrl}/api/catalog/products?filters=ProductCategory={category}"), "products", Infrastructure.HttpMethod.GET),
+                    new HateoasLink(new Uri($"{baseUrl}/api/catalog/categories"), "categories", Infrastructure.HttpMethod.GET),
+                    new HateoasLink(new Uri($"{baseUrl}/api/catalog/products"), "create-product", Infrastructure.HttpMethod.POST)
                 ]
             );
 
@@ -45,11 +45,6 @@ public static class GetFieldDefinitions
         return app;
     }
 
-    private static string GetBaseUrl(IHttpContextAccessor httpContextAccessor)
-    {
-        HttpRequest request = httpContextAccessor.HttpContext!.Request;
-        return $"{request.Scheme}://{request.Host}";
-    }
 
     // Helper methods to create FieldDefinitions for each type
     private static FieldDefinition TextField(string name, bool required = false)

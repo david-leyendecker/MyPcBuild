@@ -75,16 +75,16 @@ public static class AddPartToSlot
             session.Events.Append(buildId, @event);
             await session.SaveChangesAsync();
 
-            string baseUrl = GetBaseUrl(httpContextAccessor);
+            string baseUrl = httpContextAccessor.GetBaseUrl();
 
             AddPartToSlotResponse response = new(
                 "Part added to slot successfully",
                 [
-                    new HateoasLink($"{baseUrl}/api/builds/{buildId}", "build", "GET"),
-                    new HateoasLink($"{baseUrl}/api/builds/{buildId}/parts/{request.ProductId}", "remove", "DELETE"),
-                    new HateoasLink($"{baseUrl}/api/builds/{buildId}/compatibility", "validate", "GET"),
-                    new HateoasLink($"{baseUrl}/api/builds/{buildId}/slots", "available-slots", "GET"),
-                    new HateoasLink($"{baseUrl}/api/catalog/products/{request.ProductId}", "product", "GET")
+                    new HateoasLink(new Uri($"{baseUrl}/api/builds/{buildId}"), "build", Infrastructure.HttpMethod.GET),
+                    new HateoasLink(new Uri($"{baseUrl}/api/builds/{buildId}/parts/{request.ProductId}"), "remove", Infrastructure.HttpMethod.DELETE),
+                    new HateoasLink(new Uri($"{baseUrl}/api/builds/{buildId}/compatibility"), "validate", Infrastructure.HttpMethod.GET),
+                    new HateoasLink(new Uri($"{baseUrl}/api/builds/{buildId}/slots"), "available-slots", Infrastructure.HttpMethod.GET),
+                    new HateoasLink(new Uri($"{baseUrl}/api/catalog/products/{request.ProductId}"), "product", Infrastructure.HttpMethod.GET)
                 ]
             );
 
@@ -116,11 +116,6 @@ public static class AddPartToSlot
         return null;
     }
 
-    private static string GetBaseUrl(IHttpContextAccessor httpContextAccessor)
-    {
-        HttpRequest request = httpContextAccessor.HttpContext!.Request;
-        return $"{request.Scheme}://{request.Host}";
-    }
 }
 
 public record AddPartToSlotRequest(

@@ -21,7 +21,7 @@ public static class GetCategories
                 .ToListAsync())
                 .ToDictionary(x => x.Category, x => x.Count);
 
-            string baseUrl = GetBaseUrl(httpContextAccessor);
+            string baseUrl = httpContextAccessor.GetBaseUrl();
 
             List<CategoryInfo> categories = [.. categoryInfoDict
                 .Select(kvp => new CategoryInfo(
@@ -29,16 +29,16 @@ public static class GetCategories
                     kvp.Value.DisplayValue,
                     productCounts.GetValueOrDefault(kvp.Key, 0),
                     [
-                        new HateoasLink($"{baseUrl}/api/catalog/products?filters=ProductCategory={kvp.Key}", "products", "GET"),
-                        new HateoasLink($"{baseUrl}/api/catalog/field-definitions/{kvp.Key}", "field-definitions", "GET")
+                        new HateoasLink(new Uri($"{baseUrl}/api/catalog/products?filters=ProductCategory={kvp.Key}"), "products", Infrastructure.HttpMethod.GET),
+                        new HateoasLink(new Uri($"{baseUrl}/api/catalog/field-definitions/{kvp.Key}"), "field-definitions", Infrastructure.HttpMethod.GET)
                     ]
                 ))];
 
             GetCategoriesResponse response = new(
                 categories,
                 [
-                    new HateoasLink($"{baseUrl}/api/catalog/categories", "self", "GET"),
-                    new HateoasLink($"{baseUrl}/api/catalog/products", "all-products", "GET")
+                    new HateoasLink(new Uri($"{baseUrl}/api/catalog/categories"), "self", Infrastructure.HttpMethod.GET),
+                    new HateoasLink(new Uri($"{baseUrl}/api/catalog/products"), "all-products", Infrastructure.HttpMethod.GET)
                 ]
             );
             return Results.Ok(response);
@@ -49,11 +49,6 @@ public static class GetCategories
         return app;
     }
 
-    private static string GetBaseUrl(IHttpContextAccessor httpContextAccessor)
-    {
-        HttpRequest request = httpContextAccessor.HttpContext!.Request;
-        return $"{request.Scheme}://{request.Host}";
-    }
 }
 
 public record GetCategoriesResponse(

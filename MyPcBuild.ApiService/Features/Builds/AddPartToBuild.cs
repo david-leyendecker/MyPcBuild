@@ -38,15 +38,15 @@ public static class AddPartToBuild
             session.Events.Append(buildId, @event);
             await session.SaveChangesAsync();
 
-            string baseUrl = GetBaseUrl(httpContextAccessor);
+            string baseUrl = httpContextAccessor.GetBaseUrl();
 
             AddPartResponse response = new(
                 "Part added successfully",
                 [
-                    new HateoasLink($"{baseUrl}/api/builds/{buildId}", "build", "GET"),
-                    new HateoasLink($"{baseUrl}/api/builds/{buildId}/parts/{request.ProductId}", "remove", "DELETE"),
-                    new HateoasLink($"{baseUrl}/api/builds/{buildId}/compatibility", "validate", "GET"),
-                    new HateoasLink($"{baseUrl}/api/catalog/products/{request.ProductId}", "product", "GET")
+                    new HateoasLink(new Uri($"{baseUrl}/api/builds/{buildId}"), "build", Infrastructure.HttpMethod.GET),
+                    new HateoasLink(new Uri($"{baseUrl}/api/builds/{buildId}/parts/{request.ProductId}"), "remove", Infrastructure.HttpMethod.DELETE),
+                    new HateoasLink(new Uri($"{baseUrl}/api/builds/{buildId}/compatibility"), "validate", Infrastructure.HttpMethod.GET),
+                    new HateoasLink(new Uri($"{baseUrl}/api/catalog/products/{request.ProductId}"), "product", Infrastructure.HttpMethod.GET)
                 ]
             );
 
@@ -58,11 +58,6 @@ public static class AddPartToBuild
         return app;
     }
 
-    private static string GetBaseUrl(IHttpContextAccessor httpContextAccessor)
-    {
-        HttpRequest request = httpContextAccessor.HttpContext!.Request;
-        return $"{request.Scheme}://{request.Host}";
-    }
 }
 
 public record AddPartRequest(Guid ProductId, decimal PricePaid);

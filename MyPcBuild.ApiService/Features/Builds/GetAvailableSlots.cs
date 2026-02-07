@@ -20,7 +20,7 @@ public static class GetAvailableSlots
                 return Results.NotFound();
             }
 
-            string baseUrl = GetBaseUrl(httpContextAccessor);
+            string baseUrl = httpContextAccessor.GetBaseUrl();
 
             List<AvailableSlotDto> availableSlots = [];
 
@@ -99,9 +99,9 @@ public static class GetAvailableSlots
             GetAvailableSlotsResponse response = new(
                 availableSlots,
                 [
-                    new HateoasLink($"{baseUrl}/api/builds/{buildId}/slots", "self", "GET"),
-                    new HateoasLink($"{baseUrl}/api/builds/{buildId}", "build", "GET"),
-                    new HateoasLink($"{baseUrl}/api/builds/{buildId}/parts/slot", "add-part-to-slot", "POST")
+                    new HateoasLink(new Uri($"{baseUrl}/api/builds/{buildId}/slots"), "self", Infrastructure.HttpMethod.GET),
+                    new HateoasLink(new Uri($"{baseUrl}/api/builds/{buildId}"), "build", Infrastructure.HttpMethod.GET),
+                    new HateoasLink(new Uri($"{baseUrl}/api/builds/{buildId}/parts/slot"), "add-part-to-slot", Infrastructure.HttpMethod.POST)
                 ]
             );
 
@@ -113,11 +113,6 @@ public static class GetAvailableSlots
         return app;
     }
 
-    private static string GetBaseUrl(IHttpContextAccessor httpContextAccessor)
-    {
-        HttpRequest request = httpContextAccessor.HttpContext!.Request;
-        return $"{request.Scheme}://{request.Host}";
-    }
 }
 
 public record GetAvailableSlotsResponse(

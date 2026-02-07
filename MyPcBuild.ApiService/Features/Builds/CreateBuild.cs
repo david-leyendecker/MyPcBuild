@@ -25,16 +25,16 @@ public static class CreateBuild
             session.Events.StartStream<Build>(buildId, @event);
             await session.SaveChangesAsync();
 
-            string baseUrl = GetBaseUrl(httpContextAccessor);
+            string baseUrl = httpContextAccessor.GetBaseUrl();
 
             CreateBuildResponse response = new(
                 buildId,
                 request.Name,
                 request.UserId,
                 [
-                    new HateoasLink($"{baseUrl}/api/builds/{buildId}", "self", "GET"),
-                    new HateoasLink($"{baseUrl}/api/builds/{buildId}/parts", "add-part", "POST"),
-                    new HateoasLink($"{baseUrl}/api/builds/{buildId}/compatibility", "validate", "GET")
+                    new HateoasLink(new Uri($"{baseUrl}/api/builds/{buildId}"), "self", Infrastructure.HttpMethod.GET),
+                    new HateoasLink(new Uri($"{baseUrl}/api/builds/{buildId}/parts"), "add-part", Infrastructure.HttpMethod.POST),
+                    new HateoasLink(new Uri($"{baseUrl}/api/builds/{buildId}/compatibility"), "validate", Infrastructure.HttpMethod.GET)
                 ]
             );
             return Results.Created($"/api/builds/{buildId}", response);
@@ -45,11 +45,6 @@ public static class CreateBuild
         return app;
     }
 
-    private static string GetBaseUrl(IHttpContextAccessor httpContextAccessor)
-    {
-        HttpRequest request = httpContextAccessor.HttpContext!.Request;
-        return $"{request.Scheme}://{request.Host}";
-    }
 }
 
 public record CreateBuildRequest(string Name, Guid UserId);

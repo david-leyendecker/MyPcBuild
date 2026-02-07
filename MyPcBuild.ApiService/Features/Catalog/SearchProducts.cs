@@ -14,15 +14,15 @@ public static class SearchProducts
             string? query = null,
             int maxResults = 10) =>
         {
-            string baseUrl = GetBaseUrl(httpContextAccessor);
+            string baseUrl = httpContextAccessor.GetBaseUrl();
 
             if (string.IsNullOrWhiteSpace(query))
             {
                 SearchProductsResponse emptyResponse = new(
                     [],
                     [
-                        new HateoasLink($"{baseUrl}/api/catalog/search", "self", "GET"),
-                        new HateoasLink($"{baseUrl}/api/catalog/products", "all-products", "GET")
+                        new HateoasLink(new Uri($"{baseUrl}/api/catalog/search"), "self", Infrastructure.HttpMethod.GET),
+                        new HateoasLink(new Uri($"{baseUrl}/api/catalog/products"), "all-products", Infrastructure.HttpMethod.GET)
                     ]
                 );
                 return Results.Ok(emptyResponse);
@@ -41,14 +41,14 @@ public static class SearchProducts
                     p.Price,
                     p.Manufacturer,
                     [
-                        new HateoasLink($"{baseUrl}/api/catalog/products/{p.Id}", "self", "GET"),
-                        new HateoasLink($"{baseUrl}/api/catalog/products?filters=ProductCategory={p.ProductCategory}", "category", "GET")
+                        new HateoasLink(new Uri($"{baseUrl}/api/catalog/products/{p.Id}"), "self", Infrastructure.HttpMethod.GET),
+                        new HateoasLink(new Uri($"{baseUrl}/api/catalog/products?filters=ProductCategory={p.ProductCategory}"), "category", Infrastructure.HttpMethod.GET)
                     ]
                 )).ToList(),
                 [
-                    new HateoasLink($"{baseUrl}/api/catalog/search?query={Uri.EscapeDataString(query)}&maxResults={maxResults}", "self", "GET"),
-                    new HateoasLink($"{baseUrl}/api/catalog/products", "all-products", "GET"),
-                    new HateoasLink($"{baseUrl}/api/catalog/categories", "categories", "GET")
+                    new HateoasLink(new Uri($"{baseUrl}/api/catalog/search?query={Uri.EscapeDataString(query)}&maxResults={maxResults}"), "self", Infrastructure.HttpMethod.GET),
+                    new HateoasLink(new Uri($"{baseUrl}/api/catalog/products"), "all-products", Infrastructure.HttpMethod.GET),
+                    new HateoasLink(new Uri($"{baseUrl}/api/catalog/categories"), "categories", Infrastructure.HttpMethod.GET)
                 ]
             );
 
@@ -60,11 +60,6 @@ public static class SearchProducts
         return app;
     }
 
-    private static string GetBaseUrl(IHttpContextAccessor httpContextAccessor)
-    {
-        HttpRequest request = httpContextAccessor.HttpContext!.Request;
-        return $"{request.Scheme}://{request.Host}";
-    }
 }
 
 public record SearchProductsResponse(

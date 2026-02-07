@@ -22,7 +22,7 @@ public static class GetBuild
                 return Results.NotFound();
             }
 
-            string baseUrl = GetBaseUrl(httpContextAccessor);
+            string baseUrl = httpContextAccessor.GetBaseUrl();
 
             // Load products for the build
             List<ProductDetails> productDetails = [];
@@ -100,8 +100,8 @@ public static class GetBuild
                         slots,
                         chambers,
                         [
-                            new HateoasLink($"{baseUrl}/api/catalog/products/{product.Id}", "product", "GET"),
-                            new HateoasLink($"{baseUrl}/api/builds/{buildId}/parts/{product.Id}", "remove", "DELETE")
+                            new HateoasLink(new Uri($"{baseUrl}/api/catalog/products/{product.Id}"), "product", Infrastructure.HttpMethod.GET),
+                            new HateoasLink(new Uri($"{baseUrl}/api/builds/{buildId}/parts/{product.Id}"), "remove", Infrastructure.HttpMethod.DELETE)
                         ]
                     ));
                 }
@@ -137,11 +137,11 @@ public static class GetBuild
                 )).ToList() ?? [],
                 DateTimeOffset.UtcNow,
                 [
-                    new HateoasLink($"{baseUrl}/api/builds/{buildId}", "self", "GET"),
-                    new HateoasLink($"{baseUrl}/api/builds/{buildId}/parts", "add-part", "POST"),
-                    new HateoasLink($"{baseUrl}/api/builds/{buildId}/compatibility", "validate", "GET"),
-                    new HateoasLink($"{baseUrl}/api/builds/{buildId}/slots", "available-slots", "GET"),
-                    new HateoasLink($"{baseUrl}/api/catalog/products", "catalog", "GET")
+                    new HateoasLink(new Uri($"{baseUrl}/api/builds/{buildId}"), "self", Infrastructure.HttpMethod.GET),
+                    new HateoasLink(new Uri($"{baseUrl}/api/builds/{buildId}/parts"), "add-part", Infrastructure.HttpMethod.POST),
+                    new HateoasLink(new Uri($"{baseUrl}/api/builds/{buildId}/compatibility"), "validate", Infrastructure.HttpMethod.GET),
+                    new HateoasLink(new Uri($"{baseUrl}/api/builds/{buildId}/slots"), "available-slots", Infrastructure.HttpMethod.GET),
+                    new HateoasLink(new Uri($"{baseUrl}/api/catalog/products"), "catalog", Infrastructure.HttpMethod.GET)
                 ]
             );
 
@@ -153,11 +153,6 @@ public static class GetBuild
         return app;
     }
 
-    private static string GetBaseUrl(IHttpContextAccessor httpContextAccessor)
-    {
-        HttpRequest request = httpContextAccessor.HttpContext!.Request;
-        return $"{request.Scheme}://{request.Host}";
-    }
 }
 
 public record GetBuildResponse(
