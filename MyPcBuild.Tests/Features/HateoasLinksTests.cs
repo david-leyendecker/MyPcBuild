@@ -51,12 +51,12 @@ public class HateoasLinksTests
                     Guid.NewGuid(),
                     "Gaming PC",
                     1500m,
-                    [new HateoasLink(new Uri("/api/builds/1"), "self", MyPcBuild.ApiService.Infrastructure.HttpMethod.GET)]
+                    [new HateoasLink(new Uri("/api/builds/1", UriKind.Relative), "self", MyPcBuild.ApiService.Infrastructure.HttpMethod.GET)]
                 )
             ],
             [
-                new HateoasLink(new Uri("/api/builds"), "self", MyPcBuild.ApiService.Infrastructure.HttpMethod.GET),
-                new HateoasLink(new Uri("/api/builds"), "create-build", MyPcBuild.ApiService.Infrastructure.HttpMethod.POST)
+                new HateoasLink(new Uri("/api/builds", UriKind.Relative), "self", MyPcBuild.ApiService.Infrastructure.HttpMethod.GET),
+                new HateoasLink(new Uri("/api/builds", UriKind.Relative), "create-build", MyPcBuild.ApiService.Infrastructure.HttpMethod.POST)
             ]
         );
 
@@ -76,9 +76,9 @@ public class HateoasLinksTests
             "My Build",
             999m,
             [
-                new HateoasLink(new Uri($"/api/builds/{buildId}"), "self", MyPcBuild.ApiService.Infrastructure.HttpMethod.GET),
-                new HateoasLink(new Uri($"/api/builds/{buildId}/parts"), "add-part", MyPcBuild.ApiService.Infrastructure.HttpMethod.POST),
-                new HateoasLink(new Uri($"/api/builds/{buildId}/compatibility"), "validate", MyPcBuild.ApiService.Infrastructure.HttpMethod.GET)
+                new HateoasLink(new Uri($"/api/builds/{buildId}", UriKind.Relative), "self", MyPcBuild.ApiService.Infrastructure.HttpMethod.GET),
+                new HateoasLink(new Uri($"/api/builds/{buildId}/parts", UriKind.Relative), "add-part", MyPcBuild.ApiService.Infrastructure.HttpMethod.POST),
+                new HateoasLink(new Uri($"/api/builds/{buildId}/compatibility", UriKind.Relative), "validate", MyPcBuild.ApiService.Infrastructure.HttpMethod.GET)
             ]
         );
 
@@ -105,11 +105,11 @@ public class HateoasLinksTests
             [],
             DateTimeOffset.UtcNow,
             [
-                new HateoasLink(new Uri($"/api/builds/{buildId}"), "self", MyPcBuild.ApiService.Infrastructure.HttpMethod.GET),
-                new HateoasLink(new Uri($"/api/builds/{buildId}/parts"), "add-part", MyPcBuild.ApiService.Infrastructure.HttpMethod.POST),
-                new HateoasLink(new Uri($"/api/builds/{buildId}/compatibility"), "validate", MyPcBuild.ApiService.Infrastructure.HttpMethod.GET),
-                new HateoasLink(new Uri($"/api/builds/{buildId}/slots"), "available-slots", MyPcBuild.ApiService.Infrastructure.HttpMethod.GET),
-                new HateoasLink(new Uri("/api/catalog/products"), "catalog", MyPcBuild.ApiService.Infrastructure.HttpMethod.GET)
+                new HateoasLink(new Uri($"/api/builds/{buildId}", UriKind.Relative), "self", MyPcBuild.ApiService.Infrastructure.HttpMethod.GET),
+                new HateoasLink(new Uri($"/api/builds/{buildId}/parts", UriKind.Relative), "add-part", MyPcBuild.ApiService.Infrastructure.HttpMethod.POST),
+                new HateoasLink(new Uri($"/api/builds/{buildId}/compatibility", UriKind.Relative), "validate", MyPcBuild.ApiService.Infrastructure.HttpMethod.GET),
+                new HateoasLink(new Uri($"/api/builds/{buildId}/slots", UriKind.Relative), "available-slots", MyPcBuild.ApiService.Infrastructure.HttpMethod.GET),
+                new HateoasLink(new Uri("/api/catalog/products", UriKind.Relative), "catalog", MyPcBuild.ApiService.Infrastructure.HttpMethod.GET)
             ]
         );
 
@@ -142,8 +142,8 @@ public class HateoasLinksTests
             null,
             null,
             [
-                new HateoasLink(new Uri($"/api/catalog/products/{productId}"), "product", MyPcBuild.ApiService.Infrastructure.HttpMethod.GET),
-                new HateoasLink(new Uri($"/api/builds/{buildId}/parts/{productId}"), "remove", MyPcBuild.ApiService.Infrastructure.HttpMethod.DELETE)
+                new HateoasLink(new Uri($"/api/catalog/products/{productId}", UriKind.Relative), "product", MyPcBuild.ApiService.Infrastructure.HttpMethod.GET),
+                new HateoasLink(new Uri($"/api/builds/{buildId}/parts/{productId}", UriKind.Relative), "remove", MyPcBuild.ApiService.Infrastructure.HttpMethod.DELETE)
             ]
         );
 
@@ -165,9 +165,9 @@ public class HateoasLinksTests
             "New Build",
             Guid.NewGuid(),
             [
-                new HateoasLink(new Uri($"/api/builds/{buildId}"), "self", MyPcBuild.ApiService.Infrastructure.HttpMethod.GET),
-                new HateoasLink(new Uri($"/api/builds/{buildId}/parts"), "add-part", MyPcBuild.ApiService.Infrastructure.HttpMethod.POST),
-                new HateoasLink(new Uri($"/api/builds/{buildId}/compatibility"), "validate", MyPcBuild.ApiService.Infrastructure.HttpMethod.GET)
+                new HateoasLink(new Uri($"/api/builds/{buildId}", UriKind.Relative), "self", MyPcBuild.ApiService.Infrastructure.HttpMethod.GET),
+                new HateoasLink(new Uri($"/api/builds/{buildId}/parts", UriKind.Relative), "add-part", MyPcBuild.ApiService.Infrastructure.HttpMethod.POST),
+                new HateoasLink(new Uri($"/api/builds/{buildId}/compatibility", UriKind.Relative), "validate", MyPcBuild.ApiService.Infrastructure.HttpMethod.GET)
             ]
         );
 
@@ -188,10 +188,10 @@ public class HateoasLinksTests
         AddPartResponse response = new(
             "Part added successfully",
             [
-                new HateoasLink(new Uri($"/api/builds/{buildId}"), "build", MyPcBuild.ApiService.Infrastructure.HttpMethod.GET),
-                new HateoasLink(new Uri($"/api/builds/{buildId}/parts/{productId}"), "remove", MyPcBuild.ApiService.Infrastructure.HttpMethod.DELETE),
-                new HateoasLink(new Uri($"/api/builds/{buildId}/compatibility"), "validate", MyPcBuild.ApiService.Infrastructure.HttpMethod.GET),
-                new HateoasLink(new Uri($"/api/catalog/products/{productId}"), "product", MyPcBuild.ApiService.Infrastructure.HttpMethod.GET)
+                new HateoasLink(new Uri($"/api/builds/{buildId}", UriKind.Relative), "build", MyPcBuild.ApiService.Infrastructure.HttpMethod.GET),
+                new HateoasLink(new Uri($"/api/builds/{buildId}/parts/{productId}", UriKind.Relative), "remove", MyPcBuild.ApiService.Infrastructure.HttpMethod.DELETE),
+                new HateoasLink(new Uri($"/api/builds/{buildId}/compatibility", UriKind.Relative), "validate", MyPcBuild.ApiService.Infrastructure.HttpMethod.GET),
+                new HateoasLink(new Uri($"/api/catalog/products/{productId}", UriKind.Relative), "product", MyPcBuild.ApiService.Infrastructure.HttpMethod.GET)
             ]
         );
 
@@ -210,10 +210,10 @@ public class HateoasLinksTests
         RemovePartResponse response = new(
             "Part removed successfully",
             [
-                new HateoasLink(new Uri("/api/builds/1"), "build", MyPcBuild.ApiService.Infrastructure.HttpMethod.GET),
-                new HateoasLink(new Uri("/api/builds/1/parts"), "add-part", MyPcBuild.ApiService.Infrastructure.HttpMethod.POST),
-                new HateoasLink(new Uri("/api/builds/1/compatibility"), "validate", MyPcBuild.ApiService.Infrastructure.HttpMethod.GET),
-                new HateoasLink(new Uri("/api/catalog/products"), "catalog", MyPcBuild.ApiService.Infrastructure.HttpMethod.GET)
+                new HateoasLink(new Uri("/api/builds/1", UriKind.Relative), "build", MyPcBuild.ApiService.Infrastructure.HttpMethod.GET),
+                new HateoasLink(new Uri("/api/builds/1/parts", UriKind.Relative), "add-part", MyPcBuild.ApiService.Infrastructure.HttpMethod.POST),
+                new HateoasLink(new Uri("/api/builds/1/compatibility", UriKind.Relative), "validate", MyPcBuild.ApiService.Infrastructure.HttpMethod.GET),
+                new HateoasLink(new Uri("/api/catalog/products", UriKind.Relative), "catalog", MyPcBuild.ApiService.Infrastructure.HttpMethod.GET)
             ]
         );
 
@@ -233,9 +233,9 @@ public class HateoasLinksTests
         GetAvailableSlotsResponse response = new(
             [],
             [
-                new HateoasLink(new Uri($"/api/builds/{buildId}/slots"), "self", MyPcBuild.ApiService.Infrastructure.HttpMethod.GET),
-                new HateoasLink(new Uri($"/api/builds/{buildId}"), "build", MyPcBuild.ApiService.Infrastructure.HttpMethod.GET),
-                new HateoasLink(new Uri($"/api/builds/{buildId}/parts/slot"), "add-part-to-slot", MyPcBuild.ApiService.Infrastructure.HttpMethod.POST)
+                new HateoasLink(new Uri($"/api/builds/{buildId}/slots", UriKind.Relative), "self", MyPcBuild.ApiService.Infrastructure.HttpMethod.GET),
+                new HateoasLink(new Uri($"/api/builds/{buildId}", UriKind.Relative), "build", MyPcBuild.ApiService.Infrastructure.HttpMethod.GET),
+                new HateoasLink(new Uri($"/api/builds/{buildId}/parts/slot", UriKind.Relative), "add-part-to-slot", MyPcBuild.ApiService.Infrastructure.HttpMethod.POST)
             ]
         );
 
@@ -256,9 +256,9 @@ public class HateoasLinksTests
             [],
             new PaginationMetadata { Total = 0, Page = 1, ItemsPerPage = 20 },
             [
-                new HateoasLink(new Uri("/api/catalog/products?page=1&itemsPerPage=20"), "self", MyPcBuild.ApiService.Infrastructure.HttpMethod.GET),
-                new HateoasLink(new Uri("/api/catalog/categories"), "categories", MyPcBuild.ApiService.Infrastructure.HttpMethod.GET),
-                new HateoasLink(new Uri("/api/catalog/products"), "create-product", MyPcBuild.ApiService.Infrastructure.HttpMethod.POST)
+                new HateoasLink(new Uri("/api/catalog/products?page=1&itemsPerPage=20", UriKind.Relative), "self", MyPcBuild.ApiService.Infrastructure.HttpMethod.GET),
+                new HateoasLink(new Uri("/api/catalog/categories", UriKind.Relative), "categories", MyPcBuild.ApiService.Infrastructure.HttpMethod.GET),
+                new HateoasLink(new Uri("/api/catalog/products", UriKind.Relative), "create-product", MyPcBuild.ApiService.Infrastructure.HttpMethod.POST)
             ]
         );
 
@@ -284,8 +284,8 @@ public class HateoasLinksTests
             false,
             DateTime.UtcNow,
             [
-                new HateoasLink(new Uri($"/api/catalog/products/{productId}"), "self", MyPcBuild.ApiService.Infrastructure.HttpMethod.GET),
-                new HateoasLink(new Uri("/api/catalog/products?filters=ProductCategory=CPU"), "category", MyPcBuild.ApiService.Infrastructure.HttpMethod.GET)
+                new HateoasLink(new Uri($"/api/catalog/products/{productId}", UriKind.Relative), "self", MyPcBuild.ApiService.Infrastructure.HttpMethod.GET),
+                new HateoasLink(new Uri("/api/catalog/products?filters=ProductCategory=CPU", UriKind.Relative), "category", MyPcBuild.ApiService.Infrastructure.HttpMethod.GET)
             ]
         );
 
@@ -304,11 +304,11 @@ public class HateoasLinksTests
         GetProductByIdResponse response = new(
             null!,
             [
-                new HateoasLink(new Uri($"/api/catalog/products/{productId}"), "self", MyPcBuild.ApiService.Infrastructure.HttpMethod.GET),
-                new HateoasLink(new Uri($"/api/catalog/products/{productId}"), "update", MyPcBuild.ApiService.Infrastructure.HttpMethod.PUT),
-                new HateoasLink(new Uri("/api/catalog/products?filters=ProductCategory=CPU"), "category", MyPcBuild.ApiService.Infrastructure.HttpMethod.GET),
-                new HateoasLink(new Uri("/api/catalog/products"), "all-products", MyPcBuild.ApiService.Infrastructure.HttpMethod.GET),
-                new HateoasLink(new Uri("/api/catalog/categories"), "categories", MyPcBuild.ApiService.Infrastructure.HttpMethod.GET)
+                new HateoasLink(new Uri($"/api/catalog/products/{productId}", UriKind.Relative), "self", MyPcBuild.ApiService.Infrastructure.HttpMethod.GET),
+                new HateoasLink(new Uri($"/api/catalog/products/{productId}", UriKind.Relative), "update", MyPcBuild.ApiService.Infrastructure.HttpMethod.PUT),
+                new HateoasLink(new Uri("/api/catalog/products?filters=ProductCategory=CPU", UriKind.Relative), "category", MyPcBuild.ApiService.Infrastructure.HttpMethod.GET),
+                new HateoasLink(new Uri("/api/catalog/products", UriKind.Relative), "all-products", MyPcBuild.ApiService.Infrastructure.HttpMethod.GET),
+                new HateoasLink(new Uri("/api/catalog/categories", UriKind.Relative), "categories", MyPcBuild.ApiService.Infrastructure.HttpMethod.GET)
             ]
         );
 
@@ -329,13 +329,13 @@ public class HateoasLinksTests
             [
                 new CategoryInfo("CPU", "Processors", 4,
                 [
-                    new HateoasLink(new Uri("/api/catalog/products?filters=ProductCategory=CPU"), "products", MyPcBuild.ApiService.Infrastructure.HttpMethod.GET),
-                    new HateoasLink(new Uri("/api/catalog/field-definitions/CPU"), "field-definitions", MyPcBuild.ApiService.Infrastructure.HttpMethod.GET)
+                    new HateoasLink(new Uri("/api/catalog/products?filters=ProductCategory=CPU", UriKind.Relative), "products", MyPcBuild.ApiService.Infrastructure.HttpMethod.GET),
+                    new HateoasLink(new Uri("/api/catalog/field-definitions/CPU", UriKind.Relative), "field-definitions", MyPcBuild.ApiService.Infrastructure.HttpMethod.GET)
                 ])
             ],
             [
-                new HateoasLink(new Uri("/api/catalog/categories"), "self", MyPcBuild.ApiService.Infrastructure.HttpMethod.GET),
-                new HateoasLink(new Uri("/api/catalog/products"), "all-products", MyPcBuild.ApiService.Infrastructure.HttpMethod.GET)
+                new HateoasLink(new Uri("/api/catalog/categories", UriKind.Relative), "self", MyPcBuild.ApiService.Infrastructure.HttpMethod.GET),
+                new HateoasLink(new Uri("/api/catalog/products", UriKind.Relative), "all-products", MyPcBuild.ApiService.Infrastructure.HttpMethod.GET)
             ]
         );
 
@@ -360,10 +360,10 @@ public class HateoasLinksTests
         CreateProductResponse response = new(
             productId,
             [
-                new HateoasLink(new Uri($"/api/catalog/products/{productId}"), "self", MyPcBuild.ApiService.Infrastructure.HttpMethod.GET),
-                new HateoasLink(new Uri($"/api/catalog/products/{productId}"), "update", MyPcBuild.ApiService.Infrastructure.HttpMethod.PUT),
-                new HateoasLink(new Uri($"/api/catalog/products/{productId}/publish"), "publish", MyPcBuild.ApiService.Infrastructure.HttpMethod.POST),
-                new HateoasLink(new Uri("/api/catalog/products"), "all-products", MyPcBuild.ApiService.Infrastructure.HttpMethod.GET)
+                new HateoasLink(new Uri($"/api/catalog/products/{productId}", UriKind.Relative), "self", MyPcBuild.ApiService.Infrastructure.HttpMethod.GET),
+                new HateoasLink(new Uri($"/api/catalog/products/{productId}", UriKind.Relative), "update", MyPcBuild.ApiService.Infrastructure.HttpMethod.PUT),
+                new HateoasLink(new Uri($"/api/catalog/products/{productId}/publish", UriKind.Relative), "publish", MyPcBuild.ApiService.Infrastructure.HttpMethod.POST),
+                new HateoasLink(new Uri("/api/catalog/products", UriKind.Relative), "all-products", MyPcBuild.ApiService.Infrastructure.HttpMethod.GET)
             ]
         );
 
@@ -382,9 +382,9 @@ public class HateoasLinksTests
         SearchProductsResponse response = new(
             [],
             [
-                new HateoasLink(new Uri("/api/catalog/search?query=ryzen&maxResults=10"), "self", MyPcBuild.ApiService.Infrastructure.HttpMethod.GET),
-                new HateoasLink(new Uri("/api/catalog/products"), "all-products", MyPcBuild.ApiService.Infrastructure.HttpMethod.GET),
-                new HateoasLink(new Uri("/api/catalog/categories"), "categories", MyPcBuild.ApiService.Infrastructure.HttpMethod.GET)
+                new HateoasLink(new Uri("/api/catalog/search?query=ryzen&maxResults=10", UriKind.Relative), "self", MyPcBuild.ApiService.Infrastructure.HttpMethod.GET),
+                new HateoasLink(new Uri("/api/catalog/products", UriKind.Relative), "all-products", MyPcBuild.ApiService.Infrastructure.HttpMethod.GET),
+                new HateoasLink(new Uri("/api/catalog/categories", UriKind.Relative), "categories", MyPcBuild.ApiService.Infrastructure.HttpMethod.GET)
             ]
         );
 
@@ -403,10 +403,10 @@ public class HateoasLinksTests
             ProductCategory.CPU,
             [],
             [
-                new HateoasLink(new Uri("/api/catalog/field-definitions/CPU"), "self", MyPcBuild.ApiService.Infrastructure.HttpMethod.GET),
-                new HateoasLink(new Uri("/api/catalog/products?filters=ProductCategory=CPU"), "products", MyPcBuild.ApiService.Infrastructure.HttpMethod.GET),
-                new HateoasLink(new Uri("/api/catalog/categories"), "categories", MyPcBuild.ApiService.Infrastructure.HttpMethod.GET),
-                new HateoasLink(new Uri("/api/catalog/products"), "create-product", MyPcBuild.ApiService.Infrastructure.HttpMethod.POST)
+                new HateoasLink(new Uri("/api/catalog/field-definitions/CPU", UriKind.Relative), "self", MyPcBuild.ApiService.Infrastructure.HttpMethod.GET),
+                new HateoasLink(new Uri("/api/catalog/products?filters=ProductCategory=CPU", UriKind.Relative), "products", MyPcBuild.ApiService.Infrastructure.HttpMethod.GET),
+                new HateoasLink(new Uri("/api/catalog/categories", UriKind.Relative), "categories", MyPcBuild.ApiService.Infrastructure.HttpMethod.GET),
+                new HateoasLink(new Uri("/api/catalog/products", UriKind.Relative), "create-product", MyPcBuild.ApiService.Infrastructure.HttpMethod.POST)
             ]
         );
 
@@ -431,11 +431,11 @@ public class HateoasLinksTests
             [],
             [
                 new ProductInfo(Guid.NewGuid(), "AMD Ryzen 9", ProductCategory.CPU,
-                    [new HateoasLink(new Uri("/api/catalog/products/1"), "product", MyPcBuild.ApiService.Infrastructure.HttpMethod.GET)])
+                    [new HateoasLink(new Uri("/api/catalog/products/1", UriKind.Relative), "product", MyPcBuild.ApiService.Infrastructure.HttpMethod.GET)])
             ],
             [
-                new HateoasLink(new Uri("/api/compatibility/validate"), "self", MyPcBuild.ApiService.Infrastructure.HttpMethod.POST),
-                new HateoasLink(new Uri("/api/catalog/products"), "catalog", MyPcBuild.ApiService.Infrastructure.HttpMethod.GET)
+                new HateoasLink(new Uri("/api/compatibility/validate", UriKind.Relative), "self", MyPcBuild.ApiService.Infrastructure.HttpMethod.POST),
+                new HateoasLink(new Uri("/api/catalog/products", UriKind.Relative), "catalog", MyPcBuild.ApiService.Infrastructure.HttpMethod.GET)
             ]
         );
 
@@ -466,10 +466,10 @@ public class HateoasLinksTests
             [],
             [],
             [
-                new HateoasLink(new Uri($"/api/builds/{buildId}/compatibility"), "self", MyPcBuild.ApiService.Infrastructure.HttpMethod.GET),
-                new HateoasLink(new Uri($"/api/builds/{buildId}"), "build", MyPcBuild.ApiService.Infrastructure.HttpMethod.GET),
-                new HateoasLink(new Uri($"/api/builds/{buildId}/parts"), "add-part", MyPcBuild.ApiService.Infrastructure.HttpMethod.POST),
-                new HateoasLink(new Uri("/api/catalog/products"), "catalog", MyPcBuild.ApiService.Infrastructure.HttpMethod.GET)
+                new HateoasLink(new Uri($"/api/builds/{buildId}/compatibility", UriKind.Relative), "self", MyPcBuild.ApiService.Infrastructure.HttpMethod.GET),
+                new HateoasLink(new Uri($"/api/builds/{buildId}", UriKind.Relative), "build", MyPcBuild.ApiService.Infrastructure.HttpMethod.GET),
+                new HateoasLink(new Uri($"/api/builds/{buildId}/parts", UriKind.Relative), "add-part", MyPcBuild.ApiService.Infrastructure.HttpMethod.POST),
+                new HateoasLink(new Uri("/api/catalog/products", UriKind.Relative), "catalog", MyPcBuild.ApiService.Infrastructure.HttpMethod.GET)
             ]
         );
 
@@ -496,11 +496,11 @@ public class HateoasLinksTests
             false,
             [],
             [
-                new HateoasLink(new Uri($"/api/builds/{buildId}/parts/validate"), "self", MyPcBuild.ApiService.Infrastructure.HttpMethod.POST),
-                new HateoasLink(new Uri($"/api/builds/{buildId}"), "build", MyPcBuild.ApiService.Infrastructure.HttpMethod.GET),
-                new HateoasLink(new Uri($"/api/builds/{buildId}/parts"), "add-part", MyPcBuild.ApiService.Infrastructure.HttpMethod.POST),
-                new HateoasLink(new Uri($"/api/builds/{buildId}/slots"), "available-slots", MyPcBuild.ApiService.Infrastructure.HttpMethod.GET),
-                new HateoasLink(new Uri($"/api/builds/{buildId}/validate"), "validate-build", MyPcBuild.ApiService.Infrastructure.HttpMethod.POST)
+                new HateoasLink(new Uri($"/api/builds/{buildId}/parts/validate", UriKind.Relative), "self", MyPcBuild.ApiService.Infrastructure.HttpMethod.POST),
+                new HateoasLink(new Uri($"/api/builds/{buildId}", UriKind.Relative), "build", MyPcBuild.ApiService.Infrastructure.HttpMethod.GET),
+                new HateoasLink(new Uri($"/api/builds/{buildId}/parts", UriKind.Relative), "add-part", MyPcBuild.ApiService.Infrastructure.HttpMethod.POST),
+                new HateoasLink(new Uri($"/api/builds/{buildId}/slots", UriKind.Relative), "available-slots", MyPcBuild.ApiService.Infrastructure.HttpMethod.GET),
+                new HateoasLink(new Uri($"/api/builds/{buildId}/validate", UriKind.Relative), "validate-build", MyPcBuild.ApiService.Infrastructure.HttpMethod.POST)
             ]
         );
 
@@ -526,11 +526,11 @@ public class HateoasLinksTests
             false,
             [],
             [
-                new HateoasLink(new Uri($"/api/builds/{buildId}/validate"), "self", MyPcBuild.ApiService.Infrastructure.HttpMethod.POST),
-                new HateoasLink(new Uri($"/api/builds/{buildId}"), "build", MyPcBuild.ApiService.Infrastructure.HttpMethod.GET),
-                new HateoasLink(new Uri($"/api/builds/{buildId}/parts"), "add-part", MyPcBuild.ApiService.Infrastructure.HttpMethod.POST),
-                new HateoasLink(new Uri($"/api/builds/{buildId}/slots"), "available-slots", MyPcBuild.ApiService.Infrastructure.HttpMethod.GET),
-                new HateoasLink(new Uri($"/api/builds/{buildId}/compatibility"), "validate-compatibility", MyPcBuild.ApiService.Infrastructure.HttpMethod.GET)
+                new HateoasLink(new Uri($"/api/builds/{buildId}/validate", UriKind.Relative), "self", MyPcBuild.ApiService.Infrastructure.HttpMethod.POST),
+                new HateoasLink(new Uri($"/api/builds/{buildId}", UriKind.Relative), "build", MyPcBuild.ApiService.Infrastructure.HttpMethod.GET),
+                new HateoasLink(new Uri($"/api/builds/{buildId}/parts", UriKind.Relative), "add-part", MyPcBuild.ApiService.Infrastructure.HttpMethod.POST),
+                new HateoasLink(new Uri($"/api/builds/{buildId}/slots", UriKind.Relative), "available-slots", MyPcBuild.ApiService.Infrastructure.HttpMethod.GET),
+                new HateoasLink(new Uri($"/api/builds/{buildId}/compatibility", UriKind.Relative), "validate-compatibility", MyPcBuild.ApiService.Infrastructure.HttpMethod.GET)
             ]
         );
 
@@ -570,10 +570,10 @@ public class HateoasLinksTests
 
         List<HateoasLink> testLinks =
         [
-            new HateoasLink(new Uri("/api/builds"), "self", MyPcBuild.ApiService.Infrastructure.HttpMethod.GET),
-            new HateoasLink(new Uri("/api/builds"), "create", MyPcBuild.ApiService.Infrastructure.HttpMethod.POST),
-            new HateoasLink(new Uri("/api/builds/1"), "update", MyPcBuild.ApiService.Infrastructure.HttpMethod.PUT),
-            new HateoasLink(new Uri("/api/builds/1"), "remove", MyPcBuild.ApiService.Infrastructure.HttpMethod.DELETE)
+            new HateoasLink(new Uri("/api/builds", UriKind.Relative), "self", MyPcBuild.ApiService.Infrastructure.HttpMethod.GET),
+            new HateoasLink(new Uri("/api/builds", UriKind.Relative), "create", MyPcBuild.ApiService.Infrastructure.HttpMethod.POST),
+            new HateoasLink(new Uri("/api/builds/1", UriKind.Relative), "update", MyPcBuild.ApiService.Infrastructure.HttpMethod.PUT),
+            new HateoasLink(new Uri("/api/builds/1", UriKind.Relative), "remove", MyPcBuild.ApiService.Infrastructure.HttpMethod.DELETE)
         ];
 
         // Assert
