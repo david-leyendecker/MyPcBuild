@@ -1,5 +1,6 @@
 using Marten;
 using MyPcBuild.ApiService.Domain.Models;
+using MyPcBuild.ApiService.Infrastructure;
 
 namespace MyPcBuild.ApiService.Features.Catalog;
 
@@ -9,6 +10,7 @@ public static class PublishProduct
     {
         app.MapPost("/api/catalog/products/{id:guid}/publish", async (
             IDocumentSession session,
+            IHttpContextAccessor httpContextAccessor,
             Guid id,
             CancellationToken cancellationToken) =>
         {
@@ -34,16 +36,31 @@ public static class PublishProduct
             session.Store(publishedProduct);
             await session.SaveChangesAsync(cancellationToken);
 
-            return Results.Ok(new PublishProductResponse(publishedProduct.Id, publishedProduct));
+            string baseUrl = httpContextAccessor.GetBaseUrl();
+
+            PublishProductResponse response = new(
+                publishedProduct.Id,
+                publishedProduct,
+                [
+                    new HateoasLink(new Uri($"{baseUrl}/api/catalog/products/{publishedProduct.Id}"), "self", Infrastructure.HttpMethod.GET),
+                    new HateoasLink(new Uri($"{baseUrl}/api/catalog/products/{publishedProduct.Id}"), "update", Infrastructure.HttpMethod.PUT),
+                    new HateoasLink(new Uri($"{baseUrl}/api/catalog/products"), "all-products", Infrastructure.HttpMethod.GET),
+                    new HateoasLink(new Uri($"{baseUrl}/api/catalog/categories"), "categories", Infrastructure.HttpMethod.GET)
+                ]
+            );
+
+            return Results.Ok(response);
         })
         .WithName("PublishProduct")
         .WithTags("Catalog");
 
         return app;
     }
+
 }
 
 public record PublishProductResponse(
     Guid Id,
-    Product Product
+    Product Product,
+    List<HateoasLink> Links
 );

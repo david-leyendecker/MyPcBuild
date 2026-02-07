@@ -1,5 +1,6 @@
 using Marten;
 using MyPcBuild.ApiService.Domain.Models;
+using MyPcBuild.ApiService.Infrastructure;
 
 namespace MyPcBuild.ApiService.Features.Catalog;
 
@@ -10,6 +11,7 @@ public static class GenerateProductWithAi
         app.MapPost("/api/catalog/products/generate-with-ai", async (
             IDocumentSession session,
             IAiProductGenerator aiGenerator,
+            IHttpContextAccessor httpContextAccessor,
             GenerateProductRequest request,
             CancellationToken cancellationToken) =>
         {
@@ -24,7 +26,20 @@ public static class GenerateProductWithAi
                 session.Store(product);
                 await session.SaveChangesAsync(cancellationToken);
 
-                return Results.Created($"/api/catalog/{product.Id}", new GenerateProductResponse(product.Id, product));
+                string baseUrl = httpContextAccessor.GetBaseUrl();
+
+                GenerateProductResponse response = new(
+                    product.Id,
+                    product,
+                    [
+                        new HateoasLink(new Uri($"{baseUrl}/api/catalog/products/{product.Id}"), "self", Infrastructure.HttpMethod.GET),
+                        new HateoasLink(new Uri($"{baseUrl}/api/catalog/products/{product.Id}"), "update", Infrastructure.HttpMethod.PUT),
+                        new HateoasLink(new Uri($"{baseUrl}/api/catalog/products/{product.Id}/publish"), "publish", Infrastructure.HttpMethod.POST),
+                        new HateoasLink(new Uri($"{baseUrl}/api/catalog/products"), "all-products", Infrastructure.HttpMethod.GET)
+                    ]
+                );
+
+                return Results.Created($"/api/catalog/{product.Id}", response);
             }
             catch (InvalidOperationException ex)
             {
@@ -36,6 +51,7 @@ public static class GenerateProductWithAi
 
         return app;
     }
+
 }
 
 public record GenerateProductRequest(
@@ -45,5 +61,6 @@ public record GenerateProductRequest(
 
 public record GenerateProductResponse(
     Guid Id,
-    Product Product
+    Product Product,
+    List<HateoasLink> Links
 );

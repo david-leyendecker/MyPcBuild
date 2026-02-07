@@ -2,6 +2,7 @@ using Marten;
 using Microsoft.AspNetCore.Mvc;
 using MyPcBuild.ApiService.Domain.Models;
 using MyPcBuild.ApiService.Features.Catalog.DTOs;
+using MyPcBuild.ApiService.Infrastructure;
 
 namespace MyPcBuild.ApiService.Features.Catalog;
 
@@ -12,6 +13,7 @@ public static class UpdateProduct
         app.MapPut("/api/catalog/products/{id}", async (
             [FromRoute] Guid id,
             IDocumentSession session,
+            IHttpContextAccessor httpContextAccessor,
             ProductRequest request) =>
         {
             Product? existingProduct = await session.LoadAsync<Product>(id);
@@ -32,7 +34,23 @@ public static class UpdateProduct
             session.Store(updatedProduct);
             await session.SaveChangesAsync();
 
-            return Results.Ok(new UpdateProductResponse(updatedProduct.Id));
+            string baseUrl = httpContextAccessor.GetBaseUrl();
+
+            List<HateoasLink> links =
+            [
+                new HateoasLink(new Uri($"{baseUrl}/api/catalog/products/{updatedProduct.Id}"), "self", Infrastructure.HttpMethod.GET),
+                new HateoasLink(new Uri($"{baseUrl}/api/catalog/products/{updatedProduct.Id}"), "update", Infrastructure.HttpMethod.PUT),
+                new HateoasLink(new Uri($"{baseUrl}/api/catalog/products"), "all-products", Infrastructure.HttpMethod.GET)
+            ];
+
+            if (updatedProduct.IsDraft)
+            {
+                links.Add(new HateoasLink(new Uri($"{baseUrl}/api/catalog/products/{updatedProduct.Id}/publish"), "publish", Infrastructure.HttpMethod.POST));
+            }
+
+            UpdateProductResponse response = new(updatedProduct.Id, links);
+
+            return Results.Ok(response);
         })
         .WithName("UpdateProduct")
         .Produces<UpdateProductResponse>(StatusCodes.Status200OK)
@@ -41,6 +59,10 @@ public static class UpdateProduct
 
         return app;
     }
+
 }
 
-public record UpdateProductResponse(Guid Id);
+public record UpdateProductResponse(
+    Guid Id,
+    List<HateoasLink> Links
+);

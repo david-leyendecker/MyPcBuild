@@ -32,6 +32,7 @@ public static class GetProducts
     {
         app.MapGet("/api/catalog/products", async (
             IDocumentSession session,
+            IHttpContextAccessor httpContextAccessor,
             [AsParameters] QueryParameters queryParams) =>
         {
             IQueryable<Product> query = session.Query<Product>();
@@ -66,6 +67,25 @@ public static class GetProducts
                 ItemsPerPage = queryParams.ItemsPerPage
             };
 
+            string baseUrl = httpContextAccessor.GetBaseUrl();
+
+            List<HateoasLink> links =
+            [
+                new HateoasLink(new Uri($"{baseUrl}/api/catalog/products?page={queryParams.Page}&itemsPerPage={queryParams.ItemsPerPage}"), "self", Infrastructure.HttpMethod.GET),
+                new HateoasLink(new Uri($"{baseUrl}/api/catalog/categories"), "categories", Infrastructure.HttpMethod.GET),
+                new HateoasLink(new Uri($"{baseUrl}/api/catalog/products"), "create-product", Infrastructure.HttpMethod.POST)
+            ];
+
+            if (pagination.HasNextPage)
+            {
+                links.Add(new HateoasLink(new Uri($"{baseUrl}/api/catalog/products?page={queryParams.Page + 1}&itemsPerPage={queryParams.ItemsPerPage}"), "next", Infrastructure.HttpMethod.GET));
+            }
+
+            if (pagination.HasPreviousPage)
+            {
+                links.Add(new HateoasLink(new Uri($"{baseUrl}/api/catalog/products?page={queryParams.Page - 1}&itemsPerPage={queryParams.ItemsPerPage}"), "prev", Infrastructure.HttpMethod.GET));
+            }
+
             GetProductsResponse response = new(
                 productResults.Select(p => new ProductSummary(
                     p.Id,
@@ -74,9 +94,14 @@ public static class GetProducts
                     p.Price,
                     p.Manufacturer,
                     p.IsDraft,
-                    p.PublishedAt
+                    p.PublishedAt,
+                    [
+                        new HateoasLink(new Uri($"{baseUrl}/api/catalog/products/{p.Id}"), "self", Infrastructure.HttpMethod.GET),
+                        new HateoasLink(new Uri($"{baseUrl}/api/catalog/products?filters=ProductCategory={p.ProductCategory}"), "category", Infrastructure.HttpMethod.GET)
+                    ]
                 )).ToList(),
-                pagination
+                pagination,
+                links
             );
 
             return Results.Ok(response);
@@ -128,11 +153,13 @@ public static class GetProducts
             ? query.OrderByDescending(keySelector).ThenBy(p => p.Name)
             : query.OrderBy(keySelector).ThenBy(p => p.Name);
     }
+
 }
 
 public record GetProductsResponse(
     List<ProductSummary> Items,
-    PaginationMetadata Pagination
+    PaginationMetadata Pagination,
+    List<HateoasLink> Links
 );
 
 public record ProductSummary(
@@ -142,5 +169,6 @@ public record ProductSummary(
     decimal Price,
     string Manufacturer,
     bool IsDraft,
-    DateTime? PublishedAt
+    DateTime? PublishedAt,
+    List<HateoasLink> Links
 );

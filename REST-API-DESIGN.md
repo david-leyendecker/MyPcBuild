@@ -1,7 +1,9 @@
-# REST API Design - HATEOAS Pattern
+# REST API Design - HATEOAS Pattern & REPR Convention
 
 ## Overview
 The API follows REpresentational State Transfer (REST) principles with HATEOAS (Hypermedia as the Engine of Application State) for discoverability.
+
+All endpoints follow the **REPR (Request-Endpoint-Response)** pattern where each endpoint is defined in its own file containing all related models (request, handler, response, and HATEOAS link generation).
 
 ## Key Principles
 
@@ -11,8 +13,48 @@ Every endpoint represents a resource or collection of resources:
 - `/api/builds/{id}` - Single build resource
 - `/api/compatibility/validate` - Compatibility validation resource
 
-### 2. **HATEOAS Links**
-Every response includes hypermedia links to related resources:
+### 2. **REPR Pattern (One File Per Endpoint)**
+Each endpoint has its own dedicated file containing:
+- **Request model** - Input DTOs/records
+- **Endpoint handler** - Static class with the `Map*Endpoint` extension method
+- **Response model** - Output DTOs/records with HATEOAS links
+
+Example file structure:
+```
+Features/
+├── Builds/
+│   ├── BuildEndpoints.cs          # Routing orchestrator
+│   ├── GetBuilds.cs               # GET /api/builds
+│   ├── GetBuild.cs                # GET /api/builds/{id}
+│   ├── CreateBuild.cs             # POST /api/builds
+│   ├── AddPartToBuild.cs          # POST /api/builds/{id}/parts
+│   ├── AddPartToSlot.cs           # POST /api/builds/{id}/parts/slot
+│   ├── RemovePartFromBuild.cs     # DELETE /api/builds/{id}/parts/{productId}
+│   ├── GetAvailableSlots.cs       # GET /api/builds/{id}/slots
+│   └── BuildDtos.cs               # Shared spatial DTOs
+├── Catalog/
+│   ├── CatalogEndpoints.cs        # Routing orchestrator
+│   ├── GetProducts.cs             # GET /api/catalog/products
+│   ├── GetProductById.cs          # GET /api/catalog/products/{id}
+│   ├── GetCategories.cs           # GET /api/catalog/categories
+│   ├── SearchProducts.cs          # GET /api/catalog/search
+│   ├── CreateProduct.cs           # POST /api/catalog/products
+│   ├── UpdateProduct.cs           # PUT /api/catalog/products/{id}
+│   ├── PublishProduct.cs          # POST /api/catalog/products/{id}/publish
+│   ├── GenerateProductWithAi.cs   # POST /api/catalog/products/generate-with-ai
+│   └── GetFieldDefinitions.cs     # GET /api/catalog/field-definitions/{category}
+├── Compatibility/
+│   ├── CompatibilityEndpoints.cs  # Routing orchestrator
+│   ├── ValidateCompatibility.cs   # POST /api/compatibility/validate
+│   └── GetBuildCompatibility.cs   # GET /api/builds/{id}/compatibility
+└── Spatial/
+    ├── SpatialEndpoints.cs        # Routing orchestrator
+    ├── ValidatePartInstallation.cs # POST /api/builds/{id}/parts/validate
+    └── ValidateBuildSpatial.cs    # POST /api/builds/{id}/validate
+```
+
+### 3. **HATEOAS Links**
+Every response includes hypermedia links to related resources using the `HateoasLink` record:
 
 ```json
 {
@@ -38,7 +80,7 @@ Every response includes hypermedia links to related resources:
 }
 ```
 
-### 3. **Link Relations (rel)**
+### 4. **Link Relations (rel)**
 
 | Relation | Description |
 |----------|-------------|
@@ -49,12 +91,21 @@ Every response includes hypermedia links to related resources:
 | `category` | Link to product category |
 | `products` | Link to products in category |
 | `add-part` | Action to add part to build |
+| `add-part-to-slot` | Action to add part to a specific slot |
 | `remove` | Action to remove resource |
 | `validate` | Action to validate compatibility |
+| `validate-build` | Action to validate build spatial configuration |
+| `validate-compatibility` | Action to validate compatibility |
 | `prev` | Previous page |
 | `next` | Next page |
 | `all-products` | Link to all products |
 | `categories` | Link to category list |
+| `create-build` | Action to create a new build |
+| `create-product` | Action to create a new product |
+| `update` | Action to update resource |
+| `publish` | Action to publish a draft product |
+| `available-slots` | Link to available slots in a build |
+| `field-definitions` | Link to field definitions for a category |
 
 ## Response DTOs
 
@@ -310,23 +361,57 @@ Links guide user through process:
 
 ## Implementation Details
 
-### ResponseMapper Service
-Centralizes DTO mapping with HATEOAS link generation:
+### HateoasLink Record
+All HATEOAS links use the shared `HateoasLink` record from `Infrastructure/HateoasLink.cs`:
 ```csharp
-public interface IResponseMapper
-{
-    CompatibilityValidationResponse MapCompatibilityResult(...);
-    ProductCatalogResponse MapProductCatalog(...);
-    BuildResponse MapBuild(...);
-}
+public record HateoasLink(string Href, string Rel, string Method);
 ```
 
-### HttpContextAccessor
-Used to generate absolute URLs:
+### REPR Pattern Example
+Each endpoint file follows this structure:
 ```csharp
-private string GetAbsoluteUrl(string relativePath)
+// CreateBuild.cs - Single file for the POST /api/builds endpoint
+public static class CreateBuild
 {
-    return $"{request.Scheme}://{request.Host}{relativePath}";
+    public static IEndpointRouteBuilder MapCreateBuildEndpoint(this IEndpointRouteBuilder app)
+    {
+        app.MapPost("/api/builds", async (
+            CreateBuildRequest request,
+            IDocumentSession session,
+            IHttpContextAccessor httpContextAccessor) =>
+        {
+            // ... handler logic ...
+
+            string baseUrl = GetBaseUrl(httpContextAccessor);
+            CreateBuildResponse response = new(buildId, request.Name, request.UserId,
+            [
+                new HateoasLink($"{baseUrl}/api/builds/{buildId}", "self", "GET"),
+                new HateoasLink($"{baseUrl}/api/builds/{buildId}/parts", "add-part", "POST"),
+                new HateoasLink($"{baseUrl}/api/builds/{buildId}/compatibility", "validate", "GET")
+            ]);
+            return Results.Created($"/api/builds/{buildId}", response);
+        })
+        .WithName("CreateBuild")
+        .WithTags("Builds");
+
+        return app;
+    }
+}
+
+// Request model - in the same file
+public record CreateBuildRequest(string Name, Guid UserId);
+
+// Response model - in the same file, includes HATEOAS links
+public record CreateBuildResponse(Guid Id, string Name, Guid UserId, List<HateoasLink> Links);
+```
+
+### URL Generation
+Uses `IHttpContextAccessor` to generate absolute URLs:
+```csharp
+private static string GetBaseUrl(IHttpContextAccessor httpContextAccessor)
+{
+    HttpRequest request = httpContextAccessor.HttpContext!.Request;
+    return $"{request.Scheme}://{request.Host}";
 }
 ```
 

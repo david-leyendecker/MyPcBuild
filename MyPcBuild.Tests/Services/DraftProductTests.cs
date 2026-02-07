@@ -1,6 +1,7 @@
 using MyPcBuild.ApiService.Domain.Models;
 using MyPcBuild.ApiService.Domain.Models.Spatial;
 using MyPcBuild.ApiService.Features.Catalog;
+using MyPcBuild.ApiService.Infrastructure;
 
 namespace MyPcBuild.Tests.Services;
 
@@ -101,7 +102,8 @@ public class DraftProductTests
             399.99m,
             "AMD",
             true,
-            null
+            null,
+            []
         );
 
         ProductSummary publishedSummary = new ProductSummary(
@@ -111,7 +113,8 @@ public class DraftProductTests
             999.99m,
             "NVIDIA",
             false,
-            publishTime
+            publishTime,
+            []
         );
 
         // Assert

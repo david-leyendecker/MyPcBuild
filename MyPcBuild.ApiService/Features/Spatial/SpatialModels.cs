@@ -10,17 +10,10 @@ public record ValidatePartInstallationRequest(
     Vector3 Position
 );
 
-// Response Models
+// Shared DTOs
 
 public record SpatialIssueDto(
     string Message,
     string Severity,
     string Category
-);
-
-public record SpatialValidationResponse(
-    bool IsValid,
-    bool HasErrors,
-    bool HasWarnings,
-    List<SpatialIssueDto> Issues
 );

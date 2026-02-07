@@ -1,5 +1,6 @@
 using Marten;
 using MyPcBuild.ApiService.Domain.Models;
+using MyPcBuild.ApiService.Infrastructure;
 
 namespace MyPcBuild.ApiService.Features.Compatibility;
 
@@ -10,7 +11,8 @@ public static class ValidateCompatibility
         app.MapPost("/api/compatibility/validate", async (
             ValidateCompatibilityRequest request,
             IDocumentSession session,
-            ICompatibilityValidator validator) =>
+            ICompatibilityValidator validator,
+            IHttpContextAccessor httpContextAccessor) =>
         {
             if (request.ProductIds == null || !request.ProductIds.Any())
             {
@@ -35,7 +37,9 @@ public static class ValidateCompatibility
 
             // Validate compatibility
             CompatibilityResult result = await validator.ValidateBuild(products);
-            
+
+            string baseUrl = httpContextAccessor.GetBaseUrl();
+
             // Map to response DTO
             ValidateCompatibilityResponse response = new(
                 result.IsCompatible,
@@ -46,7 +50,18 @@ public static class ValidateCompatibility
                     i.Severity.ToString(),
                     i.Category
                 )).ToList(),
-                products.Select(p => new ProductInfo(p.Id, p.Name, p.ProductCategory)).ToList()
+                products.Select(p => new ProductInfo(
+                    p.Id,
+                    p.Name,
+                    p.ProductCategory,
+                    [
+                        new HateoasLink(new Uri($"{baseUrl}/api/catalog/products/{p.Id}"), "product", Infrastructure.HttpMethod.GET)
+                    ]
+                )).ToList(),
+                [
+                    new HateoasLink(new Uri($"{baseUrl}/api/compatibility/validate"), "self", Infrastructure.HttpMethod.POST),
+                    new HateoasLink(new Uri($"{baseUrl}/api/catalog/products"), "catalog", Infrastructure.HttpMethod.GET)
+                ]
             );
 
             return Results.Ok(response);
@@ -56,6 +71,7 @@ public static class ValidateCompatibility
 
         return app;
     }
+
 }
 
 public record ValidateCompatibilityRequest(List<Guid> ProductIds);
@@ -65,7 +81,8 @@ public record ValidateCompatibilityResponse(
     bool HasErrors,
     bool HasWarnings,
     List<CompatibilityIssueDto> Issues,
-    List<ProductInfo> ValidatedProducts
+    List<ProductInfo> ValidatedProducts,
+    List<HateoasLink> Links
 );
 
 public record CompatibilityIssueDto(
@@ -77,5 +94,6 @@ public record CompatibilityIssueDto(
 public record ProductInfo(
     Guid Id,
     string Name,
-    ProductCategory Category
+    ProductCategory Category,
+    List<HateoasLink> Links
 );

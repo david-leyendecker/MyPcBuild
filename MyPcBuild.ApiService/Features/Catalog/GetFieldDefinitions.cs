@@ -1,4 +1,5 @@
 using MyPcBuild.ApiService.Domain.Models;
+using MyPcBuild.ApiService.Infrastructure;
 
 namespace MyPcBuild.ApiService.Features.Catalog;
 
@@ -6,7 +7,9 @@ public static class GetFieldDefinitions
 {
     public static IEndpointRouteBuilder MapGetFieldDefinitionsEndpoint(this IEndpointRouteBuilder app)
     {
-        app.MapGet("/api/catalog/field-definitions/{category}", (ProductCategory category) =>
+        app.MapGet("/api/catalog/field-definitions/{category}", (
+            ProductCategory category,
+            IHttpContextAccessor httpContextAccessor) =>
         {
             List<FieldDefinition> fields = category switch
             {
@@ -21,13 +24,27 @@ public static class GetFieldDefinitions
                 _ => throw new ArgumentException($"Unknown category: {category}")
             };
 
-            return Results.Ok(new GetFieldDefinitionsResponse(category, fields));
+            string baseUrl = httpContextAccessor.GetBaseUrl();
+
+            GetFieldDefinitionsResponse response = new(
+                category,
+                fields,
+                [
+                    new HateoasLink(new Uri($"{baseUrl}/api/catalog/field-definitions/{category}"), "self", Infrastructure.HttpMethod.GET),
+                    new HateoasLink(new Uri($"{baseUrl}/api/catalog/products?filters=ProductCategory={category}"), "products", Infrastructure.HttpMethod.GET),
+                    new HateoasLink(new Uri($"{baseUrl}/api/catalog/categories"), "categories", Infrastructure.HttpMethod.GET),
+                    new HateoasLink(new Uri($"{baseUrl}/api/catalog/products"), "create-product", Infrastructure.HttpMethod.POST)
+                ]
+            );
+
+            return Results.Ok(response);
         })
         .WithName("GetFieldDefinitions")
         .WithTags("Catalog");
 
         return app;
     }
+
 
     // Helper methods to create FieldDefinitions for each type
     private static FieldDefinition TextField(string name, bool required = false)
@@ -167,7 +184,8 @@ public static class GetFieldDefinitions
 
 public record GetFieldDefinitionsResponse(
     ProductCategory Category,
-    List<FieldDefinition> Fields
+    List<FieldDefinition> Fields,
+    List<HateoasLink> Links
 );
 
 public record FieldDefinition(

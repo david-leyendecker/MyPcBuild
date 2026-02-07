@@ -1,5 +1,6 @@
 using Marten;
 using MyPcBuild.ApiService.Domain.Models;
+using MyPcBuild.ApiService.Infrastructure;
 
 namespace MyPcBuild.ApiService.Features.Catalog;
 
@@ -7,7 +8,9 @@ public static class GetCategories
 {
     public static IEndpointRouteBuilder MapGetCategoriesEndpoint(this IEndpointRouteBuilder app)
     {
-        app.MapGet("/api/catalog/categories", async (IDocumentSession session) =>
+        app.MapGet("/api/catalog/categories", async (
+            IDocumentSession session,
+            IHttpContextAccessor httpContextAccessor) =>
         {
             Dictionary<ProductCategory, ProductCategoryInfo> categoryInfoDict = ProductCategoryInfo.ByEnum();
 
@@ -18,14 +21,26 @@ public static class GetCategories
                 .ToListAsync())
                 .ToDictionary(x => x.Category, x => x.Count);
 
+            string baseUrl = httpContextAccessor.GetBaseUrl();
+
             List<CategoryInfo> categories = [.. categoryInfoDict
                 .Select(kvp => new CategoryInfo(
                     kvp.Key.ToString(),
                     kvp.Value.DisplayValue,
-                    productCounts.GetValueOrDefault(kvp.Key, 0)
+                    productCounts.GetValueOrDefault(kvp.Key, 0),
+                    [
+                        new HateoasLink(new Uri($"{baseUrl}/api/catalog/products?filters=ProductCategory={kvp.Key}"), "products", Infrastructure.HttpMethod.GET),
+                        new HateoasLink(new Uri($"{baseUrl}/api/catalog/field-definitions/{kvp.Key}"), "field-definitions", Infrastructure.HttpMethod.GET)
+                    ]
                 ))];
 
-            GetCategoriesResponse response = new(categories);
+            GetCategoriesResponse response = new(
+                categories,
+                [
+                    new HateoasLink(new Uri($"{baseUrl}/api/catalog/categories"), "self", Infrastructure.HttpMethod.GET),
+                    new HateoasLink(new Uri($"{baseUrl}/api/catalog/products"), "all-products", Infrastructure.HttpMethod.GET)
+                ]
+            );
             return Results.Ok(response);
         })
         .WithName("GetCategories")
@@ -33,12 +48,17 @@ public static class GetCategories
 
         return app;
     }
+
 }
 
-public record GetCategoriesResponse(List<CategoryInfo> Categories);
+public record GetCategoriesResponse(
+    List<CategoryInfo> Categories,
+    List<HateoasLink> Links
+);
 
 public record CategoryInfo(
     string Name,
     string DisplayValue,
-    int ProductCount
+    int ProductCount,
+    List<HateoasLink> Links
 );
