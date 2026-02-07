@@ -12,6 +12,7 @@ using MyPcBuild.ApiService.Features.Catalog.DTOs;
 using MyPcBuild.ApiService.Features.Compatibility;
 using MyPcBuild.ApiService.Features.Spatial;
 using MyPcBuild.ApiService.Infrastructure;
+using MyPcBuild.ApiService.Infrastructure.Hateoas;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
@@ -50,6 +51,9 @@ builder.Services.AddScoped<ICompatibilityValidator, CompatibilityValidator>();
 
 // Register spatial validator
 builder.Services.AddScoped<ISpatialValidator, SpatialValidator>();
+
+// Register HATEOAS link generator
+builder.Services.AddScoped<ILinkGenerator, HateoasLinkGenerator>();
 
 // Add OpenAPI
 builder.AddAzureChatCompletionsClient("chat")

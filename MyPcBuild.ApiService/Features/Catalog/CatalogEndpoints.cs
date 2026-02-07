@@ -1,6 +1,8 @@
+using MyPcBuild.ApiService.Features.Catalog.Endpoints;
+
 namespace MyPcBuild.ApiService.Features.Catalog;
 
-public static class Endpoints
+public static class CatalogEndpoints
 {
     public static IEndpointRouteBuilder MapCatalogEndpoints(this IEndpointRouteBuilder app)
     {
