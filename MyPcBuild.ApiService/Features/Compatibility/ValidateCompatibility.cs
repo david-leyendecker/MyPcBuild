@@ -1,5 +1,6 @@
 using Marten;
 using MyPcBuild.ApiService.Domain.Models;
+using MyPcBuild.ApiService.Infrastructure;
 
 namespace MyPcBuild.ApiService.Features.Compatibility;
 
@@ -10,7 +11,8 @@ public static class ValidateCompatibility
         app.MapPost("/api/compatibility/validate", async (
             ValidateCompatibilityRequest request,
             IDocumentSession session,
-            ICompatibilityValidator validator) =>
+            ICompatibilityValidator validator,
+            IHttpContextAccessor httpContextAccessor) =>
         {
             if (request.ProductIds == null || !request.ProductIds.Any())
             {
@@ -35,7 +37,9 @@ public static class ValidateCompatibility
 
             // Validate compatibility
             CompatibilityResult result = await validator.ValidateBuild(products);
-            
+
+            string baseUrl = GetBaseUrl(httpContextAccessor);
+
             // Map to response DTO
             ValidateCompatibilityResponse response = new(
                 result.IsCompatible,
@@ -46,7 +50,18 @@ public static class ValidateCompatibility
                     i.Severity.ToString(),
                     i.Category
                 )).ToList(),
-                products.Select(p => new ProductInfo(p.Id, p.Name, p.ProductCategory)).ToList()
+                products.Select(p => new ProductInfo(
+                    p.Id,
+                    p.Name,
+                    p.ProductCategory,
+                    [
+                        new HateoasLink($"{baseUrl}/api/catalog/products/{p.Id}", "product", "GET")
+                    ]
+                )).ToList(),
+                [
+                    new HateoasLink($"{baseUrl}/api/compatibility/validate", "self", "POST"),
+                    new HateoasLink($"{baseUrl}/api/catalog/products", "catalog", "GET")
+                ]
             );
 
             return Results.Ok(response);
@@ -55,6 +70,12 @@ public static class ValidateCompatibility
         .WithTags("Compatibility");
 
         return app;
+    }
+
+    private static string GetBaseUrl(IHttpContextAccessor httpContextAccessor)
+    {
+        HttpRequest request = httpContextAccessor.HttpContext!.Request;
+        return $"{request.Scheme}://{request.Host}";
     }
 }
 
@@ -65,7 +86,8 @@ public record ValidateCompatibilityResponse(
     bool HasErrors,
     bool HasWarnings,
     List<CompatibilityIssueDto> Issues,
-    List<ProductInfo> ValidatedProducts
+    List<ProductInfo> ValidatedProducts,
+    List<HateoasLink> Links
 );
 
 public record CompatibilityIssueDto(
@@ -77,5 +99,6 @@ public record CompatibilityIssueDto(
 public record ProductInfo(
     Guid Id,
     string Name,
-    ProductCategory Category
+    ProductCategory Category,
+    List<HateoasLink> Links
 );

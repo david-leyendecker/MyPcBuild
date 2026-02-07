@@ -1,5 +1,6 @@
 using Marten;
 using MyPcBuild.ApiService.Domain.Models;
+using MyPcBuild.ApiService.Infrastructure;
 
 namespace MyPcBuild.ApiService.Features.Catalog;
 
@@ -7,7 +8,9 @@ public static class GetCategories
 {
     public static IEndpointRouteBuilder MapGetCategoriesEndpoint(this IEndpointRouteBuilder app)
     {
-        app.MapGet("/api/catalog/categories", async (IDocumentSession session) =>
+        app.MapGet("/api/catalog/categories", async (
+            IDocumentSession session,
+            IHttpContextAccessor httpContextAccessor) =>
         {
             Dictionary<ProductCategory, ProductCategoryInfo> categoryInfoDict = ProductCategoryInfo.ByEnum();
 
@@ -18,14 +21,26 @@ public static class GetCategories
                 .ToListAsync())
                 .ToDictionary(x => x.Category, x => x.Count);
 
+            string baseUrl = GetBaseUrl(httpContextAccessor);
+
             List<CategoryInfo> categories = [.. categoryInfoDict
                 .Select(kvp => new CategoryInfo(
                     kvp.Key.ToString(),
                     kvp.Value.DisplayValue,
-                    productCounts.GetValueOrDefault(kvp.Key, 0)
+                    productCounts.GetValueOrDefault(kvp.Key, 0),
+                    [
+                        new HateoasLink($"{baseUrl}/api/catalog/products?filters=ProductCategory={kvp.Key}", "products", "GET"),
+                        new HateoasLink($"{baseUrl}/api/catalog/field-definitions/{kvp.Key}", "field-definitions", "GET")
+                    ]
                 ))];
 
-            GetCategoriesResponse response = new(categories);
+            GetCategoriesResponse response = new(
+                categories,
+                [
+                    new HateoasLink($"{baseUrl}/api/catalog/categories", "self", "GET"),
+                    new HateoasLink($"{baseUrl}/api/catalog/products", "all-products", "GET")
+                ]
+            );
             return Results.Ok(response);
         })
         .WithName("GetCategories")
@@ -33,12 +48,22 @@ public static class GetCategories
 
         return app;
     }
+
+    private static string GetBaseUrl(IHttpContextAccessor httpContextAccessor)
+    {
+        HttpRequest request = httpContextAccessor.HttpContext!.Request;
+        return $"{request.Scheme}://{request.Host}";
+    }
 }
 
-public record GetCategoriesResponse(List<CategoryInfo> Categories);
+public record GetCategoriesResponse(
+    List<CategoryInfo> Categories,
+    List<HateoasLink> Links
+);
 
 public record CategoryInfo(
     string Name,
     string DisplayValue,
-    int ProductCount
+    int ProductCount,
+    List<HateoasLink> Links
 );

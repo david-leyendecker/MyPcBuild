@@ -1,6 +1,7 @@
 using Marten;
 using MyPcBuild.ApiService.Domain.Models;
 using MyPcBuild.ApiService.Features.Catalog.DTOs;
+using MyPcBuild.ApiService.Infrastructure;
 
 namespace MyPcBuild.ApiService.Features.Catalog;
 
@@ -10,6 +11,7 @@ public static class CreateProduct
     {
         app.MapPost("/api/catalog/products", async (
             IDocumentSession session,
+            IHttpContextAccessor httpContextAccessor,
             ProductRequest request) =>
         {
             Product product = ProductDtoMapper.ToDomain(request);
@@ -17,7 +19,19 @@ public static class CreateProduct
             session.Store(product);
             await session.SaveChangesAsync();
 
-            return Results.Created($"/api/catalog/products/{product.Id}", new CreateProductResponse(product.Id));
+            string baseUrl = GetBaseUrl(httpContextAccessor);
+
+            CreateProductResponse response = new(
+                product.Id,
+                [
+                    new HateoasLink($"{baseUrl}/api/catalog/products/{product.Id}", "self", "GET"),
+                    new HateoasLink($"{baseUrl}/api/catalog/products/{product.Id}", "update", "PUT"),
+                    new HateoasLink($"{baseUrl}/api/catalog/products/{product.Id}/publish", "publish", "POST"),
+                    new HateoasLink($"{baseUrl}/api/catalog/products", "all-products", "GET")
+                ]
+            );
+
+            return Results.Created($"/api/catalog/products/{product.Id}", response);
         })
         .WithName("CreateProduct")
         .Produces<CreateProductResponse>(StatusCodes.Status201Created)
@@ -25,6 +39,15 @@ public static class CreateProduct
 
         return app;
     }
+
+    private static string GetBaseUrl(IHttpContextAccessor httpContextAccessor)
+    {
+        HttpRequest request = httpContextAccessor.HttpContext!.Request;
+        return $"{request.Scheme}://{request.Host}";
+    }
 }
 
-public record CreateProductResponse(Guid Id);
+public record CreateProductResponse(
+    Guid Id,
+    List<HateoasLink> Links
+);

@@ -2,6 +2,7 @@ using Marten;
 using MyPcBuild.ApiService.Domain.Events;
 using MyPcBuild.ApiService.Domain.Models;
 using MyPcBuild.ApiService.Domain.Models.Spatial;
+using MyPcBuild.ApiService.Infrastructure;
 
 namespace MyPcBuild.ApiService.Features.Builds;
 
@@ -12,7 +13,8 @@ public static class AddPartToSlot
         app.MapPost("/api/builds/{buildId:guid}/parts/slot", async (
             Guid buildId,
             AddPartToSlotRequest request,
-            IDocumentSession session) =>
+            IDocumentSession session,
+            IHttpContextAccessor httpContextAccessor) =>
         {
             // Validate that the product exists and is not a draft
             Product? product = await session.LoadAsync<Product>(request.ProductId);
@@ -73,7 +75,20 @@ public static class AddPartToSlot
             session.Events.Append(buildId, @event);
             await session.SaveChangesAsync();
 
-            return Results.Ok(new { Message = "Part added to slot successfully" });
+            string baseUrl = GetBaseUrl(httpContextAccessor);
+
+            AddPartToSlotResponse response = new(
+                "Part added to slot successfully",
+                [
+                    new HateoasLink($"{baseUrl}/api/builds/{buildId}", "build", "GET"),
+                    new HateoasLink($"{baseUrl}/api/builds/{buildId}/parts/{request.ProductId}", "remove", "DELETE"),
+                    new HateoasLink($"{baseUrl}/api/builds/{buildId}/compatibility", "validate", "GET"),
+                    new HateoasLink($"{baseUrl}/api/builds/{buildId}/slots", "available-slots", "GET"),
+                    new HateoasLink($"{baseUrl}/api/catalog/products/{request.ProductId}", "product", "GET")
+                ]
+            );
+
+            return Results.Ok(response);
         })
         .WithName("AddPartToSlot")
         .WithTags("Builds");
@@ -100,6 +115,12 @@ public static class AddPartToSlot
 
         return null;
     }
+
+    private static string GetBaseUrl(IHttpContextAccessor httpContextAccessor)
+    {
+        HttpRequest request = httpContextAccessor.HttpContext!.Request;
+        return $"{request.Scheme}://{request.Host}";
+    }
 }
 
 public record AddPartToSlotRequest(
@@ -107,4 +128,9 @@ public record AddPartToSlotRequest(
     decimal PricePaid,
     Guid SlotId,
     Guid ParentProductId
+);
+
+public record AddPartToSlotResponse(
+    string Message,
+    List<HateoasLink> Links
 );

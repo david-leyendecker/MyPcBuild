@@ -1,6 +1,7 @@
 using Marten;
 using MyPcBuild.ApiService.Domain.Models;
 using MyPcBuild.ApiService.Domain.Models.Spatial;
+using MyPcBuild.ApiService.Infrastructure;
 
 namespace MyPcBuild.ApiService.Features.Builds;
 
@@ -10,13 +11,16 @@ public static class GetAvailableSlots
     {
         app.MapGet("/api/builds/{buildId:guid}/slots", async (
             Guid buildId,
-            IDocumentSession session) =>
+            IDocumentSession session,
+            IHttpContextAccessor httpContextAccessor) =>
         {
             Build? build = await session.Events.AggregateStreamAsync<Build>(buildId);
             if (build is null)
             {
                 return Results.NotFound();
             }
+
+            string baseUrl = GetBaseUrl(httpContextAccessor);
 
             List<AvailableSlotDto> availableSlots = [];
 
@@ -92,14 +96,34 @@ public static class GetAvailableSlots
                 }
             }
 
-            return Results.Ok(availableSlots);
+            GetAvailableSlotsResponse response = new(
+                availableSlots,
+                [
+                    new HateoasLink($"{baseUrl}/api/builds/{buildId}/slots", "self", "GET"),
+                    new HateoasLink($"{baseUrl}/api/builds/{buildId}", "build", "GET"),
+                    new HateoasLink($"{baseUrl}/api/builds/{buildId}/parts/slot", "add-part-to-slot", "POST")
+                ]
+            );
+
+            return Results.Ok(response);
         })
         .WithName("GetAvailableSlots")
         .WithTags("Builds");
 
         return app;
     }
+
+    private static string GetBaseUrl(IHttpContextAccessor httpContextAccessor)
+    {
+        HttpRequest request = httpContextAccessor.HttpContext!.Request;
+        return $"{request.Scheme}://{request.Host}";
+    }
 }
+
+public record GetAvailableSlotsResponse(
+    List<AvailableSlotDto> Slots,
+    List<HateoasLink> Links
+);
 
 public record AvailableSlotDto(
     Guid Id,

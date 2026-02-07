@@ -2,6 +2,7 @@ using Marten;
 using MyPcBuild.ApiService.Domain.Models;
 using MyPcBuild.ApiService.Domain.Models.Spatial;
 using MyPcBuild.ApiService.Features.Compatibility;
+using MyPcBuild.ApiService.Infrastructure;
 
 namespace MyPcBuild.ApiService.Features.Builds;
 
@@ -12,13 +13,16 @@ public static class GetBuild
         app.MapGet("/api/builds/{buildId:guid}", async (
             Guid buildId,
             IDocumentSession session,
-            ICompatibilityValidator validator) =>
+            ICompatibilityValidator validator,
+            IHttpContextAccessor httpContextAccessor) =>
         {
             Build? build = await session.Events.AggregateStreamAsync<Build>(buildId);
             if (build is null)
             {
                 return Results.NotFound();
             }
+
+            string baseUrl = GetBaseUrl(httpContextAccessor);
 
             // Load products for the build
             List<ProductDetails> productDetails = [];
@@ -94,7 +98,11 @@ public static class GetBuild
                         rotation,
                         dimensions,
                         slots,
-                        chambers
+                        chambers,
+                        [
+                            new HateoasLink($"{baseUrl}/api/catalog/products/{product.Id}", "product", "GET"),
+                            new HateoasLink($"{baseUrl}/api/builds/{buildId}/parts/{product.Id}", "remove", "DELETE")
+                        ]
                     ));
                 }
             }
@@ -127,7 +135,14 @@ public static class GetBuild
                     i.Severity.ToString(),
                     i.Category
                 )).ToList() ?? [],
-                DateTimeOffset.UtcNow
+                DateTimeOffset.UtcNow,
+                [
+                    new HateoasLink($"{baseUrl}/api/builds/{buildId}", "self", "GET"),
+                    new HateoasLink($"{baseUrl}/api/builds/{buildId}/parts", "add-part", "POST"),
+                    new HateoasLink($"{baseUrl}/api/builds/{buildId}/compatibility", "validate", "GET"),
+                    new HateoasLink($"{baseUrl}/api/builds/{buildId}/slots", "available-slots", "GET"),
+                    new HateoasLink($"{baseUrl}/api/catalog/products", "catalog", "GET")
+                ]
             );
 
             return Results.Ok(response);
@@ -136,6 +151,12 @@ public static class GetBuild
         .WithTags("Builds");
 
         return app;
+    }
+
+    private static string GetBaseUrl(IHttpContextAccessor httpContextAccessor)
+    {
+        HttpRequest request = httpContextAccessor.HttpContext!.Request;
+        return $"{request.Scheme}://{request.Host}";
     }
 }
 
@@ -146,7 +167,8 @@ public record GetBuildResponse(
     List<ProductDetails> Parts,
     bool IsCompatible,
     List<CompatibilityIssueDto> CompatibilityIssues,
-    DateTimeOffset CreatedAt
+    DateTimeOffset CreatedAt,
+    List<HateoasLink> Links
 );
 
 public record ProductDetails(
@@ -160,7 +182,8 @@ public record ProductDetails(
     RotationDto? Rotation,
     DimensionsDto? Dimensions,
     List<SlotDto>? Slots,
-    List<ChamberDto>? Chambers
+    List<ChamberDto>? Chambers,
+    List<HateoasLink> Links
 );
 
 public record CompatibilityIssueDto(

@@ -1,6 +1,7 @@
 using Marten;
 using MyPcBuild.ApiService.Domain.Models;
 using MyPcBuild.ApiService.Features.Catalog.DTOs;
+using MyPcBuild.ApiService.Infrastructure;
 
 namespace MyPcBuild.ApiService.Features.Catalog;
 
@@ -13,7 +14,8 @@ public static class GetProductById
     {
         app.MapGet("/api/catalog/products/{id:guid}", async (
             Guid id,
-            IDocumentSession session) =>
+            IDocumentSession session,
+            IHttpContextAccessor httpContextAccessor) =>
         {
             Product? product = await session.LoadAsync<Product>(id);
 
@@ -22,14 +24,39 @@ public static class GetProductById
                 return Results.NotFound();
             }
 
+            string baseUrl = GetBaseUrl(httpContextAccessor);
+
             ProductResponse response = ProductDtoMapper.ToResponse(product);
-            return Results.Ok(response);
+
+            GetProductByIdResponse wrappedResponse = new(
+                response,
+                [
+                    new HateoasLink($"{baseUrl}/api/catalog/products/{id}", "self", "GET"),
+                    new HateoasLink($"{baseUrl}/api/catalog/products/{id}", "update", "PUT"),
+                    new HateoasLink($"{baseUrl}/api/catalog/products?filters=ProductCategory={product.ProductCategory}", "category", "GET"),
+                    new HateoasLink($"{baseUrl}/api/catalog/products", "all-products", "GET"),
+                    new HateoasLink($"{baseUrl}/api/catalog/categories", "categories", "GET")
+                ]
+            );
+
+            return Results.Ok(wrappedResponse);
         })
         .WithName("GetProductById")
-        .Produces<ProductResponse>(StatusCodes.Status200OK)
+        .Produces<GetProductByIdResponse>(StatusCodes.Status200OK)
         .Produces(StatusCodes.Status404NotFound)
         .WithTags("Catalog");
 
         return app;
     }
+
+    private static string GetBaseUrl(IHttpContextAccessor httpContextAccessor)
+    {
+        HttpRequest request = httpContextAccessor.HttpContext!.Request;
+        return $"{request.Scheme}://{request.Host}";
+    }
 }
+
+public record GetProductByIdResponse(
+    ProductResponse Product,
+    List<HateoasLink> Links
+);
