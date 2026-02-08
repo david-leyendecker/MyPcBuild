@@ -59,7 +59,7 @@ export interface BuildValidation {
   buildId: string;
   buildName: string;
   isCompatible: boolean;
-  hasErrros: boolean;
+  hasErrors: boolean;
   hasWarnings: boolean;
   issues: CompatibilityIssue[];
   products: BuildPart[];
