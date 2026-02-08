@@ -59,7 +59,11 @@ const toggleMobileMenu = () => {
       <!-- Main Content -->
       <main class="flex-1 overflow-auto">
         <div class="container py-6">
-          <RouterView />
+          <RouterView v-slot="{ Component, route }">
+            <Transition name="page" mode="out-in">
+              <component :is="Component" :key="route.path" />
+            </Transition>
+          </RouterView>
         </div>
       </main>
     </div>
@@ -108,5 +112,20 @@ const toggleMobileMenu = () => {
 .slide-enter-from,
 .slide-leave-to {
   transform: translateX(-100%);
+}
+
+.page-enter-active,
+.page-leave-active {
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.page-enter-from {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+.page-leave-to {
+  opacity: 0;
+  transform: translateY(-10px);
 }
 </style>

@@ -21,8 +21,8 @@ IResourceBuilder<ProjectResource> apiService = builder.AddProject<Projects.MyPcB
     .WithHttpHealthCheck("/health")
     .WaitFor(postgres);
 
-// Add new Naive UI client (Vite dev server)
-var client = builder.AddViteApp("client", "../apps/naive-ui-client")
+// Add Naive UI client (Vite dev server)
+var naiveClient = builder.AddViteApp("naive-client", "../apps/naive-ui-client")
     .WithExternalHttpEndpoints()
     .WithHttpsEndpoint(port: null, env: "PORT")
     .WithReference(apiService)
@@ -30,12 +30,23 @@ var client = builder.AddViteApp("client", "../apps/naive-ui-client")
     .WithHttpsDeveloperCertificate()
     .PublishAsDockerFile();
 
-// Configure API service with allowed CORS origins from client
+// Add shadcn-vue client (Vite dev server)
+var shadcnClient = builder.AddViteApp("shadcn-client", "../apps/shadcn-vue-client")
+    .WithExternalHttpEndpoints()
+    .WithHttpsEndpoint(port: null, env: "PORT")
+    .WithReference(apiService)
+    .WithDeveloperCertificateTrust(true)
+    .WithHttpsDeveloperCertificate()
+    .PublishAsDockerFile();
+
+// Configure API service with allowed CORS origins from clients
 apiService.WithEnvironment(context =>
 {
     List<string> allowedOrigins = [];
-    AddAllowedOrigins(allowedOrigins, client.GetEndpoint("http"));
-    AddAllowedOrigins(allowedOrigins, client.GetEndpoint("https"));
+    AddAllowedOrigins(allowedOrigins, naiveClient.GetEndpoint("http"));
+    AddAllowedOrigins(allowedOrigins, naiveClient.GetEndpoint("https"));
+    AddAllowedOrigins(allowedOrigins, shadcnClient.GetEndpoint("http"));
+    AddAllowedOrigins(allowedOrigins, shadcnClient.GetEndpoint("https"));
     if (allowedOrigins.Count == 0)
     {
         throw new InvalidOperationException("No client endpoints discovered to configure AllowedOrigins.");

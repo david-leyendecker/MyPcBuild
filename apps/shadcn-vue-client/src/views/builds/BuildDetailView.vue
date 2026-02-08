@@ -11,6 +11,7 @@ import ErrorState from '@/components/shared/ErrorState.vue'
 import BuildSummaryBar from '@/components/builds/BuildSummaryBar.vue'
 import BuildPartsList from '@/components/builds/BuildPartsList.vue'
 import CompatibilityPanel from '@/components/compatibility/CompatibilityPanel.vue'
+import BuildViewer3D from '@/components/spatial/BuildViewer3D.vue'
 
 interface Props {
   id: string
@@ -21,7 +22,7 @@ const route = useRoute()
 const router = useRouter()
 const buildStore = useBuildStore()
 
-type Tab = 'overview' | 'parts' | 'compatibility'
+type Tab = 'overview' | 'parts' | 'compatibility' | '3d'
 const activeTab = ref<Tab>('overview')
 
 const totalCost = computed(() => 
@@ -57,6 +58,7 @@ const tabs: { value: Tab; label: string }[] = [
   { value: 'overview', label: 'Overview' },
   { value: 'parts', label: 'Parts' },
   { value: 'compatibility', label: 'Compatibility' },
+  { value: '3d', label: '3D View' },
 ]
 </script>
 
@@ -179,6 +181,15 @@ const tabs: { value: Tab; label: string }[] = [
         <!-- Compatibility Tab -->
         <div v-if="activeTab === 'compatibility'">
           <CompatibilityPanel :issues="buildStore.validationIssues" />
+        </div>
+
+        <!-- 3D View Tab -->
+        <div v-if="activeTab === '3d'" class="h-[600px]">
+          <BuildViewer3D
+            :parts="buildStore.currentBuild.parts"
+            :collisions="[]"
+            :title="`3D View - ${buildStore.currentBuild.name}`"
+          />
         </div>
       </div>
     </div>

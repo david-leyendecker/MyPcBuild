@@ -3,11 +3,13 @@ import { ref, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { catalogApi, getCategoryFromBackend, getCategoryDisplayName } from '@/api/catalog'
 import type { Product } from '@/api/catalog'
+import type { ProductResponse } from '@/types/product'
 import LoadingState from '@/components/shared/LoadingState.vue'
 import ErrorState from '@/components/shared/ErrorState.vue'
 import CategoryIcon from '@/components/shared/CategoryIcon.vue'
 import StatusBadge from '@/components/shared/StatusBadge.vue'
 import PriceDisplay from '@/components/shared/PriceDisplay.vue'
+import ProductViewer3D from '@/components/spatial/ProductViewer3D.vue'
 import Button from '@/components/ui/button/Button.vue'
 import Card from '@/components/ui/card/Card.vue'
 import CardHeader from '@/components/ui/card/CardHeader.vue'
@@ -20,6 +22,7 @@ const route = useRoute()
 const router = useRouter()
 
 const product = ref<Product | null>(null)
+const productData = ref<ProductResponse | null>(null)
 const isLoading = ref(false)
 const error = ref<string | null>(null)
 const showDeleteDialog = ref(false)
@@ -34,6 +37,12 @@ const categoryDisplay = computed(() => {
   return getCategoryDisplayName(product.value.category)
 })
 
+const hasSpatialData = computed(() => {
+  if (!productData.value) return false
+  const p = productData.value as any
+  return !!(p.dimensions || p.slots?.length || p.chambers?.length)
+})
+
 onMounted(async () => {
   await loadProduct()
 })
@@ -44,6 +53,7 @@ async function loadProduct() {
   try {
     const id = route.params.id as string
     product.value = await catalogApi.getProduct(id)
+    productData.value = await catalogApi.getProduct(id) as any
   } catch (err) {
     error.value = err instanceof Error ? err.message : 'Failed to load product'
   } finally {
@@ -177,6 +187,23 @@ function goBack() {
           </CardContent>
         </Card>
       </div>
+
+      <!-- 3D Visualization (if spatial data exists) -->
+      <Card v-if="hasSpatialData && productData" class="mt-6">
+        <CardHeader>
+          <CardTitle>3D Preview</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div class="h-[500px]">
+            <ProductViewer3D
+              :dimensions="(productData as any).dimensions"
+              :slots="(productData as any).slots"
+              :chambers="(productData as any).chambers"
+              :title="`${product.name} - 3D Preview`"
+            />
+          </div>
+        </CardContent>
+      </Card>
     </div>
 
     <!-- Delete Confirmation Dialog -->
