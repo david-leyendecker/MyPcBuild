@@ -52,8 +52,9 @@ async function loadProduct() {
   error.value = null
   try {
     const id = route.params.id as string
-    product.value = await catalogApi.getProduct(id)
-    productData.value = await catalogApi.getProduct(id) as any
+    const response = await catalogApi.getProduct(id)
+    product.value = response
+    productData.value = response as any
   } catch (err) {
     error.value = err instanceof Error ? err.message : 'Failed to load product'
   } finally {
