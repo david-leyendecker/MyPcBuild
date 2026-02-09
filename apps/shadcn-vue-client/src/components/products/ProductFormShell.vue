@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, withDefaults } from 'vue'
+import { ref } from 'vue'
 import type { ProductCategory } from '@/types/product'
 import Input from '@/components/ui/input/Input.vue'
 import Label from '@/components/ui/label/Label.vue'

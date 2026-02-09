@@ -1,8 +1,11 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
 import type { PcCaseProductRequest } from '@/types/product'
+import type { Chamber } from '@/types/spatial'
 import Input from '@/components/ui/input/Input.vue'
 import Label from '@/components/ui/label/Label.vue'
+import DimensionsInput from '@/components/value-objects/DimensionsInput.vue'
+import ChambersInput from '@/components/value-objects/ChambersInput.vue'
 
 interface Props {
   modelValue?: Partial<PcCaseProductRequest>
@@ -16,34 +19,27 @@ const emit = defineEmits<{
 const formFactor = ref(props.modelValue?.formFactor || 'Mid Tower')
 const color = ref(props.modelValue?.color || 'Black')
 const sidePanelWindow = ref(props.modelValue?.sidePanelWindow || 'Tempered Glass')
-const dimensionLength = ref(props.modelValue?.dimensions?.length || 450)
-const dimensionWidth = ref(props.modelValue?.dimensions?.width || 210)
-const dimensionHeight = ref(props.modelValue?.dimensions?.height || 460)
+const dimensions = ref(props.modelValue?.dimensions || { length: 450, width: 210, height: 460 })
+const chambers = ref<Chamber[]>(props.modelValue?.chambers || [])
 
-watch([formFactor, color, sidePanelWindow, dimensionLength, dimensionWidth, dimensionHeight], () => {
+watch([formFactor, color, sidePanelWindow, dimensions, chambers], () => {
   emit('update:modelValue', {
     category: 'case',
     formFactor: formFactor.value,
     color: color.value,
     sidePanelWindow: sidePanelWindow.value,
-    dimensions: {
-      length: dimensionLength.value,
-      width: dimensionWidth.value,
-      height: dimensionHeight.value
-    }
+    dimensions: dimensions.value,
+    chambers: chambers.value
   })
-})
+}, { deep: true })
 
 defineExpose({
   getFormData: () => ({
     formFactor: formFactor.value,
     color: color.value,
     sidePanelWindow: sidePanelWindow.value,
-    dimensions: {
-      length: dimensionLength.value,
-      width: dimensionWidth.value,
-      height: dimensionHeight.value
-    }
+    dimensions: dimensions.value,
+    chambers: chambers.value
   })
 })
 </script>
@@ -74,18 +70,11 @@ defineExpose({
     </div>
 
     <div class="space-y-2 col-span-2">
-      <Label>Dimensions (mm) *</Label>
-      <div class="grid grid-cols-3 gap-2">
-        <div>
-          <Input v-model.number="dimensionLength" type="number" placeholder="Length" min="0" />
-        </div>
-        <div>
-          <Input v-model.number="dimensionWidth" type="number" placeholder="Width" min="0" />
-        </div>
-        <div>
-          <Input v-model.number="dimensionHeight" type="number" placeholder="Height" min="0" />
-        </div>
-      </div>
+      <DimensionsInput v-model="dimensions" label="Dimensions (mm) *" />
+    </div>
+
+    <div class="col-span-2">
+      <ChambersInput v-model="chambers" label="Chambers (for spatial layout)" />
     </div>
   </div>
 </template>
