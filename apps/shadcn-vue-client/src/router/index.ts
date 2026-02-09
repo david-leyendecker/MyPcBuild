@@ -36,6 +36,12 @@ const router = createRouter({
       props: true,
     },
     {
+      path: '/catalog/:id/edit',
+      name: 'product-edit',
+      component: () => import('@/views/catalog/ProductEditView.vue'),
+      props: true,
+    },
+    {
       path: '/:pathMatch(.*)*',
       name: 'not-found',
       component: () => import('@/views/NotFoundView.vue'),

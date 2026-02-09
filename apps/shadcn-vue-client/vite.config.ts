@@ -10,13 +10,9 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url))
     }
   },
+  envPrefix: ['VITE_', 'services__'],
   server: {
-    port: Number(process.env.PORT) || 5174,
-    proxy: {
-      '/api': {
-        target: process.env.VITE_API_URL || 'http://localhost:5000',
-        changeOrigin: true,
-      },
-    },
-  },
+    port: process.env.PORT ? parseInt(process.env.PORT) : 5173,
+    strictPort: false,
+  }
 })

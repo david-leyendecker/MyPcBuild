@@ -29,9 +29,9 @@ export const useBuildStore = defineStore('builds', () => {
     error.value = null;
     try {
       const response = await buildsApi.getBuilds();
-      builds.value = response.map(b => ({
-        id: b.id,
-        name: b.name,
+      builds.value = response.items.map(item => ({
+        id: item.id,
+        name: item.name,
         parts: [],
         createdAt: '',
         updatedAt: ''
@@ -56,11 +56,16 @@ export const useBuildStore = defineStore('builds', () => {
     }
   }
 
-  async function createBuild(name: string) {
+  /**
+   * Create a new build
+   * @param name - The name of the build
+   * @param userId - The user ID (TODO: integrate with authentication system)
+   */
+  async function createBuild(name: string, userId: string = 'default-user-id') {
     isLoading.value = true;
     error.value = null;
     try {
-      const newBuild = await buildsApi.createBuild(name);
+      const newBuild = await buildsApi.createBuild(name, userId);
       builds.value.push({
         id: newBuild.id,
         name: newBuild.name,
@@ -72,29 +77,6 @@ export const useBuildStore = defineStore('builds', () => {
       return newBuild;
     } catch (err) {
       error.value = err instanceof Error ? err.message : 'Failed to create build';
-      throw err;
-    } finally {
-      isLoading.value = false;
-    }
-  }
-
-  async function updateBuild(id: string, name: string) {
-    isLoading.value = true;
-    error.value = null;
-    try {
-      await buildsApi.updateBuild(id, name);
-      const index = builds.value.findIndex(b => b.id === id);
-      if (index !== -1) {
-        const build = builds.value[index];
-        if (build) {
-          build.name = name;
-        }
-      }
-      if (currentBuild.value?.id === id) {
-        currentBuild.value.name = name;
-      }
-    } catch (err) {
-      error.value = err instanceof Error ? err.message : 'Failed to update build';
       throw err;
     } finally {
       isLoading.value = false;
@@ -156,7 +138,6 @@ export const useBuildStore = defineStore('builds', () => {
     loadBuilds,
     loadBuild,
     createBuild,
-    updateBuild,
     addPart,
     addPartToSlot,
     removePart,

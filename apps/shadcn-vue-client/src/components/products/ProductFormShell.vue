@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, withDefaults } from 'vue'
 import type { ProductCategory } from '@/types/product'
 import Input from '@/components/ui/input/Input.vue'
 import Label from '@/components/ui/label/Label.vue'
@@ -8,17 +8,24 @@ import Button from '@/components/ui/button/Button.vue'
 interface Props {
   category: ProductCategory
   isSubmitting?: boolean
+  initialName?: string
+  initialManufacturer?: string
+  initialPrice?: number
 }
 
-const props = defineProps<Props>()
+const props = withDefaults(defineProps<Props>(), {
+  initialName: '',
+  initialManufacturer: '',
+  initialPrice: 0
+})
 
 const emit = defineEmits<{
   submit: [data: { name: string; manufacturer: string; price: number; isDraft: boolean }]
 }>()
 
-const name = ref('')
-const manufacturer = ref('')
-const price = ref(0)
+const name = ref(props.initialName)
+const manufacturer = ref(props.initialManufacturer)
+const price = ref(props.initialPrice)
 
 const errors = ref<Record<string, string>>({})
 

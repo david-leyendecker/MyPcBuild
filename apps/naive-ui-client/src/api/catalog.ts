@@ -173,8 +173,8 @@ export const catalogApi = {
   },
 
   async getProduct(id: string): Promise<Product> {
-    const response = await apiClient.get<Product>(`/catalog/products/${id}`);
-    return response.data;
+    const response = await apiClient.get<{ product: Product }>(`/catalog/products/${id}`);
+    return response.data.product;
   },
 
   async getFieldDefinitions(category: ProductCategory): Promise<FieldDefinition[]> {

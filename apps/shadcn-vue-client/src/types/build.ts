@@ -4,6 +4,14 @@
 
 import type { Vector3, Rotation, Dimensions, Slot, Chamber } from './spatial';
 
+export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
+
+export interface HateoasLink {
+  href: string;
+  rel: string;
+  method: HttpMethod;
+}
+
 export interface Build {
   id: string;
   name: string;
@@ -12,10 +20,16 @@ export interface Build {
   updatedAt: string;
 }
 
-export interface GetBuildsResponse {
+export interface GetBuildsResponseItem {
   id: string;
   name: string;
   totalPrice: number;
+  links: HateoasLink[];
+}
+
+export interface GetBuildsResponse {
+  items: GetBuildsResponseItem[];
+  links: HateoasLink[];
 }
 
 export interface GetBuildResponse {
@@ -26,12 +40,19 @@ export interface GetBuildResponse {
   isCompatible: boolean;
   compatibilityIssues: CompatibilityIssue[];
   createdAt: string;
+  links?: HateoasLink[];
+}
+
+export interface CreateBuildRequest {
+  name: string;
+  userId: string;
 }
 
 export interface CreateBuildResponse {
   id: string;
   name: string;
   userId: string;
+  links?: HateoasLink[];
 }
 
 export interface BuildPart {
@@ -63,6 +84,7 @@ export interface BuildValidation {
   hasWarnings: boolean;
   issues: CompatibilityIssue[];
   products: BuildPart[];
+  links?: HateoasLink[];
 }
 
 export interface AvailableSlot {
@@ -75,6 +97,7 @@ export interface AvailableSlot {
   isOccupied: boolean;
   parentProductId: string;
   parentProductName: string;
+  links?: HateoasLink[];
 }
 
 export interface AddPartToSlotRequest {

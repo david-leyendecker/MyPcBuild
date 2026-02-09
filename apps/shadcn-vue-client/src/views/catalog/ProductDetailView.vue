@@ -176,7 +176,7 @@ function goBack() {
           </CardHeader>
           <CardContent class="space-y-3">
             <div
-              v-for="[key, value] in Object.entries(product.specifications)"
+              v-for="[key, value] in Object.entries(product.specifications || {})"
               :key="key"
               class="flex justify-between"
             >
@@ -184,6 +184,9 @@ function goBack() {
                 {{ key.replace(/([A-Z])/g, ' $1').trim() }}
               </div>
               <div class="text-sm">{{ value }}</div>
+            </div>
+            <div v-if="!product.specifications || Object.keys(product.specifications).length === 0" class="text-sm text-muted-foreground">
+              No specifications available
             </div>
           </CardContent>
         </Card>

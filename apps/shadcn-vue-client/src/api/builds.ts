@@ -6,6 +6,7 @@ import apiClient from './client';
 import type {
   GetBuildsResponse,
   GetBuildResponse,
+  CreateBuildRequest,
   CreateBuildResponse,
   BuildValidation,
   AvailableSlot,
@@ -13,8 +14,8 @@ import type {
 } from '@/types/build';
 
 export const buildsApi = {
-  async getBuilds(): Promise<GetBuildsResponse[]> {
-    const response = await apiClient.get<GetBuildsResponse[]>('/builds');
+  async getBuilds(): Promise<GetBuildsResponse> {
+    const response = await apiClient.get<GetBuildsResponse>('/builds');
     return response.data;
   },
 
@@ -23,13 +24,10 @@ export const buildsApi = {
     return response.data;
   },
 
-  async createBuild(name: string): Promise<CreateBuildResponse> {
-    const response = await apiClient.post<CreateBuildResponse>('/builds', { name });
+  async createBuild(name: string, userId: string): Promise<CreateBuildResponse> {
+    const request: CreateBuildRequest = { name, userId };
+    const response = await apiClient.post<CreateBuildResponse>('/builds', request);
     return response.data;
-  },
-
-  async updateBuild(buildId: string, name: string): Promise<void> {
-    await apiClient.put(`/builds/${buildId}`, { name });
   },
 
   async addPart(buildId: string, productId: string, pricePaid: number = 0): Promise<void> {
