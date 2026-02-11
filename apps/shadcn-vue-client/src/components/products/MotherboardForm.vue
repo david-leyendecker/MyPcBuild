@@ -4,6 +4,7 @@ import type { MotherboardProductRequest, CpuSocket, FormFactor, MemoryType } fro
 import type { Slot } from '@/types/spatial'
 import Input from '@/components/ui/input/Input.vue'
 import Label from '@/components/ui/label/Label.vue'
+import FormSelect from '@/components/shared/FormSelect.vue'
 import DimensionsInput from '@/components/value-objects/DimensionsInput.vue'
 import SlotsInput from '@/components/value-objects/SlotsInput.vue'
 
@@ -24,9 +25,9 @@ const maxMemoryGB = ref(props.modelValue?.maxMemory?.valueInGB || 128)
 const dimensions = ref(props.modelValue?.dimensions || { length: 305, width: 244, height: 69 })
 const slots = ref<Slot[]>(props.modelValue?.slots || [])
 
-const socketOptions: CpuSocket[] = ['LGA1700', 'LGA1200', 'LGA1151', 'LGA2066', 'AM5', 'AM4', 'sTRX4', 'TR4']
-const formFactorOptions: FormFactor[] = ['ATX', 'MicroATX', 'MiniITX', 'EATX']
-const memoryTypes: MemoryType[] = ['DDR3', 'DDR4', 'DDR5']
+const socketOptions = (['LGA1700', 'LGA1200', 'LGA1151', 'LGA2066', 'AM5', 'AM4', 'sTRX4', 'TR4'] as CpuSocket[]).map(v => ({ value: v, label: v }))
+const formFactorOptions = (['ATX', 'MicroATX', 'MiniITX', 'EATX'] as FormFactor[]).map(v => ({ value: v, label: v }))
+const memoryTypeOptions = (['DDR3', 'DDR4', 'DDR5'] as MemoryType[]).map(v => ({ value: v, label: v }))
 
 watch([socket, chipset, formFactor, memoryType, maxMemoryGB, dimensions, slots], () => {
   emit('update:modelValue', {
@@ -58,13 +59,7 @@ defineExpose({
   <div class="grid gap-4 md:grid-cols-2">
     <div class="space-y-2">
       <Label for="socket">CPU Socket *</Label>
-      <select
-        id="socket"
-        v-model="socket"
-        class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-      >
-        <option v-for="opt in socketOptions" :key="opt" :value="opt">{{ opt }}</option>
-      </select>
+      <FormSelect v-model="socket" :options="socketOptions" />
     </div>
 
     <div class="space-y-2">
@@ -74,24 +69,12 @@ defineExpose({
 
     <div class="space-y-2">
       <Label for="formFactor">Form Factor *</Label>
-      <select
-        id="formFactor"
-        v-model="formFactor"
-        class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-      >
-        <option v-for="opt in formFactorOptions" :key="opt" :value="opt">{{ opt }}</option>
-      </select>
+      <FormSelect v-model="formFactor" :options="formFactorOptions" />
     </div>
 
     <div class="space-y-2">
       <Label for="memoryType">Memory Type *</Label>
-      <select
-        id="memoryType"
-        v-model="memoryType"
-        class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-      >
-        <option v-for="opt in memoryTypes" :key="opt" :value="opt">{{ opt }}</option>
-      </select>
+      <FormSelect v-model="memoryType" :options="memoryTypeOptions" />
     </div>
 
     <div class="space-y-2">

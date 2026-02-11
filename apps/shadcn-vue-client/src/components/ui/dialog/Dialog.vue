@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { watch, onUnmounted } from 'vue'
+
 interface Props {
   open: boolean
   title?: string
@@ -8,12 +10,30 @@ interface Emits {
   (e: 'update:open', value: boolean): void
 }
 
-defineProps<Props>()
+const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
 
 function close() {
   emit('update:open', false)
 }
+
+function handleKeydown(e: KeyboardEvent) {
+  if (e.key === 'Escape') {
+    close()
+  }
+}
+
+watch(() => props.open, (isOpen) => {
+  if (isOpen) {
+    document.addEventListener('keydown', handleKeydown)
+  } else {
+    document.removeEventListener('keydown', handleKeydown)
+  }
+})
+
+onUnmounted(() => {
+  document.removeEventListener('keydown', handleKeydown)
+})
 </script>
 
 <template>
@@ -43,6 +63,9 @@ function close() {
     >
       <div
         v-if="open"
+        role="dialog"
+        aria-modal="true"
+        :aria-label="title"
         class="fixed left-1/2 top-1/2 z-50 w-full max-w-lg -translate-x-1/2 -translate-y-1/2 p-6"
         @click.stop
       >

@@ -3,6 +3,8 @@ import { ref, watch } from 'vue'
 import type { CoolerProductRequest, CoolerType, CpuSocket } from '@/types/product'
 import Input from '@/components/ui/input/Input.vue'
 import Label from '@/components/ui/label/Label.vue'
+import FormSelect from '@/components/shared/FormSelect.vue'
+import DimensionsInput from '@/components/shared/DimensionsInput.vue'
 
 interface Props {
   modelValue?: Partial<CoolerProductRequest>
@@ -21,7 +23,7 @@ const dimensionLength = ref(props.modelValue?.dimensions?.length || 120)
 const dimensionWidth = ref(props.modelValue?.dimensions?.width || 120)
 const dimensionHeight = ref(props.modelValue?.dimensions?.height || 160)
 
-const coolerTypeOptions: CoolerType[] = ['Air', 'AIO', 'CustomLoop']
+const coolerTypeOptions = (['Air', 'AIO', 'CustomLoop'] as CoolerType[]).map(v => ({ value: v, label: v }))
 const socketOptions: CpuSocket[] = ['LGA1700', 'LGA1200', 'LGA1151', 'LGA2066', 'AM5', 'AM4', 'sTRX4', 'TR4']
 
 function toggleSocket(socket: CpuSocket) {
@@ -67,13 +69,7 @@ defineExpose({
   <div class="grid gap-4 md:grid-cols-2">
     <div class="space-y-2">
       <Label for="coolerType">Cooler Type *</Label>
-      <select
-        id="coolerType"
-        v-model="coolerType"
-        class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-      >
-        <option v-for="opt in coolerTypeOptions" :key="opt" :value="opt">{{ opt }}</option>
-      </select>
+      <FormSelect v-model="coolerType" :options="coolerTypeOptions" />
     </div>
 
     <div class="space-y-2">
@@ -108,19 +104,10 @@ defineExpose({
       </div>
     </div>
 
-    <div class="space-y-2 col-span-2">
-      <Label>Dimensions (mm) *</Label>
-      <div class="grid grid-cols-3 gap-2">
-        <div>
-          <Input v-model.number="dimensionLength" type="number" placeholder="Length" min="0" />
-        </div>
-        <div>
-          <Input v-model.number="dimensionWidth" type="number" placeholder="Width" min="0" />
-        </div>
-        <div>
-          <Input v-model.number="dimensionHeight" type="number" placeholder="Height" min="0" />
-        </div>
-      </div>
-    </div>
+    <DimensionsInput
+      v-model:length="dimensionLength"
+      v-model:width="dimensionWidth"
+      v-model:height="dimensionHeight"
+    />
   </div>
 </template>

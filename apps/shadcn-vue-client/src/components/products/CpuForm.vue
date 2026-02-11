@@ -3,6 +3,7 @@ import { ref, watch } from 'vue'
 import type { CpuProductRequest, CpuSocket } from '@/types/product'
 import Input from '@/components/ui/input/Input.vue'
 import Label from '@/components/ui/label/Label.vue'
+import FormSelect from '@/components/shared/FormSelect.vue'
 
 interface Props {
   modelValue?: Partial<CpuProductRequest>
@@ -21,7 +22,7 @@ const boostClockGHz = ref(props.modelValue?.boostClock?.valueInGHz || 5.0)
 const tdpWatts = ref(props.modelValue?.tdp?.valueInWatts || 105)
 const integratedGraphics = ref(props.modelValue?.integratedGraphics || false)
 
-const socketOptions: CpuSocket[] = ['LGA1700', 'LGA1200', 'LGA1151', 'LGA2066', 'AM5', 'AM4', 'sTRX4', 'TR4']
+const socketOptions = (['LGA1700', 'LGA1200', 'LGA1151', 'LGA2066', 'AM5', 'AM4', 'sTRX4', 'TR4'] as CpuSocket[]).map(v => ({ value: v, label: v }))
 
 watch([socket, cores, threads, baseClockGHz, boostClockGHz, tdpWatts, integratedGraphics], () => {
   emit('update:modelValue', {
@@ -53,13 +54,7 @@ defineExpose({
   <div class="grid gap-4 md:grid-cols-2">
     <div class="space-y-2">
       <Label for="socket">CPU Socket *</Label>
-      <select
-        id="socket"
-        v-model="socket"
-        class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-      >
-        <option v-for="opt in socketOptions" :key="opt" :value="opt">{{ opt }}</option>
-      </select>
+      <FormSelect v-model="socket" :options="socketOptions" />
     </div>
 
     <div class="space-y-2">

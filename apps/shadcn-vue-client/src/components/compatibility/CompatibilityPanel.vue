@@ -20,7 +20,7 @@ const warnings = computed(() => props.issues.filter(i => i.severity === 'Warning
         Errors ({{ errors.length }})
       </h3>
       <div class="space-y-2">
-        <IssueCard v-for="(issue, idx) in errors" :key="idx" :issue="issue" />
+        <IssueCard v-for="(issue, idx) in errors" :key="`error-${idx}-${issue.message}`" :issue="issue" />
       </div>
     </div>
 
@@ -29,7 +29,7 @@ const warnings = computed(() => props.issues.filter(i => i.severity === 'Warning
         Warnings ({{ warnings.length }})
       </h3>
       <div class="space-y-2">
-        <IssueCard v-for="(issue, idx) in warnings" :key="idx" :issue="issue" />
+        <IssueCard v-for="(issue, idx) in warnings" :key="`warn-${idx}-${issue.message}`" :issue="issue" />
       </div>
     </div>
 

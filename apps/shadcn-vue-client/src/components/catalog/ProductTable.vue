@@ -1,7 +1,9 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import type { ProductSummary } from '@/api/catalog'
 import { getCategoryFromBackend } from '@/api/catalog'
+import type { ProductCategory } from '@/types/product'
 import CategoryIcon from '@/components/shared/CategoryIcon.vue'
 import StatusBadge from '@/components/shared/StatusBadge.vue'
 import PriceDisplay from '@/components/shared/PriceDisplay.vue'
@@ -13,9 +15,15 @@ interface Props {
 const props = defineProps<Props>()
 const router = useRouter()
 
-function getCategoryForProduct(categoryName: string) {
-  return getCategoryFromBackend(categoryName)
-}
+const categoryMap = computed(() => {
+  const map = new Map<string, ProductCategory | null>()
+  for (const product of props.products) {
+    if (!map.has(product.categoryName)) {
+      map.set(product.categoryName, getCategoryFromBackend(product.categoryName))
+    }
+  }
+  return map
+})
 
 function handleRowClick(productId: string) {
   router.push({ name: 'product-detail', params: { id: productId } })
@@ -53,8 +61,8 @@ function handleRowClick(productId: string) {
         >
           <td class="p-4 align-middle">
             <CategoryIcon
-              v-if="getCategoryForProduct(product.categoryName)"
-              :category="getCategoryForProduct(product.categoryName)!"
+              v-if="categoryMap.get(product.categoryName)"
+              :category="categoryMap.get(product.categoryName)!"
               class="h-5 w-5 text-muted-foreground"
             />
           </td>

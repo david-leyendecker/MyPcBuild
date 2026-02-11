@@ -14,6 +14,7 @@ export const useCatalogStore = defineStore('catalog', () => {
   const products = ref<ProductSummary[]>([]);
   const totalProducts = ref(0);
   const selectedCategory = ref<string | null>(null);
+  const statusFilter = ref<'all' | 'draft' | 'published'>('all');
   const searchQuery = ref('');
   const currentPage = ref(1);
   const itemsPerPage = ref(10);
@@ -31,6 +32,12 @@ export const useCatalogStore = defineStore('catalog', () => {
       if (selectedCategory.value) {
         const filterValue = getCategoryBackendValue(selectedCategory.value);
         filters.push(`ProductCategory=${filterValue}`);
+      }
+
+      if (statusFilter.value === 'draft') {
+        filters.push('IsDraft=true');
+      } else if (statusFilter.value === 'published') {
+        filters.push('IsDraft=false');
       }
       
       const response: GetProductsResponse = await catalogApi.getProducts({
@@ -82,6 +89,12 @@ export const useCatalogStore = defineStore('catalog', () => {
     loadProducts();
   }
 
+  function setStatus(status: 'all' | 'draft' | 'published') {
+    statusFilter.value = status;
+    currentPage.value = 1;
+    loadProducts();
+  }
+
   function clearError() {
     error.value = null;
   }
@@ -90,6 +103,7 @@ export const useCatalogStore = defineStore('catalog', () => {
     products,
     totalProducts,
     selectedCategory,
+    statusFilter,
     searchQuery,
     currentPage,
     itemsPerPage,
@@ -100,6 +114,7 @@ export const useCatalogStore = defineStore('catalog', () => {
     loadProducts,
     setCategory,
     setSearch,
+    setStatus,
     setPage,
     setItemsPerPage,
     setSorting,

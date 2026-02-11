@@ -4,6 +4,7 @@ import type { PcCaseProductRequest } from '@/types/product'
 import type { Chamber } from '@/types/spatial'
 import Input from '@/components/ui/input/Input.vue'
 import Label from '@/components/ui/label/Label.vue'
+import FormSelect from '@/components/shared/FormSelect.vue'
 import DimensionsInput from '@/components/value-objects/DimensionsInput.vue'
 import ChambersInput from '@/components/value-objects/ChambersInput.vue'
 
@@ -58,15 +59,14 @@ defineExpose({
 
     <div class="space-y-2">
       <Label for="sidePanelWindow">Side Panel Window *</Label>
-      <select
-        id="sidePanelWindow"
+      <FormSelect
         v-model="sidePanelWindow"
-        class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-      >
-        <option value="None">None</option>
-        <option value="Acrylic">Acrylic</option>
-        <option value="Tempered Glass">Tempered Glass</option>
-      </select>
+        :options="[
+          { value: 'None', label: 'None' },
+          { value: 'Acrylic', label: 'Acrylic' },
+          { value: 'Tempered Glass', label: 'Tempered Glass' },
+        ]"
+      />
     </div>
 
     <div class="space-y-2 col-span-2">

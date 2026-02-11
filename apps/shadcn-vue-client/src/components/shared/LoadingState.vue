@@ -16,15 +16,3 @@ withDefaults(defineProps<Props>(), {
     <p class="text-sm text-muted-foreground">{{ message }}</p>
   </div>
 </template>
-
-<style scoped>
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-.animate-spin {
-  animation: spin 1s linear infinite;
-}
-</style>

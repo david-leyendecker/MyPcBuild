@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import { AlertCircle, AlertTriangle } from 'lucide-vue-next'
 import type { CompatibilityIssue } from '@/types/build'
 import { Card, CardContent } from '@/components/ui/card'
@@ -10,8 +11,8 @@ interface Props {
 
 const props = defineProps<Props>()
 
-const iconComponent = props.issue.severity === 'Error' ? AlertCircle : AlertTriangle
-const severityClass = props.issue.severity === 'Error' ? 'text-destructive' : 'text-yellow-500'
+const iconComponent = computed(() => props.issue.severity === 'Error' ? AlertCircle : AlertTriangle)
+const severityClass = computed(() => props.issue.severity === 'Error' ? 'text-destructive' : 'text-yellow-500')
 </script>
 
 <template>

@@ -3,6 +3,7 @@ import { ref, watch } from 'vue'
 import type { RamProductRequest, MemoryType } from '@/types/product'
 import Input from '@/components/ui/input/Input.vue'
 import Label from '@/components/ui/label/Label.vue'
+import FormSelect from '@/components/shared/FormSelect.vue'
 
 interface Props {
   modelValue?: Partial<RamProductRequest>
@@ -20,7 +21,7 @@ const speedGHz = ref(props.modelValue?.speed?.valueInGHz || 3.2)
 const casLatency = ref(props.modelValue?.casLatency || 'CL16')
 const voltageVolts = ref(props.modelValue?.voltage?.valueInVolts || 1.35)
 
-const memoryTypes: MemoryType[] = ['DDR3', 'DDR4', 'DDR5']
+const memoryTypeOptions = (['DDR3', 'DDR4', 'DDR5'] as MemoryType[]).map(v => ({ value: v, label: v }))
 
 watch([type, capacityGB, configuration, speedGHz, casLatency, voltageVolts], () => {
   emit('update:modelValue', {
@@ -50,13 +51,7 @@ defineExpose({
   <div class="grid gap-4 md:grid-cols-2">
     <div class="space-y-2">
       <Label for="type">Memory Type *</Label>
-      <select
-        id="type"
-        v-model="type"
-        class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-      >
-        <option v-for="opt in memoryTypes" :key="opt" :value="opt">{{ opt }}</option>
-      </select>
+      <FormSelect v-model="type" :options="memoryTypeOptions" />
     </div>
 
     <div class="space-y-2">

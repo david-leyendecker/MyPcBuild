@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, type Component } from 'vue'
 import { Cpu, Gpu, CircuitBoard, MemoryStick, HardDrive, Zap, Fan, Box } from 'lucide-vue-next'
 import type { ProductCategory } from '@/types/product'
 
@@ -10,19 +10,18 @@ interface Props {
 
 const props = defineProps<Props>()
 
-const iconComponent = computed(() => {
-  const iconMap: Record<ProductCategory, any> = {
-    cpu: Cpu,
-    gpu: Gpu,
-    motherboard: CircuitBoard,
-    ram: MemoryStick,
-    storage: HardDrive,
-    powersupply: Zap,
-    cooler: Fan,
-    case: Box,
-  }
-  return iconMap[props.category]
-})
+const iconMap: Record<ProductCategory, Component> = {
+  cpu: Cpu,
+  gpu: Gpu,
+  motherboard: CircuitBoard,
+  ram: MemoryStick,
+  storage: HardDrive,
+  powersupply: Zap,
+  cooler: Fan,
+  case: Box,
+}
+
+const iconComponent = computed(() => iconMap[props.category])
 </script>
 
 <template>

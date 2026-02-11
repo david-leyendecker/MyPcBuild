@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref, watch, onUnmounted } from 'vue'
 import { useCatalogStore } from '@/stores/catalogStore'
 import { categoryLabels } from '@/api/catalog'
 import type { ProductCategory } from '@/types/product'
@@ -11,7 +11,7 @@ const catalogStore = useCatalogStore()
 const categories: ProductCategory[] = ['cpu', 'gpu', 'motherboard', 'ram', 'storage', 'powersupply', 'cooler', 'case']
 
 const selectedCategories = ref<Set<ProductCategory>>(new Set())
-const statusFilter = ref<'all' | 'draft' | 'published'>('all')
+const statusFilter = ref<'all' | 'draft' | 'published'>(catalogStore.statusFilter)
 const searchQuery = ref(catalogStore.searchQuery)
 
 let searchDebounceTimeout: ReturnType<typeof setTimeout> | null = null
@@ -25,6 +25,12 @@ watch(searchQuery, (newValue) => {
   }, 300)
 })
 
+onUnmounted(() => {
+  if (searchDebounceTimeout) {
+    clearTimeout(searchDebounceTimeout)
+  }
+})
+
 watch(selectedCategories, () => {
   if (selectedCategories.value.size === 0) {
     catalogStore.setCategory(null)
@@ -33,6 +39,10 @@ watch(selectedCategories, () => {
     catalogStore.setCategory(category || null)
   }
 }, { deep: true })
+
+watch(statusFilter, (newValue) => {
+  catalogStore.setStatus(newValue)
+})
 
 function toggleCategory(category: ProductCategory) {
   if (selectedCategories.value.has(category)) {

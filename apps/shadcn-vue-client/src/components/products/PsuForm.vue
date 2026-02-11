@@ -3,6 +3,7 @@ import { ref, watch } from 'vue'
 import type { PsuProductRequest } from '@/types/product'
 import Input from '@/components/ui/input/Input.vue'
 import Label from '@/components/ui/label/Label.vue'
+import FormSelect from '@/components/shared/FormSelect.vue'
 
 interface Props {
   modelValue?: Partial<PsuProductRequest>
@@ -58,15 +59,14 @@ defineExpose({
 
     <div class="space-y-2">
       <Label for="modular">Modular Type *</Label>
-      <select
-        id="modular"
+      <FormSelect
         v-model="modular"
-        class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-      >
-        <option value="Full">Full Modular</option>
-        <option value="Semi">Semi Modular</option>
-        <option value="Non">Non Modular</option>
-      </select>
+        :options="[
+          { value: 'Full', label: 'Full Modular' },
+          { value: 'Semi', label: 'Semi Modular' },
+          { value: 'Non', label: 'Non Modular' },
+        ]"
+      />
     </div>
 
     <div class="space-y-2">

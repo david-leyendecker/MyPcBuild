@@ -60,6 +60,7 @@ const mousePos = ref({ x: 0, y: 0 });
 const showGrid = ref(true);
 
 const partMeshes = new Map<string, THREE.Mesh>();
+const chamberMeshes: THREE.Mesh[] = [];
 let hasInitialFit = false;
 let viewer3DInstance: ReturnType<typeof use3DViewer> | null = null;
 let state: any = null;
@@ -83,11 +84,13 @@ onMounted(() => {
   });
 
   updateScene();
-  window.addEventListener('mousemove', onMouseMove);
+  containerRef.value.addEventListener('mousemove', onMouseMove);
 });
 
 onUnmounted(() => {
-  window.removeEventListener('mousemove', onMouseMove);
+  if (containerRef.value) {
+    containerRef.value.removeEventListener('mousemove', onMouseMove);
+  }
   if (viewer3DInstance) {
     viewer3DInstance.unmount();
   }
@@ -105,6 +108,27 @@ function updateScene() {
   if (!state) return;
 
   clearMeshMap(partMeshes, state.scene);
+
+  // Clear previously created chamber meshes to prevent leaks
+  for (const mesh of chamberMeshes) {
+    state.scene.remove(mesh);
+    mesh.geometry.dispose();
+    if (Array.isArray(mesh.material)) {
+      mesh.material.forEach((m: THREE.Material) => m.dispose());
+    } else {
+      mesh.material.dispose();
+    }
+    // Also dispose children (wireframe edges)
+    mesh.children.forEach((child: THREE.Object3D) => {
+      if (child instanceof THREE.LineSegments) {
+        child.geometry.dispose();
+        if (child.material instanceof THREE.Material) {
+          child.material.dispose();
+        }
+      }
+    });
+  }
+  chamberMeshes.length = 0;
 
   props.parts.forEach(part => {
     if (!part.dimensions) return;
@@ -162,6 +186,7 @@ function updateScene() {
         chamberMesh.add(chamberWireframe);
 
         state.scene.add(chamberMesh);
+        chamberMeshes.push(chamberMesh);
       });
     }
   });

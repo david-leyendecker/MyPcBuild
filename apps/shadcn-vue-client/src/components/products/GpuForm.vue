@@ -3,6 +3,8 @@ import { ref, watch } from 'vue'
 import type { GpuProductRequest, MemoryType, GpuPowerConnector } from '@/types/product'
 import Input from '@/components/ui/input/Input.vue'
 import Label from '@/components/ui/label/Label.vue'
+import FormSelect from '@/components/shared/FormSelect.vue'
+import DimensionsInput from '@/components/shared/DimensionsInput.vue'
 
 interface Props {
   modelValue?: Partial<GpuProductRequest>
@@ -27,8 +29,8 @@ const dimensionLength = ref(props.modelValue?.dimensions?.length || 304)
 const dimensionWidth = ref(props.modelValue?.dimensions?.width || 137)
 const dimensionHeight = ref(props.modelValue?.dimensions?.height || 61)
 
-const memoryTypes: MemoryType[] = ['GDDR5', 'GDDR5X', 'GDDR6', 'GDDR6X', 'HBM2', 'HBM2E', 'HBM3']
-const powerConnectorOptions: GpuPowerConnector[] = ['Dual8Pin', 'Triple8Pin', 'One16Pin']
+const memoryTypeOptions = (['GDDR5', 'GDDR5X', 'GDDR6', 'GDDR6X', 'HBM2', 'HBM2E', 'HBM3'] as MemoryType[]).map(v => ({ value: v, label: v }))
+const powerConnectorOptions = (['Dual8Pin', 'Triple8Pin', 'One16Pin'] as GpuPowerConnector[]).map(v => ({ value: v, label: v }))
 
 watch([chipsetManufacturer, series, vramGB, memoryType, coreClockGHz, boostClockGHz, tdpWatts, lengthMm, powerConnectors, rayTracing, dimensionLength, dimensionWidth, dimensionHeight], () => {
   emit('update:modelValue', {
@@ -91,13 +93,7 @@ defineExpose({
 
     <div class="space-y-2">
       <Label for="memoryType">Memory Type *</Label>
-      <select
-        id="memoryType"
-        v-model="memoryType"
-        class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-      >
-        <option v-for="opt in memoryTypes" :key="opt" :value="opt">{{ opt }}</option>
-      </select>
+      <FormSelect v-model="memoryType" :options="memoryTypeOptions" />
     </div>
 
     <div class="space-y-2">
@@ -117,29 +113,14 @@ defineExpose({
 
     <div class="space-y-2">
       <Label for="powerConnectors">Power Connectors *</Label>
-      <select
-        id="powerConnectors"
-        v-model="powerConnectors"
-        class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-      >
-        <option v-for="opt in powerConnectorOptions" :key="opt" :value="opt">{{ opt }}</option>
-      </select>
+      <FormSelect v-model="powerConnectors" :options="powerConnectorOptions" />
     </div>
 
-    <div class="space-y-2 col-span-2">
-      <Label>Dimensions (mm) *</Label>
-      <div class="grid grid-cols-3 gap-2">
-        <div>
-          <Input v-model.number="dimensionLength" type="number" placeholder="Length" min="0" />
-        </div>
-        <div>
-          <Input v-model.number="dimensionWidth" type="number" placeholder="Width" min="0" />
-        </div>
-        <div>
-          <Input v-model.number="dimensionHeight" type="number" placeholder="Height" min="0" />
-        </div>
-      </div>
-    </div>
+    <DimensionsInput
+      v-model:length="dimensionLength"
+      v-model:width="dimensionWidth"
+      v-model:height="dimensionHeight"
+    />
 
     <div class="space-y-2 flex items-center">
       <input
