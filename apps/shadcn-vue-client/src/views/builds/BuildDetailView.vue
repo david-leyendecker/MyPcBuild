@@ -34,6 +34,10 @@ const partCount = computed(() => buildStore.currentBuild?.parts.length || 0)
 const hasErrors = computed(() => buildStore.errors.length > 0)
 const hasWarnings = computed(() => buildStore.warnings.length > 0)
 
+const hasSpatialParts = computed(() =>
+  buildStore.currentBuild?.parts.some(p => p.dimensions) ?? false
+)
+
 onMounted(async () => {
   const buildId = props.id || route.params.id as string
   await buildStore.loadBuild(buildId)
@@ -93,6 +97,19 @@ const tabs: { value: Tab; label: string }[] = [
         :has-errors="hasErrors"
         :has-warnings="hasWarnings"
       />
+
+      <!-- 3D Visualization (when parts have spatial data) -->
+      <Card v-if="hasSpatialParts">
+        <CardContent class="p-0">
+          <div class="h-[500px]">
+            <BuildViewer3D
+              :parts="buildStore.currentBuild.parts"
+              :collisions="[]"
+              :title="`3D Preview - ${buildStore.currentBuild.name}`"
+            />
+          </div>
+        </CardContent>
+      </Card>
 
       <!-- Tabs -->
       <div class="border-b">

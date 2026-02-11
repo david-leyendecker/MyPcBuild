@@ -39,6 +39,14 @@ public abstract record ProductRequest
 /// <summary>
 /// Base response for product queries.
 /// </summary>
+[JsonDerivedType(typeof(CpuProductResponse))]
+[JsonDerivedType(typeof(GpuProductResponse))]
+[JsonDerivedType(typeof(MotherboardProductResponse))]
+[JsonDerivedType(typeof(RamProductResponse))]
+[JsonDerivedType(typeof(StorageProductResponse))]
+[JsonDerivedType(typeof(PsuProductResponse))]
+[JsonDerivedType(typeof(CoolerProductResponse))]
+[JsonDerivedType(typeof(PcCaseProductResponse))]
 public abstract record ProductResponse
 {
     /// <summary>

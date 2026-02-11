@@ -43,7 +43,7 @@ const isActive = (path: string) => {
 <template>
   <aside 
     :class="cn(
-      'border-r bg-background transition-all duration-300',
+      'h-full border-r bg-background transition-all duration-300',
       isCollapsed ? 'w-16' : 'w-64'
     )"
   >
