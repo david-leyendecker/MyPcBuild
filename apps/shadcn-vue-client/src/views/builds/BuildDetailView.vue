@@ -191,10 +191,14 @@ const tabs: { value: Tab; label: string }[] = [
         <!-- 3D View Tab -->
         <div v-if="activeTab === '3d'" class="h-[600px]">
           <BuildViewer3D
+            v-if="hasSpatialParts"
             :parts="buildStore.currentBuild.parts"
             :collisions="[]"
             :title="`3D View - ${buildStore.currentBuild.name}`"
           />
+          <div v-else class="flex items-center justify-center h-full text-muted-foreground">
+            Add parts with dimensions to see the 3D preview
+          </div>
         </div>
       </div>
     </div>

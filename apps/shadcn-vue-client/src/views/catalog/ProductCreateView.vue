@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { ref, computed, markRaw } from 'vue'
 import { useRouter } from 'vue-router'
-import type { ProductCategory } from '@/types/product'
+import type { ProductCategory, CategoryFormData, CategoryFormComponentRef } from '@/types/product'
 import { categoryLabels, catalogApi } from '@/api/catalog'
 import type { CreateProductRequest } from '@/api/catalog'
+import { useProductSpatialData } from '@/composables/useProductSpatialData'
 import CategoryIcon from '@/components/shared/CategoryIcon.vue'
 import Card from '@/components/ui/card/Card.vue'
 import CardHeader from '@/components/ui/card/CardHeader.vue'
@@ -26,11 +27,11 @@ const router = useRouter()
 
 const step = ref<1 | 2>(1)
 const selectedCategory = ref<ProductCategory | null>(null)
-const categoryFormData = ref<any>({})
+const categoryFormData = ref<CategoryFormData>({})
 const isSubmitting = ref(false)
 const error = ref<string | null>(null)
 
-const categoryFormRef = ref<any>(null)
+const categoryFormRef = ref<CategoryFormComponentRef | null>(null)
 
 const categories: ProductCategory[] = ['cpu', 'gpu', 'motherboard', 'ram', 'storage', 'powersupply', 'cooler', 'case']
 
@@ -50,14 +51,7 @@ const currentFormComponent = computed(() => {
   return categoryFormComponents[selectedCategory.value]
 })
 
-const hasSpatialData = computed(() => {
-  const data = categoryFormData.value as any
-  if (!data) return false
-  const hasDimensions = data.dimensions && (data.dimensions.length || data.dimensions.width || data.dimensions.height)
-  const hasSlots = data.slots && data.slots.length > 0
-  const hasChambers = data.chambers && data.chambers.length > 0
-  return !!(hasDimensions || hasSlots || hasChambers)
-})
+const { hasSpatialData, dimensions, slots, chambers } = useProductSpatialData(categoryFormData)
 
 function selectCategory(category: ProductCategory) {
   selectedCategory.value = category
@@ -179,9 +173,9 @@ async function handleSubmit(commonData: { name: string; manufacturer: string; pr
         <CardContent>
           <div class="h-[500px]">
             <ProductViewer3D
-              :dimensions="(categoryFormData as any).dimensions"
-              :slots="(categoryFormData as any).slots"
-              :chambers="(categoryFormData as any).chambers"
+              :dimensions="dimensions"
+              :slots="slots"
+              :chambers="chambers"
               title="Product 3D Preview"
             />
           </div>

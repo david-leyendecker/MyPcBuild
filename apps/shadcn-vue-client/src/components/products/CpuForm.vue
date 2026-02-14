@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
-import type { CpuProductRequest, CpuSocket } from '@/types/product'
+import type { CpuProductRequest, CpuSocket, ProductRequest } from '@/types/product'
 import Input from '@/components/ui/input/Input.vue'
 import Label from '@/components/ui/label/Label.vue'
 import FormSelect from '@/components/shared/FormSelect.vue'
 
 interface Props {
-  modelValue?: Partial<CpuProductRequest>
+  modelValue?: Partial<ProductRequest>
 }
 
 const props = defineProps<Props>()
@@ -14,13 +14,15 @@ const emit = defineEmits<{
   'update:modelValue': [value: Partial<CpuProductRequest>]
 }>()
 
-const socket = ref<CpuSocket>(props.modelValue?.socket || 'AM5')
-const cores = ref(props.modelValue?.cores || 8)
-const threads = ref(props.modelValue?.threads || 16)
-const baseClockGHz = ref(props.modelValue?.baseClock?.valueInGHz || 3.5)
-const boostClockGHz = ref(props.modelValue?.boostClock?.valueInGHz || 5.0)
-const tdpWatts = ref(props.modelValue?.tdp?.valueInWatts || 105)
-const integratedGraphics = ref(props.modelValue?.integratedGraphics || false)
+/** Narrow to CPU shape - safe when this form is rendered for CPU category */
+const model = props.modelValue as Partial<CpuProductRequest> | undefined
+const socket = ref<CpuSocket>(model?.socket || 'AM5')
+const cores = ref(model?.cores || 8)
+const threads = ref(model?.threads || 16)
+const baseClockGHz = ref(model?.baseClock?.valueInGHz || 3.5)
+const boostClockGHz = ref(model?.boostClock?.valueInGHz || 5.0)
+const tdpWatts = ref(model?.tdp?.valueInWatts || 105)
+const integratedGraphics = ref(model?.integratedGraphics || false)
 
 const socketOptions = (['LGA1700', 'LGA1200', 'LGA1151', 'LGA2066', 'AM5', 'AM4', 'sTRX4', 'TR4'] as CpuSocket[]).map(v => ({ value: v, label: v }))
 

@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
-import type { GpuProductRequest, MemoryType, GpuPowerConnector } from '@/types/product'
+import type { GpuProductRequest, MemoryType, GpuPowerConnector, ProductRequest } from '@/types/product'
 import Input from '@/components/ui/input/Input.vue'
 import Label from '@/components/ui/label/Label.vue'
 import FormSelect from '@/components/shared/FormSelect.vue'
 import DimensionsInput from '@/components/shared/DimensionsInput.vue'
 
 interface Props {
-  modelValue?: Partial<GpuProductRequest>
+  modelValue?: Partial<ProductRequest>
 }
 
 const props = defineProps<Props>()
@@ -15,19 +15,21 @@ const emit = defineEmits<{
   'update:modelValue': [value: Partial<GpuProductRequest>]
 }>()
 
-const chipsetManufacturer = ref(props.modelValue?.chipsetManufacturer || 'NVIDIA')
-const series = ref(props.modelValue?.series || 'RTX 4000')
-const vramGB = ref(props.modelValue?.vram?.valueInGB || 16)
-const memoryType = ref<MemoryType>(props.modelValue?.memoryType || 'GDDR6X')
-const coreClockGHz = ref(props.modelValue?.coreClock?.valueInGHz || 2.2)
-const boostClockGHz = ref(props.modelValue?.boostClock?.valueInGHz || 2.5)
-const tdpWatts = ref(props.modelValue?.tdp?.valueInWatts || 320)
-const lengthMm = ref(props.modelValue?.length?.valueInMm || 304)
-const powerConnectors = ref<GpuPowerConnector>(props.modelValue?.powerConnectors || 'Dual8Pin')
-const rayTracing = ref(props.modelValue?.rayTracing || true)
-const dimensionLength = ref(props.modelValue?.dimensions?.length || 304)
-const dimensionWidth = ref(props.modelValue?.dimensions?.width || 137)
-const dimensionHeight = ref(props.modelValue?.dimensions?.height || 61)
+/** Narrow to GPU shape - safe when this form is rendered for GPU category */
+const model = props.modelValue as Partial<GpuProductRequest> | undefined
+const chipsetManufacturer = ref(model?.chipsetManufacturer || 'NVIDIA')
+const series = ref(model?.series || 'RTX 4000')
+const vramGB = ref(model?.vram?.valueInGB || 16)
+const memoryType = ref<MemoryType>(model?.memoryType || 'GDDR6X')
+const coreClockGHz = ref(model?.coreClock?.valueInGHz || 2.2)
+const boostClockGHz = ref(model?.boostClock?.valueInGHz || 2.5)
+const tdpWatts = ref(model?.tdp?.valueInWatts || 320)
+const lengthMm = ref(model?.length?.valueInMm || 304)
+const powerConnectors = ref<GpuPowerConnector>(model?.powerConnectors || 'Dual8Pin')
+const rayTracing = ref(model?.rayTracing ?? true)
+const dimensionLength = ref(model?.dimensions?.length || 304)
+const dimensionWidth = ref(model?.dimensions?.width || 137)
+const dimensionHeight = ref(model?.dimensions?.height || 61)
 
 const memoryTypeOptions = (['GDDR5', 'GDDR5X', 'GDDR6', 'GDDR6X', 'HBM2', 'HBM2E', 'HBM3'] as MemoryType[]).map(v => ({ value: v, label: v }))
 const powerConnectorOptions = (['Dual8Pin', 'Triple8Pin', 'One16Pin'] as GpuPowerConnector[]).map(v => ({ value: v, label: v }))

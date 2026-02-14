@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
-import type { MotherboardProductRequest, CpuSocket, FormFactor, MemoryType } from '@/types/product'
+import type { MotherboardProductRequest, CpuSocket, FormFactor, MemoryType, ProductRequest } from '@/types/product'
 import type { Slot } from '@/types/spatial'
 import Input from '@/components/ui/input/Input.vue'
 import Label from '@/components/ui/label/Label.vue'
@@ -9,7 +9,7 @@ import DimensionsInput from '@/components/value-objects/DimensionsInput.vue'
 import SlotsInput from '@/components/value-objects/SlotsInput.vue'
 
 interface Props {
-  modelValue?: Partial<MotherboardProductRequest>
+  modelValue?: Partial<ProductRequest>
 }
 
 const props = defineProps<Props>()
@@ -17,13 +17,15 @@ const emit = defineEmits<{
   'update:modelValue': [value: Partial<MotherboardProductRequest>]
 }>()
 
-const socket = ref<CpuSocket>(props.modelValue?.socket || 'AM5')
-const chipset = ref(props.modelValue?.chipset || 'X670')
-const formFactor = ref<FormFactor>(props.modelValue?.formFactor || 'ATX')
-const memoryType = ref<MemoryType>(props.modelValue?.memoryType || 'DDR5')
-const maxMemoryGB = ref(props.modelValue?.maxMemory?.valueInGB || 128)
-const dimensions = ref(props.modelValue?.dimensions || { length: 305, width: 244, height: 69 })
-const slots = ref<Slot[]>(props.modelValue?.slots || [])
+/** Narrow to Motherboard shape - safe when this form is rendered for Motherboard category */
+const model = props.modelValue as Partial<MotherboardProductRequest> | undefined
+const socket = ref<CpuSocket>(model?.socket || 'AM5')
+const chipset = ref(model?.chipset || 'X670')
+const formFactor = ref<FormFactor>(model?.formFactor || 'ATX')
+const memoryType = ref<MemoryType>(model?.memoryType || 'DDR5')
+const maxMemoryGB = ref(model?.maxMemory?.valueInGB || 128)
+const dimensions = ref(model?.dimensions || { length: 305, width: 244, height: 69 })
+const slots = ref<Slot[]>(model?.slots || [])
 
 const socketOptions = (['LGA1700', 'LGA1200', 'LGA1151', 'LGA2066', 'AM5', 'AM4', 'sTRX4', 'TR4'] as CpuSocket[]).map(v => ({ value: v, label: v }))
 const formFactorOptions = (['ATX', 'MicroATX', 'MiniITX', 'EATX'] as FormFactor[]).map(v => ({ value: v, label: v }))

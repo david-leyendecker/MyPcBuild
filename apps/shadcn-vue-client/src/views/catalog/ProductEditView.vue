@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { ref, computed, markRaw, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import type { ProductCategory } from '@/types/product'
+import type { ProductCategory, CategoryFormData, CategoryFormComponentRef } from '@/types/product'
 import { categoryLabels, catalogApi } from '@/api/catalog'
 import type { CreateProductRequest } from '@/api/catalog'
+import { useProductSpatialData } from '@/composables/useProductSpatialData'
 import LoadingState from '@/components/shared/LoadingState.vue'
 import ErrorState from '@/components/shared/ErrorState.vue'
 import Card from '@/components/ui/card/Card.vue'
@@ -32,11 +33,11 @@ const selectedCategory = ref<ProductCategory | null>(null)
 const productName = ref('')
 const productManufacturer = ref('')
 const productPrice = ref(0)
-const categoryFormData = ref<any>({})
+const categoryFormData = ref<CategoryFormData>({})
 const isSubmitting = ref(false)
 const error = ref<string | null>(null)
 
-const categoryFormRef = ref<any>(null)
+const categoryFormRef = ref<CategoryFormComponentRef | null>(null)
 
 const categoryFormComponents = {
   cpu: markRaw(CpuForm),
@@ -54,22 +55,7 @@ const currentFormComponent = computed(() => {
   return categoryFormComponents[selectedCategory.value]
 })
 
-function useProductSpatialData(formDataRef: { value: any }) {
-  const hasSpatialData = computed(() => {
-    const data = formDataRef.value as any
-    if (!data) return false
-    const hasDimensions = data.dimensions && (data.dimensions.length || data.dimensions.width || data.dimensions.height)
-    const hasSlots = data.slots && data.slots.length > 0
-    const hasChambers = data.chambers && data.chambers.length > 0
-    return !!(hasDimensions || hasSlots || hasChambers)
-  })
-
-  return {
-    hasSpatialData
-  }
-}
-
-const { hasSpatialData } = useProductSpatialData(categoryFormData)
+const { hasSpatialData, dimensions, slots, chambers } = useProductSpatialData(categoryFormData)
 onMounted(async () => {
   await loadProduct()
 })
@@ -82,7 +68,7 @@ async function loadProduct() {
     productName.value = product.name
     productManufacturer.value = product.manufacturer
     productPrice.value = product.price
-    categoryFormData.value = product.specifications || {}
+    categoryFormData.value = (product.specifications || {}) as CategoryFormData
   } catch (err) {
     error.value = err instanceof Error ? err.message : 'Failed to load product'
   } finally {
@@ -181,9 +167,9 @@ async function handleSubmit(commonData: { name: string; manufacturer: string; pr
         <CardContent>
           <div class="h-[500px]">
             <ProductViewer3D
-              :dimensions="(categoryFormData as any).dimensions"
-              :slots="(categoryFormData as any).slots"
-              :chambers="(categoryFormData as any).chambers"
+              :dimensions="dimensions"
+              :slots="slots"
+              :chambers="chambers"
               title="Product 3D Preview"
             />
           </div>

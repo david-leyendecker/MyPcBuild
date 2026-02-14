@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
-import type { PcCaseProductRequest } from '@/types/product'
+import type { PcCaseProductRequest, ProductRequest } from '@/types/product'
 import type { Chamber } from '@/types/spatial'
 import Input from '@/components/ui/input/Input.vue'
 import Label from '@/components/ui/label/Label.vue'
@@ -9,7 +9,7 @@ import DimensionsInput from '@/components/value-objects/DimensionsInput.vue'
 import ChambersInput from '@/components/value-objects/ChambersInput.vue'
 
 interface Props {
-  modelValue?: Partial<PcCaseProductRequest>
+  modelValue?: Partial<ProductRequest>
 }
 
 const props = defineProps<Props>()
@@ -17,11 +17,13 @@ const emit = defineEmits<{
   'update:modelValue': [value: Partial<PcCaseProductRequest>]
 }>()
 
-const formFactor = ref(props.modelValue?.formFactor || 'Mid Tower')
-const color = ref(props.modelValue?.color || 'Black')
-const sidePanelWindow = ref(props.modelValue?.sidePanelWindow || 'Tempered Glass')
-const dimensions = ref(props.modelValue?.dimensions || { length: 450, width: 210, height: 460 })
-const chambers = ref<Chamber[]>(props.modelValue?.chambers || [])
+/** Narrow to PC Case shape - safe when this form is rendered for Case category */
+const model = props.modelValue as Partial<PcCaseProductRequest> | undefined
+const formFactor = ref(model?.formFactor || 'Mid Tower')
+const color = ref(model?.color || 'Black')
+const sidePanelWindow = ref(model?.sidePanelWindow || 'Tempered Glass')
+const dimensions = ref(model?.dimensions || { length: 450, width: 210, height: 460 })
+const chambers = ref<Chamber[]>(model?.chambers || [])
 
 watch([formFactor, color, sidePanelWindow, dimensions, chambers], () => {
   emit('update:modelValue', {

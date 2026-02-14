@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
-import type { RamProductRequest, MemoryType } from '@/types/product'
+import type { RamProductRequest, MemoryType, ProductRequest } from '@/types/product'
 import Input from '@/components/ui/input/Input.vue'
 import Label from '@/components/ui/label/Label.vue'
 import FormSelect from '@/components/shared/FormSelect.vue'
 
 interface Props {
-  modelValue?: Partial<RamProductRequest>
+  modelValue?: Partial<ProductRequest>
 }
 
 const props = defineProps<Props>()
@@ -14,12 +14,14 @@ const emit = defineEmits<{
   'update:modelValue': [value: Partial<RamProductRequest>]
 }>()
 
-const type = ref<MemoryType>(props.modelValue?.type || 'DDR5')
-const capacityGB = ref(props.modelValue?.capacity?.valueInGB || 16)
-const configuration = ref(props.modelValue?.configuration || '2x8GB')
-const speedGHz = ref(props.modelValue?.speed?.valueInGHz || 3.2)
-const casLatency = ref(props.modelValue?.casLatency || 'CL16')
-const voltageVolts = ref(props.modelValue?.voltage?.valueInVolts || 1.35)
+/** Narrow to RAM shape - safe when this form is rendered for RAM category */
+const model = props.modelValue as Partial<RamProductRequest> | undefined
+const type = ref<MemoryType>(model?.type || 'DDR5')
+const capacityGB = ref(model?.capacity?.valueInGB || 16)
+const configuration = ref(model?.configuration || '2x8GB')
+const speedGHz = ref(model?.speed?.valueInGHz || 3.2)
+const casLatency = ref(model?.casLatency || 'CL16')
+const voltageVolts = ref(model?.voltage?.valueInVolts || 1.35)
 
 const memoryTypeOptions = (['DDR3', 'DDR4', 'DDR5'] as MemoryType[]).map(v => ({ value: v, label: v }))
 

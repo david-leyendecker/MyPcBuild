@@ -293,3 +293,20 @@ export type ProductResponse =
   | PsuProductResponse
   | CoolerProductResponse
   | PcCaseProductResponse;
+
+// ========== Form Types ==========
+
+/** Form data for any product category (used in create/edit views) */
+export type CategoryFormData = Partial<ProductRequest>;
+
+/** Interface for category form components that expose getFormData */
+export interface CategoryFormComponentRef {
+  getFormData(): Record<string, unknown>;
+}
+
+/** Form data shape that may include spatial fields for 3D preview */
+export interface FormDataWithSpatial {
+  dimensions?: Dimensions;
+  slots?: Slot[];
+  chambers?: Chamber[];
+}

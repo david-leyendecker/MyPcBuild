@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
-import type { CoolerProductRequest, CoolerType, CpuSocket } from '@/types/product'
+import type { CoolerProductRequest, CoolerType, CpuSocket, ProductRequest } from '@/types/product'
 import Input from '@/components/ui/input/Input.vue'
 import Label from '@/components/ui/label/Label.vue'
 import FormSelect from '@/components/shared/FormSelect.vue'
 import DimensionsInput from '@/components/shared/DimensionsInput.vue'
 
 interface Props {
-  modelValue?: Partial<CoolerProductRequest>
+  modelValue?: Partial<ProductRequest>
 }
 
 const props = defineProps<Props>()
@@ -15,13 +15,15 @@ const emit = defineEmits<{
   'update:modelValue': [value: Partial<CoolerProductRequest>]
 }>()
 
-const coolerType = ref<CoolerType>(props.modelValue?.coolerType || 'Air')
-const heightMm = ref(props.modelValue?.height?.valueInMm || 160)
-const tdpWatts = ref(props.modelValue?.tdp?.valueInWatts || 180)
-const selectedSockets = ref<CpuSocket[]>(props.modelValue?.sockets || ['AM5', 'LGA1700'])
-const dimensionLength = ref(props.modelValue?.dimensions?.length || 120)
-const dimensionWidth = ref(props.modelValue?.dimensions?.width || 120)
-const dimensionHeight = ref(props.modelValue?.dimensions?.height || 160)
+/** Narrow to Cooler shape - safe when this form is rendered for Cooler category */
+const model = props.modelValue as Partial<CoolerProductRequest> | undefined
+const coolerType = ref<CoolerType>(model?.coolerType || 'Air')
+const heightMm = ref(model?.height?.valueInMm || 160)
+const tdpWatts = ref(model?.tdp?.valueInWatts || 180)
+const selectedSockets = ref<CpuSocket[]>(model?.sockets || ['AM5', 'LGA1700'])
+const dimensionLength = ref(model?.dimensions?.length || 120)
+const dimensionWidth = ref(model?.dimensions?.width || 120)
+const dimensionHeight = ref(model?.dimensions?.height || 160)
 
 const coolerTypeOptions = (['Air', 'AIO', 'CustomLoop'] as CoolerType[]).map(v => ({ value: v, label: v }))
 const socketOptions: CpuSocket[] = ['LGA1700', 'LGA1200', 'LGA1151', 'LGA2066', 'AM5', 'AM4', 'sTRX4', 'TR4']
