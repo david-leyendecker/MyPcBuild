@@ -1,6 +1,11 @@
-import apiClient from './client';
+/**
+ * Catalog API client
+ */
 
-export const ProductCategory = {
+import apiClient from './client';
+import type { ProductCategory } from '@/types/product';
+
+export const ProductCategoryConst = {
   CPU: 'cpu',
   GPU: 'gpu',
   Motherboard: 'motherboard',
@@ -10,8 +15,6 @@ export const ProductCategory = {
   Cooler: 'cooler',
   Case: 'case'
 } as const;
-
-export type ProductCategory = typeof ProductCategory[keyof typeof ProductCategory];
 
 // Central mapping for all category-related conversions
 export const categoryMapping = {

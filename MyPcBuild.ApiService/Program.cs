@@ -12,6 +12,7 @@ using MyPcBuild.ApiService.Features.Catalog.DTOs;
 using MyPcBuild.ApiService.Features.Compatibility;
 using MyPcBuild.ApiService.Features.Spatial;
 using MyPcBuild.ApiService.Infrastructure;
+using Scalar.AspNetCore;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
@@ -22,6 +23,9 @@ builder.Services.AddLogging();
 // Add services to the container
 builder.Services.AddProblemDetails();
 builder.Services.AddHttpContextAccessor();
+
+// Add OpenAPI
+builder.Services.AddOpenApi();
 
 // Add CORS for Vue.js client
 string allowedOrigins = builder.Configuration["AllowedOrigins"]
@@ -102,6 +106,10 @@ WebApplication app = builder.Build();
 
 // Configure the HTTP request pipeline
 app.UseExceptionHandler();
+
+// Map OpenAPI endpoint and Scalar UI
+app.MapOpenApi();
+app.MapScalarApiReference();
 
 // Enable CORS
 app.UseCors();
