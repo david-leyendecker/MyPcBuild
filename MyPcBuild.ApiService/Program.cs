@@ -1,16 +1,19 @@
-using System;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Marten;
 using Marten.Events.Projections;
 using Microsoft.Extensions.AI;
-using MyPcBuild.ApiService.Domain.Events;
-using MyPcBuild.ApiService.Domain.Models;
-using MyPcBuild.ApiService.Features.Builds;
-using MyPcBuild.ApiService.Features.Catalog;
-using MyPcBuild.ApiService.Features.Catalog.DTOs;
-using MyPcBuild.ApiService.Features.Compatibility;
-using MyPcBuild.ApiService.Features.Spatial;
+using MyPcBuild.ApiService.Builds.Endpoints;
+using MyPcBuild.ApiService.Builds.Events;
+using MyPcBuild.ApiService.Builds.Models;
+using MyPcBuild.ApiService.Catalog.DTOs;
+using MyPcBuild.ApiService.Catalog.Endpoints;
+using MyPcBuild.ApiService.Catalog.Models;
+using MyPcBuild.ApiService.Catalog.Services;
+using MyPcBuild.ApiService.Compatibility.Endpoints;
+using MyPcBuild.ApiService.Compatibility.Models;
+using MyPcBuild.ApiService.Spatial.Endpoints;
+using MyPcBuild.ApiService.Spatial.Models;
 using MyPcBuild.ApiService.Infrastructure;
 using Scalar.AspNetCore;
 

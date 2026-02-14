@@ -1,6 +1,6 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using MyPcBuild.ApiService.Domain.Models;
+using MyPcBuild.ApiService.Catalog.Models;
 
 namespace MyPcBuild.ApiService.Infrastructure;
 
