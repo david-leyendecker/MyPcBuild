@@ -1,7 +1,7 @@
 using Marten;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using MyPcBuild.ApiService.Domain.Models;
+using MyPcBuild.ApiService.Catalog.Models;
 
 namespace MyPcBuild.ApiService.Infrastructure;
 
