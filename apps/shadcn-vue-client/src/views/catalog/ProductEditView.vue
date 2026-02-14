@@ -54,15 +54,22 @@ const currentFormComponent = computed(() => {
   return categoryFormComponents[selectedCategory.value]
 })
 
-const hasSpatialData = computed(() => {
-  const data = categoryFormData.value as any
-  if (!data) return false
-  const hasDimensions = data.dimensions && (data.dimensions.length || data.dimensions.width || data.dimensions.height)
-  const hasSlots = data.slots && data.slots.length > 0
-  const hasChambers = data.chambers && data.chambers.length > 0
-  return !!(hasDimensions || hasSlots || hasChambers)
-})
+function useProductSpatialData(formDataRef: { value: any }) {
+  const hasSpatialData = computed(() => {
+    const data = formDataRef.value as any
+    if (!data) return false
+    const hasDimensions = data.dimensions && (data.dimensions.length || data.dimensions.width || data.dimensions.height)
+    const hasSlots = data.slots && data.slots.length > 0
+    const hasChambers = data.chambers && data.chambers.length > 0
+    return !!(hasDimensions || hasSlots || hasChambers)
+  })
 
+  return {
+    hasSpatialData
+  }
+}
+
+const { hasSpatialData } = useProductSpatialData(categoryFormData)
 onMounted(async () => {
   await loadProduct()
 })
@@ -173,8 +180,12 @@ async function handleSubmit(commonData: { name: string; manufacturer: string; pr
         </CardHeader>
         <CardContent>
           <div class="h-[500px]">
-            <ProductViewer3D :dimensions="(categoryFormData as any).dimensions" :slots="(categoryFormData as any).slots"
-              :chambers="(categoryFormData as any).chambers" title="Product 3D Preview" />
+            <ProductViewer3D
+              :dimensions="(categoryFormData as any).dimensions"
+              :slots="(categoryFormData as any).slots"
+              :chambers="(categoryFormData as any).chambers"
+              title="Product 3D Preview"
+            />
           </div>
         </CardContent>
       </Card>
