@@ -34,6 +34,10 @@ const partCount = computed(() => buildStore.currentBuild?.parts.length || 0)
 const hasErrors = computed(() => buildStore.errors.length > 0)
 const hasWarnings = computed(() => buildStore.warnings.length > 0)
 
+const hasSpatialParts = computed(() =>
+  buildStore.currentBuild?.parts.some(p => p.dimensions) ?? false
+)
+
 onMounted(async () => {
   const buildId = props.id || route.params.id as string
   await buildStore.loadBuild(buildId)
@@ -93,6 +97,7 @@ const tabs: { value: Tab; label: string }[] = [
         :has-errors="hasErrors"
         :has-warnings="hasWarnings"
       />
+
 
       <!-- Tabs -->
       <div class="border-b">

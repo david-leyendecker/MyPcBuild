@@ -11,6 +11,7 @@ import CardTitle from '@/components/ui/card/CardTitle.vue'
 import CardContent from '@/components/ui/card/CardContent.vue'
 import Button from '@/components/ui/button/Button.vue'
 import ProductFormShell from '@/components/products/ProductFormShell.vue'
+import ProductViewer3D from '@/components/spatial/ProductViewer3D.vue'
 import CpuForm from '@/components/products/CpuForm.vue'
 import GpuForm from '@/components/products/GpuForm.vue'
 import MotherboardForm from '@/components/products/MotherboardForm.vue'
@@ -47,6 +48,15 @@ const categoryFormComponents = {
 const currentFormComponent = computed(() => {
   if (!selectedCategory.value) return null
   return categoryFormComponents[selectedCategory.value]
+})
+
+const hasSpatialData = computed(() => {
+  const data = categoryFormData.value as any
+  if (!data) return false
+  const hasDimensions = data.dimensions && (data.dimensions.length || data.dimensions.width || data.dimensions.height)
+  const hasSlots = data.slots && data.slots.length > 0
+  const hasChambers = data.chambers && data.chambers.length > 0
+  return !!(hasDimensions || hasSlots || hasChambers)
 })
 
 function selectCategory(category: ProductCategory) {
@@ -157,6 +167,23 @@ async function handleSubmit(commonData: { name: string; manufacturer: string; pr
 
           <div v-if="error" class="mt-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md">
             <p class="text-sm text-red-800 dark:text-red-200">{{ error }}</p>
+          </div>
+        </CardContent>
+      </Card>
+
+      <!-- 3D Preview (when spatial data exists) -->
+      <Card v-if="hasSpatialData" class="mt-6">
+        <CardHeader>
+          <CardTitle>3D Preview</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div class="h-[500px]">
+            <ProductViewer3D
+              :dimensions="(categoryFormData as any).dimensions"
+              :slots="(categoryFormData as any).slots"
+              :chambers="(categoryFormData as any).chambers"
+              title="Product 3D Preview"
+            />
           </div>
         </CardContent>
       </Card>
