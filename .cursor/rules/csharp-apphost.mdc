@@ -1,0 +1,21 @@
+---
+description: C# conventions for AppHost (var accepted)
+globs: MyPcBuild.AppHost/**/*.cs
+alwaysApply: false
+---
+
+# AppHost C# Rules
+
+## var Usage
+
+In AppHost, `var` is accepted and can be used for local declarations. This exception applies only to the AppHost project.
+
+```csharp
+// ✅ Acceptable in AppHost
+var builder = DistributedApplication.CreateBuilder(args);
+var apiService = builder.AddProject<ProjectReference>("apiservice", "../MyPcBuild.ApiService/MyPcBuild.ApiService.csproj");
+```
+
+## Otherwise
+
+Follow general C# best practices. C# 14 features (collection expressions, target-typed new, etc.) are still encouraged where they improve readability.

@@ -1,0 +1,55 @@
+---
+description: C# coding standards for ApiService, Tests, ServiceDefaults
+globs: MyPcBuild.ApiService/**/*.cs, MyPcBuild.Tests/**/*.cs, MyPcBuild.ServiceDefaults/**/*.cs
+alwaysApply: false
+---
+
+# Backend C# Rules
+
+## C# 14 Language Features
+
+Use C# 14 features where applicable:
+- **Extension members** for extending types
+- **Collection expressions**: `List<T> items = [];` or `[a, b, c]`
+- **Target-typed new**: `List<string> list = new();`
+- **nameof** with unbound generics: `nameof(List<>)`
+- **field** keyword for field-backed properties
+- **Lambda parameter modifiers** when needed
+
+## Explicit Types Over var
+
+Prefer explicit types instead of `var` for clarity and maintainability.
+
+```csharp
+// ❌ BAD
+var products = await session.Query<Product>().ToListAsync();
+var result = validator.ValidateBuild(products);
+
+// ✅ GOOD
+List<Product> products = await session.Query<Product>().ToListAsync();
+CompatibilityResult result = await validator.ValidateBuild(products);
+```
+
+## Target-Typed new Expression
+
+Use `new()` when the type is obvious from the left-hand side.
+
+```csharp
+// ❌ BAD
+List<Product> products = new List<Product>();
+Dictionary<Guid, string> map = new Dictionary<Guid, string>();
+
+// ✅ GOOD
+List<Product> products = new();
+Dictionary<Guid, string> map = new();
+```
+
+## Collection Expressions
+
+Prefer collection expressions for inline initialization.
+
+```csharp
+// ✅ GOOD
+List<Product> products = [];
+List<HateoasLink> links = [link1, link2];
+```

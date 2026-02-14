@@ -1,0 +1,39 @@
+---
+description: TypeScript and Vue coding standards for the frontend
+globs: apps/**/*.ts, apps/**/*.tsx, apps/**/*.vue
+alwaysApply: false
+---
+
+# Frontend TypeScript Rules
+
+## Type Safety
+
+- Prefer explicit types for function parameters and return values.
+- Avoid `any`; use `unknown` when the type is truly unknown, then narrow with type guards.
+- Use type assertions only when necessary; prefer proper typing.
+
+```typescript
+// ❌ BAD
+function process(data: any) { return data.value; }
+
+// ✅ GOOD
+function process(data: { value: string }): string {
+  return data.value;
+}
+```
+
+## Imports
+
+- Use type-only imports when importing only types: `import type { X } from '...'`
+- Prefer named exports over default exports for shared utilities and types.
+
+## Strict Mode
+
+- Keep `strict: true` (or equivalent) in tsconfig.
+- Prefer optional chaining (`?.`) and nullish coalescing (`??`) over manual null checks.
+
+## Vue / Composition API
+
+- Use `<script setup lang="ts">` for Vue SFCs.
+- Define props and emits with TypeScript interfaces.
+- Prefer composables for shared reactive logic.
