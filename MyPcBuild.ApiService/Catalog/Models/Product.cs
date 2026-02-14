@@ -106,7 +106,6 @@ public record GpuProduct(
     Frequency CoreClock,
     Frequency BoostClock,
     Power TDP,
-    Length Length,
     GpuPowerConnector PowerConnectors,
     bool RayTracing
 ) : Product(Id, Name, Price, Manufacturer), ISlottedProduct

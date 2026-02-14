@@ -496,7 +496,6 @@ public class CompatibilityValidatorTests
             Frequency.FromMHz(2310),
             Frequency.FromMHz(2610),
             Power.FromWatts(tdp > 0 ? tdp : 300),
-            Length.FromMm(length),
             GpuPowerConnector.Dual8Pin,
             true
         );

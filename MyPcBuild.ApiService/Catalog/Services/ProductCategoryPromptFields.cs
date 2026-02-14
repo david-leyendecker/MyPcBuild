@@ -47,7 +47,6 @@ public class ProductCategoryPromptFields
             new(nameof(GpuProductRequest.CoreClock), "integer MHz"),
             new(nameof(GpuProductRequest.BoostClock), "integer MHz"),
             new(nameof(GpuProductRequest.TDP), "integer watts"),
-            new(nameof(GpuProductRequest.Length), "integer mm"),
             new(nameof(GpuProductRequest.PowerConnectors), $"string: {string.Join(", ", Enum.GetNames(typeof(ApiGpuPowerConnector)))}"),
             new(nameof(GpuProductRequest.RayTracing), "boolean"),
             new(nameof(GpuProductRequest.Dimensions), "object with Length, Width, Height in mm (decimals)")

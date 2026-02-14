@@ -24,7 +24,6 @@ const memoryType = ref<MemoryType>(model?.memoryType || 'GDDR6X')
 const coreClockGHz = ref(model?.coreClock?.valueInGHz || 2.2)
 const boostClockGHz = ref(model?.boostClock?.valueInGHz || 2.5)
 const tdpWatts = ref(model?.tdp?.valueInWatts || 320)
-const lengthMm = ref(model?.length?.valueInMm || 304)
 const powerConnectors = ref<GpuPowerConnector>(model?.powerConnectors || 'Dual8Pin')
 const rayTracing = ref(model?.rayTracing ?? true)
 const dimensionLength = ref(model?.dimensions?.length || 304)
@@ -34,7 +33,7 @@ const dimensionHeight = ref(model?.dimensions?.height || 61)
 const memoryTypeOptions = (['GDDR5', 'GDDR5X', 'GDDR6', 'GDDR6X', 'HBM2', 'HBM2E', 'HBM3'] as MemoryType[]).map(v => ({ value: v, label: v }))
 const powerConnectorOptions = (['Dual8Pin', 'Triple8Pin', 'One16Pin'] as GpuPowerConnector[]).map(v => ({ value: v, label: v }))
 
-watch([chipsetManufacturer, series, vramGB, memoryType, coreClockGHz, boostClockGHz, tdpWatts, lengthMm, powerConnectors, rayTracing, dimensionLength, dimensionWidth, dimensionHeight], () => {
+watch([chipsetManufacturer, series, vramGB, memoryType, coreClockGHz, boostClockGHz, tdpWatts, powerConnectors, rayTracing, dimensionLength, dimensionWidth, dimensionHeight], () => {
   emit('update:modelValue', {
     category: 'gpu',
     chipsetManufacturer: chipsetManufacturer.value,
@@ -44,7 +43,6 @@ watch([chipsetManufacturer, series, vramGB, memoryType, coreClockGHz, boostClock
     coreClock: { valueInGHz: coreClockGHz.value },
     boostClock: { valueInGHz: boostClockGHz.value },
     tdp: { valueInWatts: tdpWatts.value },
-    length: { valueInMm: lengthMm.value },
     powerConnectors: powerConnectors.value,
     rayTracing: rayTracing.value,
     dimensions: {
@@ -64,7 +62,6 @@ defineExpose({
     coreClock: { valueInGHz: coreClockGHz.value },
     boostClock: { valueInGHz: boostClockGHz.value },
     tdp: { valueInWatts: tdpWatts.value },
-    length: { valueInMm: lengthMm.value },
     powerConnectors: powerConnectors.value,
     rayTracing: rayTracing.value,
     dimensions: {

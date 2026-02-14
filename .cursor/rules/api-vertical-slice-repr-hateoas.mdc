@@ -1,0 +1,146 @@
+---
+description: Vertical slice structure, REPR pattern, and HATEOAS conventions for MyPcBuild.ApiService
+globs: MyPcBuild.ApiService/**/*.cs
+alwaysApply: false
+---
+
+# MyPcBuild.ApiService Architecture
+
+## Vertical Slice Structure
+
+Organize code by **feature/domain** (vertical slices), not by technical layer. Each slice is self-contained.
+
+### Folder Layout
+
+```
+MyPcBuild.ApiService/
+├── {Feature}/                    # e.g. Builds, Catalog, Compatibility, Spatial
+│   ├── Endpoints/                # HTTP endpoints for this feature
+│   │   ├── {Feature}Endpoints.cs # Aggregator: Map{Feature}Endpoints()
+│   │   └── {EndpointName}.cs    # One file per endpoint (REPR)
+│   ├── Models/                  # Feature-specific models, DTOs, validators
+│   ├── Services/                # Optional: feature business logic
+│   ├── Events/                  # Optional: domain events (e.g. Builds)
+│   └── Projections/             # Optional: read models (e.g. Builds)
+├── Infrastructure/              # Shared: HateoasLink, QueryParameters, PaginationMetadata
+├── SharedDomain/                # Shared domain types across features
+└── Program.cs                   # Map features via app.Map{Feature}Endpoints()
+```
+
+### Rules
+
+- **One endpoint per file**: Each `{EndpointName}.cs` handles a single HTTP operation.
+- **Feature aggregator**: `{Feature}Endpoints.cs` exposes `Map{Feature}Endpoints()` and chains `Map*Endpoint()` calls.
+- **Colocate by feature**: Endpoints, models, and services for a feature live under the same `{Feature}/` folder.
+- **Infrastructure**: Shared cross-cutting concerns (HATEOAS, pagination, query params) go in `Infrastructure/`.
+
+---
+
+## REPR Pattern (Request-Endpoint-Response)
+
+We use minimal APIs with an endpoint-centric REPR-style structure ([reference](https://code-maze.com/aspnetcore-repr-request-endpoint-response-pattern/)).
+
+### Endpoint File Template
+
+```csharp
+namespace MyPcBuild.ApiService.{Feature}.Endpoints;
+
+public static class {EndpointName}
+{
+    public static IEndpointRouteBuilder Map{EndpointName}Endpoint(this IEndpointRouteBuilder app)
+    {
+        app.Map{HttpMethod}("/api/{feature}/{route}", async (
+            {RequestParams},
+            {Dependencies}) =>
+        {
+            // 1. Validate request
+            // 2. Load/process data
+            // 3. Build response (include HATEOAS links)
+            return Results.Ok(response);
+        })
+        .WithName("{EndpointName}")
+        .WithTags("{Feature}");
+
+        return app;
+    }
+}
+
+// Request: inline record or from query/body
+public record {EndpointName}Request(...);
+
+// Response: include Links for HATEOAS
+public record {EndpointName}Response(
+    ...Data,
+    List<HateoasLink> Links
+);
+```
+
+### Naming
+
+- **Endpoint class**: PascalCase verb + noun (e.g. `GetProductById`, `ValidateCompatibility`, `AddPartToSlot`).
+- **Extension method**: `Map{EndpointName}Endpoint`.
+- **Request/Response records**: Co-located at bottom of same file unless shared.
+
+---
+
+## HATEOAS (Hypermedia Links)
+
+We embed links in responses so clients can discover and navigate the API ([reference](https://code-maze.com/hateoas-aspnet-core-web-api/)).
+
+### Link Model
+
+Use `HateoasLink` from `MyPcBuild.ApiService.Infrastructure`:
+
+```csharp
+public record HateoasLink(Uri Href, string Rel, HttpMethod Method);
+```
+
+### Link Generation
+
+```csharp
+using MyPcBuild.ApiService.Infrastructure;
+
+string baseUrl = httpContextAccessor.GetBaseUrl();
+
+List<HateoasLink> links =
+[
+    new HateoasLink(new Uri($"{baseUrl}/api/catalog/products/{id}"), "self", Infrastructure.HttpMethod.GET),
+    new HateoasLink(new Uri($"{baseUrl}/api/catalog/products"), "all-products", Infrastructure.HttpMethod.GET)
+];
+```
+
+> Use `Infrastructure.HttpMethod` (not `System.Net.Http.HttpMethod`) for the enum.
+
+### Conventions
+
+| Rel value     | Meaning                              | Example |
+|---------------|--------------------------------------|---------|
+| `self`        | Current resource                     | GET same URI |
+| `next` / `prev` | Pagination                         | Paginated list links |
+| `category`    | Related category filter              | Products by category |
+| `product`     | Link to product detail               | Nested product in build |
+| `add-part`    | Add a part to a build                | POST to builds/{id}/parts |
+| `remove`      | Remove a part                        | DELETE part |
+| `validate`    | Validation endpoint                  | Compatibility/spatial validate |
+| `catalog`     | Product catalog                      | GET /api/catalog/products |
+| `create-product` | Create a product                 | POST /api/catalog/products |
+
+### Response Shape
+
+- **Single resource**: Response record with `Links` property (e.g. `GetProductByIdResponse`).
+- **Collection**: Top-level `Links` + each item has its own `Links` (e.g. `GetProductsResponse`, `ProductSummary`).
+- **Nested resources**: Include `Links` on nested DTOs (e.g. `ProductDetails` in build response).
+
+### Base URL
+
+Inject `IHttpContextAccessor` and use `httpContextAccessor.GetBaseUrl()` for all `Href` values. Never hardcode host or port.
+
+---
+
+## Checklist for New Endpoints
+
+1. Add `{EndpointName}.cs` under `{Feature}/Endpoints/`.
+2. Define Request and Response records (Response includes `List<HateoasLink> Links`).
+3. Register in `{Feature}Endpoints.cs` via `app.Map{EndpointName}Endpoint()`.
+4. Include `self` link; add contextual links (e.g. `product`, `category`, `add-part`).
+5. Use `.WithName()` and `.WithTags()` for OpenAPI and routing.

@@ -101,7 +101,6 @@ export interface GpuProductRequest {
   coreClock: Frequency;
   boostClock: Frequency;
   tdp: Power;
-  length: Length;
   powerConnectors: GpuPowerConnector;
   rayTracing: boolean;
   dimensions: Dimensions;
@@ -117,7 +116,6 @@ export interface GpuProductResponse extends ProductBase {
   coreClock: Frequency;
   boostClock: Frequency;
   tdp: Power;
-  length: Length;
   powerConnectors: GpuPowerConnector;
   rayTracing: boolean;
   dimensions: Dimensions;

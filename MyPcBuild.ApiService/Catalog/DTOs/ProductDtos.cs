@@ -336,12 +336,6 @@ public record GpuProductRequest : ProductRequest
     public required ApiPower TDP { get; init; }
 
     /// <summary>
-    /// GPU length.
-    /// </summary>
-    [Required]
-    public required ApiLength Length { get; init; }
-
-    /// <summary>
     /// Power connector configuration.
     /// </summary>
     [Required]
@@ -411,12 +405,6 @@ public record GpuProductResponse : ProductResponse
     /// </summary>
     [Required]
     public required ApiPower TDP { get; init; }
-
-    /// <summary>
-    /// GPU length.
-    /// </summary>
-    [Required]
-    public required ApiLength Length { get; init; }
 
     /// <summary>
     /// Power connector configuration.

@@ -82,7 +82,6 @@ public class AiProductGeneratorTests
   "CoreClock": 2235,
   "BoostClock": 2520,
   "TDP": 450,
-  "Length": 304,
   "PowerConnectors": "1x16-pin",
   "RayTracing": true,
   "Dimensions": "304,137,61",

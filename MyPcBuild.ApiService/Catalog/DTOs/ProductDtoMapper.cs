@@ -110,7 +110,6 @@ public static class ProductDtoMapper
             CoreClock = ApiFrequency.FromMHz((int)gpu.CoreClock.ToMHz()),
             BoostClock = ApiFrequency.FromMHz((int)gpu.BoostClock.ToMHz()),
             TDP = ApiPower.FromWatts(gpu.TDP.ValueInWatts),
-            Length = ApiLength.FromMm(gpu.Length.ValueInMm),
             PowerConnectors = ToApiGpuPowerConnector(gpu.PowerConnectors),
             RayTracing = gpu.RayTracing,
             Dimensions = gpu.Dimensions.ToDimensionsModel(),
@@ -268,7 +267,6 @@ public static class ProductDtoMapper
             Frequency.FromMHz((int)request.CoreClock.ToMHz()),
             Frequency.FromMHz((int)request.BoostClock.ToMHz()),
             Power.FromWatts(request.TDP.ValueInWatts),
-            Length.FromMm(request.Length.ValueInMm),
             ToDomainGpuPowerConnector(request.PowerConnectors),
             request.RayTracing
         );
