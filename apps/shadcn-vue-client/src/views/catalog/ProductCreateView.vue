@@ -3,7 +3,7 @@ import { ref, computed, markRaw } from 'vue'
 import { useRouter } from 'vue-router'
 import type { ProductCategory, CategoryFormData, CategoryFormComponentRef } from '@/types/product'
 import { categoryLabels, catalogApi } from '@/api/catalog'
-import type { CreateProductRequest } from '@/api/catalog'
+import type { ProductRequest } from '@/types/product'
 import { useProductSpatialData } from '@/composables/useProductSpatialData'
 import CategoryIcon from '@/components/shared/CategoryIcon.vue'
 import Card from '@/components/ui/card/Card.vue'
@@ -77,23 +77,15 @@ async function handleSubmit(commonData: { name: string; manufacturer: string; pr
 
   try {
     const categoryData = categoryFormRef.value.getFormData()
-    
-    const fields: Record<string, string> = {}
-    Object.entries(categoryData).forEach(([key, value]) => {
-      if (typeof value === 'object' && value !== null) {
-        fields[key] = JSON.stringify(value)
-      } else {
-        fields[key] = String(value)
-      }
-    })
 
-    const request: CreateProductRequest = {
+    // Build flat ProductRequest format expected by API (socket, chipset, etc. at root)
+    const request: ProductRequest = {
       category: selectedCategory.value,
       name: commonData.name,
       price: commonData.price,
       manufacturer: commonData.manufacturer,
-      fields
-    }
+      ...categoryData
+    } as ProductRequest
 
     const response = await catalogApi.createProduct(request)
     

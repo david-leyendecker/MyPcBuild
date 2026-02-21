@@ -42,31 +42,40 @@ watch(() => props.modelValue, (newValue) => {
     <Label v-if="label">{{ label }}</Label>
     <div class="grid grid-cols-3 gap-2">
       <div>
-        <Input
-          v-model.number="x"
-          type="number"
-          placeholder="X"
-          :disabled="!editable"
+        <Label class="flex flex-col gap-2">
+          X
+          <Input
+            v-model.number="x"
+            type="number"
+            placeholder="X"
+            :disabled="!editable"
           step="1"
-        />
+          />
+        </Label>
       </div>
       <div>
-        <Input
-          v-model.number="y"
-          type="number"
-          placeholder="Y"
-          :disabled="!editable"
-          step="1"
-        />
+        <Label class="flex flex-col gap-2">
+          Y
+          <Input
+            v-model.number="y"
+            type="number"
+            placeholder="Y"
+            :disabled="!editable"
+            step="1"
+          />
+        </Label>
       </div>
       <div>
-        <Input
-          v-model.number="z"
-          type="number"
-          placeholder="Z"
-          :disabled="!editable"
-          step="1"
-        />
+        <Label class="flex flex-col gap-2">
+          Z
+          <Input
+            v-model.number="z"
+            type="number"
+            placeholder="Z"
+            :disabled="!editable"
+            step="1"
+          />
+        </Label>
       </div>
     </div>
   </div>

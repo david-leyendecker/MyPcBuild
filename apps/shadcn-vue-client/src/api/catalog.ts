@@ -3,7 +3,7 @@
  */
 
 import apiClient from './client';
-import type { ProductCategory } from '@/types/product';
+import type { ProductCategory, ProductRequest } from '@/types/product';
 
 export const ProductCategoryConst = {
   CPU: 'cpu',
@@ -187,7 +187,7 @@ export const catalogApi = {
     return response.data.fields;
   },
 
-  async createProduct(request: CreateProductRequest): Promise<{ id: string }> {
+  async createProduct(request: ProductRequest): Promise<{ id: string }> {
     const response = await apiClient.post<{ id: string }>('/catalog/products', request);
     return response.data;
   },
@@ -202,7 +202,7 @@ export const catalogApi = {
     return response.data;
   },
 
-  async updateProduct(id: string, request: CreateProductRequest): Promise<{ id: string }> {
+  async updateProduct(id: string, request: ProductRequest): Promise<{ id: string }> {
     const response = await apiClient.put<{ id: string }>(`/catalog/products/${id}`, request);
     return response.data;
   }

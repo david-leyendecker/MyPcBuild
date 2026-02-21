@@ -22,13 +22,13 @@ IResourceBuilder<ProjectResource> apiService = builder.AddProject<Projects.MyPcB
     .WaitFor(postgres);
 
 // Add Naive UI client (Vite dev server)
-var naiveClient = builder.AddViteApp("naive-client", "../apps/naive-ui-client")
-    .WithExternalHttpEndpoints()
-    .WithHttpsEndpoint(port: null, env: "PORT")
-    .WithReference(apiService)
-    .WithDeveloperCertificateTrust(true)
-    .WithHttpsDeveloperCertificate()
-    .PublishAsDockerFile();
+// var naiveClient = builder.AddViteApp("naive-client", "../apps/naive-ui-client")
+//     .WithExternalHttpEndpoints()
+//     .WithHttpsEndpoint(port: null, env: "PORT")
+//     .WithReference(apiService)
+//     .WithDeveloperCertificateTrust(true)
+//     .WithHttpsDeveloperCertificate()
+//     .PublishAsDockerFile();
 
 // Add shadcn-vue client (Vite dev server)
 var shadcnClient = builder.AddViteApp("shadcn-client", "../apps/shadcn-vue-client")
@@ -43,8 +43,8 @@ var shadcnClient = builder.AddViteApp("shadcn-client", "../apps/shadcn-vue-clien
 apiService.WithEnvironment(context =>
 {
     List<string> allowedOrigins = [];
-    AddAllowedOrigins(allowedOrigins, naiveClient.GetEndpoint("http"));
-    AddAllowedOrigins(allowedOrigins, naiveClient.GetEndpoint("https"));
+    // AddAllowedOrigins(allowedOrigins, naiveClient.GetEndpoint("http"));
+    // AddAllowedOrigins(allowedOrigins, naiveClient.GetEndpoint("https"));
     AddAllowedOrigins(allowedOrigins, shadcnClient.GetEndpoint("http"));
     AddAllowedOrigins(allowedOrigins, shadcnClient.GetEndpoint("https"));
     if (allowedOrigins.Count == 0)

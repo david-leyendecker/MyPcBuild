@@ -3,7 +3,7 @@ import { ref, computed, markRaw, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import type { ProductCategory, CategoryFormData, CategoryFormComponentRef } from '@/types/product'
 import { categoryLabels, catalogApi } from '@/api/catalog'
-import type { CreateProductRequest } from '@/api/catalog'
+import type { ProductRequest } from '@/types/product'
 import { useProductSpatialData } from '@/composables/useProductSpatialData'
 import LoadingState from '@/components/shared/LoadingState.vue'
 import ErrorState from '@/components/shared/ErrorState.vue'
@@ -63,12 +63,14 @@ onMounted(async () => {
 async function loadProduct() {
   try {
     const product = await catalogApi.getProduct(productId)
-    // product.category is already in frontend format (ProductCategory)
     selectedCategory.value = product.category as ProductCategory
     productName.value = product.name
     productManufacturer.value = product.manufacturer
     productPrice.value = product.price
-    categoryFormData.value = (product.specifications || {}) as CategoryFormData
+    // API returns ProductResponse with category-specific fields at top level (socket, chipset, etc.)
+    const p = product as unknown as Record<string, unknown>
+    const { id: _id, isDraft: _draft, publishedAt: _pub, ...formFields } = p
+    categoryFormData.value = formFields as CategoryFormData
   } catch (err) {
     error.value = err instanceof Error ? err.message : 'Failed to load product'
   } finally {
@@ -89,22 +91,14 @@ async function handleSubmit(commonData: { name: string; manufacturer: string; pr
   try {
     const categoryData = categoryFormRef.value.getFormData()
 
-    const fields: Record<string, string> = {}
-    Object.entries(categoryData).forEach(([key, value]) => {
-      if (typeof value === 'object' && value !== null) {
-        fields[key] = JSON.stringify(value)
-      } else {
-        fields[key] = String(value)
-      }
-    })
-
-    const request: CreateProductRequest = {
+    // Build flat ProductRequest format expected by API (socket, chipset, etc. at root)
+    const request: ProductRequest = {
       category: selectedCategory.value,
       name: commonData.name,
       price: commonData.price,
       manufacturer: commonData.manufacturer,
-      fields
-    }
+      ...categoryData
+    } as ProductRequest
 
     await catalogApi.updateProduct(productId, request)
 
