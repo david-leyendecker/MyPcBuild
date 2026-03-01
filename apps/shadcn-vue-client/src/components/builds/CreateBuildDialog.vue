@@ -3,8 +3,7 @@ import { ref } from 'vue'
 import { useBuildStore } from '@/stores/buildStore'
 import { Dialog } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
+import { FormItemText } from '@/components/form-items'
 
 interface Emits {
   (e: 'created', buildId: string): void
@@ -46,18 +45,13 @@ defineExpose({ openDialog })
 
 <template>
   <Dialog v-model:open="open" title="Create New Build">
-    <div class="space-y-4">
-      <div>
-        <Label for="build-name">Build Name</Label>
-        <Input
-          id="build-name"
-          v-model="buildName"
-          placeholder="My Gaming PC"
-          class="mt-1"
-          @keyup.enter="handleCreate"
-        />
-        <p v-if="error" class="text-sm text-destructive mt-1">{{ error }}</p>
-      </div>
+    <div class="space-y-4" @keydown.enter="handleCreate">
+      <FormItemText
+        label="Build Name"
+        v-model="buildName"
+        placeholder="My Gaming PC"
+        :error="error ?? undefined"
+      />
       
       <div class="flex justify-end gap-2 pt-4">
         <Button variant="outline" @click="open = false">

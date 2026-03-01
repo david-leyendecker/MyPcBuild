@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import Input from '@/components/ui/input/Input.vue'
 import Label from '@/components/ui/label/Label.vue'
+import { FormItemNumber } from '@/components/form-items'
 
 interface Props {
   length: number
@@ -24,33 +24,30 @@ const emit = defineEmits<{
   <div class="space-y-2 col-span-2">
     <Label>{{ label }}</Label>
     <div class="grid grid-cols-3 gap-2">
-      <div>
-        <Input
-          :model-value="length"
-          type="number"
-          placeholder="Length"
-          min="0"
-          @update:model-value="emit('update:length', Number($event))"
-        />
-      </div>
-      <div>
-        <Input
-          :model-value="width"
-          type="number"
-          placeholder="Width"
-          min="0"
-          @update:model-value="emit('update:width', Number($event))"
-        />
-      </div>
-      <div>
-        <Input
-          :model-value="height"
-          type="number"
-          placeholder="Height"
-          min="0"
-          @update:model-value="emit('update:height', Number($event))"
-        />
-      </div>
+      <FormItemNumber
+        label="Length"
+        hide-label
+        :model-value="length"
+        placeholder="Length"
+        :min="0"
+        @update:model-value="emit('update:length', $event)"
+      />
+      <FormItemNumber
+        label="Width"
+        hide-label
+        :model-value="width"
+        placeholder="Width"
+        :min="0"
+        @update:model-value="emit('update:width', $event)"
+      />
+      <FormItemNumber
+        label="Height"
+        hide-label
+        :model-value="height"
+        placeholder="Height"
+        :min="0"
+        @update:model-value="emit('update:height', $event)"
+      />
     </div>
   </div>
 </template>

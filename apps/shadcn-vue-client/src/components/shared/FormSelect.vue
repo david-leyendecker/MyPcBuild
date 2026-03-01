@@ -5,13 +5,26 @@ import { cn } from '@/lib/utils'
 interface Props {
   modelValue: string | number
   options: { value: string | number; label: string }[]
+  id?: string
+  disabled?: boolean
   class?: HTMLAttributes['class']
 }
 
 const props = defineProps<Props>()
 const emit = defineEmits<{
-  'update:modelValue': [value: string]
+  'update:modelValue': [value: string | number]
 }>()
+
+function handleChange(event: Event) {
+  const stringValue = (event.target as HTMLSelectElement).value
+  const matched = props.options.find((o) => String(o.value) === stringValue)
+  if (matched === undefined) {
+    console.warn(`[FormSelect] No matching option found for value "${stringValue}"`)
+    emit('update:modelValue', stringValue)
+    return
+  }
+  emit('update:modelValue', matched.value)
+}
 
 const classes = computed(() =>
   cn(
@@ -23,9 +36,11 @@ const classes = computed(() =>
 
 <template>
   <select
+    :id="id"
     :value="modelValue"
+    :disabled="disabled"
     :class="classes"
-    @change="emit('update:modelValue', ($event.target as HTMLSelectElement).value)"
+    @change="handleChange"
   >
     <option
       v-for="option in options"

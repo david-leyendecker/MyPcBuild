@@ -4,7 +4,7 @@ import type { Slot } from '@/types/spatial'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Collapsible } from '@/components/ui/collapsible'
-import Input from '@/components/ui/input/Input.vue'
+import { FormItemText, FormItemSelect } from '@/components/form-items'
 import Label from '@/components/ui/label/Label.vue'
 import Vector3Input from './Vector3Input.vue'
 import DimensionsInput from './DimensionsInput.vue'
@@ -111,29 +111,21 @@ watch(() => props.modelValue, (newValue) => {
         <Card class="mt-2">
           <CardContent class="p-4 space-y-4">
             <div class="grid gap-4 md:grid-cols-2">
-              <div class="space-y-2">
-                <Label>Slot Name *</Label>
-                <Input
-                  v-model="slot.name"
-                  placeholder="Slot Name"
-                  :disabled="!editable"
-                  @update:model-value="emitUpdate"
-                />
-              </div>
+              <FormItemText
+                label="Slot Name *"
+                :model-value="slot.name"
+                placeholder="Slot Name"
+                :disabled="!editable"
+                @update:model-value="(v) => { slot.name = v; emitUpdate() }"
+              />
 
-              <div class="space-y-2">
-                <Label>Allowed Category *</Label>
-                <select
-                  v-model="slot.allowedCategory"
-                  class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                  :disabled="!editable"
-                  @change="emitUpdate"
-                >
-                  <option v-for="cat in categoryOptions" :key="cat.value" :value="cat.value">
-                    {{ cat.label }}
-                  </option>
-                </select>
-              </div>
+              <FormItemSelect
+                label="Allowed Category *"
+                :model-value="slot.allowedCategory"
+                :options="categoryOptions"
+                :disabled="!editable"
+                @update:model-value="(v) => { slot.allowedCategory = String(v); emitUpdate() }"
+              />
             </div>
 
             <Vector3Input

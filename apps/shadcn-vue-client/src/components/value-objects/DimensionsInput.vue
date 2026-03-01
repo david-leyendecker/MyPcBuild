@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
 import type { Dimensions } from '@/types/spatial'
-import Input from '@/components/ui/input/Input.vue'
 import Label from '@/components/ui/label/Label.vue'
+import { FormItemNumber } from '@/components/form-items'
 
 interface Props {
   modelValue?: Dimensions
@@ -25,10 +25,10 @@ const width = ref(props.modelValue?.width || 0)
 const height = ref(props.modelValue?.height || 0)
 
 watch([length, width, height], () => {
-  emit('update:modelValue', { 
-    length: length.value, 
-    width: width.value, 
-    height: height.value 
+  emit('update:modelValue', {
+    length: length.value,
+    width: width.value,
+    height: height.value
   })
 })
 
@@ -45,45 +45,33 @@ watch(() => props.modelValue, (newValue) => {
   <div class="space-y-2">
     <Label v-if="label">{{ label }}</Label>
     <div class="grid grid-cols-3 gap-2">
-      <div>
-        <Label class="flex flex-col gap-2">
-          Length
-          <Input
-            v-model.number="length"
-            type="number"
-            placeholder="Length"
-            :disabled="!editable"
-            min="0"
-            step="0.1"
-          />
-        </Label>
-      </div>
-      <div>
-        <Label class="flex flex-col gap-2">
-          Width
-          <Input
-            v-model.number="width"
-            type="number"
-            placeholder="Width"
-            :disabled="!editable"
-            min="0"
-            step="0.1"
-          />
-        </Label>
-      </div>
-      <div>
-        <Label class="flex flex-col gap-2">
-          Height
-          <Input
-            v-model.number="height"
-            type="number"
-            placeholder="Height"
-            :disabled="!editable"
-            min="0"
-            step="0.1"
-          />
-        </Label>
-      </div>
+      <FormItemNumber
+        label="Length"
+        hide-label
+        v-model="length"
+        placeholder="Length"
+        :disabled="!editable"
+        :min="0"
+        :step="0.1"
+      />
+      <FormItemNumber
+        label="Width"
+        hide-label
+        v-model="width"
+        placeholder="Width"
+        :disabled="!editable"
+        :min="0"
+        :step="0.1"
+      />
+      <FormItemNumber
+        label="Height"
+        hide-label
+        v-model="height"
+        placeholder="Height"
+        :disabled="!editable"
+        :min="0"
+        :step="0.1"
+      />
     </div>
   </div>
 </template>

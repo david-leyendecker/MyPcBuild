@@ -1,9 +1,7 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
 import type { CpuProductRequest, CpuSocket, ProductRequest } from '@/types/product'
-import Input from '@/components/ui/input/Input.vue'
-import Label from '@/components/ui/label/Label.vue'
-import FormSelect from '@/components/shared/FormSelect.vue'
+import { FormItemSelect, FormItemNumber, FormItemCheckbox } from '@/components/form-items'
 
 interface Props {
   modelValue?: Partial<ProductRequest>
@@ -54,46 +52,18 @@ defineExpose({
 
 <template>
   <div class="grid gap-4 md:grid-cols-2">
-    <div class="space-y-2">
-      <Label for="socket">CPU Socket *</Label>
-      <FormSelect v-model="socket" :options="socketOptions" />
-    </div>
+    <FormItemSelect label="CPU Socket *" v-model="socket" :options="socketOptions" />
 
-    <div class="space-y-2">
-      <Label for="cores">Cores *</Label>
-      <Input id="cores" v-model.number="cores" type="number" min="1" />
-    </div>
+    <FormItemNumber label="Cores *" v-model="cores" :min="1" />
 
-    <div class="space-y-2">
-      <Label for="threads">Threads *</Label>
-      <Input id="threads" v-model.number="threads" type="number" min="1" />
-    </div>
+    <FormItemNumber label="Threads *" v-model="threads" :min="1" />
 
-    <div class="space-y-2">
-      <Label for="baseClock">Base Clock (GHz) *</Label>
-      <Input id="baseClock" v-model.number="baseClockGHz" type="number" step="0.1" min="0" />
-    </div>
+    <FormItemNumber label="Base Clock (GHz) *" v-model="baseClockGHz" :step="0.1" :min="0" />
 
-    <div class="space-y-2">
-      <Label for="boostClock">Boost Clock (GHz) *</Label>
-      <Input id="boostClock" v-model.number="boostClockGHz" type="number" step="0.1" min="0" />
-    </div>
+    <FormItemNumber label="Boost Clock (GHz) *" v-model="boostClockGHz" :step="0.1" :min="0" />
 
-    <div class="space-y-2">
-      <Label for="tdp">TDP (Watts) *</Label>
-      <Input id="tdp" v-model.number="tdpWatts" type="number" min="0" />
-    </div>
+    <FormItemNumber label="TDP (Watts) *" v-model="tdpWatts" :min="0" />
 
-    <div class="space-y-2 flex items-center">
-      <input
-        id="integratedGraphics"
-        v-model="integratedGraphics"
-        type="checkbox"
-        class="h-4 w-4 rounded border-gray-300"
-      />
-      <Label for="integratedGraphics" class="ml-2 cursor-pointer">
-        Integrated Graphics
-      </Label>
-    </div>
+    <FormItemCheckbox label="Integrated Graphics" v-model="integratedGraphics" />
   </div>
 </template>

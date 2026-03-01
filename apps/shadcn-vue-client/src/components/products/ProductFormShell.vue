@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import type { ProductCategory } from '@/types/product'
-import Input from '@/components/ui/input/Input.vue'
-import Label from '@/components/ui/label/Label.vue'
+import { FormItemText, FormItemMoney } from '@/components/form-items'
 import Button from '@/components/ui/button/Button.vue'
 
 interface Props {
@@ -70,43 +69,26 @@ defineExpose({
   <div class="space-y-6">
     <!-- Common Fields -->
     <div class="grid gap-4 md:grid-cols-2">
-      <div class="space-y-2">
-        <Label for="name">Product Name *</Label>
-        <Input
-          id="name"
-          v-model="name"
-          type="text"
-          placeholder="Enter product name"
-          :class="{ 'border-red-500': errors.name }"
-        />
-        <span v-if="errors.name" class="text-sm text-red-500">{{ errors.name }}</span>
-      </div>
+      <FormItemText
+        label="Product Name *"
+        v-model="name"
+        placeholder="Enter product name"
+        :error="errors.name"
+      />
 
-      <div class="space-y-2">
-        <Label for="manufacturer">Manufacturer *</Label>
-        <Input
-          id="manufacturer"
-          v-model="manufacturer"
-          type="text"
-          placeholder="Enter manufacturer"
-          :class="{ 'border-red-500': errors.manufacturer }"
-        />
-        <span v-if="errors.manufacturer" class="text-sm text-red-500">{{ errors.manufacturer }}</span>
-      </div>
+      <FormItemText
+        label="Manufacturer *"
+        v-model="manufacturer"
+        placeholder="Enter manufacturer"
+        :error="errors.manufacturer"
+      />
 
-      <div class="space-y-2">
-        <Label for="price">Price (USD) *</Label>
-        <Input
-          id="price"
-          v-model.number="price"
-          type="number"
-          step="0.01"
-          min="0"
-          placeholder="0.00"
-          :class="{ 'border-red-500': errors.price }"
-        />
-        <span v-if="errors.price" class="text-sm text-red-500">{{ errors.price }}</span>
-      </div>
+      <FormItemMoney
+        label="Price (USD) *"
+        v-model="price"
+        placeholder="0.00"
+        :error="errors.price"
+      />
     </div>
 
     <!-- Category-Specific Fields Slot -->

@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
 import type { Rotation } from '@/types/spatial'
-import Input from '@/components/ui/input/Input.vue'
 import Label from '@/components/ui/label/Label.vue'
+import { FormItemNumber } from '@/components/form-items'
 
 interface Props {
   modelValue?: Rotation | null
@@ -41,42 +41,30 @@ watch(() => props.modelValue, (newValue) => {
   <div class="space-y-2">
     <Label v-if="label">{{ label }}</Label>
     <div class="grid grid-cols-3 gap-2">
-      <div>
-        <Label class="flex flex-col gap-2">
-          X
-          <Input
-            v-model.number="x"
-            type="number"
-            placeholder="X"
-            :disabled="!editable"
-          step="1"
-          />
-        </Label>
-      </div>
-      <div>
-        <Label class="flex flex-col gap-2">
-          Y
-          <Input
-            v-model.number="y"
-            type="number"
-            placeholder="Y"
-            :disabled="!editable"
-            step="1"
-          />
-        </Label>
-      </div>
-      <div>
-        <Label class="flex flex-col gap-2">
-          Z
-          <Input
-            v-model.number="z"
-            type="number"
-            placeholder="Z"
-            :disabled="!editable"
-            step="1"
-          />
-        </Label>
-      </div>
+      <FormItemNumber
+        label="X"
+        hide-label
+        v-model="x"
+        placeholder="X"
+        :disabled="!editable"
+        :step="1"
+      />
+      <FormItemNumber
+        label="Y"
+        hide-label
+        v-model="y"
+        placeholder="Y"
+        :disabled="!editable"
+        :step="1"
+      />
+      <FormItemNumber
+        label="Z"
+        hide-label
+        v-model="z"
+        placeholder="Z"
+        :disabled="!editable"
+        :step="1"
+      />
     </div>
   </div>
 </template>
