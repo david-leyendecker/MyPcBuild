@@ -40,6 +40,7 @@ function getId(index: number) {
         <input
           :id="getId(index)"
           type="radio"
+          :name="baseId"
           :value="option.value"
           :checked="modelValue === option.value"
           :disabled="disabled"
