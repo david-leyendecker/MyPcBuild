@@ -5,6 +5,8 @@ import { cn } from '@/lib/utils'
 interface Props {
   modelValue: string | number
   options: { value: string | number; label: string }[]
+  id?: string
+  disabled?: boolean
   class?: HTMLAttributes['class']
 }
 
@@ -23,7 +25,9 @@ const classes = computed(() =>
 
 <template>
   <select
+    :id="id"
     :value="modelValue"
+    :disabled="disabled"
     :class="classes"
     @change="emit('update:modelValue', ($event.target as HTMLSelectElement).value)"
   >

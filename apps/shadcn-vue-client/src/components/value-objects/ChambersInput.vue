@@ -4,7 +4,7 @@ import type { Chamber } from '@/types/spatial'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Collapsible } from '@/components/ui/collapsible'
-import Input from '@/components/ui/input/Input.vue'
+import { FormItemText } from '@/components/form-items'
 import Label from '@/components/ui/label/Label.vue'
 import Vector3Input from './Vector3Input.vue'
 import DimensionsInput from './DimensionsInput.vue'
@@ -97,15 +97,13 @@ watch(() => props.modelValue, (newValue) => {
 
         <Card class="mt-2">
           <CardContent class="p-4 space-y-4">
-            <div class="space-y-2">
-              <Label>Chamber Name *</Label>
-              <Input
-                v-model="chamber.name"
-                placeholder="Chamber Name"
-                :disabled="!editable"
-                @update:model-value="emitUpdate"
-              />
-            </div>
+            <FormItemText
+              label="Chamber Name *"
+              :model-value="chamber.name"
+              placeholder="Chamber Name"
+              :disabled="!editable"
+              @update:model-value="(v) => { chamber.name = v; emitUpdate() }"
+            />
 
             <Vector3Input
               v-model="chamber.relativePosition"

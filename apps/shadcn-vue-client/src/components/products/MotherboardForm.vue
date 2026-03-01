@@ -2,9 +2,7 @@
 import { ref, watch } from 'vue'
 import type { MotherboardProductRequest, CpuSocket, FormFactor, MemoryType, ProductRequest } from '@/types/product'
 import type { Slot } from '@/types/spatial'
-import Input from '@/components/ui/input/Input.vue'
-import Label from '@/components/ui/label/Label.vue'
-import FormSelect from '@/components/shared/FormSelect.vue'
+import { FormItemSelect, FormItemText, FormItemNumber } from '@/components/form-items'
 import DimensionsInput from '@/components/value-objects/DimensionsInput.vue'
 import SlotsInput from '@/components/value-objects/SlotsInput.vue'
 
@@ -59,32 +57,17 @@ defineExpose({
 
 <template>
   <div class="grid gap-4 md:grid-cols-2">
-    <div class="space-y-2">
-      <Label for="socket">CPU Socket *</Label>
-      <FormSelect v-model="socket" :options="socketOptions" />
-    </div>
+    <FormItemSelect label="CPU Socket *" v-model="socket" :options="socketOptions" />
 
-    <div class="space-y-2">
-      <Label for="chipset">Chipset *</Label>
-      <Input id="chipset" v-model="chipset" type="text" placeholder="e.g., X670, Z790" />
-    </div>
+    <FormItemText label="Chipset *" v-model="chipset" placeholder="e.g., X670, Z790" />
 
-    <div class="space-y-2">
-      <Label for="formFactor">Form Factor *</Label>
-      <FormSelect v-model="formFactor" :options="formFactorOptions" />
-    </div>
+    <FormItemSelect label="Form Factor *" v-model="formFactor" :options="formFactorOptions" />
 
-    <div class="space-y-2">
-      <Label for="memoryType">Memory Type *</Label>
-      <FormSelect v-model="memoryType" :options="memoryTypeOptions" />
-    </div>
+    <FormItemSelect label="Memory Type *" v-model="memoryType" :options="memoryTypeOptions" />
 
-    <div class="space-y-2">
-      <Label for="maxMemory">Max Memory (GB) *</Label>
-      <Input id="maxMemory" v-model.number="maxMemoryGB" type="number" min="1" />
-    </div>
+    <FormItemNumber label="Max Memory (GB) *" v-model="maxMemoryGB" :min="1" />
 
-    <div class="space-y-2 col-span-2">
+    <div class="col-span-2">
       <DimensionsInput v-model="dimensions" label="Dimensions (mm) *" />
     </div>
 

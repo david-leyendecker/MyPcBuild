@@ -1,9 +1,7 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
 import type { CoolerProductRequest, CoolerType, CpuSocket, ProductRequest } from '@/types/product'
-import Input from '@/components/ui/input/Input.vue'
-import Label from '@/components/ui/label/Label.vue'
-import FormSelect from '@/components/shared/FormSelect.vue'
+import { FormItemSelect, FormItemNumber, FormItemCheckboxGroup } from '@/components/form-items'
 import DimensionsInput from '@/components/shared/DimensionsInput.vue'
 
 interface Props {
@@ -26,16 +24,7 @@ const dimensionWidth = ref(model?.dimensions?.width || 120)
 const dimensionHeight = ref(model?.dimensions?.height || 160)
 
 const coolerTypeOptions = (['Air', 'AIO', 'CustomLoop'] as CoolerType[]).map(v => ({ value: v, label: v }))
-const socketOptions: CpuSocket[] = ['LGA1700', 'LGA1200', 'LGA1151', 'LGA2066', 'AM5', 'AM4', 'sTRX4', 'TR4']
-
-function toggleSocket(socket: CpuSocket) {
-  const index = selectedSockets.value.indexOf(socket)
-  if (index === -1) {
-    selectedSockets.value.push(socket)
-  } else {
-    selectedSockets.value.splice(index, 1)
-  }
-}
+const socketOptions = (['LGA1700', 'LGA1200', 'LGA1151', 'LGA2066', 'AM5', 'AM4', 'sTRX4', 'TR4'] as CpuSocket[]).map(v => ({ value: v, label: v }))
 
 watch([coolerType, heightMm, tdpWatts, selectedSockets, dimensionLength, dimensionWidth, dimensionHeight], () => {
   emit('update:modelValue', {
@@ -69,42 +58,18 @@ defineExpose({
 
 <template>
   <div class="grid gap-4 md:grid-cols-2">
-    <div class="space-y-2">
-      <Label for="coolerType">Cooler Type *</Label>
-      <FormSelect v-model="coolerType" :options="coolerTypeOptions" />
-    </div>
+    <FormItemSelect label="Cooler Type *" v-model="coolerType" :options="coolerTypeOptions" />
 
-    <div class="space-y-2">
-      <Label for="height">Height (mm) *</Label>
-      <Input id="height" v-model.number="heightMm" type="number" min="0" />
-    </div>
+    <FormItemNumber label="Height (mm) *" v-model="heightMm" :min="0" />
 
-    <div class="space-y-2">
-      <Label for="tdp">Max TDP (Watts) *</Label>
-      <Input id="tdp" v-model.number="tdpWatts" type="number" min="0" />
-    </div>
+    <FormItemNumber label="Max TDP (Watts) *" v-model="tdpWatts" :min="0" />
 
-    <div class="space-y-2 col-span-2">
-      <Label>Supported Sockets *</Label>
-      <div class="grid grid-cols-4 gap-2">
-        <div
-          v-for="socket in socketOptions"
-          :key="socket"
-          class="flex items-center space-x-2"
-        >
-          <input
-            :id="`socket-${socket}`"
-            type="checkbox"
-            :checked="selectedSockets.includes(socket)"
-            class="h-4 w-4 rounded border-gray-300"
-            @change="toggleSocket(socket)"
-          />
-          <Label :for="`socket-${socket}`" class="text-sm cursor-pointer">
-            {{ socket }}
-          </Label>
-        </div>
-      </div>
-    </div>
+    <FormItemCheckboxGroup
+      label="Supported Sockets *"
+      v-model="selectedSockets"
+      :options="socketOptions"
+      class="col-span-2"
+    />
 
     <DimensionsInput
       v-model:length="dimensionLength"

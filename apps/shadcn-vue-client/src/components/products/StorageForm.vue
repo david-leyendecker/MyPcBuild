@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
 import type { StorageProductRequest, ProductRequest } from '@/types/product'
-import Input from '@/components/ui/input/Input.vue'
-import Label from '@/components/ui/label/Label.vue'
+import { FormItemText, FormItemNumber } from '@/components/form-items'
 
 interface Props {
   modelValue?: Partial<ProductRequest>
@@ -48,34 +47,16 @@ defineExpose({
 
 <template>
   <div class="grid gap-4 md:grid-cols-2">
-    <div class="space-y-2">
-      <Label for="type">Storage Type *</Label>
-      <Input id="type" v-model="type" type="text" placeholder="e.g., SSD, HDD" />
-    </div>
+    <FormItemText label="Storage Type *" v-model="type" placeholder="e.g., SSD, HDD" />
 
-    <div class="space-y-2">
-      <Label for="interface">Interface *</Label>
-      <Input id="interface" v-model="interfaceType" type="text" placeholder="e.g., NVMe, SATA" />
-    </div>
+    <FormItemText label="Interface *" v-model="interfaceType" placeholder="e.g., NVMe, SATA" />
 
-    <div class="space-y-2">
-      <Label for="formFactor">Form Factor *</Label>
-      <Input id="formFactor" v-model="storageFormFactor" type="text" placeholder="e.g., M.2, 2.5-inch" />
-    </div>
+    <FormItemText label="Form Factor *" v-model="storageFormFactor" placeholder="e.g., M.2, 2.5-inch" />
 
-    <div class="space-y-2">
-      <Label for="capacity">Capacity (GB) *</Label>
-      <Input id="capacity" v-model.number="capacityGB" type="number" min="1" />
-    </div>
+    <FormItemNumber label="Capacity (GB) *" v-model="capacityGB" :min="1" />
 
-    <div class="space-y-2">
-      <Label for="readSpeed">Read Speed (MB/s) *</Label>
-      <Input id="readSpeed" v-model.number="readSpeedMBps" type="number" min="0" />
-    </div>
+    <FormItemNumber label="Read Speed (MB/s) *" v-model="readSpeedMBps" :min="0" />
 
-    <div class="space-y-2">
-      <Label for="writeSpeed">Write Speed (MB/s) *</Label>
-      <Input id="writeSpeed" v-model.number="writeSpeedMBps" type="number" min="0" />
-    </div>
+    <FormItemNumber label="Write Speed (MB/s) *" v-model="writeSpeedMBps" :min="0" />
   </div>
 </template>

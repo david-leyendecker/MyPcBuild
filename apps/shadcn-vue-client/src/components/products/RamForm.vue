@@ -1,9 +1,7 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
 import type { RamProductRequest, MemoryType, ProductRequest } from '@/types/product'
-import Input from '@/components/ui/input/Input.vue'
-import Label from '@/components/ui/label/Label.vue'
-import FormSelect from '@/components/shared/FormSelect.vue'
+import { FormItemSelect, FormItemNumber, FormItemText } from '@/components/form-items'
 
 interface Props {
   modelValue?: Partial<ProductRequest>
@@ -51,34 +49,16 @@ defineExpose({
 
 <template>
   <div class="grid gap-4 md:grid-cols-2">
-    <div class="space-y-2">
-      <Label for="type">Memory Type *</Label>
-      <FormSelect v-model="type" :options="memoryTypeOptions" />
-    </div>
+    <FormItemSelect label="Memory Type *" v-model="type" :options="memoryTypeOptions" />
 
-    <div class="space-y-2">
-      <Label for="capacity">Capacity (GB) *</Label>
-      <Input id="capacity" v-model.number="capacityGB" type="number" min="1" />
-    </div>
+    <FormItemNumber label="Capacity (GB) *" v-model="capacityGB" :min="1" />
 
-    <div class="space-y-2">
-      <Label for="configuration">Configuration *</Label>
-      <Input id="configuration" v-model="configuration" type="text" placeholder="e.g., 2x8GB" />
-    </div>
+    <FormItemText label="Configuration *" v-model="configuration" placeholder="e.g., 2x8GB" />
 
-    <div class="space-y-2">
-      <Label for="speed">Speed (GHz) *</Label>
-      <Input id="speed" v-model.number="speedGHz" type="number" step="0.1" min="0" />
-    </div>
+    <FormItemNumber label="Speed (GHz) *" v-model="speedGHz" :step="0.1" :min="0" />
 
-    <div class="space-y-2">
-      <Label for="casLatency">CAS Latency *</Label>
-      <Input id="casLatency" v-model="casLatency" type="text" placeholder="e.g., CL16" />
-    </div>
+    <FormItemText label="CAS Latency *" v-model="casLatency" placeholder="e.g., CL16" />
 
-    <div class="space-y-2">
-      <Label for="voltage">Voltage (V) *</Label>
-      <Input id="voltage" v-model.number="voltageVolts" type="number" step="0.01" min="0" />
-    </div>
+    <FormItemNumber label="Voltage (V) *" v-model="voltageVolts" :step="0.01" :min="0" />
   </div>
 </template>

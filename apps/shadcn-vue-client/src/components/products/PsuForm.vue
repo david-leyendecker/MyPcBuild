@@ -1,9 +1,7 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
 import type { PsuProductRequest, ProductRequest } from '@/types/product'
-import Input from '@/components/ui/input/Input.vue'
-import Label from '@/components/ui/label/Label.vue'
-import FormSelect from '@/components/shared/FormSelect.vue'
+import { FormItemNumber, FormItemText, FormItemSelect } from '@/components/form-items'
 
 interface Props {
   modelValue?: Partial<ProductRequest>
@@ -49,41 +47,24 @@ defineExpose({
 
 <template>
   <div class="grid gap-4 md:grid-cols-2">
-    <div class="space-y-2">
-      <Label for="wattage">Wattage (W) *</Label>
-      <Input id="wattage" v-model.number="wattageWatts" type="number" min="1" />
-    </div>
+    <FormItemNumber label="Wattage (W) *" v-model="wattageWatts" :min="1" />
 
-    <div class="space-y-2">
-      <Label for="efficiency">Efficiency Certification *</Label>
-      <Input id="efficiency" v-model="efficiency" type="text" placeholder="e.g., 80+ Gold" />
-    </div>
+    <FormItemText label="Efficiency Certification *" v-model="efficiency" placeholder="e.g., 80+ Gold" />
 
-    <div class="space-y-2">
-      <Label for="modular">Modular Type *</Label>
-      <FormSelect
-        v-model="modular"
-        :options="[
-          { value: 'Full', label: 'Full Modular' },
-          { value: 'Semi', label: 'Semi Modular' },
-          { value: 'Non', label: 'Non Modular' },
-        ]"
-      />
-    </div>
+    <FormItemSelect
+      label="Modular Type *"
+      v-model="modular"
+      :options="[
+        { value: 'Full', label: 'Full Modular' },
+        { value: 'Semi', label: 'Semi Modular' },
+        { value: 'Non', label: 'Non Modular' },
+      ]"
+    />
 
-    <div class="space-y-2">
-      <Label for="formFactor">Form Factor *</Label>
-      <Input id="formFactor" v-model="formFactor" type="text" placeholder="e.g., ATX, SFX" />
-    </div>
+    <FormItemText label="Form Factor *" v-model="formFactor" placeholder="e.g., ATX, SFX" />
 
-    <div class="space-y-2">
-      <Label for="length">Length (mm) *</Label>
-      <Input id="length" v-model.number="lengthMm" type="number" min="0" />
-    </div>
+    <FormItemNumber label="Length (mm) *" v-model="lengthMm" :min="0" />
 
-    <div class="space-y-2">
-      <Label for="pcie8Pin">PCIe 8-Pin Connectors *</Label>
-      <Input id="pcie8Pin" v-model.number="pcie8Pin" type="number" min="0" />
-    </div>
+    <FormItemNumber label="PCIe 8-Pin Connectors *" v-model="pcie8Pin" :min="0" />
   </div>
 </template>

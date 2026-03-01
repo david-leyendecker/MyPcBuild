@@ -1,9 +1,7 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
 import type { GpuProductRequest, MemoryType, GpuPowerConnector, ProductRequest } from '@/types/product'
-import Input from '@/components/ui/input/Input.vue'
-import Label from '@/components/ui/label/Label.vue'
-import FormSelect from '@/components/shared/FormSelect.vue'
+import { FormItemText, FormItemNumber, FormItemSelect, FormItemCheckbox } from '@/components/form-items'
 import DimensionsInput from '@/components/shared/DimensionsInput.vue'
 
 interface Props {
@@ -75,45 +73,21 @@ defineExpose({
 
 <template>
   <div class="grid gap-4 md:grid-cols-2">
-    <div class="space-y-2">
-      <Label for="chipsetManufacturer">Chipset Manufacturer *</Label>
-      <Input id="chipsetManufacturer" v-model="chipsetManufacturer" type="text" placeholder="e.g., NVIDIA, AMD" />
-    </div>
+    <FormItemText label="Chipset Manufacturer *" v-model="chipsetManufacturer" placeholder="e.g., NVIDIA, AMD" />
 
-    <div class="space-y-2">
-      <Label for="series">Series *</Label>
-      <Input id="series" v-model="series" type="text" placeholder="e.g., RTX 4000" />
-    </div>
+    <FormItemText label="Series *" v-model="series" placeholder="e.g., RTX 4000" />
 
-    <div class="space-y-2">
-      <Label for="vram">VRAM (GB) *</Label>
-      <Input id="vram" v-model.number="vramGB" type="number" min="1" />
-    </div>
+    <FormItemNumber label="VRAM (GB) *" v-model="vramGB" :min="1" />
 
-    <div class="space-y-2">
-      <Label for="memoryType">Memory Type *</Label>
-      <FormSelect v-model="memoryType" :options="memoryTypeOptions" />
-    </div>
+    <FormItemSelect label="Memory Type *" v-model="memoryType" :options="memoryTypeOptions" />
 
-    <div class="space-y-2">
-      <Label for="coreClock">Core Clock (GHz) *</Label>
-      <Input id="coreClock" v-model.number="coreClockGHz" type="number" step="0.1" min="0" />
-    </div>
+    <FormItemNumber label="Core Clock (GHz) *" v-model="coreClockGHz" :step="0.1" :min="0" />
 
-    <div class="space-y-2">
-      <Label for="boostClock">Boost Clock (GHz) *</Label>
-      <Input id="boostClock" v-model.number="boostClockGHz" type="number" step="0.1" min="0" />
-    </div>
+    <FormItemNumber label="Boost Clock (GHz) *" v-model="boostClockGHz" :step="0.1" :min="0" />
 
-    <div class="space-y-2">
-      <Label for="tdp">TDP (Watts) *</Label>
-      <Input id="tdp" v-model.number="tdpWatts" type="number" min="0" />
-    </div>
+    <FormItemNumber label="TDP (Watts) *" v-model="tdpWatts" :min="0" />
 
-    <div class="space-y-2">
-      <Label for="powerConnectors">Power Connectors *</Label>
-      <FormSelect v-model="powerConnectors" :options="powerConnectorOptions" />
-    </div>
+    <FormItemSelect label="Power Connectors *" v-model="powerConnectors" :options="powerConnectorOptions" />
 
     <DimensionsInput
       v-model:length="dimensionLength"
@@ -121,16 +95,6 @@ defineExpose({
       v-model:height="dimensionHeight"
     />
 
-    <div class="space-y-2 flex items-center">
-      <input
-        id="rayTracing"
-        v-model="rayTracing"
-        type="checkbox"
-        class="h-4 w-4 rounded border-gray-300"
-      />
-      <Label for="rayTracing" class="ml-2 cursor-pointer">
-        Ray Tracing Support
-      </Label>
-    </div>
+    <FormItemCheckbox label="Ray Tracing Support" v-model="rayTracing" />
   </div>
 </template>
