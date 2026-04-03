@@ -3,8 +3,11 @@
     <!-- Form Factor and Color -->
     <n-grid :cols="2" :x-gap="12">
       <n-form-item-gi label="Form Factor">
-        <n-input v-model:value="localProduct.formFactor" :disabled="!editable"
-          placeholder="e.g., Mid Tower, Full Tower" />
+        <n-select
+          v-model:value="localProduct.formFactor"
+          :options="formFactorOptions"
+          :disabled="!editable"
+        />
       </n-form-item-gi>
       
       <n-form-item-gi label="Color">
@@ -13,8 +16,11 @@
 
       <!-- Side Panel Window -->
       <n-form-item-gi label="Side Panel Window">
-        <n-input v-model:value="localProduct.sidePanelWindow" :disabled="!editable"
-          placeholder="e.g., Tempered Glass, Acrylic, None" />
+        <n-select
+          v-model:value="localProduct.sidePanelWindow"
+          :options="sidePanelTypeOptions"
+          :disabled="!editable"
+        />
       </n-form-item-gi>
 
       <!-- Dimensions -->
@@ -32,8 +38,9 @@
 
 <script setup lang="ts">
 import { ref, watch } from 'vue';
-import { NForm, NFormItemGi, NGrid, NInput } from 'naive-ui';
+import { NForm, NFormItemGi, NGrid, NInput, NSelect } from 'naive-ui';
 import type { PcCaseProductRequest, PcCaseProductResponse } from '@/types/products';
+import { formFactorOptions, sidePanelTypeOptions } from '@/constants/enumOptions';
 import DimensionsInput from '@/components/ValueObjects/DimensionsInput.vue';
 import ChambersInput from '@/components/ValueObjects/ChambersInput.vue';
 
@@ -51,7 +58,7 @@ const emit = defineEmits<{
 }>();
 
 const localProduct = ref<Partial<PcCaseProductRequest>>({
-  formFactor: props.modelValue.formFactor ?? 'Mid Tower',
+  formFactor: props.modelValue.formFactor ?? 'ATX',
   color: props.modelValue.color ?? 'Black',
   sidePanelWindow: props.modelValue.sidePanelWindow ?? 'Tempered Glass',
   dimensions: props.modelValue.dimensions ?? { length: 450, width: 210, height: 450 },
@@ -62,7 +69,7 @@ watch(
   () => props.modelValue,
   (newValue) => {
     Object.assign(localProduct.value, {
-      formFactor: newValue.formFactor ?? 'Mid Tower',
+      formFactor: newValue.formFactor ?? 'ATX',
       color: newValue.color ?? 'Black',
       sidePanelWindow: newValue.sidePanelWindow ?? 'Tempered Glass',
       dimensions: newValue.dimensions ?? { length: 450, width: 210, height: 450 },

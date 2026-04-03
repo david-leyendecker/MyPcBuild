@@ -1,7 +1,5 @@
-using MyPcBuild.ApiService.Domain.Models;
-using MyPcBuild.ApiService.Domain.Models.Spatial;
-using MyPcBuild.ApiService.Features.Catalog;
-using MyPcBuild.ApiService.Infrastructure;
+using MyPcBuild.ApiService.Catalog.Endpoints;
+using MyPcBuild.ApiService.Catalog.Models;
 
 namespace MyPcBuild.Tests.Services;
 

@@ -10,27 +10,27 @@
       </n-form-item-gi>
       
       <n-form-item-gi label="Efficiency Rating">
-        <n-input 
+        <n-select 
           v-model:value="localProduct.efficiency"
+          :options="psuEfficiencyOptions"
           :disabled="!editable"
-          placeholder="e.g., 80+ Gold, 80+ Platinum"
         />
       </n-form-item-gi>
 
       <!-- Modular and Form Factor -->
       <n-form-item-gi label="Modularity">
-        <n-input 
+        <n-select 
           v-model:value="localProduct.modular"
+          :options="psuModularityOptions"
           :disabled="!editable"
-          placeholder="e.g., Fully Modular, Semi-Modular"
         />
       </n-form-item-gi>
       
       <n-form-item-gi label="Form Factor">
-        <n-input 
+        <n-select 
           v-model:value="localProduct.formFactor"
+          :options="psuFormFactorOptions"
           :disabled="!editable"
-          placeholder="e.g., ATX, SFX"
         />
       </n-form-item-gi>
 
@@ -55,8 +55,9 @@
 
 <script setup lang="ts">
 import { ref, watch } from 'vue';
-import { NForm, NFormItemGi, NGrid, NInput, NInputNumber } from 'naive-ui';
+import { NForm, NFormItemGi, NGrid, NInputNumber, NSelect } from 'naive-ui';
 import type { PsuProductRequest, PsuProductResponse } from '@/types/products';
+import { psuEfficiencyOptions, psuModularityOptions, psuFormFactorOptions } from '@/constants/enumOptions';
 import PowerInput from '@/components/ValueObjects/PowerInput.vue';
 import LengthInput from '@/components/ValueObjects/LengthInput.vue';
 

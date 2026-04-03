@@ -68,7 +68,7 @@ public class ProductCategoryPromptFields
             new(nameof(PcCaseProductRequest.Name), "product name (string)"),
             new(nameof(PcCaseProductRequest.Manufacturer), "manufacturer name (string)"),
             new(nameof(PcCaseProductRequest.Price), "decimal price"),
-            new(nameof(PcCaseProductRequest.FormFactor), "string form factor description"),
+            new(nameof(PcCaseProductRequest.FormFactor), $"string: {string.Join(", ", Enum.GetNames(typeof(ApiFormFactor)))}"),
             new(nameof(PcCaseProductRequest.Color), "color name (string)"),
             new(nameof(PcCaseProductRequest.SidePanelWindow), "string: None, Acrylic, or Tempered Glass"),
             new(nameof(PcCaseProductRequest.Dimensions), "object with Length, Width, Height in mm (decimals)")

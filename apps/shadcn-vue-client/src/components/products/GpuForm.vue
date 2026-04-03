@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
-import type { GpuProductRequest, MemoryType, GpuPowerConnector, ProductRequest } from '@/types/product'
-import { FormItemText, FormItemNumber, FormItemSelect, FormItemCheckbox } from '@/components/form-items'
+import type { GpuProductRequest, MemoryType, GpuPowerConnector, GpuChipsetManufacturer, ProductRequest } from '@/types/product'
+import { FormItemNumber, FormItemSelect, FormItemCheckbox } from '@/components/form-items'
+import { gpuChipsetManufacturerOptions, gpuMemoryTypeOptions, gpuPowerConnectorOptions } from '@/constants/enumOptions'
 import DimensionsInput from '@/components/shared/DimensionsInput.vue'
 
 interface Props {
@@ -15,7 +16,7 @@ const emit = defineEmits<{
 
 /** Narrow to GPU shape - safe when this form is rendered for GPU category */
 const model = props.modelValue as Partial<GpuProductRequest> | undefined
-const chipsetManufacturer = ref(model?.chipsetManufacturer || 'NVIDIA')
+const chipsetManufacturer = ref<GpuChipsetManufacturer>(model?.chipsetManufacturer || 'NVIDIA')
 const series = ref(model?.series || 'RTX 4000')
 const vramGB = ref(model?.vram?.valueInGB || 16)
 const memoryType = ref<MemoryType>(model?.memoryType || 'GDDR6X')
@@ -27,9 +28,6 @@ const rayTracing = ref(model?.rayTracing ?? true)
 const dimensionLength = ref(model?.dimensions?.length || 304)
 const dimensionWidth = ref(model?.dimensions?.width || 137)
 const dimensionHeight = ref(model?.dimensions?.height || 61)
-
-const memoryTypeOptions = (['GDDR5', 'GDDR5X', 'GDDR6', 'GDDR6X', 'HBM2', 'HBM2E', 'HBM3'] as MemoryType[]).map(v => ({ value: v, label: v }))
-const powerConnectorOptions = (['Dual8Pin', 'Triple8Pin', 'One16Pin'] as GpuPowerConnector[]).map(v => ({ value: v, label: v }))
 
 watch([chipsetManufacturer, series, vramGB, memoryType, coreClockGHz, boostClockGHz, tdpWatts, powerConnectors, rayTracing, dimensionLength, dimensionWidth, dimensionHeight], () => {
   emit('update:modelValue', {
@@ -73,13 +71,13 @@ defineExpose({
 
 <template>
   <div class="grid gap-4 md:grid-cols-2">
-    <FormItemText label="Chipset Manufacturer *" v-model="chipsetManufacturer" placeholder="e.g., NVIDIA, AMD" />
+    <FormItemSelect label="Chipset Manufacturer *" v-model="chipsetManufacturer" :options="gpuChipsetManufacturerOptions" />
 
     <FormItemText label="Series *" v-model="series" placeholder="e.g., RTX 4000" />
 
     <FormItemNumber label="VRAM (GB) *" v-model="vramGB" :min="1" />
 
-    <FormItemSelect label="Memory Type *" v-model="memoryType" :options="memoryTypeOptions" />
+    <FormItemSelect label="Memory Type *" v-model="memoryType" :options="gpuMemoryTypeOptions" />
 
     <FormItemNumber label="Core Clock (GHz) *" v-model="coreClockGHz" :step="0.1" :min="0" />
 
@@ -87,7 +85,7 @@ defineExpose({
 
     <FormItemNumber label="TDP (Watts) *" v-model="tdpWatts" :min="0" />
 
-    <FormItemSelect label="Power Connectors *" v-model="powerConnectors" :options="powerConnectorOptions" />
+    <FormItemSelect label="Power Connectors *" v-model="powerConnectors" :options="gpuPowerConnectorOptions" />
 
     <DimensionsInput
       v-model:length="dimensionLength"

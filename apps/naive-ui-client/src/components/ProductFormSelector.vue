@@ -11,6 +11,7 @@
 <script setup lang="ts">
 import { ref, computed, watch, type Component } from 'vue';
 import { NEmpty } from 'naive-ui';
+import { ProductCategory } from '@/api/catalog';
 import type { ProductRequest, ProductResponse } from '@/types/products';
 import CpuProductForm from './ProductForms/CpuProductForm.vue';
 import GpuProductForm from './ProductForms/GpuProductForm.vue';
@@ -42,21 +43,21 @@ const formComponent = computed<Component | null>(() => {
   const categoryLower = props.category.toLowerCase();
   
   switch (categoryLower) {
-    case 'cpu':
+    case ProductCategory.CPU:
       return CpuProductForm;
-    case 'gpu':
+    case ProductCategory.GPU:
       return GpuProductForm;
-    case 'motherboard':
+    case ProductCategory.Motherboard:
       return MotherboardProductForm;
-    case 'ram':
+    case ProductCategory.RAM:
       return RamProductForm;
-    case 'storage':
+    case ProductCategory.Storage:
       return StorageProductForm;
-    case 'powersupply':
+    case ProductCategory.PowerSupply:
       return PsuProductForm;
-    case 'cooler':
+    case ProductCategory.Cooler:
       return CoolerProductForm;
-    case 'case':
+    case ProductCategory.Case:
       return PcCaseProductForm;
     default:
       return null;

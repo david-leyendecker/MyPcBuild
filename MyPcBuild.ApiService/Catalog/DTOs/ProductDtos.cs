@@ -44,7 +44,7 @@ public abstract record ProductRequest
 [JsonDerivedType(typeof(MotherboardProductResponse), "motherboard")]
 [JsonDerivedType(typeof(RamProductResponse), "ram")]
 [JsonDerivedType(typeof(StorageProductResponse), "storage")]
-[JsonDerivedType(typeof(PsuProductResponse), "psu")]
+[JsonDerivedType(typeof(PsuProductResponse), "powersupply")]
 [JsonDerivedType(typeof(CoolerProductResponse), "cooler")]
 [JsonDerivedType(typeof(PcCaseProductResponse), "case")]
 public abstract record ProductResponse
@@ -297,7 +297,7 @@ public record GpuProductRequest : ProductRequest
     /// GPU chipset manufacturer (NVIDIA, AMD, Intel).
     /// </summary>
     [Required]
-    public required string ChipsetManufacturer { get; init; }
+    public required ApiGpuChipsetManufacturer ChipsetManufacturer { get; init; }
 
     /// <summary>
     /// GPU series name.
@@ -368,7 +368,7 @@ public record GpuProductResponse : ProductResponse
     /// GPU chipset manufacturer (NVIDIA, AMD, Intel).
     /// </summary>
     [Required]
-    public required string ChipsetManufacturer { get; init; }
+    public required ApiGpuChipsetManufacturer ChipsetManufacturer { get; init; }
 
     /// <summary>
     /// GPU series name.
@@ -453,7 +453,7 @@ public record RamProductRequest : ProductRequest
     /// Configuration description (e.g., "2x16GB").
     /// </summary>
     [Required]
-    public required string Configuration { get; init; }
+    public required ApiRamConfiguration Configuration { get; init; }
 
     /// <summary>
     /// Memory speed.
@@ -465,7 +465,7 @@ public record RamProductRequest : ProductRequest
     /// CAS latency (e.g., "CL16").
     /// </summary>
     [Required]
-    public required string CASLatency { get; init; }
+    public required ApiCasLatency CASLatency { get; init; }
 
     /// <summary>
     /// Operating voltage.
@@ -495,7 +495,7 @@ public record RamProductResponse : ProductResponse
     /// Configuration description (e.g., "2x16GB").
     /// </summary>
     [Required]
-    public required string Configuration { get; init; }
+    public required ApiRamConfiguration Configuration { get; init; }
 
     /// <summary>
     /// Memory speed.
@@ -507,7 +507,7 @@ public record RamProductResponse : ProductResponse
     /// CAS latency (e.g., "CL16").
     /// </summary>
     [Required]
-    public required string CASLatency { get; init; }
+    public required ApiCasLatency CASLatency { get; init; }
 
     /// <summary>
     /// Operating voltage.
@@ -527,7 +527,7 @@ public record PcCaseProductRequest : ProductRequest
     /// Case form factor description.
     /// </summary>
     [Required]
-    public required string FormFactor { get; init; }
+    public required ApiFormFactor FormFactor { get; init; }
 
     /// <summary>
     /// Case color.
@@ -539,7 +539,8 @@ public record PcCaseProductRequest : ProductRequest
     /// Side panel window type (e.g., "Tempered Glass", "Acrylic", "None").
     /// </summary>
     [Required]
-    public required string SidePanelWindow { get; init; }
+    [JsonConverter(typeof(ApiSidePanelTypeConverter))]
+    public required ApiSidePanelType SidePanelWindow { get; init; }
 
     /// <summary>
     /// Physical dimensions in millimeters.
@@ -562,7 +563,7 @@ public record PcCaseProductResponse : ProductResponse
     /// Case form factor description.
     /// </summary>
     [Required]
-    public required string FormFactor { get; init; }
+    public required ApiFormFactor FormFactor { get; init; }
 
     /// <summary>
     /// Case color.
@@ -574,7 +575,7 @@ public record PcCaseProductResponse : ProductResponse
     /// Side panel window type (e.g., "Tempered Glass", "Acrylic", "None").
     /// </summary>
     [Required]
-    public required string SidePanelWindow { get; init; }
+    public required ApiSidePanelType SidePanelWindow { get; init; }
 
     /// <summary>
     /// Physical dimensions in millimeters.
@@ -605,19 +606,19 @@ public record PsuProductRequest : ProductRequest
     /// Efficiency rating (e.g., "80+ Gold").
     /// </summary>
     [Required]
-    public required string Efficiency { get; init; }
+    public required ApiPsuEfficiency Efficiency { get; init; }
 
     /// <summary>
     /// Modularity type (e.g., "Fully Modular", "Semi-Modular", "Non-Modular").
     /// </summary>
     [Required]
-    public required string Modular { get; init; }
+    public required ApiPsuModularity Modular { get; init; }
 
     /// <summary>
     /// PSU form factor (e.g., "ATX", "SFX").
     /// </summary>
     [Required]
-    public required string FormFactor { get; init; }
+    public required ApiPsuFormFactor FormFactor { get; init; }
 
     /// <summary>
     /// PSU length.
@@ -648,19 +649,19 @@ public record PsuProductResponse : ProductResponse
     /// Efficiency rating (e.g., "80+ Gold").
     /// </summary>
     [Required]
-    public required string Efficiency { get; init; }
+    public required ApiPsuEfficiency Efficiency { get; init; }
 
     /// <summary>
     /// Modularity type (e.g., "Fully Modular", "Semi-Modular", "Non-Modular").
     /// </summary>
     [Required]
-    public required string Modular { get; init; }
+    public required ApiPsuModularity Modular { get; init; }
 
     /// <summary>
     /// PSU form factor (e.g., "ATX", "SFX").
     /// </summary>
     [Required]
-    public required string FormFactor { get; init; }
+    public required ApiPsuFormFactor FormFactor { get; init; }
 
     /// <summary>
     /// PSU length.
@@ -686,19 +687,19 @@ public record StorageProductRequest : ProductRequest
     /// Storage type (e.g., "SSD", "HDD").
     /// </summary>
     [Required]
-    public required string Type { get; init; }
+    public required ApiStorageType Type { get; init; }
 
     /// <summary>
     /// Interface type (e.g., "NVMe", "SATA").
     /// </summary>
     [Required]
-    public required string Interface { get; init; }
+    public required ApiStorageInterface Interface { get; init; }
 
     /// <summary>
     /// Storage form factor (e.g., "M.2 2280", "2.5 inch").
     /// </summary>
     [Required]
-    public required string StorageFormFactor { get; init; }
+    public required ApiStorageFormFactor StorageFormFactor { get; init; }
 
     /// <summary>
     /// Storage capacity.
@@ -728,19 +729,19 @@ public record StorageProductResponse : ProductResponse
     /// Storage type (e.g., "SSD", "HDD").
     /// </summary>
     [Required]
-    public required string Type { get; init; }
+    public required ApiStorageType Type { get; init; }
 
     /// <summary>
     /// Interface type (e.g., "NVMe", "SATA").
     /// </summary>
     [Required]
-    public required string Interface { get; init; }
+    public required ApiStorageInterface Interface { get; init; }
 
     /// <summary>
     /// Storage form factor (e.g., "M.2 2280", "2.5 inch").
     /// </summary>
     [Required]
-    public required string StorageFormFactor { get; init; }
+    public required ApiStorageFormFactor StorageFormFactor { get; init; }
 
     /// <summary>
     /// Storage capacity.
@@ -950,10 +951,10 @@ public record SlotModel
     public required string Name { get; init; }
 
     /// <summary>
-    /// Allowed product category name.
+    /// Allowed product category.
     /// </summary>
     [Required]
-    public required string AllowedCategory { get; init; }
+    public required ProductCategory AllowedCategory { get; init; }
 
     /// <summary>
     /// Relative position.

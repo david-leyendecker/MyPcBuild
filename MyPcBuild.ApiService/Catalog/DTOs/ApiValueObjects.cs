@@ -31,7 +31,7 @@ internal class ApiFrequencyConverter : JsonConverter<ApiFrequency>
         {
             return ApiFrequency.FromGHz(reader.GetDecimal());
         }
-        
+
         if (reader.TokenType == JsonTokenType.StartObject)
         {
             using JsonDocument doc = JsonDocument.ParseValue(ref reader);
@@ -41,7 +41,7 @@ internal class ApiFrequencyConverter : JsonConverter<ApiFrequency>
                 return ApiFrequency.FromGHz(valueElement.GetDecimal());
             }
         }
-        
+
         throw new JsonException($"Cannot convert {reader.TokenType} to ApiFrequency");
     }
 
@@ -77,7 +77,7 @@ internal class ApiStorageCapacityConverter : JsonConverter<ApiStorageCapacity>
         {
             return ApiStorageCapacity.FromGB(reader.GetInt32());
         }
-        
+
         if (reader.TokenType == JsonTokenType.StartObject)
         {
             using JsonDocument doc = JsonDocument.ParseValue(ref reader);
@@ -87,7 +87,7 @@ internal class ApiStorageCapacityConverter : JsonConverter<ApiStorageCapacity>
                 return ApiStorageCapacity.FromGB(valueElement.GetInt32());
             }
         }
-        
+
         throw new JsonException($"Cannot convert {reader.TokenType} to ApiStorageCapacity");
     }
 
@@ -123,7 +123,7 @@ internal class ApiPowerConverter : JsonConverter<ApiPower>
         {
             return ApiPower.FromWatts(reader.GetInt32());
         }
-        
+
         if (reader.TokenType == JsonTokenType.StartObject)
         {
             using JsonDocument doc = JsonDocument.ParseValue(ref reader);
@@ -133,7 +133,7 @@ internal class ApiPowerConverter : JsonConverter<ApiPower>
                 return ApiPower.FromWatts(valueElement.GetInt32());
             }
         }
-        
+
         throw new JsonException($"Cannot convert {reader.TokenType} to ApiPower");
     }
 
@@ -169,7 +169,7 @@ internal class ApiVoltageConverter : JsonConverter<ApiVoltage>
         {
             return ApiVoltage.FromVolts(reader.GetDecimal());
         }
-        
+
         if (reader.TokenType == JsonTokenType.StartObject)
         {
             using JsonDocument doc = JsonDocument.ParseValue(ref reader);
@@ -179,7 +179,7 @@ internal class ApiVoltageConverter : JsonConverter<ApiVoltage>
                 return ApiVoltage.FromVolts(valueElement.GetDecimal());
             }
         }
-        
+
         throw new JsonException($"Cannot convert {reader.TokenType} to ApiVoltage");
     }
 
@@ -215,7 +215,7 @@ internal class ApiLengthConverter : JsonConverter<ApiLength>
         {
             return ApiLength.FromMm(reader.GetInt32());
         }
-        
+
         if (reader.TokenType == JsonTokenType.StartObject)
         {
             using JsonDocument doc = JsonDocument.ParseValue(ref reader);
@@ -225,7 +225,7 @@ internal class ApiLengthConverter : JsonConverter<ApiLength>
                 return ApiLength.FromMm(valueElement.GetInt32());
             }
         }
-        
+
         throw new JsonException($"Cannot convert {reader.TokenType} to ApiLength");
     }
 
@@ -261,7 +261,7 @@ internal class ApiDataSpeedConverter : JsonConverter<ApiDataSpeed>
         {
             return ApiDataSpeed.FromMBps(reader.GetInt32());
         }
-        
+
         if (reader.TokenType == JsonTokenType.StartObject)
         {
             using JsonDocument doc = JsonDocument.ParseValue(ref reader);
@@ -271,7 +271,7 @@ internal class ApiDataSpeedConverter : JsonConverter<ApiDataSpeed>
                 return ApiDataSpeed.FromMBps(valueElement.GetInt32());
             }
         }
-        
+
         throw new JsonException($"Cannot convert {reader.TokenType} to ApiDataSpeed");
     }
 
@@ -280,5 +280,122 @@ internal class ApiDataSpeedConverter : JsonConverter<ApiDataSpeed>
         writer.WriteStartObject();
         writer.WriteNumber("valueInMBps", value.ValueInMBps);
         writer.WriteEndObject();
+    }
+}
+
+/// <summary>
+/// Represents CAS latency (API).
+/// </summary>
+[JsonConverter(typeof(ApiCasLatencyConverter))]
+public record ApiCasLatency
+{
+    [Required]
+    [Range(1, 50)]
+    public required int Value { get; init; }
+
+    public static ApiCasLatency FromInt(int value) => new() { Value = value };
+    public override string ToString() => $"CL{Value}";
+}
+
+internal class ApiCasLatencyConverter : JsonConverter<ApiCasLatency>
+{
+    public override ApiCasLatency Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    {
+        if (reader.TokenType == JsonTokenType.Number)
+        {
+            return ApiCasLatency.FromInt(reader.GetInt32());
+        }
+
+        if (reader.TokenType == JsonTokenType.String)
+        {
+            string? s = reader.GetString();
+            if (string.IsNullOrWhiteSpace(s)) throw new JsonException("CAS latency string cannot be empty");
+            string normalized = s.TrimStart('C', 'L', 'c', 'l');
+            if (int.TryParse(normalized, out int val) && val >= 1 && val <= 50)
+                return ApiCasLatency.FromInt(val);
+        }
+
+        if (reader.TokenType == JsonTokenType.StartObject)
+        {
+            using JsonDocument doc = JsonDocument.ParseValue(ref reader);
+            if (doc.RootElement.TryGetProperty("value", out JsonElement valueElement) ||
+                doc.RootElement.TryGetProperty("Value", out valueElement))
+            {
+                return ApiCasLatency.FromInt(valueElement.GetInt32());
+            }
+        }
+
+        throw new JsonException($"Cannot convert to ApiCasLatency. Expected number, CL16-style string, or object with value.");
+    }
+
+    public override void Write(Utf8JsonWriter writer, ApiCasLatency value, JsonSerializerOptions options)
+    {
+        writer.WriteStringValue(value.ToString());
+    }
+}
+
+/// <summary>
+/// Represents RAM configuration (API).
+/// </summary>
+[JsonConverter(typeof(ApiRamConfigurationConverter))]
+public record ApiRamConfiguration
+{
+    [Required]
+    [Range(1, 8)]
+    public required int ModuleCount { get; init; }
+
+    [Required]
+    public required ApiStorageCapacity ModuleCapacity { get; init; }
+
+    public static ApiRamConfiguration From(int moduleCount, int capacityGb) =>
+        new() { ModuleCount = moduleCount, ModuleCapacity = ApiStorageCapacity.FromGB(capacityGb) };
+
+    public int TotalCapacityGb => ModuleCount * ModuleCapacity.ValueInGB;
+    public override string ToString() => $"{ModuleCount}x{ModuleCapacity.ValueInGB}GB";
+}
+
+internal class ApiRamConfigurationConverter : JsonConverter<ApiRamConfiguration>
+{
+    public override ApiRamConfiguration Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    {
+        if (reader.TokenType == JsonTokenType.String)
+        {
+            string? s = reader.GetString();
+            if (string.IsNullOrWhiteSpace(s)) throw new JsonException("RAM configuration string cannot be empty");
+            string[] parts = s.ToUpperInvariant().Split(['X', 'x']);
+            if (parts.Length != 2 ||
+                !int.TryParse(parts[0].Trim(), out int count) ||
+                count < 1 || count > 8 ||
+                !int.TryParse(parts[1].Trim().Replace("GB", "").Trim(), out int gb) ||
+                gb < 1)
+            {
+                throw new JsonException($"Invalid RAM configuration format: {s}. Expected e.g. 2x16GB");
+            }
+            return ApiRamConfiguration.From(count, gb);
+        }
+
+        if (reader.TokenType == JsonTokenType.StartObject)
+        {
+            using JsonDocument doc = JsonDocument.ParseValue(ref reader);
+            int count = 1;
+            int gb = 16;
+            if (doc.RootElement.TryGetProperty("moduleCount", out JsonElement mc) || doc.RootElement.TryGetProperty("ModuleCount", out mc))
+                count = mc.GetInt32();
+            if (doc.RootElement.TryGetProperty("moduleCapacity", out JsonElement cap) || doc.RootElement.TryGetProperty("ModuleCapacity", out cap))
+            {
+                if (cap.ValueKind == JsonValueKind.Number)
+                    gb = cap.GetInt32();
+                else if (cap.TryGetProperty("valueInGB", out JsonElement gbEl) || cap.TryGetProperty("ValueInGB", out gbEl))
+                    gb = gbEl.GetInt32();
+            }
+            return ApiRamConfiguration.From(count, gb);
+        }
+
+        throw new JsonException("Cannot convert to ApiRamConfiguration. Expected 2x16GB-style string or object.");
+    }
+
+    public override void Write(Utf8JsonWriter writer, ApiRamConfiguration value, JsonSerializerOptions options)
+    {
+        writer.WriteStringValue(value.ToString());
     }
 }

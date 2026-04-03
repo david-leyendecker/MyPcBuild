@@ -1,6 +1,7 @@
-using MyPcBuild.ApiService.Domain.Models;
-using MyPcBuild.ApiService.Domain.Models.Spatial;
-using MyPcBuild.ApiService.Features.Spatial;
+using MyPcBuild.ApiService.Builds.Models;
+using MyPcBuild.ApiService.Catalog.Models;
+using MyPcBuild.ApiService.SharedDomain.Spatial;
+using MyPcBuild.ApiService.Spatial.Models;
 
 namespace MyPcBuild.Tests.Services;
 
@@ -295,9 +296,9 @@ public class SpatialValidatorTests
                     ]
                 )
             ],
-            "ATX",
+            FormFactor.ATX,
             "Black",
-            "Tempered Glass"
+            SidePanelType.TemperedGlass
         );
     }
 

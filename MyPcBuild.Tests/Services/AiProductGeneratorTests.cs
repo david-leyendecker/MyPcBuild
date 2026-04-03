@@ -1,9 +1,9 @@
 using Microsoft.Extensions.AI;
 using Microsoft.Extensions.Logging;
 using Moq;
-using MyPcBuild.ApiService.Domain.Models;
-using MyPcBuild.ApiService.Domain.Models.Spatial;
-using MyPcBuild.ApiService.Features.Catalog;
+using MyPcBuild.ApiService.Catalog.Models;
+using MyPcBuild.ApiService.Catalog.Services;
+using MyPcBuild.ApiService.SharedDomain.Spatial;
 
 namespace MyPcBuild.Tests.Services;
 
@@ -119,7 +119,7 @@ public class AiProductGeneratorTests
         Assert.Equal("GeForce RTX 4090", gpuProduct.Name);
         Assert.Equal("NVIDIA", gpuProduct.Manufacturer);
         Assert.Equal(1599.99m, gpuProduct.Price);
-        Assert.Equal("NVIDIA", gpuProduct.ChipsetManufacturer);
+        Assert.Equal(GpuChipsetManufacturer.NVIDIA, gpuProduct.ChipsetManufacturer);
         Assert.Equal(24, gpuProduct.VRAM.ValueInGB);
         Assert.True(gpuProduct.RayTracing);
     }
@@ -175,6 +175,9 @@ public class AiProductGeneratorTests
         Assert.Equal("Vengeance DDR5", ramProduct.Name);
         Assert.Equal(MemoryType.DDR5, ramProduct.Type);
         Assert.Equal(32, ramProduct.Capacity.ValueInGB);
+        Assert.Equal(2, ramProduct.Configuration.ModuleCount);
+        Assert.Equal(16, ramProduct.Configuration.ModuleCapacity.ValueInGB);
+        Assert.Equal(30, ramProduct.CASLatency.Value);
     }
 
     [Fact]
@@ -216,7 +219,7 @@ public class AiProductGeneratorTests
             "Name": "NZXT S320 Elite",
             "Manufacturer": "NZXT",
             "Price": 69.99,
-            "FormFactor": "Mid Tower",
+            "FormFactor": "ATX",
             "Color": "Black",
             "SidePanelWindow": "Tempered Glass",
             "Dimensions": {
@@ -275,6 +278,8 @@ public class AiProductGeneratorTests
         Assert.Equal("S320 Elite", pcCaseProduct.Name);
         Assert.Equal("NZXT", pcCaseProduct.Manufacturer);
         Assert.Equal(69.99m, pcCaseProduct.Price);
-        Assert.Equal(new Dimensions(Length: 490, Width: 210, Height: 450), pcCaseProduct.Dimensions);
+        Assert.Equal(FormFactor.ATX, pcCaseProduct.FormFactor);
+        Assert.Equal(SidePanelType.TemperedGlass, pcCaseProduct.SidePanelWindow);
+        Assert.Equal(new Dimensions(490, 210, 450), pcCaseProduct.Dimensions);
     }
 }

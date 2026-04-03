@@ -3,6 +3,7 @@ import { ref, watch } from 'vue'
 import type { PcCaseProductRequest, ProductRequest } from '@/types/product'
 import type { Chamber } from '@/types/spatial'
 import { FormItemText, FormItemSelect } from '@/components/form-items'
+import { formFactorOptions, sidePanelTypeOptions } from '@/constants/enumOptions'
 import DimensionsInput from '@/components/value-objects/DimensionsInput.vue'
 import ChambersInput from '@/components/value-objects/ChambersInput.vue'
 
@@ -17,7 +18,7 @@ const emit = defineEmits<{
 
 /** Narrow to PC Case shape - safe when this form is rendered for Case category */
 const model = props.modelValue as Partial<PcCaseProductRequest> | undefined
-const formFactor = ref(model?.formFactor || 'Mid Tower')
+const formFactor = ref(model?.formFactor || 'ATX')
 const color = ref(model?.color || 'Black')
 const sidePanelWindow = ref(model?.sidePanelWindow || 'Tempered Glass')
 const dimensions = ref(model?.dimensions || { length: 450, width: 210, height: 460 })
@@ -47,18 +48,18 @@ defineExpose({
 
 <template>
   <div class="grid gap-4 md:grid-cols-2">
-    <FormItemText label="Form Factor *" v-model="formFactor" placeholder="e.g., Mid Tower, Full Tower" />
+    <FormItemSelect
+      label="Form Factor *"
+      v-model="formFactor"
+      :options="formFactorOptions"
+    />
 
     <FormItemText label="Color *" v-model="color" placeholder="e.g., Black, White" />
 
     <FormItemSelect
       label="Side Panel Window *"
       v-model="sidePanelWindow"
-      :options="[
-        { value: 'None', label: 'None' },
-        { value: 'Acrylic', label: 'Acrylic' },
-        { value: 'Tempered Glass', label: 'Tempered Glass' },
-      ]"
+      :options="sidePanelTypeOptions"
     />
 
     <div class="col-span-2">

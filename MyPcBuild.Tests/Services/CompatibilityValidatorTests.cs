@@ -1,6 +1,6 @@
-using MyPcBuild.ApiService.Domain.Models;
-using MyPcBuild.ApiService.Domain.Models.Spatial;
-using MyPcBuild.ApiService.Features.Compatibility;
+using MyPcBuild.ApiService.Catalog.Models;
+using MyPcBuild.ApiService.Compatibility.Models;
+using MyPcBuild.ApiService.SharedDomain.Spatial;
 
 namespace MyPcBuild.Tests.Services;
 
@@ -473,9 +473,9 @@ public class CompatibilityValidatorTests
             "G.Skill",
             memoryTypeEnum,
             StorageCapacity.FromGB(capacity),
-            configuration,
+            RamConfiguration.Parse(configuration),
             Frequency.FromMHz(6000),
-            "CL30",
+            CasLatency.FromInt(30),
             Voltage.FromVolts(1.35m)
         );
     }
@@ -489,7 +489,7 @@ public class CompatibilityValidatorTests
             "NVIDIA",
             new Dimensions(length, 140, 61), // Typical GPU dimensions
             [], // No sub-slots for compatibility tests
-            "NVIDIA",
+            GpuChipsetManufacturer.NVIDIA,
             "RTX 4070",
             StorageCapacity.FromGB(12),
             MemoryType.GDDR6X,
@@ -503,6 +503,7 @@ public class CompatibilityValidatorTests
 
     private PcCaseProduct CreateCase(string name, string formFactor)
     {
+        FormFactor formFactorEnum = Enum.Parse<FormFactor>(formFactor, ignoreCase: true);
         return new PcCaseProduct(
             Guid.NewGuid(),
             name,
@@ -510,9 +511,9 @@ public class CompatibilityValidatorTests
             "Lian Li",
             new Dimensions(450, 220, 500), // Typical case dimensions
             [], // No chambers for compatibility tests
-            formFactor,
+            formFactorEnum,
             "Black",
-            "Tempered Glass"
+            SidePanelType.TemperedGlass
         );
     }
 
@@ -524,9 +525,9 @@ public class CompatibilityValidatorTests
             129.99m,
             "Corsair",
             Power.FromWatts(wattage),
-            "80+ Gold",
-            "Fully Modular",
-            "ATX",
+            PsuEfficiency.Gold,
+            PsuModularity.FullyModular,
+            PsuFormFactor.ATX,
             Length.FromMm(160),
             6
         );

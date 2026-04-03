@@ -3,10 +3,10 @@
     <n-grid :cols="2" :x-gap="12">
       <!-- Chipset Manufacturer and Series -->
       <n-form-item-gi label="Chipset Manufacturer">
-        <n-input 
+        <n-select 
           v-model:value="localProduct.chipsetManufacturer"
+          :options="gpuChipsetManufacturerOptions"
           :disabled="!editable"
-          placeholder="e.g., NVIDIA, AMD"
         />
       </n-form-item-gi>
       
@@ -29,7 +29,7 @@
       <n-form-item-gi label="Memory Type">
         <n-select 
           v-model:value="localProduct.memoryType"
-          :options="memoryTypeOptions"
+          :options="gpuMemoryTypeOptions"
           :disabled="!editable"
         />
       </n-form-item-gi>
@@ -68,7 +68,7 @@
       <n-form-item-gi label="Power Connectors">
         <n-select 
           v-model:value="localProduct.powerConnectors"
-          :options="powerConnectorOptions"
+          :options="gpuPowerConnectorOptions"
           :disabled="!editable"
         />
       </n-form-item-gi>
@@ -104,7 +104,8 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue';
 import { NForm, NFormItemGi, NGrid, NInput, NSelect, NCheckbox } from 'naive-ui';
-import type { GpuProductRequest, GpuProductResponse, MemoryType, GpuPowerConnector } from '@/types/products';
+import type { GpuProductRequest, GpuProductResponse } from '@/types/products';
+import { gpuChipsetManufacturerOptions, gpuMemoryTypeOptions, gpuPowerConnectorOptions } from '@/constants/enumOptions';
 import FrequencyInput from '@/components/ValueObjects/FrequencyInput.vue';
 import PowerInput from '@/components/ValueObjects/PowerInput.vue';
 import LengthInput from '@/components/ValueObjects/LengthInput.vue';
@@ -125,24 +126,8 @@ const emit = defineEmits<{
   'update:modelValue': [value: Partial<GpuProductRequest>]
 }>();
 
-const memoryTypeOptions = [
-  { label: 'GDDR5', value: 'GDDR5' as MemoryType },
-  { label: 'GDDR5X', value: 'GDDR5X' as MemoryType },
-  { label: 'GDDR6', value: 'GDDR6' as MemoryType },
-  { label: 'GDDR6X', value: 'GDDR6X' as MemoryType },
-  { label: 'HBM2', value: 'HBM2' as MemoryType },
-  { label: 'HBM2E', value: 'HBM2E' as MemoryType },
-  { label: 'HBM3', value: 'HBM3' as MemoryType }
-];
-
-const powerConnectorOptions = [
-  { label: 'Dual 8-Pin', value: 'Dual8Pin' as GpuPowerConnector },
-  { label: 'Triple 8-Pin', value: 'Triple8Pin' as GpuPowerConnector },
-  { label: '1x 16-Pin', value: 'One16Pin' as GpuPowerConnector }
-];
-
 const localProduct = ref<Partial<GpuProductRequest>>({
-  chipsetManufacturer: props.modelValue.chipsetManufacturer ?? '',
+  chipsetManufacturer: props.modelValue.chipsetManufacturer ?? 'NVIDIA',
   series: props.modelValue.series ?? '',
   vram: props.modelValue.vram ?? { valueInGB: 8 },
   memoryType: props.modelValue.memoryType,
@@ -160,7 +145,7 @@ watch(
   () => props.modelValue,
   (newValue) => {
     Object.assign(localProduct.value, {
-      chipsetManufacturer: newValue.chipsetManufacturer ?? '',
+      chipsetManufacturer: newValue.chipsetManufacturer ?? 'NVIDIA',
       series: newValue.series ?? '',
       vram: newValue.vram ?? { valueInGB: 8 },
       memoryType: newValue.memoryType,

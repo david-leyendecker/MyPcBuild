@@ -80,7 +80,16 @@ public class OpenAiProductGenerator(ILogger<OpenAiProductGenerator> logger, ICha
             NumberHandling = JsonNumberHandling.AllowReadingFromString,
             Converters =
             {
+                // Custom enum/value converters (must precede JsonStringEnumConverter)
                 new ApiGpuPowerConnectorConverter(),
+                new ApiGpuChipsetManufacturerConverter(),
+                new ApiSidePanelTypeConverter(),
+                new ApiPsuEfficiencyConverter(),
+                new ApiPsuModularityConverter(),
+                new ApiPsuFormFactorConverter(),
+                new ApiStorageTypeConverter(),
+                new ApiStorageInterfaceConverter(),
+                new ApiStorageFormFactorConverter(),
                 new DimensionsModelConverter(),
                 new SlotModelListConverter(),
                 new ChamberModelListConverter(),

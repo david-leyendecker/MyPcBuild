@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
-import type { PsuProductRequest, ProductRequest } from '@/types/product'
-import { FormItemNumber, FormItemText, FormItemSelect } from '@/components/form-items'
+import type { PsuProductRequest, PsuEfficiency, PsuModularity, PsuFormFactor, ProductRequest } from '@/types/product'
+import { FormItemNumber, FormItemSelect } from '@/components/form-items'
+import { psuEfficiencyOptions, psuModularityOptions, psuFormFactorOptions } from '@/constants/enumOptions'
 
 interface Props {
   modelValue?: Partial<ProductRequest>
@@ -15,9 +16,9 @@ const emit = defineEmits<{
 /** Narrow to PSU shape - safe when this form is rendered for PSU category */
 const model = props.modelValue as Partial<PsuProductRequest> | undefined
 const wattageWatts = ref(model?.wattage?.valueInWatts || 750)
-const efficiency = ref(model?.efficiency || '80+ Gold')
-const modular = ref(model?.modular || 'Full')
-const formFactor = ref(model?.formFactor || 'ATX')
+const efficiency = ref<PsuEfficiency>(model?.efficiency || '80+ Gold')
+const modular = ref<PsuModularity>(model?.modular || 'Fully Modular')
+const formFactor = ref<PsuFormFactor>(model?.formFactor || 'ATX')
 const lengthMm = ref(model?.length?.valueInMm || 160)
 const pcie8Pin = ref(model?.pcie8Pin || 4)
 
@@ -49,19 +50,23 @@ defineExpose({
   <div class="grid gap-4 md:grid-cols-2">
     <FormItemNumber label="Wattage (W) *" v-model="wattageWatts" :min="1" />
 
-    <FormItemText label="Efficiency Certification *" v-model="efficiency" placeholder="e.g., 80+ Gold" />
+    <FormItemSelect
+      label="Efficiency Certification *"
+      v-model="efficiency"
+      :options="psuEfficiencyOptions"
+    />
 
     <FormItemSelect
       label="Modular Type *"
       v-model="modular"
-      :options="[
-        { value: 'Full', label: 'Full Modular' },
-        { value: 'Semi', label: 'Semi Modular' },
-        { value: 'Non', label: 'Non Modular' },
-      ]"
+      :options="psuModularityOptions"
     />
 
-    <FormItemText label="Form Factor *" v-model="formFactor" placeholder="e.g., ATX, SFX" />
+    <FormItemSelect
+      label="Form Factor *"
+      v-model="formFactor"
+      :options="psuFormFactorOptions"
+    />
 
     <FormItemNumber label="Length (mm) *" v-model="lengthMm" :min="0" />
 

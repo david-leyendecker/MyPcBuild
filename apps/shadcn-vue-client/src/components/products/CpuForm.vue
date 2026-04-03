@@ -2,6 +2,7 @@
 import { ref, watch } from 'vue'
 import type { CpuProductRequest, CpuSocket, ProductRequest } from '@/types/product'
 import { FormItemSelect, FormItemNumber, FormItemCheckbox } from '@/components/form-items'
+import { cpuSocketOptions } from '@/constants/enumOptions'
 
 interface Props {
   modelValue?: Partial<ProductRequest>
@@ -21,8 +22,6 @@ const baseClockGHz = ref(model?.baseClock?.valueInGHz || 3.5)
 const boostClockGHz = ref(model?.boostClock?.valueInGHz || 5.0)
 const tdpWatts = ref(model?.tdp?.valueInWatts || 105)
 const integratedGraphics = ref(model?.integratedGraphics || false)
-
-const socketOptions = (['LGA1700', 'LGA1200', 'LGA1151', 'LGA2066', 'AM5', 'AM4', 'sTRX4', 'TR4'] as CpuSocket[]).map(v => ({ value: v, label: v }))
 
 watch([socket, cores, threads, baseClockGHz, boostClockGHz, tdpWatts, integratedGraphics], () => {
   emit('update:modelValue', {
@@ -52,7 +51,7 @@ defineExpose({
 
 <template>
   <div class="grid gap-4 md:grid-cols-2">
-    <FormItemSelect label="CPU Socket *" v-model="socket" :options="socketOptions" />
+    <FormItemSelect label="CPU Socket *" v-model="socket" :options="cpuSocketOptions" />
 
     <FormItemNumber label="Cores *" v-model="cores" :min="1" />
 

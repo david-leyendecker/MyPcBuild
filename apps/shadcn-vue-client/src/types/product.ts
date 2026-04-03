@@ -19,6 +19,22 @@ export type CoolerType = 'Air' | 'AIO' | 'CustomLoop';
 
 export type GpuPowerConnector = 'Dual8Pin' | 'Triple8Pin' | 'One16Pin';
 
+export type GpuChipsetManufacturer = 'NVIDIA' | 'AMD' | 'Intel';
+
+export type SidePanelType = 'None' | 'Acrylic' | 'Tempered Glass';
+
+export type PsuEfficiency = '80+ Bronze' | '80+ Silver' | '80+ Gold' | '80+ Platinum' | '80+ Titanium';
+
+export type PsuModularity = 'Non-Modular' | 'Semi-Modular' | 'Fully Modular';
+
+export type PsuFormFactor = 'ATX' | 'SFX' | 'SFX-L';
+
+export type StorageType = 'SSD' | 'HDD';
+
+export type StorageInterface = 'NVMe' | 'SATA';
+
+export type StorageFormFactor = 'M.2 2280' | '2.5 inch' | '3.5 inch';
+
 // ========== Value Objects ==========
 
 export interface Frequency {
@@ -94,7 +110,7 @@ export interface GpuProductRequest {
   name: string;
   price: number;
   manufacturer: string;
-  chipsetManufacturer: string;
+  chipsetManufacturer: GpuChipsetManufacturer;
   series: string;
   vram: StorageCapacity;
   memoryType: MemoryType;
@@ -109,7 +125,7 @@ export interface GpuProductRequest {
 
 export interface GpuProductResponse extends ProductBase {
   category: 'gpu';
-  chipsetManufacturer: string;
+  chipsetManufacturer: GpuChipsetManufacturer;
   series: string;
   vram: StorageCapacity;
   memoryType: MemoryType;
@@ -181,9 +197,9 @@ export interface StorageProductRequest {
   name: string;
   price: number;
   manufacturer: string;
-  type: string;
-  interface: string;
-  storageFormFactor: string;
+  type: StorageType;
+  interface: StorageInterface;
+  storageFormFactor: StorageFormFactor;
   capacity: StorageCapacity;
   readSpeed: DataSpeed;
   writeSpeed: DataSpeed;
@@ -191,9 +207,9 @@ export interface StorageProductRequest {
 
 export interface StorageProductResponse extends ProductBase {
   category: 'storage';
-  type: string;
-  interface: string;
-  storageFormFactor: string;
+  type: StorageType;
+  interface: StorageInterface;
+  storageFormFactor: StorageFormFactor;
   capacity: StorageCapacity;
   readSpeed: DataSpeed;
   writeSpeed: DataSpeed;
@@ -207,9 +223,9 @@ export interface PsuProductRequest {
   price: number;
   manufacturer: string;
   wattage: Power;
-  efficiency: string;
-  modular: string;
-  formFactor: string;
+  efficiency: PsuEfficiency;
+  modular: PsuModularity;
+  formFactor: PsuFormFactor;
   length: Length;
   pcie8Pin: number;
 }
@@ -217,9 +233,9 @@ export interface PsuProductRequest {
 export interface PsuProductResponse extends ProductBase {
   category: 'powersupply';
   wattage: Power;
-  efficiency: string;
-  modular: string;
-  formFactor: string;
+  efficiency: PsuEfficiency;
+  modular: PsuModularity;
+  formFactor: PsuFormFactor;
   length: Length;
   pcie8Pin: number;
 }
@@ -254,18 +270,18 @@ export interface PcCaseProductRequest {
   name: string;
   price: number;
   manufacturer: string;
-  formFactor: string;
+  formFactor: FormFactor;
   color: string;
-  sidePanelWindow: string;
+  sidePanelWindow: SidePanelType;
   dimensions: Dimensions;
   chambers?: Chamber[];
 }
 
 export interface PcCaseProductResponse extends ProductBase {
   category: 'case';
-  formFactor: string;
+  formFactor: FormFactor;
   color: string;
-  sidePanelWindow: string;
+  sidePanelWindow: SidePanelType;
   dimensions: Dimensions;
   chambers?: Chamber[];
 }

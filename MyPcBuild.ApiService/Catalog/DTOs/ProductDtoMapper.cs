@@ -103,7 +103,7 @@ public static class ProductDtoMapper
             Manufacturer = gpu.Manufacturer,
             IsDraft = gpu.IsDraft,
             PublishedAt = gpu.PublishedAt,
-            ChipsetManufacturer = gpu.ChipsetManufacturer,
+            ChipsetManufacturer = ToApiGpuChipsetManufacturer(gpu.ChipsetManufacturer),
             Series = gpu.Series,
             VRAM = ApiStorageCapacity.FromGB(gpu.VRAM.ValueInGB),
             MemoryType = ToApiMemoryType(gpu.MemoryType),
@@ -130,9 +130,9 @@ public static class ProductDtoMapper
             PublishedAt = ram.PublishedAt,
             Type = ToApiMemoryType(ram.Type),
             Capacity = ApiStorageCapacity.FromGB(ram.Capacity.ValueInGB),
-            Configuration = ram.Configuration,
+            Configuration = ToApiRamConfiguration(ram.Configuration),
             Speed = ApiFrequency.FromMHz((int)ram.Speed.ToMHz()),
-            CASLatency = ram.CASLatency,
+            CASLatency = ToApiCasLatency(ram.CASLatency),
             Voltage = ApiVoltage.FromVolts(ram.Voltage.ValueInVolts)
         };
     }
@@ -148,9 +148,9 @@ public static class ProductDtoMapper
             Manufacturer = pcCase.Manufacturer,
             IsDraft = pcCase.IsDraft,
             PublishedAt = pcCase.PublishedAt,
-            FormFactor = pcCase.FormFactor,
+            FormFactor = ToApiFormFactor(pcCase.FormFactor),
             Color = pcCase.Color,
-            SidePanelWindow = pcCase.SidePanelWindow,
+            SidePanelWindow = ToApiSidePanelType(pcCase.SidePanelWindow),
             Dimensions = pcCase.Dimensions.ToDimensionsModel(),
             Chambers = [.. pcCase.Chambers.Select(c => c.ToChamberModel())]
         };
@@ -168,9 +168,9 @@ public static class ProductDtoMapper
             IsDraft = psu.IsDraft,
             PublishedAt = psu.PublishedAt,
             Wattage = ApiPower.FromWatts(psu.Wattage.ValueInWatts),
-            Efficiency = psu.Efficiency,
-            Modular = psu.Modular,
-            FormFactor = psu.FormFactor,
+            Efficiency = ToApiPsuEfficiency(psu.Efficiency),
+            Modular = ToApiPsuModularity(psu.Modular),
+            FormFactor = ToApiPsuFormFactor(psu.FormFactor),
             Length = ApiLength.FromMm(psu.Length.ValueInMm),
             PCIe8Pin = psu.PCIe8Pin
         };
@@ -187,9 +187,9 @@ public static class ProductDtoMapper
             Manufacturer = storage.Manufacturer,
             IsDraft = storage.IsDraft,
             PublishedAt = storage.PublishedAt,
-            Type = storage.Type,
-            Interface = storage.Interface,
-            StorageFormFactor = storage.StorageFormFactor,
+            Type = ToApiStorageType(storage.Type),
+            Interface = ToApiStorageInterface(storage.Interface),
+            StorageFormFactor = ToApiStorageFormFactor(storage.StorageFormFactor),
             Capacity = ApiStorageCapacity.FromGB(storage.Capacity.ValueInGB),
             ReadSpeed = ApiDataSpeed.FromMBps(storage.ReadSpeed.ValueInMBps),
             WriteSpeed = ApiDataSpeed.FromMBps(storage.WriteSpeed.ValueInMBps)
@@ -260,7 +260,7 @@ public static class ProductDtoMapper
             request.Manufacturer,
             request.Dimensions.ToDomainDimensions(),
             request.Slots?.Select(s => s.ToDomainSlot()).ToList() ?? [],
-            request.ChipsetManufacturer,
+            ToDomainGpuChipsetManufacturer(request.ChipsetManufacturer),
             request.Series,
             StorageCapacity.FromGB(request.VRAM.ValueInGB),
             ToDomainMemoryType(request.MemoryType),
@@ -281,9 +281,9 @@ public static class ProductDtoMapper
             request.Manufacturer,
             ToDomainMemoryType(request.Type),
             StorageCapacity.FromGB(request.Capacity.ValueInGB),
-            request.Configuration,
+            ToDomainRamConfiguration(request.Configuration),
             Frequency.FromMHz((int)request.Speed.ToMHz()),
-            request.CASLatency,
+            ToDomainCasLatency(request.CASLatency),
             Voltage.FromVolts(request.Voltage.ValueInVolts)
         );
     }
@@ -297,9 +297,9 @@ public static class ProductDtoMapper
             request.Manufacturer,
             request.Dimensions.ToDomainDimensions(),
             request.Chambers?.Select(c => c.ToDomainChamber()).ToList() ?? [],
-            request.FormFactor,
+            ToDomainFormFactor(request.FormFactor),
             request.Color,
-            request.SidePanelWindow
+            ToDomainSidePanelType(request.SidePanelWindow)
         );
     }
 
@@ -311,9 +311,9 @@ public static class ProductDtoMapper
             request.Price,
             request.Manufacturer,
             Power.FromWatts(request.Wattage.ValueInWatts),
-            request.Efficiency,
-            request.Modular,
-            request.FormFactor,
+            ToDomainPsuEfficiency(request.Efficiency),
+            ToDomainPsuModularity(request.Modular),
+            ToDomainPsuFormFactor(request.FormFactor),
             Length.FromMm(request.Length.ValueInMm),
             request.PCIe8Pin
         );
@@ -326,9 +326,9 @@ public static class ProductDtoMapper
             request.Name,
             request.Price,
             request.Manufacturer,
-            request.Type,
-            request.Interface,
-            request.StorageFormFactor,
+            ToDomainStorageType(request.Type),
+            ToDomainStorageInterface(request.Interface),
+            ToDomainStorageFormFactor(request.StorageFormFactor),
             StorageCapacity.FromGB(request.Capacity.ValueInGB),
             DataSpeed.FromMBps(request.ReadSpeed.ValueInMBps),
             DataSpeed.FromMBps(request.WriteSpeed.ValueInMBps)
@@ -457,6 +457,144 @@ public static class ProductDtoMapper
         ApiGpuPowerConnector.One16Pin => GpuPowerConnector.One16Pin,
         _ => throw new ArgumentException($"Unknown API GPU power connector: {connector}")
     };
+
+    private static ApiGpuChipsetManufacturer ToApiGpuChipsetManufacturer(GpuChipsetManufacturer m) => m switch
+    {
+        GpuChipsetManufacturer.NVIDIA => ApiGpuChipsetManufacturer.NVIDIA,
+        GpuChipsetManufacturer.AMD => ApiGpuChipsetManufacturer.AMD,
+        GpuChipsetManufacturer.Intel => ApiGpuChipsetManufacturer.Intel,
+        _ => throw new ArgumentException($"Unknown GPU chipset manufacturer: {m}")
+    };
+
+    private static GpuChipsetManufacturer ToDomainGpuChipsetManufacturer(ApiGpuChipsetManufacturer m) => m switch
+    {
+        ApiGpuChipsetManufacturer.NVIDIA => GpuChipsetManufacturer.NVIDIA,
+        ApiGpuChipsetManufacturer.AMD => GpuChipsetManufacturer.AMD,
+        ApiGpuChipsetManufacturer.Intel => GpuChipsetManufacturer.Intel,
+        _ => throw new ArgumentException($"Unknown API GPU chipset manufacturer: {m}")
+    };
+
+    private static ApiSidePanelType ToApiSidePanelType(SidePanelType t) => t switch
+    {
+        SidePanelType.None => ApiSidePanelType.None,
+        SidePanelType.Acrylic => ApiSidePanelType.Acrylic,
+        SidePanelType.TemperedGlass => ApiSidePanelType.TemperedGlass,
+        _ => throw new ArgumentException($"Unknown side panel type: {t}")
+    };
+
+    private static SidePanelType ToDomainSidePanelType(ApiSidePanelType t) => t switch
+    {
+        ApiSidePanelType.None => SidePanelType.None,
+        ApiSidePanelType.Acrylic => SidePanelType.Acrylic,
+        ApiSidePanelType.TemperedGlass => SidePanelType.TemperedGlass,
+        _ => throw new ArgumentException($"Unknown API side panel type: {t}")
+    };
+
+    private static ApiPsuEfficiency ToApiPsuEfficiency(PsuEfficiency e) => e switch
+    {
+        PsuEfficiency.Bronze => ApiPsuEfficiency.Bronze,
+        PsuEfficiency.Silver => ApiPsuEfficiency.Silver,
+        PsuEfficiency.Gold => ApiPsuEfficiency.Gold,
+        PsuEfficiency.Platinum => ApiPsuEfficiency.Platinum,
+        PsuEfficiency.Titanium => ApiPsuEfficiency.Titanium,
+        _ => throw new ArgumentException($"Unknown PSU efficiency: {e}")
+    };
+
+    private static PsuEfficiency ToDomainPsuEfficiency(ApiPsuEfficiency e) => e switch
+    {
+        ApiPsuEfficiency.Bronze => PsuEfficiency.Bronze,
+        ApiPsuEfficiency.Silver => PsuEfficiency.Silver,
+        ApiPsuEfficiency.Gold => PsuEfficiency.Gold,
+        ApiPsuEfficiency.Platinum => PsuEfficiency.Platinum,
+        ApiPsuEfficiency.Titanium => PsuEfficiency.Titanium,
+        _ => throw new ArgumentException($"Unknown API PSU efficiency: {e}")
+    };
+
+    private static ApiPsuModularity ToApiPsuModularity(PsuModularity m) => m switch
+    {
+        PsuModularity.NonModular => ApiPsuModularity.NonModular,
+        PsuModularity.SemiModular => ApiPsuModularity.SemiModular,
+        PsuModularity.FullyModular => ApiPsuModularity.FullyModular,
+        _ => throw new ArgumentException($"Unknown PSU modularity: {m}")
+    };
+
+    private static PsuModularity ToDomainPsuModularity(ApiPsuModularity m) => m switch
+    {
+        ApiPsuModularity.NonModular => PsuModularity.NonModular,
+        ApiPsuModularity.SemiModular => PsuModularity.SemiModular,
+        ApiPsuModularity.FullyModular => PsuModularity.FullyModular,
+        _ => throw new ArgumentException($"Unknown API PSU modularity: {m}")
+    };
+
+    private static ApiPsuFormFactor ToApiPsuFormFactor(PsuFormFactor f) => f switch
+    {
+        PsuFormFactor.ATX => ApiPsuFormFactor.ATX,
+        PsuFormFactor.SFX => ApiPsuFormFactor.SFX,
+        PsuFormFactor.SFXL => ApiPsuFormFactor.SFXL,
+        _ => throw new ArgumentException($"Unknown PSU form factor: {f}")
+    };
+
+    private static PsuFormFactor ToDomainPsuFormFactor(ApiPsuFormFactor f) => f switch
+    {
+        ApiPsuFormFactor.ATX => PsuFormFactor.ATX,
+        ApiPsuFormFactor.SFX => PsuFormFactor.SFX,
+        ApiPsuFormFactor.SFXL => PsuFormFactor.SFXL,
+        _ => throw new ArgumentException($"Unknown API PSU form factor: {f}")
+    };
+
+    private static ApiStorageType ToApiStorageType(StorageType t) => t switch
+    {
+        StorageType.SSD => ApiStorageType.SSD,
+        StorageType.HDD => ApiStorageType.HDD,
+        _ => throw new ArgumentException($"Unknown storage type: {t}")
+    };
+
+    private static StorageType ToDomainStorageType(ApiStorageType t) => t switch
+    {
+        ApiStorageType.SSD => StorageType.SSD,
+        ApiStorageType.HDD => StorageType.HDD,
+        _ => throw new ArgumentException($"Unknown API storage type: {t}")
+    };
+
+    private static ApiStorageInterface ToApiStorageInterface(StorageInterface i) => i switch
+    {
+        StorageInterface.NVMe => ApiStorageInterface.NVMe,
+        StorageInterface.SATA => ApiStorageInterface.SATA,
+        _ => throw new ArgumentException($"Unknown storage interface: {i}")
+    };
+
+    private static StorageInterface ToDomainStorageInterface(ApiStorageInterface i) => i switch
+    {
+        ApiStorageInterface.NVMe => StorageInterface.NVMe,
+        ApiStorageInterface.SATA => StorageInterface.SATA,
+        _ => throw new ArgumentException($"Unknown API storage interface: {i}")
+    };
+
+    private static ApiStorageFormFactor ToApiStorageFormFactor(StorageFormFactor f) => f switch
+    {
+        StorageFormFactor.M2_2280 => ApiStorageFormFactor.M2_2280,
+        StorageFormFactor.TwoPointFiveInch => ApiStorageFormFactor.TwoPointFiveInch,
+        StorageFormFactor.ThreePointFiveInch => ApiStorageFormFactor.ThreePointFiveInch,
+        _ => throw new ArgumentException($"Unknown storage form factor: {f}")
+    };
+
+    private static StorageFormFactor ToDomainStorageFormFactor(ApiStorageFormFactor f) => f switch
+    {
+        ApiStorageFormFactor.M2_2280 => StorageFormFactor.M2_2280,
+        ApiStorageFormFactor.TwoPointFiveInch => StorageFormFactor.TwoPointFiveInch,
+        ApiStorageFormFactor.ThreePointFiveInch => StorageFormFactor.ThreePointFiveInch,
+        _ => throw new ArgumentException($"Unknown API storage form factor: {f}")
+    };
+
+    private static ApiRamConfiguration ToApiRamConfiguration(RamConfiguration c) =>
+        ApiRamConfiguration.From(c.ModuleCount, c.ModuleCapacity.ValueInGB);
+
+    private static RamConfiguration ToDomainRamConfiguration(ApiRamConfiguration c) =>
+        RamConfiguration.From(c.ModuleCount, c.ModuleCapacity.ValueInGB);
+
+    private static ApiCasLatency ToApiCasLatency(CasLatency c) => ApiCasLatency.FromInt(c.Value);
+
+    private static CasLatency ToDomainCasLatency(ApiCasLatency c) => CasLatency.FromInt(c.Value);
 }
 
 public static class MapperExtensions
@@ -526,7 +664,7 @@ public static class MapperExtensions
         return new SlotModel
         {
             Name = slot.Name,
-            AllowedCategory = slot.AllowedProductCategory.ToString(),
+            AllowedCategory = slot.AllowedProductCategory,
             RelativePosition = slot.RelativePosition.ToVector3Model(),
             MaxDimensions = slot.MaxDimensions.ToDimensionsModel(),
             Rotation = slot.Rotation != Rotation.Identity
@@ -543,11 +681,10 @@ public static class MapperExtensions
 
     public static Slot ToDomainSlot(this SlotModel slot)
     {
-        ProductCategory category = Enum.Parse<ProductCategory>(slot.AllowedCategory, ignoreCase: true);
         return new Slot(
             Guid.NewGuid(),
             slot.Name,
-            category,
+            slot.AllowedCategory,
             slot.RelativePosition.ToDomainVector3(),
             slot.MaxDimensions.ToDomainDimensions(),
             slot.Rotation.ToDomainRotation(),

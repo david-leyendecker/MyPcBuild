@@ -1,9 +1,9 @@
-using MyPcBuild.ApiService.Features.Builds;
-using MyPcBuild.ApiService.Features.Catalog;
-using MyPcBuild.ApiService.Features.Compatibility;
-using MyPcBuild.ApiService.Features.Spatial;
+using MyPcBuild.ApiService.Builds.Endpoints;
+using MyPcBuild.ApiService.Catalog.Endpoints;
+using MyPcBuild.ApiService.Catalog.Models;
+using MyPcBuild.ApiService.Compatibility.Endpoints;
 using MyPcBuild.ApiService.Infrastructure;
-using MyPcBuild.ApiService.Domain.Models;
+using MyPcBuild.ApiService.Spatial.Endpoints;
 using HttpMethod = MyPcBuild.ApiService.Infrastructure.HttpMethod;
 
 namespace MyPcBuild.Tests.Features;

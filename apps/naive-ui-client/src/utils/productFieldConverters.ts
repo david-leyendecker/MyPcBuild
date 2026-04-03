@@ -9,6 +9,14 @@ import type {
   FormFactor,
   CoolerType,
   GpuPowerConnector,
+  GpuChipsetManufacturer,
+  SidePanelType,
+  PsuEfficiency,
+  PsuModularity,
+  PsuFormFactor,
+  StorageType,
+  StorageInterface,
+  StorageFormFactor,
   Frequency,
   Power,
   StorageCapacity,
@@ -17,6 +25,23 @@ import type {
   DataSpeed,
   Dimensions
 } from '@/types/products';
+
+const FORM_FACTOR_VALUES: readonly FormFactor[] = ['ATX', 'MicroATX', 'MiniITX', 'EATX'];
+
+function parseEnumIgnoreCase<T extends string>(
+  value: string | undefined,
+  validValues: readonly T[],
+  defaultValue: T
+): T {
+  if (!value) {
+    return defaultValue;
+  }
+
+  const normalizedValue = value.trim().toLowerCase();
+  const match = validValues.find((candidate) => candidate.toLowerCase() === normalizedValue);
+
+  return match ?? defaultValue;
+}
 
 /**
  * Parses a numeric value from a string or returns default
@@ -82,7 +107,7 @@ export function fieldsToCpuProduct(fields: Record<string, string>): Partial<Prod
 export function fieldsToGpuProduct(fields: Record<string, string>): Partial<ProductRequest> {
   return {
     category: 'gpu',
-    chipsetManufacturer: fields.ChipsetManufacturer || '',
+    chipsetManufacturer: (fields.ChipsetManufacturer || 'NVIDIA') as GpuChipsetManufacturer,
     series: fields.Series || '',
     vram: { valueInGB: parseIntValue(fields.VRAM, 8) },
     memoryType: fields.MemoryType as MemoryType,
@@ -104,7 +129,7 @@ export function fieldsToMotherboardProduct(fields: Record<string, string>): Part
     category: 'motherboard',
     socket: fields.Socket as CpuSocket,
     chipset: fields.Chipset || '',
-    formFactor: fields.FormFactor as FormFactor,
+    formFactor: parseEnumIgnoreCase(fields.FormFactor, FORM_FACTOR_VALUES, 'ATX'),
     memoryType: fields.MemoryType as MemoryType,
     maxMemory: { valueInGB: parseIntValue(fields.MaxMemory, 128) },
     dimensions: parseDimensions(fields.Dimensions)
@@ -132,9 +157,9 @@ export function fieldsToRamProduct(fields: Record<string, string>): Partial<Prod
 export function fieldsToStorageProduct(fields: Record<string, string>): Partial<ProductRequest> {
   return {
     category: 'storage',
-    type: fields.Type || 'SSD',
-    interface: fields.Interface || 'NVMe',
-    storageFormFactor: fields.StorageFormFactor || 'M.2 2280',
+    type: (fields.Type || 'SSD') as StorageType,
+    interface: (fields.Interface || 'NVMe') as StorageInterface,
+    storageFormFactor: (fields.StorageFormFactor || 'M.2 2280') as StorageFormFactor,
     capacity: { valueInGB: parseIntValue(fields.Capacity, 1000) },
     readSpeed: { valueInMBps: parseIntValue(fields.ReadSpeed, 7000) },
     writeSpeed: { valueInMBps: parseIntValue(fields.WriteSpeed, 5000) }
@@ -148,9 +173,9 @@ export function fieldsToPsuProduct(fields: Record<string, string>): Partial<Prod
   return {
     category: 'powersupply',
     wattage: { valueInWatts: parseIntValue(fields.Wattage, 750) },
-    efficiency: fields.Efficiency || '80+ Gold',
-    modular: fields.Modular || 'Fully Modular',
-    formFactor: fields.FormFactor || 'ATX',
+    efficiency: (fields.Efficiency || '80+ Gold') as PsuEfficiency,
+    modular: (fields.Modular || 'Fully Modular') as PsuModularity,
+    formFactor: (fields.FormFactor || 'ATX') as PsuFormFactor,
     length: { valueInMm: parseIntValue(fields.Length, 160) },
     pcie8Pin: parseIntValue(fields.PCIe8Pin, 4)
   };
@@ -179,9 +204,9 @@ export function fieldsToCoolerProduct(fields: Record<string, string>): Partial<P
 export function fieldsToPcCaseProduct(fields: Record<string, string>): Partial<ProductRequest> {
   return {
     category: 'case',
-    formFactor: fields.FormFactor || 'Mid Tower',
+    formFactor: parseEnumIgnoreCase(fields.FormFactor, FORM_FACTOR_VALUES, 'ATX'),
     color: fields.Color || 'Black',
-    sidePanelWindow: fields.SidePanelWindow || 'Tempered Glass',
+    sidePanelWindow: (fields.SidePanelWindow || 'Tempered Glass') as SidePanelType,
     dimensions: parseDimensions(fields.Dimensions)
   };
 }

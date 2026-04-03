@@ -2,6 +2,7 @@
 import { ref, watch } from 'vue'
 import type { CoolerProductRequest, CoolerType, CpuSocket, ProductRequest } from '@/types/product'
 import { FormItemSelect, FormItemNumber, FormItemCheckboxGroup } from '@/components/form-items'
+import { coolerTypeOptions, cpuSocketOptions } from '@/constants/enumOptions'
 import DimensionsInput from '@/components/shared/DimensionsInput.vue'
 
 interface Props {
@@ -22,9 +23,6 @@ const selectedSockets = ref<CpuSocket[]>(model?.sockets || ['AM5', 'LGA1700'])
 const dimensionLength = ref(model?.dimensions?.length || 120)
 const dimensionWidth = ref(model?.dimensions?.width || 120)
 const dimensionHeight = ref(model?.dimensions?.height || 160)
-
-const coolerTypeOptions = (['Air', 'AIO', 'CustomLoop'] as CoolerType[]).map(v => ({ value: v, label: v }))
-const socketOptions = (['LGA1700', 'LGA1200', 'LGA1151', 'LGA2066', 'AM5', 'AM4', 'sTRX4', 'TR4'] as CpuSocket[]).map(v => ({ value: v, label: v }))
 
 watch([coolerType, heightMm, tdpWatts, selectedSockets, dimensionLength, dimensionWidth, dimensionHeight], () => {
   emit('update:modelValue', {
@@ -67,7 +65,7 @@ defineExpose({
     <FormItemCheckboxGroup
       label="Supported Sockets *"
       v-model="selectedSockets"
-      :options="socketOptions"
+      :options="cpuSocketOptions"
       class="col-span-2"
     />
 

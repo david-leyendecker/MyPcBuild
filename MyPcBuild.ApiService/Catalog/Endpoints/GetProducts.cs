@@ -90,7 +90,7 @@ public static class GetProducts
                 productResults.Select(p => new ProductSummary(
                     p.Id,
                     p.Name,
-                    p.ProductCategory.ToString(),
+                    p.ProductCategory,
                     p.Price,
                     p.Manufacturer,
                     p.IsDraft,
@@ -165,7 +165,7 @@ public record GetProductsResponse(
 public record ProductSummary(
     Guid Id,
     string Name,
-    string CategoryName,
+    ProductCategory CategoryName,
     decimal Price,
     string Manufacturer,
     bool IsDraft,
