@@ -279,7 +279,7 @@ public class HateoasLinksTests
         ProductSummary summary = new(
             productId,
             "AMD Ryzen 9 7950X",
-            "CPU",
+            ProductCategory.CPU,
             549.99m,
             "AMD",
             false,

@@ -1,6 +1,6 @@
 using Microsoft.Extensions.AI;
 using Microsoft.Extensions.Logging;
-using Moq;
+using NSubstitute;
 using MyPcBuild.ApiService.Catalog.Models;
 using MyPcBuild.ApiService.Catalog.Services;
 using MyPcBuild.ApiService.SharedDomain.Spatial;
@@ -12,7 +12,6 @@ public class AiProductGeneratorTests
     [Fact]
     public async Task GenerateProductAsync_WithValidCpuDescription_ReturnsValidCpuProduct()
     {
-        // Arrange
         string jsonResponse = """
 {
   "Category": "CPU",
@@ -29,27 +28,24 @@ public class AiProductGeneratorTests
 }
 """;
 
-        Mock<IChatClient> mockChatClient = new Mock<IChatClient>();
-        Mock<ILogger<OpenAiProductGenerator>> mockLogger = new Mock<ILogger<OpenAiProductGenerator>>();
+        IChatClient mockChatClient = Substitute.For<IChatClient>();
+        ILogger<OpenAiProductGenerator> mockLogger = Substitute.For<ILogger<OpenAiProductGenerator>>();
 
         ChatResponse chatResponse = new ChatResponse(
             [
                 new ChatMessage(ChatRole.Assistant, jsonResponse)
             ]);
 
-        mockChatClient
-            .Setup(x => x.GetResponseAsync(
-                It.IsAny<IEnumerable<ChatMessage>>(),
-                It.IsAny<ChatOptions>(),
-                It.IsAny<CancellationToken>()))
-            .ReturnsAsync(chatResponse);
+        mockChatClient.GetResponseAsync(
+                Arg.Any<IEnumerable<ChatMessage>>(),
+                Arg.Any<ChatOptions?>(),
+                Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult(chatResponse));
 
-        OpenAiProductGenerator generator = new OpenAiProductGenerator(mockLogger.Object, mockChatClient.Object, new ProductCategoryPromptFields());
+        OpenAiProductGenerator generator = new OpenAiProductGenerator(mockLogger, mockChatClient, new ProductCategoryPromptFields());
 
-        // Act
         Product product = await generator.GenerateProductAsync(ProductCategory.CPU, "High-end gaming processor", CancellationToken.None);
 
-        // Assert
         Assert.NotNull(product);
         Assert.IsType<CpuProduct>(product);
         Assert.True(product.IsDraft);
@@ -68,7 +64,6 @@ public class AiProductGeneratorTests
     [Fact]
     public async Task GenerateProductAsync_WithValidGpuDescription_ReturnsValidGpuProduct()
     {
-        // Arrange
         string jsonResponse = """
 {
   "Category": "GPU",
@@ -89,27 +84,24 @@ public class AiProductGeneratorTests
 }
 """;
 
-        Mock<IChatClient> mockChatClient = new Mock<IChatClient>();
-        Mock<ILogger<OpenAiProductGenerator>> mockLogger = new Mock<ILogger<OpenAiProductGenerator>>();
+        IChatClient mockChatClient = Substitute.For<IChatClient>();
+        ILogger<OpenAiProductGenerator> mockLogger = Substitute.For<ILogger<OpenAiProductGenerator>>();
 
         ChatResponse chatResponse = new ChatResponse(
             [
                 new ChatMessage(ChatRole.Assistant, jsonResponse)
             ]);
 
-        mockChatClient
-            .Setup(x => x.GetResponseAsync(
-                It.IsAny<IEnumerable<ChatMessage>>(),
-                It.IsAny<ChatOptions>(),
-                It.IsAny<CancellationToken>()))
-            .ReturnsAsync(chatResponse);
+        mockChatClient.GetResponseAsync(
+                Arg.Any<IEnumerable<ChatMessage>>(),
+                Arg.Any<ChatOptions?>(),
+                Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult(chatResponse));
 
-        OpenAiProductGenerator generator = new OpenAiProductGenerator(mockLogger.Object, mockChatClient.Object, new ProductCategoryPromptFields());
+        OpenAiProductGenerator generator = new OpenAiProductGenerator(mockLogger, mockChatClient, new ProductCategoryPromptFields());
 
-        // Act
         Product product = await generator.GenerateProductAsync(ProductCategory.GPU, "Top-tier gaming graphics card", CancellationToken.None);
 
-        // Assert
         Assert.NotNull(product);
         Assert.IsType<GpuProduct>(product);
         Assert.True(product.IsDraft);
@@ -127,7 +119,6 @@ public class AiProductGeneratorTests
     [Fact]
     public async Task GenerateProductAsync_WithMarkdownCodeBlocks_StillParses()
     {
-        // Arrange - Response wrapped in markdown code blocks
         string jsonResponse = """
 ```json
 {
@@ -145,27 +136,24 @@ public class AiProductGeneratorTests
 ```
 """;
 
-        Mock<IChatClient> mockChatClient = new Mock<IChatClient>();
-        Mock<ILogger<OpenAiProductGenerator>> mockLogger = new Mock<ILogger<OpenAiProductGenerator>>();
+        IChatClient mockChatClient = Substitute.For<IChatClient>();
+        ILogger<OpenAiProductGenerator> mockLogger = Substitute.For<ILogger<OpenAiProductGenerator>>();
 
         ChatResponse chatResponse = new ChatResponse(
             [
                 new ChatMessage(ChatRole.Assistant, jsonResponse)
             ]);
 
-        mockChatClient
-            .Setup(x => x.GetResponseAsync(
-                It.IsAny<IEnumerable<ChatMessage>>(),
-                It.IsAny<ChatOptions>(),
-                It.IsAny<CancellationToken>()))
-            .ReturnsAsync(chatResponse);
+        mockChatClient.GetResponseAsync(
+                Arg.Any<IEnumerable<ChatMessage>>(),
+                Arg.Any<ChatOptions?>(),
+                Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult(chatResponse));
 
-        OpenAiProductGenerator generator = new OpenAiProductGenerator(mockLogger.Object, mockChatClient.Object, new ProductCategoryPromptFields());
+        OpenAiProductGenerator generator = new OpenAiProductGenerator(mockLogger, mockChatClient, new ProductCategoryPromptFields());
 
-        // Act
         Product product = await generator.GenerateProductAsync(ProductCategory.RAM, "High-speed memory kit", CancellationToken.None);
 
-        // Assert
         Assert.NotNull(product);
         Assert.IsType<RamProduct>(product);
         Assert.True(product.IsDraft);
@@ -183,27 +171,24 @@ public class AiProductGeneratorTests
     [Fact]
     public async Task GenerateProductAsync_WithInvalidJson_ThrowsException()
     {
-        // Arrange
         string invalidJson = "This is not valid JSON";
 
-        Mock<IChatClient> mockChatClient = new Mock<IChatClient>();
-        Mock<ILogger<OpenAiProductGenerator>> mockLogger = new Mock<ILogger<OpenAiProductGenerator>>();
+        IChatClient mockChatClient = Substitute.For<IChatClient>();
+        ILogger<OpenAiProductGenerator> mockLogger = Substitute.For<ILogger<OpenAiProductGenerator>>();
 
         ChatResponse chatResponse = new ChatResponse(
             [
                 new ChatMessage(ChatRole.Assistant, invalidJson)
             ]);
 
-        mockChatClient
-            .Setup(x => x.GetResponseAsync(
-                It.IsAny<IEnumerable<ChatMessage>>(),
-                It.IsAny<ChatOptions>(),
-                It.IsAny<CancellationToken>()))
-            .ReturnsAsync(chatResponse);
+        mockChatClient.GetResponseAsync(
+                Arg.Any<IEnumerable<ChatMessage>>(),
+                Arg.Any<ChatOptions?>(),
+                Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult(chatResponse));
 
-        OpenAiProductGenerator generator = new OpenAiProductGenerator(mockLogger.Object, mockChatClient.Object, new ProductCategoryPromptFields());
+        OpenAiProductGenerator generator = new OpenAiProductGenerator(mockLogger, mockChatClient, new ProductCategoryPromptFields());
 
-        // Act & Assert
         await Assert.ThrowsAsync<InvalidOperationException>(async () =>
             await generator.GenerateProductAsync(ProductCategory.CPU, "Test description", CancellationToken.None)
         );
@@ -249,27 +234,24 @@ public class AiProductGeneratorTests
         ```
         """;
 
-        Mock<IChatClient> mockChatClient = new Mock<IChatClient>();
-        Mock<ILogger<OpenAiProductGenerator>> mockLogger = new Mock<ILogger<OpenAiProductGenerator>>();
+        IChatClient mockChatClient = Substitute.For<IChatClient>();
+        ILogger<OpenAiProductGenerator> mockLogger = Substitute.For<ILogger<OpenAiProductGenerator>>();
 
         ChatResponse chatResponse = new ChatResponse(
             [
                 new ChatMessage(ChatRole.Assistant, jsonResponse)
             ]);
 
-        mockChatClient
-            .Setup(x => x.GetResponseAsync(
-                It.IsAny<IEnumerable<ChatMessage>>(),
-                It.IsAny<ChatOptions>(),
-                It.IsAny<CancellationToken>()))
-            .ReturnsAsync(chatResponse);
+        mockChatClient.GetResponseAsync(
+                Arg.Any<IEnumerable<ChatMessage>>(),
+                Arg.Any<ChatOptions?>(),
+                Arg.Any<CancellationToken>())
+            .Returns(Task.FromResult(chatResponse));
 
-        OpenAiProductGenerator generator = new OpenAiProductGenerator(mockLogger.Object, mockChatClient.Object, new ProductCategoryPromptFields());
+        OpenAiProductGenerator generator = new OpenAiProductGenerator(mockLogger, mockChatClient, new ProductCategoryPromptFields());
 
-        // Act
         Product product = await generator.GenerateProductAsync(ProductCategory.Case, "NZXT S320 Elite", CancellationToken.None);
 
-        // Assert
         Assert.NotNull(product);
         Assert.IsType<PcCaseProduct>(product);
         Assert.True(product.IsDraft);

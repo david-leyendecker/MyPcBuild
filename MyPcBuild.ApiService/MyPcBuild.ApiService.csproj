@@ -11,12 +11,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Aspire.Azure.AI.Inference" Version="13.2.0-preview.1.26170.3" />
-    <PackageReference Include="Marten" Version="8.17.0" />
-    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.2" />
-    <PackageReference Include="Npgsql" Version="10.0.1" />
-    <PackageReference Include="Scalar.AspNetCore" Version="2.12.36" />
-    <PackageReference Include="Weasel.Core" Version="8.4.2" />
+    <PackageReference Include="Aspire.Azure.AI.Inference" Version="13.2.1-preview.1.26180.6" />
+    <PackageReference Include="Marten" Version="8.28.0" />
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.5" />
+    <PackageReference Include="Npgsql" Version="10.0.2" />
+    <PackageReference Include="Scalar.AspNetCore" Version="2.13.18" />
+    <PackageReference Include="Weasel.Core" Version="8.11.2" />
   </ItemGroup>
 
 </Project>

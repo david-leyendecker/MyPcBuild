@@ -76,10 +76,10 @@ public class DraftProductTests
         DateTime publishTime = DateTime.UtcNow;
 
         // Act
-        Product publishedProduct = draftProduct with 
-        { 
-            IsDraft = false, 
-            PublishedAt = publishTime 
+        Product publishedProduct = draftProduct with
+        {
+            IsDraft = false,
+            PublishedAt = publishTime
         };
 
         // Assert
@@ -96,7 +96,7 @@ public class DraftProductTests
         ProductSummary summary = new ProductSummary(
             Guid.NewGuid(),
             "Test Product",
-            "CPU",
+            ProductCategory.CPU,
             399.99m,
             "AMD",
             true,
@@ -107,7 +107,7 @@ public class DraftProductTests
         ProductSummary publishedSummary = new ProductSummary(
             Guid.NewGuid(),
             "Published Product",
-            "GPU",
+            ProductCategory.GPU,
             999.99m,
             "NVIDIA",
             false,
@@ -118,7 +118,7 @@ public class DraftProductTests
         // Assert
         Assert.True(summary.IsDraft);
         Assert.Null(summary.PublishedAt);
-        
+
         Assert.False(publishedSummary.IsDraft);
         Assert.NotNull(publishedSummary.PublishedAt);
         Assert.Equal(publishTime, publishedSummary.PublishedAt);
