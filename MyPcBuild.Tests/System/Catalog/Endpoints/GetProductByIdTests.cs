@@ -31,13 +31,14 @@ public class GetProductByIdTests(AppHostFixture fixture)
             category = "cpu",
             name = $"Test CPU {Guid.NewGuid()}",
             manufacturer = "TestMfg",
-            baseClockGHz = 3.2,
-            boostClockGHz = 5.0,
+            price = 299m,
+            baseClock = 3.2,
+            boostClock = 5.0,
             cores = 8,
             threads = 16,
             socket = "LGA1700",
-            tdpWatts = 105,
-            specs = new { }
+            tdp = 105,
+            integratedGraphics = false,
         };
 
         string createJson = JsonSerializer.Serialize(createRequest);

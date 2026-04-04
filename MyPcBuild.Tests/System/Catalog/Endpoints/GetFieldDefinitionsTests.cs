@@ -58,7 +58,7 @@ public class GetFieldDefinitionsTests(AppHostFixture fixture)
             foreach (var field in fieldsElement.EnumerateArray())
             {
                 if (field.TryGetProperty("name", out var nameElement) && 
-                    nameElement.GetString() == "socket")
+                    string.Equals(nameElement.GetString(), "socket", StringComparison.OrdinalIgnoreCase))
                 {
                     hasSocketField = true;
                     break;

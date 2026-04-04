@@ -54,10 +54,17 @@ public class CreateProductTests(AppHostFixture fixture)
             category = "gpu",
             name = $"RTX 4090 {Guid.NewGuid()}",
             manufacturer = "NVIDIA",
-            vramGb = 24,
-            vramType = "GDDR6X",
+            price = 799m,
             chipsetManufacturer = "NVIDIA",
-            specs = new { }
+            series = "RTX 4000",
+            vram = 24,
+            memoryType = "GDDR6X",
+            coreClock = 2.23,
+            boostClock = 2.52,
+            tdp = 450,
+            powerConnectors = "Triple8Pin",
+            rayTracing = true,
+            dimensions = new { length = 336, width = 140, height = 61 },
         };
 
         string json = JsonSerializer.Serialize(request);
@@ -79,12 +86,13 @@ public class CreateProductTests(AppHostFixture fixture)
             category = "motherboard",
             name = $"ROG STRIX {Guid.NewGuid()}",
             manufacturer = "ASUS",
+            price = 449m,
             socket = "LGA1700",
+            chipset = "Z790",
             formFactor = "ATX",
-            maxRamGb = 192,
-            ramSlots = 4,
-            m2Slots = 4,
-            specs = new { }
+            memoryType = "DDR5",
+            maxMemory = 192,
+            dimensions = new { length = 305, width = 244, height = 60 },
         };
 
         string json = JsonSerializer.Serialize(request);
@@ -106,11 +114,13 @@ public class CreateProductTests(AppHostFixture fixture)
             category = "ram",
             name = $"Corsair {Guid.NewGuid()}",
             manufacturer = "Corsair",
-            memoryType = "DDR5",
-            capacityGb = 32,
-            speedMhz = 5600,
+            price = 129m,
+            type = "DDR5",
+            capacity = 32,
+            configuration = "2x16GB",
+            speed = 5.6,
             casLatency = "CL36",
-            specs = new { }
+            voltage = 1.35,
         };
 
         string json = JsonSerializer.Serialize(request);
@@ -132,8 +142,11 @@ public class CreateProductTests(AppHostFixture fixture)
             category = "case",
             name = $"NZXT H710 {Guid.NewGuid()}",
             manufacturer = "NZXT",
+            price = 169m,
             formFactor = "ATX",
+            color = "Black",
             sidePanelWindow = "TemperedGlass",
+            dimensions = new { length = 494, width = 230, height = 516 },
         };
 
         string json = JsonSerializer.Serialize(request);
@@ -155,10 +168,13 @@ public class CreateProductTests(AppHostFixture fixture)
             category = "powersupply",
             name = $"Corsair RM850e {Guid.NewGuid()}",
             manufacturer = "Corsair",
+            price = 129m,
             wattage = 850,
             efficiency = "Gold",
             modular = "FullyModular",
             formFactor = "ATX",
+            length = 160,
+            pcIe8Pin = 4,
         };
 
         string json = JsonSerializer.Serialize(request);
@@ -180,11 +196,13 @@ public class CreateProductTests(AppHostFixture fixture)
             category = "storage",
             name = $"Samsung 990 Pro {Guid.NewGuid()}",
             manufacturer = "Samsung",
-            storageType = "SSD",
-            capacityGb = 1000,
+            price = 109m,
+            type = "SSD",
             @interface = "NVMe",
             storageFormFactor = "M2_2280",
-            specs = new { }
+            capacity = 1000,
+            readSpeed = 7450,
+            writeSpeed = 6900,
         };
 
         string json = JsonSerializer.Serialize(request);
@@ -206,10 +224,12 @@ public class CreateProductTests(AppHostFixture fixture)
             category = "cooler",
             name = $"Noctua NH-D15 {Guid.NewGuid()}",
             manufacturer = "Noctua",
-            coolerType = "AirTower",
-            maxTdpWatts = 220,
-            socketsSupported = new[] { "LGA1700", "AM5" },
-            specs = new { }
+            price = 99m,
+            coolerType = "Air",
+            height = 165,
+            tdp = 220,
+            sockets = new[] { "LGA1700", "AM5" },
+            dimensions = new { length = 150, width = 166, height = 155 },
         };
 
         string json = JsonSerializer.Serialize(request);

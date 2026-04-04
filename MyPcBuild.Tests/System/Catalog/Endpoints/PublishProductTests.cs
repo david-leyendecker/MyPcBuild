@@ -20,13 +20,14 @@ public class PublishProductTests(AppHostFixture fixture)
             category = "cpu",
             name = $"Draft CPU {Guid.NewGuid()}",
             manufacturer = "Intel",
-            baseClockGHz = 3.0,
-            boostClockGHz = 4.0,
+            price = 299m,
+            baseClock = 3.0,
+            boostClock = 4.0,
             cores = 8,
             threads = 16,
             socket = "LGA1700",
-            tdpWatts = 105,
-            specs = new { }
+            tdp = 105,
+            integratedGraphics = false,
         };
 
         string createJson = JsonSerializer.Serialize(createRequest);
@@ -62,13 +63,14 @@ public class PublishProductTests(AppHostFixture fixture)
             category = "cpu",
             name = $"Draft CPU {Guid.NewGuid()}",
             manufacturer = "Intel",
-            baseClockGHz = 3.0,
-            boostClockGHz = 4.0,
+            price = 299m,
+            baseClock = 3.0,
+            boostClock = 4.0,
             cores = 8,
             threads = 16,
             socket = "LGA1700",
-            tdpWatts = 105,
-            specs = new { }
+            tdp = 105,
+            integratedGraphics = false,
         };
 
         string createJson = JsonSerializer.Serialize(createRequest);
@@ -108,13 +110,14 @@ public class PublishProductTests(AppHostFixture fixture)
             category = "cpu",
             name = $"Draft CPU {Guid.NewGuid()}",
             manufacturer = "Intel",
-            baseClockGHz = 3.0,
-            boostClockGHz = 4.0,
+            price = 299m,
+            baseClock = 3.0,
+            boostClock = 4.0,
             cores = 8,
             threads = 16,
             socket = "LGA1700",
-            tdpWatts = 105,
-            specs = new { }
+            tdp = 105,
+            integratedGraphics = false,
         };
 
         string createJson = JsonSerializer.Serialize(createRequest);

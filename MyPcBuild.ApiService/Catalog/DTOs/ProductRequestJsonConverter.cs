@@ -1,5 +1,6 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.Http;
 using MyPcBuild.ApiService.Catalog.Models;
 
 namespace MyPcBuild.ApiService.Catalog.DTOs;
@@ -20,7 +21,7 @@ public class ProductRequestJsonConverter : JsonConverter<ProductRequest>
         if (!root.TryGetProperty("category", out JsonElement categoryElement) &&
             !root.TryGetProperty("Category", out categoryElement))
         {
-            throw new JsonException("ProductRequest must have a 'category' property");
+            throw new BadHttpRequestException("ProductRequest must have a 'category' property", StatusCodes.Status400BadRequest);
         }
 
         // Parse the category - it could be a string or a number
@@ -30,13 +31,13 @@ public class ProductRequestJsonConverter : JsonConverter<ProductRequest>
             string? categoryString = categoryElement.GetString();
             if (string.IsNullOrEmpty(categoryString))
             {
-                throw new JsonException("Category value cannot be null or empty");
+                throw new BadHttpRequestException("Category value cannot be null or empty", StatusCodes.Status400BadRequest);
             }
 
             // Try case-insensitive parsing
             if (!Enum.TryParse<ProductCategory>(categoryString, ignoreCase: true, out category))
             {
-                throw new JsonException($"Invalid category value: {categoryString}");
+                throw new BadHttpRequestException($"Invalid category value: {categoryString}", StatusCodes.Status400BadRequest);
             }
         }
         else if (categoryElement.ValueKind == JsonValueKind.Number)
@@ -45,7 +46,7 @@ public class ProductRequestJsonConverter : JsonConverter<ProductRequest>
         }
         else
         {
-            throw new JsonException($"Category must be a string or number, got {categoryElement.ValueKind}");
+            throw new BadHttpRequestException($"Category must be a string or number, got {categoryElement.ValueKind}", StatusCodes.Status400BadRequest);
         }
 
         // Determine the concrete type based on category
@@ -59,16 +60,24 @@ public class ProductRequestJsonConverter : JsonConverter<ProductRequest>
             ProductCategory.PowerSupply => typeof(PsuProductRequest),
             ProductCategory.Cooler => typeof(CoolerProductRequest),
             ProductCategory.Case => typeof(PcCaseProductRequest),
-            _ => throw new JsonException($"Unknown product category: {category}")
+            _ => throw new BadHttpRequestException($"Unknown product category: {category}", StatusCodes.Status400BadRequest)
         };
 
         // Deserialize to the concrete type
         string json = root.GetRawText();
-        ProductRequest? result = (ProductRequest?)JsonSerializer.Deserialize(json, concreteType, options);
-        
+        ProductRequest? result;
+        try
+        {
+            result = (ProductRequest?)JsonSerializer.Deserialize(json, concreteType, options);
+        }
+        catch (JsonException ex)
+        {
+            throw new BadHttpRequestException(ex.Message, StatusCodes.Status400BadRequest);
+        }
+
         if (result == null)
         {
-            throw new JsonException($"Failed to deserialize {concreteType.Name}");
+            throw new BadHttpRequestException($"Failed to deserialize {concreteType.Name}", StatusCodes.Status400BadRequest);
         }
 
         return result;
