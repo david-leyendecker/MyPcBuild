@@ -10,10 +10,10 @@ namespace MyPcBuild.Tests.System.Compatibility.Endpoints;
 public class ValidateCompatibilityTests(AppHostFixture fixture)
 {
     [Fact]
-    public async Task PostValidate_CompatibleProducts_ReturnsIsCompatibleTrue()
+    public async Task PostValidate_WithProductIds_ReturnsCompatibilityResult()
     {
         HttpClient client = fixture.CreateApiServiceClient();
-        
+
         var request = new
         {
             productIds = new[] { Guid.NewGuid().ToString(), Guid.NewGuid().ToString() }
@@ -25,15 +25,21 @@ public class ValidateCompatibilityTests(AppHostFixture fixture)
             new StringContent(json, Encoding.UTF8, new MediaTypeHeaderValue("application/json"))
         );
 
-        // Non-existent products will probably cause a 400, but the endpoint should accept the format
-        Assert.True(response.IsSuccessStatusCode || response.StatusCode == HttpStatusCode.BadRequest);
+        // Non-existent products should still return a structured result
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+        string content = await response.Content.ReadAsStringAsync();
+        using JsonDocument doc = JsonDocument.Parse(content);
+
+        Assert.True(doc.RootElement.TryGetProperty("isCompatible", out _), "Response must contain 'isCompatible'");
+        Assert.True(doc.RootElement.TryGetProperty("issues", out _), "Response must contain 'issues'");
     }
 
     [Fact]
     public async Task PostValidate_EmptyProductIds_ReturnsBadRequest()
     {
         HttpClient client = fixture.CreateApiServiceClient();
-        
+
         var request = new
         {
             productIds = new string[] { }
@@ -52,7 +58,7 @@ public class ValidateCompatibilityTests(AppHostFixture fixture)
     public async Task PostValidate_ResponseSerializesIssues()
     {
         HttpClient client = fixture.CreateApiServiceClient();
-        
+
         var request = new
         {
             productIds = new[] { Guid.NewGuid().ToString() }
@@ -64,14 +70,13 @@ public class ValidateCompatibilityTests(AppHostFixture fixture)
             new StringContent(json, Encoding.UTF8, new MediaTypeHeaderValue("application/json"))
         );
 
-        if (response.IsSuccessStatusCode)
-        {
-            string content = await response.Content.ReadAsStringAsync();
-            using JsonDocument doc = JsonDocument.Parse(content);
-            
-            Assert.True(doc.RootElement.TryGetProperty("isCompatible", out _));
-            Assert.True(doc.RootElement.TryGetProperty("issues", out _));
-        }
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+        string content = await response.Content.ReadAsStringAsync();
+        using JsonDocument doc = JsonDocument.Parse(content);
+
+        Assert.True(doc.RootElement.TryGetProperty("isCompatible", out _), "Response must contain 'isCompatible'");
+        Assert.True(doc.RootElement.TryGetProperty("issues", out _), "Response must contain 'issues'");
     }
 }
 
@@ -82,7 +87,7 @@ public class GetBuildCompatibilityTests(AppHostFixture fixture)
     public async Task GetCompatibility_NonExistentBuild_ReturnsNotFound()
     {
         HttpClient client = fixture.CreateApiServiceClient();
-        
+
         HttpResponseMessage response = await client.GetAsync($"/api/builds/{Guid.NewGuid()}/compatibility");
 
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
@@ -92,7 +97,7 @@ public class GetBuildCompatibilityTests(AppHostFixture fixture)
     public async Task GetCompatibility_ExistingBuild_ReturnsOk()
     {
         HttpClient client = fixture.CreateApiServiceClient();
-        
+
         // Create a build
         var createRequest = new
         {
@@ -106,23 +111,24 @@ public class GetBuildCompatibilityTests(AppHostFixture fixture)
             new StringContent(createJson, Encoding.UTF8, new MediaTypeHeaderValue("application/json"))
         );
 
+        Assert.Equal(HttpStatusCode.Created, createResponse.StatusCode);
+
         string content = await createResponse.Content.ReadAsStringAsync();
         using JsonDocument doc = JsonDocument.Parse(content);
-        
-        if (doc.RootElement.TryGetProperty("id", out var idElement))
-        {
-            string buildId = idElement.GetString();
-            HttpResponseMessage getResponse = await client.GetAsync($"/api/builds/{buildId}/compatibility");
 
-            Assert.Equal(HttpStatusCode.OK, getResponse.StatusCode);
-        }
+        Assert.True(doc.RootElement.TryGetProperty("id", out var idElement), "Build creation response must contain 'id'");
+        string buildId = idElement.GetString() ?? throw new InvalidOperationException("Build ID must not be null");
+
+        HttpResponseMessage getResponse = await client.GetAsync($"/api/builds/{buildId}/compatibility");
+
+        Assert.Equal(HttpStatusCode.OK, getResponse.StatusCode);
     }
 
     [Fact]
     public async Task GetCompatibility_IncludesBuildId()
     {
         HttpClient client = fixture.CreateApiServiceClient();
-        
+
         var createRequest = new
         {
             name = $"Test Build {Guid.NewGuid()}",
@@ -135,18 +141,21 @@ public class GetBuildCompatibilityTests(AppHostFixture fixture)
             new StringContent(createJson, Encoding.UTF8, new MediaTypeHeaderValue("application/json"))
         );
 
+        Assert.Equal(HttpStatusCode.Created, createResponse.StatusCode);
+
         string buildContent = await createResponse.Content.ReadAsStringAsync();
         using JsonDocument buildDoc = JsonDocument.Parse(buildContent);
-        
-        if (buildDoc.RootElement.TryGetProperty("id", out var buildIdElement))
-        {
-            string buildId = buildIdElement.GetString();
-            HttpResponseMessage getResponse = await client.GetAsync($"/api/builds/{buildId}/compatibility");
 
-            string getContent = await getResponse.Content.ReadAsStringAsync();
-            using JsonDocument getDoc = JsonDocument.Parse(getContent);
-            
-            Assert.True(getDoc.RootElement.TryGetProperty("buildId", out _));
-        }
+        Assert.True(buildDoc.RootElement.TryGetProperty("id", out var buildIdElement), "Build creation response must contain 'id'");
+        string buildId = buildIdElement.GetString() ?? throw new InvalidOperationException("Build ID must not be null");
+
+        HttpResponseMessage getResponse = await client.GetAsync($"/api/builds/{buildId}/compatibility");
+
+        Assert.Equal(HttpStatusCode.OK, getResponse.StatusCode);
+
+        string getContent = await getResponse.Content.ReadAsStringAsync();
+        using JsonDocument getDoc = JsonDocument.Parse(getContent);
+
+        Assert.True(getDoc.RootElement.TryGetProperty("buildId", out _), "Compatibility response must contain 'buildId'");
     }
 }

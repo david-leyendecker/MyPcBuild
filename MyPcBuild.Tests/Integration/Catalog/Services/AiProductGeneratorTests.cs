@@ -5,7 +5,7 @@ using MyPcBuild.ApiService.Catalog.Models;
 using MyPcBuild.ApiService.Catalog.Services;
 using MyPcBuild.ApiService.SharedDomain.Spatial;
 
-namespace MyPcBuild.Tests.Services;
+namespace MyPcBuild.Tests.Integration.Catalog.Services;
 
 public class AiProductGeneratorTests
 {

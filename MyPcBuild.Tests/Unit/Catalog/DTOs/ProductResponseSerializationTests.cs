@@ -253,7 +253,7 @@ public class ProductResponseSerializationTests
         };
 
         string serialized = JsonSerializer.Serialize<ProductResponse>(original, _options);
-        ProductResponse deserialized = JsonSerializer.Deserialize<ProductResponse>(serialized, _options);
+        ProductResponse deserialized = JsonSerializer.Deserialize<ProductResponse>(serialized, _options)!;
 
         Assert.NotNull(deserialized);
         Assert.IsType<CpuProductResponse>(deserialized);
@@ -286,7 +286,7 @@ public class ProductResponseSerializationTests
         };
 
         string serialized = JsonSerializer.Serialize<ProductResponse>(original, _options);
-        ProductResponse deserialized = JsonSerializer.Deserialize<ProductResponse>(serialized, _options);
+        ProductResponse deserialized = JsonSerializer.Deserialize<ProductResponse>(serialized, _options)!;
 
         Assert.NotNull(deserialized);
         Assert.IsType<GpuProductResponse>(deserialized);

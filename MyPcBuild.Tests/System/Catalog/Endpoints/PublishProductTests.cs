@@ -40,7 +40,7 @@ public class PublishProductTests(AppHostFixture fixture)
         
         if (createDoc.RootElement.TryGetProperty("id", out var idElement))
         {
-            string productId = idElement.GetString();
+            string productId = idElement.GetString()!;
 
             // Publish it
             var publishResponse = await client.PostAsync(
@@ -82,7 +82,7 @@ public class PublishProductTests(AppHostFixture fixture)
         
         if (createDoc.RootElement.TryGetProperty("id", out var idElement))
         {
-            string productId = idElement.GetString();
+            string productId = idElement.GetString()!;
 
             var publishResponse = await client.PostAsync(
                 $"/api/catalog/products/{productId}/publish",
@@ -128,7 +128,7 @@ public class PublishProductTests(AppHostFixture fixture)
         
         if (createDoc.RootElement.TryGetProperty("id", out var idElement))
         {
-            string productId = idElement.GetString();
+            string productId = idElement.GetString()!;
 
             // First publish
             await client.PostAsync(

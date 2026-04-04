@@ -27,7 +27,7 @@ public class ProductRequestJsonConverterTests
             }
             """;
 
-        ProductRequest result = JsonSerializer.Deserialize<ProductRequest>(json, _options);
+        ProductRequest result = JsonSerializer.Deserialize<ProductRequest>(json, _options)!;
         Assert.IsType<CpuProductRequest>(result);
 
         CpuProductRequest cpuRequest = Assert.IsType<CpuProductRequest>(result);
@@ -48,8 +48,8 @@ public class ProductRequestJsonConverterTests
                 "series": "RTX 40",
                 "vram": 24,
                 "memoryType": "GDDR6X",
-                "coreClock": 2235,
-                "boostClock": 2520,
+                "coreClock": 2.235,
+                "boostClock": 2.52,
                 "tdp": 450,
                 "powerConnectors": "One16Pin",
                 "rayTracing": true,
@@ -57,7 +57,7 @@ public class ProductRequestJsonConverterTests
             }
             """;
 
-        ProductRequest result = JsonSerializer.Deserialize<ProductRequest>(json, _options);
+        ProductRequest result = JsonSerializer.Deserialize<ProductRequest>(json, _options)!;
         Assert.IsType<GpuProductRequest>(result);
     }
 
@@ -79,7 +79,7 @@ public class ProductRequestJsonConverterTests
             }
             """;
 
-        ProductRequest result = JsonSerializer.Deserialize<ProductRequest>(json, _options);
+        ProductRequest result = JsonSerializer.Deserialize<ProductRequest>(json, _options)!;
         Assert.IsType<MotherboardProductRequest>(result);
     }
 
@@ -101,7 +101,7 @@ public class ProductRequestJsonConverterTests
             }
             """;
 
-        ProductRequest result = JsonSerializer.Deserialize<ProductRequest>(json, _options);
+        ProductRequest result = JsonSerializer.Deserialize<ProductRequest>(json, _options)!;
         Assert.IsType<RamProductRequest>(result);
     }
 
@@ -121,7 +121,7 @@ public class ProductRequestJsonConverterTests
             }
             """;
 
-        ProductRequest result = JsonSerializer.Deserialize<ProductRequest>(json, _options);
+        ProductRequest result = JsonSerializer.Deserialize<ProductRequest>(json, _options)!;
         Assert.IsType<PcCaseProductRequest>(result);
     }
 
@@ -143,7 +143,7 @@ public class ProductRequestJsonConverterTests
             }
             """;
 
-        ProductRequest result = JsonSerializer.Deserialize<ProductRequest>(json, _options);
+        ProductRequest result = JsonSerializer.Deserialize<ProductRequest>(json, _options)!;
         Assert.IsType<PsuProductRequest>(result);
     }
 
@@ -165,7 +165,7 @@ public class ProductRequestJsonConverterTests
             }
             """;
 
-        ProductRequest result = JsonSerializer.Deserialize<ProductRequest>(json, _options);
+        ProductRequest result = JsonSerializer.Deserialize<ProductRequest>(json, _options)!;
         Assert.IsType<StorageProductRequest>(result);
     }
 
@@ -186,7 +186,7 @@ public class ProductRequestJsonConverterTests
             }
             """;
 
-        ProductRequest result = JsonSerializer.Deserialize<ProductRequest>(json, _options);
+        ProductRequest result = JsonSerializer.Deserialize<ProductRequest>(json, _options)!;
         Assert.IsType<CoolerProductRequest>(result);
     }
 
@@ -209,7 +209,7 @@ public class ProductRequestJsonConverterTests
             }
             """;
 
-        ProductRequest result = JsonSerializer.Deserialize<ProductRequest>(json, _options);
+        ProductRequest result = JsonSerializer.Deserialize<ProductRequest>(json, _options)!;
         Assert.IsType<CpuProductRequest>(result);
     }
 

@@ -175,7 +175,7 @@ public record GetProductsResponse(
 public record ProductSummary(
     Guid Id,
     string Name,
-    ProductCategory CategoryName,
+    ProductCategory Category,
     decimal Price,
     string Manufacturer,
     bool IsDraft,

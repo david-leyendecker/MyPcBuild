@@ -53,7 +53,7 @@ public class GetProductByIdTests(AppHostFixture fixture)
         
         if (createDoc.RootElement.TryGetProperty("id", out var idElement))
         {
-            string productId = idElement.GetString();
+            string productId = idElement.GetString()!;
             
             // Now get the product
             HttpResponseMessage getResponse = await client.GetAsync($"/api/catalog/products/{productId}");
@@ -96,7 +96,7 @@ public class GetProductByIdTests(AppHostFixture fixture)
             
             if (createDoc.RootElement.TryGetProperty("id", out var idElement))
             {
-                string productId = idElement.GetString();
+                string productId = idElement.GetString()!;
                 HttpResponseMessage getResponse = await client.GetAsync($"/api/catalog/products/{productId}");
                 
                 string getContent = await getResponse.Content.ReadAsStringAsync();
@@ -140,7 +140,7 @@ public class GetProductByIdTests(AppHostFixture fixture)
             
             if (createDoc.RootElement.TryGetProperty("id", out var idElement))
             {
-                string productId = idElement.GetString();
+                string productId = idElement.GetString()!;
                 HttpResponseMessage getResponse = await client.GetAsync($"/api/catalog/products/{productId}");
                 
                 string getContent = await getResponse.Content.ReadAsStringAsync();
@@ -185,7 +185,7 @@ public class GetProductByIdTests(AppHostFixture fixture)
             
             if (createDoc.RootElement.TryGetProperty("id", out var idElement))
             {
-                string productId = idElement.GetString();
+                string productId = idElement.GetString()!;
                 HttpResponseMessage getResponse = await client.GetAsync($"/api/catalog/products/{productId}");
                 
                 Assert.Equal(HttpStatusCode.OK, getResponse.StatusCode);

@@ -14,7 +14,7 @@ public class ApiValueObjectsTests
     public void Deserialize_ApiFrequency_FromScalarNumber_ReturnsCorrectValue()
     {
         string input = "3.5";
-        ApiFrequency result = JsonSerializer.Deserialize<ApiFrequency>(input, _options);
+        ApiFrequency result = JsonSerializer.Deserialize<ApiFrequency>(input, _options)!;
         Assert.Equal(3.5m, result.ValueInGHz);
     }
 
@@ -22,7 +22,7 @@ public class ApiValueObjectsTests
     public void Deserialize_ApiFrequency_FromObject_ReturnsCorrectValue()
     {
         string input = "{\"valueInGHz\": 3.5}";
-        ApiFrequency result = JsonSerializer.Deserialize<ApiFrequency>(input, _options);
+        ApiFrequency result = JsonSerializer.Deserialize<ApiFrequency>(input, _options)!;
         Assert.Equal(3.5m, result.ValueInGHz);
     }
 
@@ -42,7 +42,7 @@ public class ApiValueObjectsTests
     public void Deserialize_ApiStorageCapacity_FromScalarNumber_ReturnsCorrectValue()
     {
         string input = "512";
-        ApiStorageCapacity result = JsonSerializer.Deserialize<ApiStorageCapacity>(input, _options);
+        ApiStorageCapacity result = JsonSerializer.Deserialize<ApiStorageCapacity>(input, _options)!;
         Assert.Equal(512, result.ValueInGB);
     }
 
@@ -50,7 +50,7 @@ public class ApiValueObjectsTests
     public void Deserialize_ApiStorageCapacity_FromObject_ReturnsCorrectValue()
     {
         string input = "{\"valueInGB\": 1000}";
-        ApiStorageCapacity result = JsonSerializer.Deserialize<ApiStorageCapacity>(input, _options);
+        ApiStorageCapacity result = JsonSerializer.Deserialize<ApiStorageCapacity>(input, _options)!;
         Assert.Equal(1000, result.ValueInGB);
     }
 
@@ -70,7 +70,7 @@ public class ApiValueObjectsTests
     public void Deserialize_ApiPower_FromScalarNumber_ReturnsCorrectValue()
     {
         string input = "750";
-        ApiPower result = JsonSerializer.Deserialize<ApiPower>(input, _options);
+        ApiPower result = JsonSerializer.Deserialize<ApiPower>(input, _options)!;
         Assert.Equal(750, result.ValueInWatts);
     }
 
@@ -78,7 +78,7 @@ public class ApiValueObjectsTests
     public void Deserialize_ApiPower_FromObject_ReturnsCorrectValue()
     {
         string input = "{\"valueInWatts\": 850}";
-        ApiPower result = JsonSerializer.Deserialize<ApiPower>(input, _options);
+        ApiPower result = JsonSerializer.Deserialize<ApiPower>(input, _options)!;
         Assert.Equal(850, result.ValueInWatts);
     }
 
@@ -98,7 +98,7 @@ public class ApiValueObjectsTests
     public void Deserialize_ApiVoltage_FromScalarNumber_ReturnsCorrectValue()
     {
         string input = "1.35";
-        ApiVoltage result = JsonSerializer.Deserialize<ApiVoltage>(input, _options);
+        ApiVoltage result = JsonSerializer.Deserialize<ApiVoltage>(input, _options)!;
         Assert.Equal(1.35m, result.ValueInVolts);
     }
 
@@ -106,7 +106,7 @@ public class ApiValueObjectsTests
     public void Deserialize_ApiVoltage_FromObject_ReturnsCorrectValue()
     {
         string input = "{\"valueInVolts\": 1.5}";
-        ApiVoltage result = JsonSerializer.Deserialize<ApiVoltage>(input, _options);
+        ApiVoltage result = JsonSerializer.Deserialize<ApiVoltage>(input, _options)!;
         Assert.Equal(1.5m, result.ValueInVolts);
     }
 
@@ -126,7 +126,7 @@ public class ApiValueObjectsTests
     public void Deserialize_ApiLength_FromScalarNumber_ReturnsCorrectValue()
     {
         string input = "300";
-        ApiLength result = JsonSerializer.Deserialize<ApiLength>(input, _options);
+        ApiLength result = JsonSerializer.Deserialize<ApiLength>(input, _options)!;
         Assert.Equal(300, result.ValueInMm);
     }
 
@@ -134,7 +134,7 @@ public class ApiValueObjectsTests
     public void Deserialize_ApiLength_FromObject_ReturnsCorrectValue()
     {
         string input = "{\"valueInMm\": 250}";
-        ApiLength result = JsonSerializer.Deserialize<ApiLength>(input, _options);
+        ApiLength result = JsonSerializer.Deserialize<ApiLength>(input, _options)!;
         Assert.Equal(250, result.ValueInMm);
     }
 
@@ -154,7 +154,7 @@ public class ApiValueObjectsTests
     public void Deserialize_ApiDataSpeed_FromScalarNumber_ReturnsCorrectValue()
     {
         string input = "3500";
-        ApiDataSpeed result = JsonSerializer.Deserialize<ApiDataSpeed>(input, _options);
+        ApiDataSpeed result = JsonSerializer.Deserialize<ApiDataSpeed>(input, _options)!;
         Assert.Equal(3500, result.ValueInMBps);
     }
 
@@ -162,7 +162,7 @@ public class ApiValueObjectsTests
     public void Deserialize_ApiDataSpeed_FromObject_ReturnsCorrectValue()
     {
         string input = "{\"valueInMBps\": 4500}";
-        ApiDataSpeed result = JsonSerializer.Deserialize<ApiDataSpeed>(input, _options);
+        ApiDataSpeed result = JsonSerializer.Deserialize<ApiDataSpeed>(input, _options)!;
         Assert.Equal(4500, result.ValueInMBps);
     }
 
@@ -182,7 +182,7 @@ public class ApiValueObjectsTests
     public void Deserialize_ApiCasLatency_FromStringCL_ReturnsCorrectValue()
     {
         string input = "\"CL16\"";
-        ApiCasLatency result = JsonSerializer.Deserialize<ApiCasLatency>(input, _options);
+        ApiCasLatency result = JsonSerializer.Deserialize<ApiCasLatency>(input, _options)!;
         Assert.Equal(16, result.Value);
     }
 
@@ -190,7 +190,7 @@ public class ApiValueObjectsTests
     public void Deserialize_ApiCasLatency_FromIntNumber_ReturnsCorrectValue()
     {
         string input = "16";
-        ApiCasLatency result = JsonSerializer.Deserialize<ApiCasLatency>(input, _options);
+        ApiCasLatency result = JsonSerializer.Deserialize<ApiCasLatency>(input, _options)!;
         Assert.NotNull(result);
         Assert.True(result.Value > 0);
     }
@@ -199,7 +199,7 @@ public class ApiValueObjectsTests
     public void Deserialize_ApiCasLatency_FromStringNumber_ReturnsCorrectValue()
     {
         string input = "\"18\"";
-        ApiCasLatency result = JsonSerializer.Deserialize<ApiCasLatency>(input, _options);
+        ApiCasLatency result = JsonSerializer.Deserialize<ApiCasLatency>(input, _options)!;
         Assert.Equal(18, result.Value);
     }
 
@@ -219,7 +219,7 @@ public class ApiValueObjectsTests
     public void Deserialize_ApiRamConfiguration_FromString_ReturnsCorrectValue()
     {
         string input = "\"2x16GB\"";
-        ApiRamConfiguration result = JsonSerializer.Deserialize<ApiRamConfiguration>(input, _options);
+        ApiRamConfiguration result = JsonSerializer.Deserialize<ApiRamConfiguration>(input, _options)!;
         Assert.Equal(2, result.ModuleCount);
         Assert.Equal(16, result.ModuleCapacity.ValueInGB);
     }
@@ -228,7 +228,7 @@ public class ApiValueObjectsTests
     public void Deserialize_ApiRamConfiguration_FromObject_ReturnsCorrectValue()
     {
         string input = "{\"moduleCount\": 2, \"moduleCapacity\": 32}";
-        ApiRamConfiguration result = JsonSerializer.Deserialize<ApiRamConfiguration>(input, _options);
+        ApiRamConfiguration result = JsonSerializer.Deserialize<ApiRamConfiguration>(input, _options)!;
         Assert.Equal(2, result.ModuleCount);
         Assert.Equal(32, result.ModuleCapacity.ValueInGB);
     }
@@ -253,7 +253,7 @@ public class ApiValueObjectsTests
     {
         var frequency = ApiFrequency.FromGHz(original);
         string serialized = JsonSerializer.Serialize(frequency, _options);
-        ApiFrequency deserialized = JsonSerializer.Deserialize<ApiFrequency>(serialized, _options);
+        ApiFrequency deserialized = JsonSerializer.Deserialize<ApiFrequency>(serialized, _options)!;
         Assert.Equal(frequency.ValueInGHz, deserialized.ValueInGHz);
     }
 
@@ -265,7 +265,7 @@ public class ApiValueObjectsTests
     {
         var capacity = ApiStorageCapacity.FromGB(original);
         string serialized = JsonSerializer.Serialize(capacity, _options);
-        ApiStorageCapacity deserialized = JsonSerializer.Deserialize<ApiStorageCapacity>(serialized, _options);
+        ApiStorageCapacity deserialized = JsonSerializer.Deserialize<ApiStorageCapacity>(serialized, _options)!;
         Assert.Equal(capacity.ValueInGB, deserialized.ValueInGB);
     }
 
@@ -277,7 +277,7 @@ public class ApiValueObjectsTests
     {
         var power = ApiPower.FromWatts(original);
         string serialized = JsonSerializer.Serialize(power, _options);
-        ApiPower deserialized = JsonSerializer.Deserialize<ApiPower>(serialized, _options);
+        ApiPower deserialized = JsonSerializer.Deserialize<ApiPower>(serialized, _options)!;
         Assert.Equal(power.ValueInWatts, deserialized.ValueInWatts);
     }
 

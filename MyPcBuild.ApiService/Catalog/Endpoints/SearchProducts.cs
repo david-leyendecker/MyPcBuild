@@ -70,7 +70,7 @@ public record SearchProductsResponse(
 public record SearchProductResult(
     Guid Id,
     string Name,
-    ProductCategory CategoryName,
+    ProductCategory Category,
     decimal Price,
     string Manufacturer,
     List<HateoasLink> Links

@@ -14,8 +14,8 @@ public class GetFieldDefinitionsTests(AppHostFixture fixture)
     [InlineData("gpu")]
     [InlineData("motherboard")]
     [InlineData("ram")]
-    [InlineData("pccase")]
-    [InlineData("psu")]
+    [InlineData("case")]
+    [InlineData("powersupply")]
     [InlineData("storage")]
     [InlineData("cooler")]
     public async Task GetFieldDefinitions_ValidCategory_ReturnsOk(string category)

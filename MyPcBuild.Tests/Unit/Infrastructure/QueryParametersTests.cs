@@ -86,15 +86,6 @@ public class QueryParametersTests
         Assert.Equal("category=cpu,isDraft=false", queryParams.Filters);
     }
 
-    [Fact]
-    public void GetSkip_ZeroPage_CalculatesAsIfPageIsOne()
-    {
-        // Page should be at least 1, but if somehow set to 0, it should calculate correctly
-        var queryParams = new QueryParameters { Page = 1, ItemsPerPage = 20 };
-        int skip = queryParams.GetSkip();
-        Assert.Equal(0, skip);
-    }
-
     [Theory]
     [InlineData(1)]
     [InlineData(100)]

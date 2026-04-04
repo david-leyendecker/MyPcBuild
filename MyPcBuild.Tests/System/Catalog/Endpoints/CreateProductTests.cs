@@ -19,13 +19,14 @@ public class CreateProductTests(AppHostFixture fixture)
             category = "cpu",
             name = $"Intel Core i9 {Guid.NewGuid()}",
             manufacturer = "Intel",
-            baseClockGHz = 3.2,
-            boostClockGHz = 5.0,
+            price = 589m,
+            baseClock = 3.2,
+            boostClock = 5.0,
             cores = 24,
             threads = 32,
             socket = "LGA1700",
-            tdpWatts = 253,
-            specs = new { }
+            tdp = 253,
+            integratedGraphics = false,
         };
 
         string json = JsonSerializer.Serialize(request);
@@ -40,7 +41,7 @@ public class CreateProductTests(AppHostFixture fixture)
         using JsonDocument doc = JsonDocument.Parse(content);
 
         Assert.True(doc.RootElement.TryGetProperty("id", out var idElement));
-        Assert.NotEmpty(idElement.GetString());
+        Assert.NotEmpty(idElement.GetString() ?? string.Empty);
     }
 
     [Fact]
@@ -128,12 +129,11 @@ public class CreateProductTests(AppHostFixture fixture)
 
         var request = new
         {
-            category = "pccase",
+            category = "case",
             name = $"NZXT H710 {Guid.NewGuid()}",
             manufacturer = "NZXT",
             formFactor = "ATX",
             sidePanelWindow = "TemperedGlass",
-            specs = new { }
         };
 
         string json = JsonSerializer.Serialize(request);
@@ -152,14 +152,13 @@ public class CreateProductTests(AppHostFixture fixture)
 
         var request = new
         {
-            category = "psu",
+            category = "powersupply",
             name = $"Corsair RM850e {Guid.NewGuid()}",
             manufacturer = "Corsair",
             wattage = 850,
             efficiency = "Gold",
             modular = "FullyModular",
             formFactor = "ATX",
-            specs = new { }
         };
 
         string json = JsonSerializer.Serialize(request);
@@ -271,7 +270,7 @@ public class CreateProductTests(AppHostFixture fixture)
 
         var request = new
         {
-            category = "psu",
+            category = "powersupply",
             name = $"Test PSU {Guid.NewGuid()}",
             manufacturer = "TestMfg",
             wattage = 750,
@@ -297,7 +296,7 @@ public class CreateProductTests(AppHostFixture fixture)
 
         var request = new
         {
-            category = "psu",
+            category = "powersupply",
             name = $"Test PSU {Guid.NewGuid()}",
             manufacturer = "TestMfg",
             wattage = 600,
@@ -326,13 +325,14 @@ public class CreateProductTests(AppHostFixture fixture)
             category = "cpu",
             name = $"Draft CPU {Guid.NewGuid()}",
             manufacturer = "TestMfg",
-            baseClockGHz = 3.0,
-            boostClockGHz = 4.0,
+            price = 299m,
+            baseClock = 3.0,
+            boostClock = 4.0,
             cores = 4,
             threads = 8,
             socket = "LGA1700",
-            tdpWatts = 65,
-            specs = new { }
+            tdp = 65,
+            integratedGraphics = false,
         };
 
         string json = JsonSerializer.Serialize(request);
@@ -362,13 +362,14 @@ public class CreateProductTests(AppHostFixture fixture)
             category = "cpu",
             name = $"Test CPU {Guid.NewGuid()}",
             manufacturer = "TestMfg",
-            baseClockGHz = 3.0,
-            boostClockGHz = 4.0,
+            price = 299m,
+            baseClock = 3.0,
+            boostClock = 4.0,
             cores = 4,
             threads = 8,
             socket = "LGA1700",
-            tdpWatts = 65,
-            specs = new { }
+            tdp = 65,
+            integratedGraphics = false,
         };
 
         string json = JsonSerializer.Serialize(request);

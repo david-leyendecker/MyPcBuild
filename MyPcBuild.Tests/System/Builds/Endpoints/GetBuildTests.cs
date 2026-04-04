@@ -41,7 +41,7 @@ public class GetBuildTests(AppHostFixture fixture)
         
         if (createDoc.RootElement.TryGetProperty("id", out var idElement))
         {
-            string buildId = idElement.GetString();
+            string buildId = idElement.GetString()!;
             HttpResponseMessage getResponse = await client.GetAsync($"/api/builds/{buildId}");
 
             Assert.Equal(HttpStatusCode.OK, getResponse.StatusCode);
@@ -70,7 +70,7 @@ public class GetBuildTests(AppHostFixture fixture)
         
         if (createDoc.RootElement.TryGetProperty("id", out var idElement))
         {
-            string buildId = idElement.GetString();
+            string buildId = idElement.GetString()!;
             HttpResponseMessage getResponse = await client.GetAsync($"/api/builds/{buildId}");
 
             string getContent = await getResponse.Content.ReadAsStringAsync();
@@ -102,7 +102,7 @@ public class GetBuildTests(AppHostFixture fixture)
         
         if (createDoc.RootElement.TryGetProperty("id", out var idElement))
         {
-            string buildId = idElement.GetString();
+            string buildId = idElement.GetString()!;
             HttpResponseMessage getResponse = await client.GetAsync($"/api/builds/{buildId}");
 
             string getContent = await getResponse.Content.ReadAsStringAsync();

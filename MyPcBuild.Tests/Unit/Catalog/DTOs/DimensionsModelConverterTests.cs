@@ -19,7 +19,7 @@ public class DimensionsModelConverterTests
             }
             """;
 
-        DimensionsModel result = JsonSerializer.Deserialize<DimensionsModel>(json, _options);
+        DimensionsModel result = JsonSerializer.Deserialize<DimensionsModel>(json, _options)!;
         
         Assert.NotNull(result);
         Assert.Equal(300, result.Length);
@@ -32,7 +32,7 @@ public class DimensionsModelConverterTests
     {
         string json = "\"300,200,400\"";
 
-        DimensionsModel result = JsonSerializer.Deserialize<DimensionsModel>(json, _options);
+        DimensionsModel result = JsonSerializer.Deserialize<DimensionsModel>(json, _options)!;
         
         Assert.NotNull(result);
         Assert.Equal(300, result.Length);
@@ -45,7 +45,7 @@ public class DimensionsModelConverterTests
     {
         string json = "\"300, 200, 400\"";
 
-        DimensionsModel result = JsonSerializer.Deserialize<DimensionsModel>(json, _options);
+        DimensionsModel result = JsonSerializer.Deserialize<DimensionsModel>(json, _options)!;
         
         Assert.NotNull(result);
         // Should parse correctly despite spaces
@@ -68,7 +68,7 @@ public class DimensionsModelConverterTests
     {
         var original = new DimensionsModel { Length = 500, Width = 350, Height = 650 };
         string serialized = JsonSerializer.Serialize(original, _options);
-        DimensionsModel deserialized = JsonSerializer.Deserialize<DimensionsModel>(serialized, _options);
+        DimensionsModel deserialized = JsonSerializer.Deserialize<DimensionsModel>(serialized, _options)!;
         
         Assert.NotNull(deserialized);
         Assert.Equal(original.Length, deserialized.Length);
