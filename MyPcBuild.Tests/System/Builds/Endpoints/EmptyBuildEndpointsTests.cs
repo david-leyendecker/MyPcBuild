@@ -18,7 +18,7 @@ public class AddPartToSlotTests(AppHostFixture fixture)
         var createBuildRequest = new
         {
             name = $"Test Build {Guid.NewGuid()}",
-            userId = "test-user"
+            userId = Guid.NewGuid()
         };
 
         string createBuildJson = JsonSerializer.Serialize(createBuildRequest);

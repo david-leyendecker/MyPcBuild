@@ -1,4 +1,5 @@
 using Aspire.Hosting;
+using Aspire.Hosting.ApplicationModel;
 using Aspire.Hosting.Testing;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -27,6 +28,8 @@ public sealed class AppHostFixture : IAsyncLifetime
 
         _app = await builder.BuildAsync();
         await _app.StartAsync();
+        ResourceNotificationService notificationService = _app.Services.GetRequiredService<ResourceNotificationService>();
+        await notificationService.WaitForResourceHealthyAsync("apiservice").WaitAsync(TimeSpan.FromMinutes(2));
     }
 
     public async ValueTask DisposeAsync()

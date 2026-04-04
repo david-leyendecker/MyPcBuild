@@ -20,7 +20,7 @@ const emit = defineEmits<{
 const model = props.modelValue as Partial<PcCaseProductRequest> | undefined
 const formFactor = ref(model?.formFactor || 'ATX')
 const color = ref(model?.color || 'Black')
-const sidePanelWindow = ref(model?.sidePanelWindow || 'Tempered Glass')
+const sidePanelWindow = ref(model?.sidePanelWindow || 'TemperedGlass')
 const dimensions = ref(model?.dimensions || { length: 450, width: 210, height: 460 })
 const chambers = ref<Chamber[]>(model?.chambers || [])
 

@@ -11,10 +11,11 @@ public class ApiEnumsTests
     #region ApiGpuPowerConnector
 
     [Theory]
-    [InlineData("1x16-pin", ApiGpuPowerConnector.One16Pin)]
-    [InlineData("2x8-pin", ApiGpuPowerConnector.Dual8Pin)]
-    [InlineData("3x8-pin", ApiGpuPowerConnector.Triple8Pin)]
-    public void Deserialize_GpuPowerConnector_WithVariousFormats_ReturnsCorrectValue(string json, ApiGpuPowerConnector expected)
+    [InlineData("One16Pin", ApiGpuPowerConnector.One16Pin)]
+    [InlineData("one16pin", ApiGpuPowerConnector.One16Pin)]
+    [InlineData("Dual8Pin", ApiGpuPowerConnector.Dual8Pin)]
+    [InlineData("Triple8Pin", ApiGpuPowerConnector.Triple8Pin)]
+    public void Deserialize_GpuPowerConnector_WithEnumNames_ReturnsCorrectValue(string json, ApiGpuPowerConnector expected)
     {
         string input = $"\"{json}\"";
         ApiGpuPowerConnector result = JsonSerializer.Deserialize<ApiGpuPowerConnector>(input, _options);
@@ -22,10 +23,16 @@ public class ApiEnumsTests
     }
 
     [Fact]
-    public void Serialize_ApiGpuPowerConnector_WritesCorrectString()
+    public void Serialize_ApiGpuPowerConnector_WritesEnumName()
     {
         string result = JsonSerializer.Serialize(ApiGpuPowerConnector.One16Pin, _options);
-        Assert.Equal("\"1x16-pin\"", result);
+        Assert.Equal("\"One16Pin\"", result);
+    }
+
+    [Fact]
+    public void Deserialize_GpuPowerConnector_WithOldAlias_ThrowsJsonException()
+    {
+        Assert.Throws<JsonException>(() => JsonSerializer.Deserialize<ApiGpuPowerConnector>("\"1x16-pin\"", _options));
     }
 
     #endregion
@@ -33,10 +40,11 @@ public class ApiEnumsTests
     #region ApiSidePanelType
 
     [Theory]
-    [InlineData("Tempered Glass", ApiSidePanelType.TemperedGlass)]
+    [InlineData("TemperedGlass", ApiSidePanelType.TemperedGlass)]
+    [InlineData("temperedglass", ApiSidePanelType.TemperedGlass)]
     [InlineData("Acrylic", ApiSidePanelType.Acrylic)]
     [InlineData("None", ApiSidePanelType.None)]
-    public void Deserialize_SidePanelType_WithVariousFormats_ReturnsCorrectValue(string json, ApiSidePanelType expected)
+    public void Deserialize_SidePanelType_WithEnumNames_ReturnsCorrectValue(string json, ApiSidePanelType expected)
     {
         string input = $"\"{json}\"";
         ApiSidePanelType result = JsonSerializer.Deserialize<ApiSidePanelType>(input, _options);
@@ -44,10 +52,16 @@ public class ApiEnumsTests
     }
 
     [Fact]
-    public void Serialize_ApiSidePanelType_WritesCorrectString()
+    public void Serialize_ApiSidePanelType_WritesEnumName()
     {
         string result = JsonSerializer.Serialize(ApiSidePanelType.TemperedGlass, _options);
-        Assert.Equal("\"Tempered Glass\"", result);
+        Assert.Equal("\"TemperedGlass\"", result);
+    }
+
+    [Fact]
+    public void Deserialize_SidePanelType_WithOldAlias_ThrowsJsonException()
+    {
+        Assert.Throws<JsonException>(() => JsonSerializer.Deserialize<ApiSidePanelType>("\"Tempered Glass\"", _options));
     }
 
     #endregion
@@ -55,12 +69,11 @@ public class ApiEnumsTests
     #region ApiPsuEfficiency
 
     [Theory]
-    [InlineData("80+ Gold", ApiPsuEfficiency.Gold)]
-    [InlineData("80+Gold", ApiPsuEfficiency.Gold)]
     [InlineData("Gold", ApiPsuEfficiency.Gold)]
-    [InlineData("80+ Silver", ApiPsuEfficiency.Silver)]
-    [InlineData("80+ Bronze", ApiPsuEfficiency.Bronze)]
-    public void Deserialize_PsuEfficiency_WithVariousFormats_ReturnsCorrectValue(string json, ApiPsuEfficiency expected)
+    [InlineData("gold", ApiPsuEfficiency.Gold)]
+    [InlineData("Silver", ApiPsuEfficiency.Silver)]
+    [InlineData("Bronze", ApiPsuEfficiency.Bronze)]
+    public void Deserialize_PsuEfficiency_WithEnumNames_ReturnsCorrectValue(string json, ApiPsuEfficiency expected)
     {
         string input = $"\"{json}\"";
         ApiPsuEfficiency result = JsonSerializer.Deserialize<ApiPsuEfficiency>(input, _options);
@@ -68,10 +81,16 @@ public class ApiEnumsTests
     }
 
     [Fact]
-    public void Serialize_ApiPsuEfficiency_WritesCorrectString()
+    public void Serialize_ApiPsuEfficiency_WritesEnumName()
     {
         string result = JsonSerializer.Serialize(ApiPsuEfficiency.Gold, _options);
-        Assert.Equal("\"80+ Gold\"", result);
+        Assert.Equal("\"Gold\"", result);
+    }
+
+    [Fact]
+    public void Deserialize_PsuEfficiency_WithOldAlias_ThrowsJsonException()
+    {
+        Assert.Throws<JsonException>(() => JsonSerializer.Deserialize<ApiPsuEfficiency>("\"80+ Gold\"", _options));
     }
 
     #endregion
@@ -79,12 +98,11 @@ public class ApiEnumsTests
     #region ApiPsuModularity
 
     [Theory]
-    [InlineData("Semi-Modular", ApiPsuModularity.SemiModular)]
     [InlineData("SemiModular", ApiPsuModularity.SemiModular)]
-    [InlineData("Fully-Modular", ApiPsuModularity.FullyModular)]
-    [InlineData("Modular", ApiPsuModularity.FullyModular)]
-    [InlineData("Non-Modular", ApiPsuModularity.NonModular)]
-    public void Deserialize_PsuModularity_WithVariousFormats_ReturnsCorrectValue(string json, ApiPsuModularity expected)
+    [InlineData("semimodular", ApiPsuModularity.SemiModular)]
+    [InlineData("FullyModular", ApiPsuModularity.FullyModular)]
+    [InlineData("NonModular", ApiPsuModularity.NonModular)]
+    public void Deserialize_PsuModularity_WithEnumNames_ReturnsCorrectValue(string json, ApiPsuModularity expected)
     {
         string input = $"\"{json}\"";
         ApiPsuModularity result = JsonSerializer.Deserialize<ApiPsuModularity>(input, _options);
@@ -92,10 +110,16 @@ public class ApiEnumsTests
     }
 
     [Fact]
-    public void Serialize_ApiPsuModularity_WritesCorrectString()
+    public void Serialize_ApiPsuModularity_WritesEnumName()
     {
         string result = JsonSerializer.Serialize(ApiPsuModularity.SemiModular, _options);
-        Assert.Equal("\"Semi-Modular\"", result);
+        Assert.Equal("\"SemiModular\"", result);
+    }
+
+    [Fact]
+    public void Deserialize_PsuModularity_WithOldAlias_ThrowsJsonException()
+    {
+        Assert.Throws<JsonException>(() => JsonSerializer.Deserialize<ApiPsuModularity>("\"Semi-Modular\"", _options));
     }
 
     #endregion
@@ -105,9 +129,9 @@ public class ApiEnumsTests
     [Theory]
     [InlineData("ATX", ApiPsuFormFactor.ATX)]
     [InlineData("SFX", ApiPsuFormFactor.SFX)]
-    [InlineData("SFX-L", ApiPsuFormFactor.SFXL)]
     [InlineData("SFXL", ApiPsuFormFactor.SFXL)]
-    public void Deserialize_PsuFormFactor_WithVariousFormats_ReturnsCorrectValue(string json, ApiPsuFormFactor expected)
+    [InlineData("sfxl", ApiPsuFormFactor.SFXL)]
+    public void Deserialize_PsuFormFactor_WithEnumNames_ReturnsCorrectValue(string json, ApiPsuFormFactor expected)
     {
         string input = $"\"{json}\"";
         ApiPsuFormFactor result = JsonSerializer.Deserialize<ApiPsuFormFactor>(input, _options);
@@ -115,10 +139,16 @@ public class ApiEnumsTests
     }
 
     [Fact]
-    public void Serialize_ApiPsuFormFactor_WritesCorrectString()
+    public void Serialize_ApiPsuFormFactor_WritesEnumName()
     {
         string result = JsonSerializer.Serialize(ApiPsuFormFactor.SFXL, _options);
-        Assert.Equal("\"SFX-L\"", result);
+        Assert.Equal("\"SFXL\"", result);
+    }
+
+    [Fact]
+    public void Deserialize_PsuFormFactor_WithOldAlias_ThrowsJsonException()
+    {
+        Assert.Throws<JsonException>(() => JsonSerializer.Deserialize<ApiPsuFormFactor>("\"SFX-L\"", _options));
     }
 
     #endregion
@@ -149,12 +179,11 @@ public class ApiEnumsTests
     #region ApiStorageInterface
 
     [Theory]
-    [InlineData("M.2", ApiStorageInterface.NVMe)]
     [InlineData("NVMe", ApiStorageInterface.NVMe)]
-    [InlineData("NVME", ApiStorageInterface.NVMe)]
+    [InlineData("nvme", ApiStorageInterface.NVMe)]
     [InlineData("SATA", ApiStorageInterface.SATA)]
     [InlineData("sata", ApiStorageInterface.SATA)]
-    public void Deserialize_StorageInterface_WithVariousFormats_ReturnsCorrectValue(string json, ApiStorageInterface expected)
+    public void Deserialize_StorageInterface_WithEnumNames_ReturnsCorrectValue(string json, ApiStorageInterface expected)
     {
         string input = $"\"{json}\"";
         ApiStorageInterface result = JsonSerializer.Deserialize<ApiStorageInterface>(input, _options);
@@ -173,11 +202,11 @@ public class ApiEnumsTests
     #region ApiStorageFormFactor
 
     [Theory]
-    [InlineData("M.2 2280", ApiStorageFormFactor.M2_2280)]
-    [InlineData("2.5 inch", ApiStorageFormFactor.TwoPointFiveInch)]
-    [InlineData("2.5\"", ApiStorageFormFactor.TwoPointFiveInch)]
-    [InlineData("3.5 inch", ApiStorageFormFactor.ThreePointFiveInch)]
-    public void Deserialize_StorageFormFactor_WithVariousFormats_ReturnsCorrectValue(string json, ApiStorageFormFactor expected)
+    [InlineData("M2_2280", ApiStorageFormFactor.M2_2280)]
+    [InlineData("m2_2280", ApiStorageFormFactor.M2_2280)]
+    [InlineData("TwoPointFiveInch", ApiStorageFormFactor.TwoPointFiveInch)]
+    [InlineData("ThreePointFiveInch", ApiStorageFormFactor.ThreePointFiveInch)]
+    public void Deserialize_StorageFormFactor_WithEnumNames_ReturnsCorrectValue(string json, ApiStorageFormFactor expected)
     {
         string input = $"\"{json}\"";
         ApiStorageFormFactor result = JsonSerializer.Deserialize<ApiStorageFormFactor>(input, _options);
@@ -185,10 +214,16 @@ public class ApiEnumsTests
     }
 
     [Fact]
-    public void Serialize_ApiStorageFormFactor_WritesCorrectString()
+    public void Serialize_ApiStorageFormFactor_WritesEnumName()
     {
         string result = JsonSerializer.Serialize(ApiStorageFormFactor.M2_2280, _options);
-        Assert.Equal("\"M.2 2280\"", result);
+        Assert.Equal("\"M2_2280\"", result);
+    }
+
+    [Fact]
+    public void Deserialize_StorageFormFactor_WithOldAlias_ThrowsJsonException()
+    {
+        Assert.Throws<JsonException>(() => JsonSerializer.Deserialize<ApiStorageFormFactor>("\"M.2 2280\"", _options));
     }
 
     #endregion

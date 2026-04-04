@@ -14,6 +14,11 @@ public static class CreateBuild
             IDocumentSession session,
             IHttpContextAccessor httpContextAccessor) =>
         {
+            if (string.IsNullOrWhiteSpace(request.Name))
+            {
+                return Results.BadRequest("Build name is required.");
+            }
+
             Guid buildId = Guid.NewGuid();
             BuildCreated @event = new()
             {

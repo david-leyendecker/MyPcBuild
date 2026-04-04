@@ -6,12 +6,31 @@ namespace MyPcBuild.ApiService.Catalog.Endpoints;
 
 public static class GetFieldDefinitions
 {
+    private static readonly Dictionary<string, ProductCategory> _categoryAliases = new(StringComparer.OrdinalIgnoreCase)
+    {
+        ["pccase"] = ProductCategory.Case,
+        ["case"] = ProductCategory.Case,
+        ["psu"] = ProductCategory.PowerSupply,
+        ["powersupply"] = ProductCategory.PowerSupply,
+        ["cpu"] = ProductCategory.CPU,
+        ["gpu"] = ProductCategory.GPU,
+        ["motherboard"] = ProductCategory.Motherboard,
+        ["ram"] = ProductCategory.RAM,
+        ["storage"] = ProductCategory.Storage,
+        ["cooler"] = ProductCategory.Cooler,
+    };
+
     public static IEndpointRouteBuilder MapGetFieldDefinitionsEndpoint(this IEndpointRouteBuilder app)
     {
-        app.MapGet("/api/catalog/field-definitions/{category}", (
-            ProductCategory category,
+        app.MapGet("/api/catalog/field-definitions/{categorySlug}", (
+            string categorySlug,
             IHttpContextAccessor httpContextAccessor) =>
         {
+            if (!_categoryAliases.TryGetValue(categorySlug, out ProductCategory category))
+            {
+                return Results.BadRequest($"Unknown category: '{categorySlug}'. Valid categories: cpu, gpu, motherboard, ram, storage, cooler, psu, case");
+            }
+
             List<FieldDefinition> fields = category switch
             {
                 ProductCategory.CPU => GetCpuFields(),
@@ -31,7 +50,7 @@ public static class GetFieldDefinitions
                 category,
                 fields,
                 [
-                    new HateoasLink(new Uri($"{baseUrl}/api/catalog/field-definitions/{category}"), "self", Infrastructure.HttpMethod.GET),
+                    new HateoasLink(new Uri($"{baseUrl}/api/catalog/field-definitions/{categorySlug}"), "self", Infrastructure.HttpMethod.GET),
                     new HateoasLink(new Uri($"{baseUrl}/api/catalog/products?filters=ProductCategory={category}"), "products", Infrastructure.HttpMethod.GET),
                     new HateoasLink(new Uri($"{baseUrl}/api/catalog/categories"), "categories", Infrastructure.HttpMethod.GET),
                     new HateoasLink(new Uri($"{baseUrl}/api/catalog/products"), "create-product", Infrastructure.HttpMethod.POST)

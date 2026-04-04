@@ -13,7 +13,7 @@ public class CreateProductTests(AppHostFixture fixture)
     public async Task PostProduct_ValidCpu_Returns201WithId()
     {
         HttpClient client = fixture.CreateApiServiceClient();
-        
+
         var request = new
         {
             category = "cpu",
@@ -38,7 +38,7 @@ public class CreateProductTests(AppHostFixture fixture)
 
         string content = await response.Content.ReadAsStringAsync();
         using JsonDocument doc = JsonDocument.Parse(content);
-        
+
         Assert.True(doc.RootElement.TryGetProperty("id", out var idElement));
         Assert.NotEmpty(idElement.GetString());
     }
@@ -47,7 +47,7 @@ public class CreateProductTests(AppHostFixture fixture)
     public async Task PostProduct_ValidGpu_Returns201()
     {
         HttpClient client = fixture.CreateApiServiceClient();
-        
+
         var request = new
         {
             category = "gpu",
@@ -72,7 +72,7 @@ public class CreateProductTests(AppHostFixture fixture)
     public async Task PostProduct_ValidMotherboard_Returns201()
     {
         HttpClient client = fixture.CreateApiServiceClient();
-        
+
         var request = new
         {
             category = "motherboard",
@@ -99,7 +99,7 @@ public class CreateProductTests(AppHostFixture fixture)
     public async Task PostProduct_ValidRam_Returns201()
     {
         HttpClient client = fixture.CreateApiServiceClient();
-        
+
         var request = new
         {
             category = "ram",
@@ -125,14 +125,14 @@ public class CreateProductTests(AppHostFixture fixture)
     public async Task PostProduct_ValidPcCase_Returns201()
     {
         HttpClient client = fixture.CreateApiServiceClient();
-        
+
         var request = new
         {
             category = "pccase",
             name = $"NZXT H710 {Guid.NewGuid()}",
             manufacturer = "NZXT",
             formFactor = "ATX",
-            sidePanelType = "Tempered Glass",
+            sidePanelWindow = "TemperedGlass",
             specs = new { }
         };
 
@@ -149,15 +149,15 @@ public class CreateProductTests(AppHostFixture fixture)
     public async Task PostProduct_ValidPsu_Returns201()
     {
         HttpClient client = fixture.CreateApiServiceClient();
-        
+
         var request = new
         {
             category = "psu",
             name = $"Corsair RM850e {Guid.NewGuid()}",
             manufacturer = "Corsair",
             wattage = 850,
-            efficiency = "80+ Gold",
-            modularity = "Fully-Modular",
+            efficiency = "Gold",
+            modular = "FullyModular",
             formFactor = "ATX",
             specs = new { }
         };
@@ -175,7 +175,7 @@ public class CreateProductTests(AppHostFixture fixture)
     public async Task PostProduct_ValidStorage_Returns201()
     {
         HttpClient client = fixture.CreateApiServiceClient();
-        
+
         var request = new
         {
             category = "storage",
@@ -184,7 +184,7 @@ public class CreateProductTests(AppHostFixture fixture)
             storageType = "SSD",
             capacityGb = 1000,
             @interface = "NVMe",
-            formFactor = "M.2 2280",
+            storageFormFactor = "M2_2280",
             specs = new { }
         };
 
@@ -201,7 +201,7 @@ public class CreateProductTests(AppHostFixture fixture)
     public async Task PostProduct_ValidCooler_Returns201()
     {
         HttpClient client = fixture.CreateApiServiceClient();
-        
+
         var request = new
         {
             category = "cooler",
@@ -226,7 +226,7 @@ public class CreateProductTests(AppHostFixture fixture)
     public async Task PostProduct_InvalidCategory_ReturnsBadRequest()
     {
         HttpClient client = fixture.CreateApiServiceClient();
-        
+
         var request = new
         {
             category = "invalid_category",
@@ -247,7 +247,7 @@ public class CreateProductTests(AppHostFixture fixture)
     public async Task PostProduct_MissingRequiredFields_ReturnsBadRequest()
     {
         HttpClient client = fixture.CreateApiServiceClient();
-        
+
         var request = new
         {
             category = "cpu",
@@ -265,18 +265,18 @@ public class CreateProductTests(AppHostFixture fixture)
     }
 
     [Fact]
-    public async Task PostProduct_FlexibleEnumFormats_AcceptedPsuEfficiency()
+    public async Task PostProduct_StrictEnumFormats_OldPsuEfficiencyAlias_ReturnsBadRequest()
     {
         HttpClient client = fixture.CreateApiServiceClient();
-        
+
         var request = new
         {
             category = "psu",
             name = $"Test PSU {Guid.NewGuid()}",
             manufacturer = "TestMfg",
             wattage = 750,
-            efficiency = "80+Gold",  // Flexible format without space
-            modularity = "Semi-Modular",
+            efficiency = "80+Gold",  // Old alias format, no longer accepted
+            modular = "SemiModular",
             formFactor = "ATX",
             specs = new { }
         };
@@ -287,23 +287,23 @@ public class CreateProductTests(AppHostFixture fixture)
             new StringContent(json, Encoding.UTF8, new MediaTypeHeaderValue("application/json"))
         );
 
-        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
     }
 
     [Fact]
-    public async Task PostProduct_FlexibleEnumFormats_AcceptedPsuFormFactor()
+    public async Task PostProduct_StrictEnumFormats_OldPsuFormFactorAlias_ReturnsBadRequest()
     {
         HttpClient client = fixture.CreateApiServiceClient();
-        
+
         var request = new
         {
             category = "psu",
             name = $"Test PSU {Guid.NewGuid()}",
             manufacturer = "TestMfg",
             wattage = 600,
-            efficiency = "80+ Bronze",
-            modularity = "Non-Modular",
-            formFactor = "SFX-L",  // Flexible format
+            efficiency = "Bronze",
+            modular = "NonModular",
+            formFactor = "SFX-L",  // Old alias, no longer accepted — use "SFXL"
             specs = new { }
         };
 
@@ -313,14 +313,14 @@ public class CreateProductTests(AppHostFixture fixture)
             new StringContent(json, Encoding.UTF8, new MediaTypeHeaderValue("application/json"))
         );
 
-        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
     }
 
     [Fact]
     public async Task PostProduct_CreatedProductIsDraft()
     {
         HttpClient client = fixture.CreateApiServiceClient();
-        
+
         var request = new
         {
             category = "cpu",
@@ -345,7 +345,7 @@ public class CreateProductTests(AppHostFixture fixture)
 
         string content = await response.Content.ReadAsStringAsync();
         using JsonDocument doc = JsonDocument.Parse(content);
-        
+
         if (doc.RootElement.TryGetProperty("isDraft", out var isDraftElement))
         {
             Assert.True(isDraftElement.GetBoolean());
@@ -356,7 +356,7 @@ public class CreateProductTests(AppHostFixture fixture)
     public async Task PostProduct_ResponseContainsLinks()
     {
         HttpClient client = fixture.CreateApiServiceClient();
-        
+
         var request = new
         {
             category = "cpu",
@@ -379,7 +379,7 @@ public class CreateProductTests(AppHostFixture fixture)
 
         string content = await response.Content.ReadAsStringAsync();
         using JsonDocument doc = JsonDocument.Parse(content);
-        
+
         Assert.True(doc.RootElement.TryGetProperty("links", out _));
     }
 }

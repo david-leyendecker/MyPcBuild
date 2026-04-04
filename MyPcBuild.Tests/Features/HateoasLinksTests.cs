@@ -55,6 +55,7 @@ public class HateoasLinksTests
                     [new HateoasLink(new Uri("/api/builds/1", UriKind.Relative), "self", HttpMethod.GET)]
                 )
             ],
+            new PaginationMetadata { TotalCount = 1, PageNumber = 1, ItemsPerPage = 20 },
             [
                 new HateoasLink(new Uri("/api/builds", UriKind.Relative), "self", HttpMethod.GET),
                 new HateoasLink(new Uri("/api/builds", UriKind.Relative), "create-build", HttpMethod.POST)
@@ -255,7 +256,7 @@ public class HateoasLinksTests
         // Arrange & Act
         GetProductsResponse response = new(
             [],
-            new PaginationMetadata { Total = 0, Page = 1, ItemsPerPage = 20 },
+            new PaginationMetadata { TotalCount = 0, PageNumber = 1, ItemsPerPage = 20 },
             [
                 new HateoasLink(new Uri("/api/catalog/products?page=1&itemsPerPage=20", UriKind.Relative), "self", HttpMethod.GET),
                 new HateoasLink(new Uri("/api/catalog/categories", UriKind.Relative), "categories", HttpMethod.GET),

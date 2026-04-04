@@ -21,19 +21,19 @@ export type GpuPowerConnector = 'Dual8Pin' | 'Triple8Pin' | 'One16Pin';
 
 export type GpuChipsetManufacturer = 'NVIDIA' | 'AMD' | 'Intel';
 
-export type SidePanelType = 'None' | 'Acrylic' | 'Tempered Glass';
+export type SidePanelType = 'None' | 'Acrylic' | 'TemperedGlass';
 
-export type PsuEfficiency = '80+ Bronze' | '80+ Silver' | '80+ Gold' | '80+ Platinum' | '80+ Titanium';
+export type PsuEfficiency = 'Bronze' | 'Silver' | 'Gold' | 'Platinum' | 'Titanium';
 
-export type PsuModularity = 'Non-Modular' | 'Semi-Modular' | 'Fully Modular';
+export type PsuModularity = 'NonModular' | 'SemiModular' | 'FullyModular';
 
-export type PsuFormFactor = 'ATX' | 'SFX' | 'SFX-L';
+export type PsuFormFactor = 'ATX' | 'SFX' | 'SFXL';
 
 export type StorageType = 'SSD' | 'HDD';
 
 export type StorageInterface = 'NVMe' | 'SATA';
 
-export type StorageFormFactor = 'M.2 2280' | '2.5 inch' | '3.5 inch';
+export type StorageFormFactor = 'M2_2280' | 'TwoPointFiveInch' | 'ThreePointFiveInch';
 
 // ========== Value Objects ==========
 

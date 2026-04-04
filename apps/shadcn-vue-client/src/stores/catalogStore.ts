@@ -50,7 +50,7 @@ export const useCatalogStore = defineStore('catalog', () => {
       });
       
       products.value = response.items;
-      totalProducts.value = response.pagination.total;
+      totalProducts.value = response.paginationMetadata.totalCount;
     } catch (err) {
       error.value = err instanceof Error ? err.message : 'Failed to load products';
       products.value = [];

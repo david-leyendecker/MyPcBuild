@@ -97,6 +97,7 @@ builder.Services.AddHostedService<ProductSeeder>();
 
 builder.Services.ConfigureHttpJsonOptions(options =>
 {
+    options.SerializerOptions.Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping;
     // Add custom converter for ProductRequest to handle polymorphic deserialization
     options.SerializerOptions.Converters.Add(new ProductRequestJsonConverter());
     // Add custom converter for ProductCategory to handle case-insensitive deserialization
@@ -104,6 +105,7 @@ builder.Services.ConfigureHttpJsonOptions(options =>
     // Register specific enum converters before JsonStringEnumConverter.
     // Global converters take precedence over type-level [JsonConverter] attributes,
     // so these must appear in the list first to handle non-standard string representations.
+    options.SerializerOptions.Converters.Add(new ApiGpuPowerConnectorConverter());
     options.SerializerOptions.Converters.Add(new ApiGpuChipsetManufacturerConverter());
     options.SerializerOptions.Converters.Add(new ApiSidePanelTypeConverter());
     options.SerializerOptions.Converters.Add(new ApiPsuEfficiencyConverter());
@@ -112,6 +114,7 @@ builder.Services.ConfigureHttpJsonOptions(options =>
     options.SerializerOptions.Converters.Add(new ApiStorageTypeConverter());
     options.SerializerOptions.Converters.Add(new ApiStorageInterfaceConverter());
     options.SerializerOptions.Converters.Add(new ApiStorageFormFactorConverter());
+    options.SerializerOptions.Converters.Add(new DimensionsModelConverter());
     // Generic string enum converter for all remaining enums
     options.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
 });

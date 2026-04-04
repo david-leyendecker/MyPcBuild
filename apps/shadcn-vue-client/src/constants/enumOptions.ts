@@ -81,27 +81,27 @@ export const gpuChipsetManufacturerOptions: { label: string; value: GpuChipsetMa
 export const sidePanelTypeOptions: { label: string; value: SidePanelType }[] = [
   { label: 'None', value: 'None' },
   { label: 'Acrylic', value: 'Acrylic' },
-  { label: 'Tempered Glass', value: 'Tempered Glass' }
+  { label: 'Tempered Glass', value: 'TemperedGlass' }
 ];
 
 export const psuEfficiencyOptions: { label: string; value: PsuEfficiency }[] = [
-  { label: '80+ Bronze', value: '80+ Bronze' },
-  { label: '80+ Silver', value: '80+ Silver' },
-  { label: '80+ Gold', value: '80+ Gold' },
-  { label: '80+ Platinum', value: '80+ Platinum' },
-  { label: '80+ Titanium', value: '80+ Titanium' }
+  { label: '80+ Bronze', value: 'Bronze' },
+  { label: '80+ Silver', value: 'Silver' },
+  { label: '80+ Gold', value: 'Gold' },
+  { label: '80+ Platinum', value: 'Platinum' },
+  { label: '80+ Titanium', value: 'Titanium' }
 ];
 
 export const psuModularityOptions: { label: string; value: PsuModularity }[] = [
-  { label: 'Non-Modular', value: 'Non-Modular' },
-  { label: 'Semi-Modular', value: 'Semi-Modular' },
-  { label: 'Fully Modular', value: 'Fully Modular' }
+  { label: 'Non-Modular', value: 'NonModular' },
+  { label: 'Semi-Modular', value: 'SemiModular' },
+  { label: 'Fully Modular', value: 'FullyModular' }
 ];
 
 export const psuFormFactorOptions: { label: string; value: PsuFormFactor }[] = [
   { label: 'ATX', value: 'ATX' },
   { label: 'SFX', value: 'SFX' },
-  { label: 'SFX-L', value: 'SFX-L' }
+  { label: 'SFX-L', value: 'SFXL' }
 ];
 
 export const storageTypeOptions: { label: string; value: StorageType }[] = [
@@ -115,7 +115,7 @@ export const storageInterfaceOptions: { label: string; value: StorageInterface }
 ];
 
 export const storageFormFactorOptions: { label: string; value: StorageFormFactor }[] = [
-  { label: 'M.2 2280', value: 'M.2 2280' },
-  { label: '2.5 inch', value: '2.5 inch' },
-  { label: '3.5 inch', value: '3.5 inch' }
+  { label: 'M.2 2280', value: 'M2_2280' },
+  { label: '2.5 inch', value: 'TwoPointFiveInch' },
+  { label: '3.5 inch', value: 'ThreePointFiveInch' }
 ];

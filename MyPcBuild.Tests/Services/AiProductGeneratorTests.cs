@@ -77,7 +77,7 @@ public class AiProductGeneratorTests
   "CoreClock": 2235,
   "BoostClock": 2520,
   "TDP": 450,
-  "PowerConnectors": "1x16-pin",
+  "PowerConnectors": "One16Pin",
   "RayTracing": true,
   "Dimensions": "304,137,61",
   "Slots": "[]"
@@ -206,7 +206,7 @@ public class AiProductGeneratorTests
             "Price": 69.99,
             "FormFactor": "ATX",
             "Color": "Black",
-            "SidePanelWindow": "Tempered Glass",
+            "SidePanelWindow": "TemperedGlass",
             "Dimensions": {
                 "length": 490,
                 "width": 210,

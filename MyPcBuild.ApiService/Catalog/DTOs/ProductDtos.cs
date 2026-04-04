@@ -841,6 +841,7 @@ public record CoolerProductResponse : ProductResponse
 /// <summary>
 /// Physical dimensions model.
 /// </summary>
+[JsonConverter(typeof(DimensionsModelConverter))]
 public record DimensionsModel
 {
     /// <summary>
@@ -868,7 +869,7 @@ public record DimensionsModel
 /// <summary>
 /// JSON converter for DimensionsModel that handles various input formats (object, string).
 /// </summary>
-internal class DimensionsModelConverter : JsonConverter<DimensionsModel>
+public class DimensionsModelConverter : JsonConverter<DimensionsModel>
 {
     public override DimensionsModel Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {

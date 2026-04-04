@@ -168,7 +168,7 @@ public class GetProductByIdTests(AppHostFixture fixture)
             storageType = "SSD",
             capacityGb = 500,
             @interface = "NVMe",
-            formFactor = "M.2 2280",
+            storageFormFactor = "M2_2280",
             specs = new { }
         };
 

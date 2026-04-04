@@ -16,8 +16,8 @@ const emit = defineEmits<{
 /** Narrow to PSU shape - safe when this form is rendered for PSU category */
 const model = props.modelValue as Partial<PsuProductRequest> | undefined
 const wattageWatts = ref(model?.wattage?.valueInWatts || 750)
-const efficiency = ref<PsuEfficiency>(model?.efficiency || '80+ Gold')
-const modular = ref<PsuModularity>(model?.modular || 'Fully Modular')
+const efficiency = ref<PsuEfficiency>(model?.efficiency || 'Gold')
+const modular = ref<PsuModularity>(model?.modular || 'FullyModular')
 const formFactor = ref<PsuFormFactor>(model?.formFactor || 'ATX')
 const lengthMm = ref(model?.length?.valueInMm || 160)
 const pcie8Pin = ref(model?.pcie8Pin || 4)

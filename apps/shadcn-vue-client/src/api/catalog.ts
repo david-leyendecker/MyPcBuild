@@ -108,8 +108,8 @@ export interface GetProductsParams {
 }
 
 export interface PaginationMetadata {
-  total: number;
-  page: number;
+  totalCount: number;
+  pageNumber: number;
   itemsPerPage: number;
   totalPages: number;
   hasNextPage: boolean;
@@ -118,7 +118,7 @@ export interface PaginationMetadata {
 
 export interface GetProductsResponse {
   items: ProductSummary[];
-  pagination: PaginationMetadata;
+  paginationMetadata: PaginationMetadata;
 }
 
 export interface CatalogSearchParams {

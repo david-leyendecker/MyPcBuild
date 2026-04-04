@@ -17,7 +17,7 @@ public class CreateBuildTests(AppHostFixture fixture)
         var request = new
         {
             name = $"Test Build {Guid.NewGuid()}",
-            userId = "test-user-123"
+            userId = Guid.NewGuid()
         };
 
         string json = JsonSerializer.Serialize(request);
@@ -35,7 +35,7 @@ public class CreateBuildTests(AppHostFixture fixture)
         var request = new
         {
             name = $"Test Build {Guid.NewGuid()}",
-            userId = "test-user-456"
+            userId = Guid.NewGuid()
         };
 
         string json = JsonSerializer.Serialize(request);
@@ -57,7 +57,7 @@ public class CreateBuildTests(AppHostFixture fixture)
         
         var request = new
         {
-            userId = "test-user-xyz"
+            userId = Guid.NewGuid()
             // Missing name
         };
 

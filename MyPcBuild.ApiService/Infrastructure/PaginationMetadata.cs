@@ -8,12 +8,12 @@ public record PaginationMetadata
     /// <summary>
     /// Total number of items matching the query.
     /// </summary>
-    public int Total { get; init; }
+    public int TotalCount { get; init; }
 
     /// <summary>
     /// Current page number (1-based).
     /// </summary>
-    public int Page { get; init; }
+    public int PageNumber { get; init; }
 
     /// <summary>
     /// Number of items per page.
@@ -23,15 +23,15 @@ public record PaginationMetadata
     /// <summary>
     /// Total number of pages available.
     /// </summary>
-    public int TotalPages => (int)Math.Ceiling((double)Total / ItemsPerPage);
+    public int TotalPages => (int)Math.Ceiling((double)TotalCount / ItemsPerPage);
 
     /// <summary>
     /// Indicates if there is a next page.
     /// </summary>
-    public bool HasNextPage => Page < TotalPages;
+    public bool HasNextPage => PageNumber < TotalPages;
 
     /// <summary>
     /// Indicates if there is a previous page.
     /// </summary>
-    public bool HasPreviousPage => Page > 1;
+    public bool HasPreviousPage => PageNumber > 1;
 }

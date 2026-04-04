@@ -11,36 +11,36 @@ public class QueryParameters
     /// Page number (1-based).
     /// </summary>
     [Range(1, int.MaxValue, ErrorMessage = "Page number must be at least 1.")]
-    public int Page { get; init; } = 1;
+    public int? Page { get; set; }
 
     /// <summary>
     /// Number of items per page.
     /// </summary>
     [Range(1, 100, ErrorMessage = "Page size must be between 1 and 100.")]
-    public int ItemsPerPage { get; init; } = 10;
+    public int? ItemsPerPage { get; set; }
 
     /// <summary>
     /// Search term to filter results.
     /// </summary>
-    public string? Search { get; init; }
+    public string? Search { get; set; }
     
     /// <summary>
     /// Field to sort by.
     /// </summary>
-    public string? SortBy { get; init; }
+    public string? SortBy { get; set; }
 
     /// <summary>
     /// Sort in descending order.
     /// </summary>
-    public bool SortDesc { get; init; }
+    public bool? SortDesc { get; set; }
 
     /// <summary>
     /// Generic filters as comma-separated field=value pairs (e.g., "categoryName=cpu,manufacturer=intel").
     /// </summary>
-    public string? Filters { get; init; }
+    public string? Filters { get; set; }
 
     /// <summary>
     /// Calculates how many items to skip for pagination.
     /// </summary>
-    public int GetSkip() => (Page - 1) * ItemsPerPage;
+    public int GetSkip() => ((Page ?? 1) - 1) * (ItemsPerPage ?? 20);
 }
