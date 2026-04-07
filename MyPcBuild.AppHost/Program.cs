@@ -42,11 +42,12 @@ var shadcnClient = builder.AddViteApp("shadcn-client", "../apps/shadcn-vue-clien
 // Configure API service with allowed CORS origins from clients
 apiService.WithEnvironment(context =>
 {
-    List<string> allowedOrigins = [];
-    // AddAllowedOrigins(allowedOrigins, naiveClient.GetEndpoint("http"));
-    // AddAllowedOrigins(allowedOrigins, naiveClient.GetEndpoint("https"));
-    AddAllowedOrigins(allowedOrigins, shadcnClient.GetEndpoint("http"));
-    AddAllowedOrigins(allowedOrigins, shadcnClient.GetEndpoint("https"));
+    List<string> allowedOrigins = GetAllowedOrigins([
+        // naiveClient.GetEndpoint("http"),
+        // naiveClient.GetEndpoint("https"),
+        shadcnClient.GetEndpoint("http"),
+        shadcnClient.GetEndpoint("https")
+    ]);
     if (allowedOrigins.Count == 0)
     {
         throw new InvalidOperationException("No client endpoints discovered to configure AllowedOrigins.");
@@ -56,12 +57,20 @@ apiService.WithEnvironment(context =>
 
 builder.Build().Run();
 
-static void AddAllowedOrigins(List<string> origins, EndpointReference endpoint)
+static List<string> GetAllowedOrigins(List<EndpointReference> endpoints)
 {
-    if (endpoint == null || !endpoint.Exists || string.IsNullOrWhiteSpace(endpoint.Url))
+    List<string> allowedOrigins = [];
+    foreach (EndpointReference endpoint in endpoints)
     {
-        return;
+        if (endpoint == null || !endpoint.Exists || string.IsNullOrWhiteSpace(endpoint.Url))
+        {
+            continue;
+        }
+        string url = endpoint.Url.TrimEnd('/');
+        if (!allowedOrigins.Contains(url))
+        {
+            allowedOrigins.Add(url);
+        }
     }
-
-    origins.Add(endpoint.Url.TrimEnd('/'));
+    return allowedOrigins;
 }

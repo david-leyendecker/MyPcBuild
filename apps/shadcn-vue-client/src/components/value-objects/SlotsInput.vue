@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
-import type { Slot } from '@/types/spatial'
+import type { Slot, ProductCategory } from '@/types/spatial'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Collapsible } from '@/components/ui/collapsible'
 import { FormItemText, FormItemSelect } from '@/components/form-items'
 import Label from '@/components/ui/label/Label.vue'
+import { productCategoryOptions } from '@/constants/enumOptions'
 import Vector3Input from './Vector3Input.vue'
 import DimensionsInput from './DimensionsInput.vue'
 import RotationInput from './RotationInput.vue'
@@ -29,21 +30,10 @@ const emit = defineEmits<{
 
 const localSlots = ref<Slot[]>([...props.modelValue])
 
-const categoryOptions = [
-  { label: 'CPU', value: 'CPU' },
-  { label: 'GPU', value: 'GPU' },
-  { label: 'Motherboard', value: 'Motherboard' },
-  { label: 'RAM', value: 'RAM' },
-  { label: 'Storage', value: 'Storage' },
-  { label: 'PowerSupply', value: 'PowerSupply' },
-  { label: 'Cooler', value: 'Cooler' },
-  { label: 'Case', value: 'Case' }
-]
-
 function addSlot() {
   localSlots.value.push({
     name: '',
-    allowedCategory: 'CPU',
+    allowedCategory: 'cpu',
     relativePosition: { x: 0, y: 0, z: 0 },
     maxDimensions: { length: 100, width: 100, height: 100 },
     rotation: null,
@@ -122,9 +112,9 @@ watch(() => props.modelValue, (newValue) => {
               <FormItemSelect
                 label="Allowed Category *"
                 :model-value="slot.allowedCategory"
-                :options="categoryOptions"
+                :options="productCategoryOptions"
                 :disabled="!editable"
-                @update:model-value="(v) => { slot.allowedCategory = String(v); emitUpdate() }"
+                @update:model-value="(v) => { slot.allowedCategory = v as ProductCategory; emitUpdate() }"
               />
             </div>
 

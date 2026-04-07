@@ -3,27 +3,27 @@
     <n-grid :cols="2" :x-gap="12">
       <!-- Type and Interface -->
       <n-form-item-gi label="Storage Type">
-        <n-input 
+        <n-select 
           v-model:value="localProduct.type"
+          :options="storageTypeOptions"
           :disabled="!editable"
-          placeholder="e.g., SSD, HDD"
         />
       </n-form-item-gi>
       
       <n-form-item-gi label="Interface">
-        <n-input 
+        <n-select 
           v-model:value="localProduct.interface"
+          :options="storageInterfaceOptions"
           :disabled="!editable"
-          placeholder="e.g., NVMe, SATA"
         />
       </n-form-item-gi>
 
       <!-- Form Factor and Capacity -->
       <n-form-item-gi label="Form Factor">
-        <n-input 
+        <n-select 
           v-model:value="localProduct.storageFormFactor"
+          :options="storageFormFactorOptions"
           :disabled="!editable"
-          placeholder="e.g., M.2 2280, 2.5 inch"
         />
       </n-form-item-gi>
       
@@ -54,8 +54,9 @@
 
 <script setup lang="ts">
 import { ref, watch } from 'vue';
-import { NForm, NFormItemGi, NGrid, NInput } from 'naive-ui';
+import { NForm, NFormItemGi, NGrid, NSelect } from 'naive-ui';
 import type { StorageProductRequest, StorageProductResponse } from '@/types/products';
+import { storageTypeOptions, storageInterfaceOptions, storageFormFactorOptions } from '@/constants/enumOptions';
 import StorageCapacityInput from '@/components/ValueObjects/StorageCapacityInput.vue';
 import DataSpeedInput from '@/components/ValueObjects/DataSpeedInput.vue';
 

@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
-import type { StorageProductRequest, ProductRequest } from '@/types/product'
-import { FormItemText, FormItemNumber } from '@/components/form-items'
+import type { StorageProductRequest, StorageType, StorageInterface, StorageFormFactor, ProductRequest } from '@/types/product'
+import { FormItemSelect, FormItemNumber } from '@/components/form-items'
+import { storageTypeOptions, storageInterfaceOptions, storageFormFactorOptions } from '@/constants/enumOptions'
 
 interface Props {
   modelValue?: Partial<ProductRequest>
@@ -14,9 +15,9 @@ const emit = defineEmits<{
 
 /** Narrow to Storage shape - safe when this form is rendered for Storage category */
 const model = props.modelValue as Partial<StorageProductRequest> | undefined
-const type = ref(model?.type || 'SSD')
-const interfaceType = ref(model?.interface || 'NVMe')
-const storageFormFactor = ref(model?.storageFormFactor || 'M.2')
+const type = ref<StorageType>(model?.type || 'SSD')
+const interfaceType = ref<StorageInterface>(model?.interface || 'NVMe')
+const storageFormFactor = ref<StorageFormFactor>(model?.storageFormFactor || 'M2_2280')
 const capacityGB = ref(model?.capacity?.valueInGB || 1000)
 const readSpeedMBps = ref(model?.readSpeed?.valueInMBps || 3500)
 const writeSpeedMBps = ref(model?.writeSpeed?.valueInMBps || 3000)
@@ -47,11 +48,23 @@ defineExpose({
 
 <template>
   <div class="grid gap-4 md:grid-cols-2">
-    <FormItemText label="Storage Type *" v-model="type" placeholder="e.g., SSD, HDD" />
+    <FormItemSelect
+      label="Storage Type *"
+      v-model="type"
+      :options="storageTypeOptions"
+    />
 
-    <FormItemText label="Interface *" v-model="interfaceType" placeholder="e.g., NVMe, SATA" />
+    <FormItemSelect
+      label="Interface *"
+      v-model="interfaceType"
+      :options="storageInterfaceOptions"
+    />
 
-    <FormItemText label="Form Factor *" v-model="storageFormFactor" placeholder="e.g., M.2, 2.5-inch" />
+    <FormItemSelect
+      label="Form Factor *"
+      v-model="storageFormFactor"
+      :options="storageFormFactorOptions"
+    />
 
     <FormItemNumber label="Capacity (GB) *" v-model="capacityGB" :min="1" />
 

@@ -1,3 +1,4 @@
+using MyPcBuild.ApiService.Catalog.DTOs;
 using MyPcBuild.ApiService.Catalog.Models;
 using MyPcBuild.ApiService.Infrastructure;
 
@@ -5,12 +6,31 @@ namespace MyPcBuild.ApiService.Catalog.Endpoints;
 
 public static class GetFieldDefinitions
 {
+    private static readonly Dictionary<string, ProductCategory> _categoryAliases = new(StringComparer.OrdinalIgnoreCase)
+    {
+        ["pccase"] = ProductCategory.Case,
+        ["case"] = ProductCategory.Case,
+        ["psu"] = ProductCategory.PowerSupply,
+        ["powersupply"] = ProductCategory.PowerSupply,
+        ["cpu"] = ProductCategory.CPU,
+        ["gpu"] = ProductCategory.GPU,
+        ["motherboard"] = ProductCategory.Motherboard,
+        ["ram"] = ProductCategory.RAM,
+        ["storage"] = ProductCategory.Storage,
+        ["cooler"] = ProductCategory.Cooler,
+    };
+
     public static IEndpointRouteBuilder MapGetFieldDefinitionsEndpoint(this IEndpointRouteBuilder app)
     {
-        app.MapGet("/api/catalog/field-definitions/{category}", (
-            ProductCategory category,
+        app.MapGet("/api/catalog/field-definitions/{categorySlug}", (
+            string categorySlug,
             IHttpContextAccessor httpContextAccessor) =>
         {
+            if (!_categoryAliases.TryGetValue(categorySlug, out ProductCategory category))
+            {
+                return Results.BadRequest($"Unknown category: '{categorySlug}'. Valid categories: cpu, gpu, motherboard, ram, storage, cooler, psu, case");
+            }
+
             List<FieldDefinition> fields = category switch
             {
                 ProductCategory.CPU => GetCpuFields(),
@@ -30,7 +50,7 @@ public static class GetFieldDefinitions
                 category,
                 fields,
                 [
-                    new HateoasLink(new Uri($"{baseUrl}/api/catalog/field-definitions/{category}"), "self", Infrastructure.HttpMethod.GET),
+                    new HateoasLink(new Uri($"{baseUrl}/api/catalog/field-definitions/{categorySlug}"), "self", Infrastructure.HttpMethod.GET),
                     new HateoasLink(new Uri($"{baseUrl}/api/catalog/products?filters=ProductCategory={category}"), "products", Infrastructure.HttpMethod.GET),
                     new HateoasLink(new Uri($"{baseUrl}/api/catalog/categories"), "categories", Infrastructure.HttpMethod.GET),
                     new HateoasLink(new Uri($"{baseUrl}/api/catalog/products"), "create-product", Infrastructure.HttpMethod.POST)
@@ -71,12 +91,14 @@ public static class GetFieldDefinitions
     private static FieldDefinition ChambersField(string name, bool required = false)
         => new(name, FieldDefinitionType.Chambers, required, null, null);
 
+    private static List<string> GetEnumOptions<T>() where T : struct, Enum =>
+        Enum.GetNames(typeof(T)).ToList();
+
     private static List<FieldDefinition> GetCpuFields()
     {
-
         return
         [
-            SelectField(nameof(CpuProduct.Socket), ["AM5", "AM4", "LGA1700", "LGA1200", "LGA1151"], required: true),
+            SelectField(nameof(CpuProduct.Socket), GetEnumOptions<ApiCpuSocket>(), required: true),
             NumberField(nameof(CpuProduct.Cores), required: true),
             NumberField(nameof(CpuProduct.Threads), required: true),
             NumberField(nameof(CpuProduct.BaseClock), Frequency.Unit, required: true),
@@ -90,9 +112,9 @@ public static class GetFieldDefinitions
     {
         return
         [
-            SelectField(nameof(MotherboardProduct.Socket), ["AM5", "AM4", "LGA1700", "LGA1200", "LGA1151"], required: true),
+            SelectField(nameof(MotherboardProduct.Socket), GetEnumOptions<ApiCpuSocket>(), required: true),
             TextField(nameof(MotherboardProduct.Chipset), required: true),
-            SelectField(nameof(MotherboardProduct.FormFactor), ["ATX", "MicroATX", "MiniITX", "EATX"], required: true),
+            SelectField(nameof(MotherboardProduct.FormFactor), GetEnumOptions<ApiFormFactor>(), required: true),
             SelectField(nameof(MotherboardProduct.MemoryType), ["DDR5", "DDR4", "DDR3"], required: true),
             NumberField(nameof(MotherboardProduct.MaxMemory), StorageCapacity.Unit, required: true),
             DimensionsField(nameof(MotherboardProduct.Dimensions), Length.Unit, required: true),
@@ -104,7 +126,7 @@ public static class GetFieldDefinitions
     {
         return
         [
-            SelectField(nameof(GpuProduct.ChipsetManufacturer), ["NVIDIA", "AMD", "Intel"], required: true),
+            SelectField(nameof(GpuProduct.ChipsetManufacturer), GetEnumOptions<ApiGpuChipsetManufacturer>(), required: true),
             TextField(nameof(GpuProduct.Series), required: true),
             NumberField(nameof(GpuProduct.VRAM), StorageCapacity.Unit, required: true),
             SelectField(nameof(GpuProduct.MemoryType), ["GDDR6X", "GDDR6", "GDDR5"], required: true),
@@ -135,7 +157,7 @@ public static class GetFieldDefinitions
     {
         return
         [
-            SelectField(nameof(PcCaseProduct.FormFactor), ["ATX", "MicroATX", "MiniITX", "EATX"], required: true),
+            SelectField(nameof(PcCaseProduct.FormFactor), GetEnumOptions<ApiFormFactor>(), required: true),
             TextField(nameof(PcCaseProduct.Color)),
             SelectField(nameof(PcCaseProduct.SidePanelWindow), ["None", "Acrylic", "Tempered Glass"]),
             DimensionsField(nameof(PcCaseProduct.Dimensions), Length.Unit, required: true),
@@ -160,9 +182,9 @@ public static class GetFieldDefinitions
     {
         return
         [
-            SelectField(nameof(StorageProduct.Type), ["SSD", "HDD"], required: true),
-            SelectField(nameof(StorageProduct.Interface), ["NVMe", "SATA", "M.2"], required: true),
-            TextField(nameof(StorageProduct.StorageFormFactor), required: true),
+            SelectField(nameof(StorageProduct.Type), GetEnumOptions<ApiStorageType>(), required: true),
+            SelectField(nameof(StorageProduct.Interface), GetEnumOptions<ApiStorageInterface>(), required: true),
+            SelectField(nameof(StorageProduct.StorageFormFactor), ["M.2 2280", "2.5 inch", "3.5 inch"], required: true),
             NumberField(nameof(StorageProduct.Capacity), StorageCapacity.Unit, required: true),
             NumberField(nameof(StorageProduct.ReadSpeed), DataSpeed.Unit, required: true),
             NumberField(nameof(StorageProduct.WriteSpeed), DataSpeed.Unit, required: true)
@@ -173,10 +195,10 @@ public static class GetFieldDefinitions
     {
         return
         [
-            SelectField(nameof(CoolerProduct.CoolerType), ["Air", "AIO", "CustomLoop"], required: true),
+            SelectField(nameof(CoolerProduct.CoolerType), GetEnumOptions<ApiCoolerType>(), required: true),
             NumberField(nameof(CoolerProduct.Height), Length.Unit, required: true),
             NumberField(nameof(CoolerProduct.TDP), Power.Unit, required: true),
-            MultiSelectField(nameof(CoolerProduct.Sockets), ["AM5", "AM4", "LGA1700", "LGA1200", "LGA1151"], required: true),
+            MultiSelectField(nameof(CoolerProduct.Sockets), GetEnumOptions<ApiCpuSocket>(), required: true),
             DimensionsField(nameof(CoolerProduct.Dimensions), Length.Unit, required: true)
         ];
     }

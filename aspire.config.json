@@ -1,0 +1,5 @@
+{
+  "appHost": {
+    "path": "MyPcBuild.AppHost/MyPcBuild.AppHost.csproj"
+  }
+}

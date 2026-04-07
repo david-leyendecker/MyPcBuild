@@ -37,7 +37,7 @@ public static class SearchProducts
                 results.Select(p => new SearchProductResult(
                     p.Id,
                     p.Name,
-                    p.ProductCategory.ToString(),
+                    p.ProductCategory,
                     p.Price,
                     p.Manufacturer,
                     [
@@ -70,7 +70,7 @@ public record SearchProductsResponse(
 public record SearchProductResult(
     Guid Id,
     string Name,
-    string CategoryName,
+    ProductCategory Category,
     decimal Price,
     string Manufacturer,
     List<HateoasLink> Links

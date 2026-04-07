@@ -226,14 +226,9 @@ public class CompatibilityValidator : ICompatibilityValidator
 
     }
 
-    private bool IsFormFactorCompatible(string caseFormFactor, FormFactor motherboardFormFactor)
+    private static bool IsFormFactorCompatible(FormFactor caseFormFactor, FormFactor motherboardFormFactor)
     {
-        if (!TryParseFormFactor(caseFormFactor, out FormFactor parsedCase))
-        {
-            return false;
-        }
-
-        return parsedCase switch
+        return caseFormFactor switch
         {
             FormFactor.EATX => motherboardFormFactor is FormFactor.EATX or FormFactor.ATX or FormFactor.MicroATX or FormFactor.MiniITX,
             FormFactor.ATX => motherboardFormFactor is FormFactor.ATX or FormFactor.MicroATX or FormFactor.MiniITX,
@@ -243,21 +238,8 @@ public class CompatibilityValidator : ICompatibilityValidator
         };
     }
 
-    private static bool TryParseFormFactor(string value, out FormFactor formFactor)
+    private static int ParseRamConfiguration(RamProduct ram)
     {
-        string normalized = value.Replace("-", string.Empty).Replace(" ", string.Empty);
-        return Enum.TryParse(normalized, ignoreCase: true, out formFactor);
-    }
-
-    private int ParseRamConfiguration(RamProduct ram)
-    {
-        // Parse "2x16GB" format - return the first number
-        string[] parts = ram.Configuration.Split('x');
-        if (parts.Length > 0 && int.TryParse(parts[0], out int count))
-        {
-            return count;
-        }
-
-        return 1;
+        return ram.Configuration.ModuleCount;
     }
 }

@@ -99,7 +99,7 @@ public record GpuProduct(
     Dimensions Dimensions,
     List<Slot> Slots,
     // GPU-specific properties
-    string ChipsetManufacturer,
+    GpuChipsetManufacturer ChipsetManufacturer,
     string Series,
     StorageCapacity VRAM,
     MemoryType MemoryType,
@@ -121,9 +121,9 @@ public record RamProduct(
     // RAM-specific properties
     MemoryType Type,
     StorageCapacity Capacity,
-    string Configuration,
+    RamConfiguration Configuration,
     Frequency Speed,
-    string CASLatency,
+    CasLatency CASLatency,
     Voltage Voltage
 ) : Product(Id, Name, Price, Manufacturer)
 {
@@ -138,9 +138,9 @@ public record PcCaseProduct(
     Dimensions Dimensions,
     List<Chamber> Chambers,
     // PC Case-specific properties
-    string FormFactor,
+    FormFactor FormFactor,
     string Color,
-    string SidePanelWindow
+    SidePanelType SidePanelWindow
 ) : Product(Id, Name, Price, Manufacturer), IChamberedProduct
 {
     public override ProductCategory ProductCategory => ProductCategory.Case;
@@ -153,9 +153,9 @@ public record PsuProduct(
     string Manufacturer,
     // PSU-specific properties
     Power Wattage,
-    string Efficiency,
-    string Modular,
-    string FormFactor,
+    PsuEfficiency Efficiency,
+    PsuModularity Modular,
+    PsuFormFactor FormFactor,
     Length Length,
     int PCIe8Pin
 ) : Product(Id, Name, Price, Manufacturer)
@@ -169,9 +169,9 @@ public record StorageProduct(
     decimal Price,
     string Manufacturer,
     // Storage-specific properties
-    string Type,
-    string Interface,
-    string StorageFormFactor,
+    StorageType Type,
+    StorageInterface Interface,
+    StorageFormFactor StorageFormFactor,
     StorageCapacity Capacity,
     DataSpeed ReadSpeed,
     DataSpeed WriteSpeed

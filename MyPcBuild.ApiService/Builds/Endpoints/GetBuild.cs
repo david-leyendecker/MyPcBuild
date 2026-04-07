@@ -170,7 +170,7 @@ public record GetBuildResponse(
 public record ProductDetails(
     Guid Id,
     string Name,
-    ProductCategory CategoryName,
+    ProductCategory Category,
     string Manufacturer,
     decimal PricePaid,
     Guid? SlotId,

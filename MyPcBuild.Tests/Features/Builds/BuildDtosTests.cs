@@ -1,6 +1,6 @@
 using Xunit;
-using MyPcBuild.ApiService.Features.Builds;
-using MyPcBuild.ApiService.Domain.Models.Spatial;
+using MyPcBuild.ApiService.Builds.Endpoints;
+using MyPcBuild.ApiService.Builds.Models;
 
 namespace MyPcBuild.Tests.Features.Builds;
 

@@ -3,6 +3,7 @@ import { ref, watch } from 'vue'
 import type { MotherboardProductRequest, CpuSocket, FormFactor, MemoryType, ProductRequest } from '@/types/product'
 import type { Slot } from '@/types/spatial'
 import { FormItemSelect, FormItemText, FormItemNumber } from '@/components/form-items'
+import { cpuSocketOptions, formFactorOptions, ramMemoryTypeOptions } from '@/constants/enumOptions'
 import DimensionsInput from '@/components/value-objects/DimensionsInput.vue'
 import SlotsInput from '@/components/value-objects/SlotsInput.vue'
 
@@ -24,10 +25,6 @@ const memoryType = ref<MemoryType>(model?.memoryType || 'DDR5')
 const maxMemoryGB = ref(model?.maxMemory?.valueInGB || 128)
 const dimensions = ref(model?.dimensions || { length: 305, width: 244, height: 69 })
 const slots = ref<Slot[]>(model?.slots || [])
-
-const socketOptions = (['LGA1700', 'LGA1200', 'LGA1151', 'LGA2066', 'AM5', 'AM4', 'sTRX4', 'TR4'] as CpuSocket[]).map(v => ({ value: v, label: v }))
-const formFactorOptions = (['ATX', 'MicroATX', 'MiniITX', 'EATX'] as FormFactor[]).map(v => ({ value: v, label: v }))
-const memoryTypeOptions = (['DDR3', 'DDR4', 'DDR5'] as MemoryType[]).map(v => ({ value: v, label: v }))
 
 watch([socket, chipset, formFactor, memoryType, maxMemoryGB, dimensions, slots], () => {
   emit('update:modelValue', {
@@ -57,13 +54,13 @@ defineExpose({
 
 <template>
   <div class="grid gap-4 md:grid-cols-2">
-    <FormItemSelect label="CPU Socket *" v-model="socket" :options="socketOptions" />
+    <FormItemSelect label="CPU Socket *" v-model="socket" :options="cpuSocketOptions" />
 
     <FormItemText label="Chipset *" v-model="chipset" placeholder="e.g., X670, Z790" />
 
     <FormItemSelect label="Form Factor *" v-model="formFactor" :options="formFactorOptions" />
 
-    <FormItemSelect label="Memory Type *" v-model="memoryType" :options="memoryTypeOptions" />
+    <FormItemSelect label="Memory Type *" v-model="memoryType" :options="ramMemoryTypeOptions" />
 
     <FormItemNumber label="Max Memory (GB) *" v-model="maxMemoryGB" :min="1" />
 

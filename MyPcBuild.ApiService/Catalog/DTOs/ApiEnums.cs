@@ -1,5 +1,5 @@
-using System.Text.Json;
 using System.Text.Json.Serialization;
+using MyPcBuild.ApiService.Infrastructure;
 
 namespace MyPcBuild.ApiService.Catalog.DTOs;
 
@@ -68,6 +68,7 @@ public enum ApiCoolerType
 /// <summary>
 /// GPU power connector configurations (API).
 /// </summary>
+[JsonConverter(typeof(ApiGpuPowerConnectorConverter))]
 public enum ApiGpuPowerConnector
 {
     Dual8Pin,
@@ -75,39 +76,108 @@ public enum ApiGpuPowerConnector
     One16Pin
 }
 
+public class ApiGpuPowerConnectorConverter : EnumIgnoreCaseJsonConverter<ApiGpuPowerConnector> { }
+
 /// <summary>
-/// JSON converter for ApiGpuPowerConnector to handle string values like "1x16-pin", "2x8pin", etc.
+/// GPU chipset manufacturer (API).
 /// </summary>
-internal class ApiGpuPowerConnectorConverter : JsonConverter<ApiGpuPowerConnector>
+[JsonConverter(typeof(ApiGpuChipsetManufacturerConverter))]
+public enum ApiGpuChipsetManufacturer
 {
-    public override ApiGpuPowerConnector Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
-    {
-        if (reader.TokenType == JsonTokenType.String)
-        {
-            string value = reader.GetString() ?? string.Empty;
-            string normalized = value.Replace(" ", string.Empty).Replace("-", string.Empty).ToLowerInvariant();
-
-            return normalized switch
-            {
-                "1x16pin" or "16pin" or "one16pin" => ApiGpuPowerConnector.One16Pin,
-                "2x8pin" or "dual8pin" => ApiGpuPowerConnector.Dual8Pin,
-                "3x8pin" or "triple8pin" => ApiGpuPowerConnector.Triple8Pin,
-                _ => throw new JsonException($"Unrecognized GPU power connector value: {value}. Expected one of: 1x16-pin, 2x8-pin, 3x8-pin")
-            };
-        }
-
-        // Try to parse as standard enum format
-        if (reader.TokenType == JsonTokenType.Number)
-        {
-            return (ApiGpuPowerConnector)reader.GetInt32();
-        }
-
-        throw new JsonException($"Cannot convert {reader.TokenType} to ApiGpuPowerConnector");
-    }
-
-    public override void Write(Utf8JsonWriter writer, ApiGpuPowerConnector value, JsonSerializerOptions options)
-    {
-        writer.WriteStringValue(value.ToString());
-    }
+    NVIDIA,
+    AMD,
+    Intel
 }
 
+public class ApiGpuChipsetManufacturerConverter : EnumIgnoreCaseJsonConverter<ApiGpuChipsetManufacturer> { }
+
+/// <summary>
+/// PC case side panel window type (API).
+/// </summary>
+[JsonConverter(typeof(ApiSidePanelTypeConverter))]
+public enum ApiSidePanelType
+{
+    None,
+    Acrylic,
+    TemperedGlass
+}
+
+public class ApiSidePanelTypeConverter : EnumIgnoreCaseJsonConverter<ApiSidePanelType> { }
+
+/// <summary>
+/// PSU efficiency rating (API).
+/// </summary>
+[JsonConverter(typeof(ApiPsuEfficiencyConverter))]
+public enum ApiPsuEfficiency
+{
+    Bronze,
+    Silver,
+    Gold,
+    Platinum,
+    Titanium
+}
+
+public class ApiPsuEfficiencyConverter : EnumIgnoreCaseJsonConverter<ApiPsuEfficiency> { }
+
+/// <summary>
+/// PSU modularity type (API).
+/// </summary>
+[JsonConverter(typeof(ApiPsuModularityConverter))]
+public enum ApiPsuModularity
+{
+    NonModular,
+    SemiModular,
+    FullyModular
+}
+
+public class ApiPsuModularityConverter : EnumIgnoreCaseJsonConverter<ApiPsuModularity> { }
+
+/// <summary>
+/// PSU form factor (API).
+/// </summary>
+[JsonConverter(typeof(ApiPsuFormFactorConverter))]
+public enum ApiPsuFormFactor
+{
+    ATX,
+    SFX,
+    SFXL
+}
+
+public class ApiPsuFormFactorConverter : EnumIgnoreCaseJsonConverter<ApiPsuFormFactor> { }
+
+/// <summary>
+/// Storage type (API).
+/// </summary>
+[JsonConverter(typeof(ApiStorageTypeConverter))]
+public enum ApiStorageType
+{
+    SSD,
+    HDD
+}
+
+public class ApiStorageTypeConverter : EnumIgnoreCaseJsonConverter<ApiStorageType> { }
+
+/// <summary>
+/// Storage interface (API).
+/// </summary>
+[JsonConverter(typeof(ApiStorageInterfaceConverter))]
+public enum ApiStorageInterface
+{
+    NVMe,
+    SATA
+}
+
+public class ApiStorageInterfaceConverter : EnumIgnoreCaseJsonConverter<ApiStorageInterface> { }
+
+/// <summary>
+/// Storage form factor (API).
+/// </summary>
+[JsonConverter(typeof(ApiStorageFormFactorConverter))]
+public enum ApiStorageFormFactor
+{
+    M2_2280,
+    TwoPointFiveInch,
+    ThreePointFiveInch
+}
+
+public class ApiStorageFormFactorConverter : EnumIgnoreCaseJsonConverter<ApiStorageFormFactor> { }

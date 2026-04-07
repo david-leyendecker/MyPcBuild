@@ -2,6 +2,7 @@
 import { ref, watch } from 'vue'
 import type { RamProductRequest, MemoryType, ProductRequest } from '@/types/product'
 import { FormItemSelect, FormItemNumber, FormItemText } from '@/components/form-items'
+import { ramMemoryTypeOptions } from '@/constants/enumOptions'
 
 interface Props {
   modelValue?: Partial<ProductRequest>
@@ -20,8 +21,6 @@ const configuration = ref(model?.configuration || '2x8GB')
 const speedGHz = ref(model?.speed?.valueInGHz || 3.2)
 const casLatency = ref(model?.casLatency || 'CL16')
 const voltageVolts = ref(model?.voltage?.valueInVolts || 1.35)
-
-const memoryTypeOptions = (['DDR3', 'DDR4', 'DDR5'] as MemoryType[]).map(v => ({ value: v, label: v }))
 
 watch([type, capacityGB, configuration, speedGHz, casLatency, voltageVolts], () => {
   emit('update:modelValue', {
@@ -49,7 +48,7 @@ defineExpose({
 
 <template>
   <div class="grid gap-4 md:grid-cols-2">
-    <FormItemSelect label="Memory Type *" v-model="type" :options="memoryTypeOptions" />
+    <FormItemSelect label="Memory Type *" v-model="type" :options="ramMemoryTypeOptions" />
 
     <FormItemNumber label="Capacity (GB) *" v-model="capacityGB" :min="1" />
 

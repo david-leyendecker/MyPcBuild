@@ -35,16 +35,26 @@ public static class GetProducts
             IHttpContextAccessor httpContextAccessor,
             [AsParameters] QueryParameters queryParams) =>
         {
+            if (queryParams.Page.HasValue && queryParams.Page < 1)
+            {
+                return Results.BadRequest("Page must be at least 1.");
+            }
+
+            if (queryParams.ItemsPerPage.HasValue && queryParams.ItemsPerPage < 1)
+            {
+                return Results.BadRequest("ItemsPerPage must be at least 1.");
+            }
+
             IQueryable<Product> query = session.Query<Product>();
 
             // Apply generic filters
             query = ApplyFilters(query, queryParams.Filters);
 
-            // Apply search filter
+            // Apply search filter using Marten-compatible Contains (maps to LIKE in SQL)
             if (!string.IsNullOrWhiteSpace(queryParams.Search))
             {
-                query = query.Where(p => p.Name.Contains(queryParams.Search, StringComparison.InvariantCultureIgnoreCase)
-                    || p.Manufacturer.Contains(queryParams.Search, StringComparison.InvariantCultureIgnoreCase));
+                string search = queryParams.Search;
+                query = query.Where(p => p.Name.Contains(search) || p.Manufacturer.Contains(search));
             }
 
             // Get total count before pagination
@@ -52,45 +62,45 @@ public static class GetProducts
 
             // Apply sorting (always ensure ordering for pagination correctness)
             string sortBy = queryParams.SortBy ?? "name";
-            query = ApplySorting(query, sortBy, queryParams.SortDesc);
+            query = ApplySorting(query, sortBy, queryParams.SortDesc ?? false);
 
             // Apply pagination
             IReadOnlyList<Product> productResults = await query
                 .Skip(queryParams.GetSkip())
-                .Take(queryParams.ItemsPerPage)
+                .Take(queryParams.ItemsPerPage ?? 20)
                 .ToListAsync();
 
             PaginationMetadata pagination = new()
             {
-                Total = totalCount,
-                Page = queryParams.Page,
-                ItemsPerPage = queryParams.ItemsPerPage
+                TotalCount = totalCount,
+                PageNumber = queryParams.Page ?? 1,
+                ItemsPerPage = queryParams.ItemsPerPage ?? 20
             };
 
             string baseUrl = httpContextAccessor.GetBaseUrl();
 
             List<HateoasLink> links =
             [
-                new HateoasLink(new Uri($"{baseUrl}/api/catalog/products?page={queryParams.Page}&itemsPerPage={queryParams.ItemsPerPage}"), "self", Infrastructure.HttpMethod.GET),
+                new HateoasLink(new Uri($"{baseUrl}/api/catalog/products?page={queryParams.Page ?? 1}&itemsPerPage={queryParams.ItemsPerPage ?? 20}"), "self", Infrastructure.HttpMethod.GET),
                 new HateoasLink(new Uri($"{baseUrl}/api/catalog/categories"), "categories", Infrastructure.HttpMethod.GET),
                 new HateoasLink(new Uri($"{baseUrl}/api/catalog/products"), "create-product", Infrastructure.HttpMethod.POST)
             ];
 
             if (pagination.HasNextPage)
             {
-                links.Add(new HateoasLink(new Uri($"{baseUrl}/api/catalog/products?page={queryParams.Page + 1}&itemsPerPage={queryParams.ItemsPerPage}"), "next", Infrastructure.HttpMethod.GET));
+                links.Add(new HateoasLink(new Uri($"{baseUrl}/api/catalog/products?page={(queryParams.Page ?? 1) + 1}&itemsPerPage={queryParams.ItemsPerPage ?? 20}"), "next", Infrastructure.HttpMethod.GET));
             }
 
             if (pagination.HasPreviousPage)
             {
-                links.Add(new HateoasLink(new Uri($"{baseUrl}/api/catalog/products?page={queryParams.Page - 1}&itemsPerPage={queryParams.ItemsPerPage}"), "prev", Infrastructure.HttpMethod.GET));
+                links.Add(new HateoasLink(new Uri($"{baseUrl}/api/catalog/products?page={(queryParams.Page ?? 1) - 1}&itemsPerPage={queryParams.ItemsPerPage ?? 20}"), "prev", Infrastructure.HttpMethod.GET));
             }
 
             GetProductsResponse response = new(
                 productResults.Select(p => new ProductSummary(
                     p.Id,
                     p.Name,
-                    p.ProductCategory.ToString(),
+                    p.ProductCategory,
                     p.Price,
                     p.Manufacturer,
                     p.IsDraft,
@@ -158,14 +168,14 @@ public static class GetProducts
 
 public record GetProductsResponse(
     List<ProductSummary> Items,
-    PaginationMetadata Pagination,
+    PaginationMetadata PaginationMetadata,
     List<HateoasLink> Links
 );
 
 public record ProductSummary(
     Guid Id,
     string Name,
-    string CategoryName,
+    ProductCategory Category,
     decimal Price,
     string Manufacturer,
     bool IsDraft,

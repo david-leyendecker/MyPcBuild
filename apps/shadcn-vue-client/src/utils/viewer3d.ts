@@ -118,50 +118,31 @@ export function createBoxMeshWithWireframeColor(
 }
 
 export const CATEGORY_COLORS: Record<string, number> = {
-  'CPU': 0xff6b6b,
-  'GPU': 0x4ecdc4,
-  'Motherboard': 0x45b7d1,
-  'RAM': 0x96ceb4,
-  'Storage': 0xffeaa7,
-  'PowerSupply': 0xfd79a8,
-  'Cooler': 0x74b9ff,
-  'Case': 0xa29bfe,
-  'CPU_BUILD': 0x3b82f6,
-  'GPU_BUILD': 0x10b981,
-  'Motherboard_BUILD': 0x8b5cf6,
-  'RAM_BUILD': 0xf59e0b,
-  'Storage_BUILD': 0xef4444,
-  'PowerSupply_BUILD': 0x06b6d4,
-  'Cooler_BUILD': 0xec4899,
-  'Case_BUILD': 0x6b7280,
+  'cpu': 0xff6b6b,
+  'gpu': 0x4ecdc4,
+  'motherboard': 0x45b7d1,
+  'ram': 0x96ceb4,
+  'storage': 0xffeaa7,
+  'powersupply': 0xfd79a8,
+  'cooler': 0x74b9ff,
+  'case': 0xa29bfe,
+  'cpu_build': 0x3b82f6,
+  'gpu_build': 0x10b981,
+  'motherboard_build': 0x8b5cf6,
+  'ram_build': 0xf59e0b,
+  'storage_build': 0xef4444,
+  'powersupply_build': 0x06b6d4,
+  'cooler_build': 0xec4899,
+  'case_build': 0x6b7280,
 };
 
 export function getProductCategoryColor(category: string): number {
-  const colors: Record<string, number> = {
-    'CPU': 0xff6b6b,
-    'GPU': 0x4ecdc4,
-    'Motherboard': 0x45b7d1,
-    'RAM': 0x96ceb4,
-    'Storage': 0xffeaa7,
-    'PowerSupply': 0xfd79a8,
-    'Cooler': 0x74b9ff,
-    'Case': 0xa29bfe
-  };
-  return colors[category] || 0x888888;
+  return CATEGORY_COLORS[category.toLowerCase()] || 0x888888;
 }
 
 export function getBuildCategoryColor(category: string): number {
-  const colors: Record<string, number> = {
-    'CPU': 0x3b82f6,
-    'GPU': 0x10b981,
-    'Motherboard': 0x8b5cf6,
-    'RAM': 0xf59e0b,
-    'Storage': 0xef4444,
-    'PowerSupply': 0x06b6d4,
-    'Cooler': 0xec4899,
-    'Case': 0x6b7280
-  };
-  return colors[category] || 0x9ca3af;
+  const key = `${category.toLowerCase()}_build`;
+  return CATEGORY_COLORS[key] || 0x9ca3af;
 }
 
 export function degreesToRadians(degrees: number): number {

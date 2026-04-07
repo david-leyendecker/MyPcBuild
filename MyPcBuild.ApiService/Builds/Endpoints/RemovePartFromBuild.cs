@@ -1,5 +1,6 @@
 using Marten;
 using MyPcBuild.ApiService.Builds.Events;
+using MyPcBuild.ApiService.Builds.Models;
 using MyPcBuild.ApiService.Infrastructure;
 
 namespace MyPcBuild.ApiService.Builds.Endpoints;
@@ -14,6 +15,12 @@ public static class RemovePartFromBuild
             IDocumentSession session,
             IHttpContextAccessor httpContextAccessor) =>
         {
+            Build? build = await session.Events.AggregateStreamAsync<Build>(buildId);
+            if (build is null)
+            {
+                return Results.NotFound();
+            }
+
             PartRemoved @event = new()
             {
                 BuildId = buildId,

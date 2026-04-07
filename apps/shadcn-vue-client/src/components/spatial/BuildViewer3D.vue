@@ -142,7 +142,7 @@ function updateScene() {
       part.dimensions.width,
       getBuildCategoryColor(part.categoryName),
       0xffffff,
-      part.categoryName === 'Case' ? 0.3 : 0.8
+      part.categoryName.toLowerCase() === 'case' ? 0.3 : 0.8
     );
 
     mesh.position.set(position.x, position.y, position.z);

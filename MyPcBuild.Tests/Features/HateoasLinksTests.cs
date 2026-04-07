@@ -1,9 +1,9 @@
-using MyPcBuild.ApiService.Features.Builds;
-using MyPcBuild.ApiService.Features.Catalog;
-using MyPcBuild.ApiService.Features.Compatibility;
-using MyPcBuild.ApiService.Features.Spatial;
+using MyPcBuild.ApiService.Builds.Endpoints;
+using MyPcBuild.ApiService.Catalog.Endpoints;
+using MyPcBuild.ApiService.Catalog.Models;
+using MyPcBuild.ApiService.Compatibility.Endpoints;
 using MyPcBuild.ApiService.Infrastructure;
-using MyPcBuild.ApiService.Domain.Models;
+using MyPcBuild.ApiService.Spatial.Endpoints;
 using HttpMethod = MyPcBuild.ApiService.Infrastructure.HttpMethod;
 
 namespace MyPcBuild.Tests.Features;
@@ -55,6 +55,7 @@ public class HateoasLinksTests
                     [new HateoasLink(new Uri("/api/builds/1", UriKind.Relative), "self", HttpMethod.GET)]
                 )
             ],
+            new PaginationMetadata { TotalCount = 1, PageNumber = 1, ItemsPerPage = 20 },
             [
                 new HateoasLink(new Uri("/api/builds", UriKind.Relative), "self", HttpMethod.GET),
                 new HateoasLink(new Uri("/api/builds", UriKind.Relative), "create-build", HttpMethod.POST)
@@ -255,7 +256,7 @@ public class HateoasLinksTests
         // Arrange & Act
         GetProductsResponse response = new(
             [],
-            new PaginationMetadata { Total = 0, Page = 1, ItemsPerPage = 20 },
+            new PaginationMetadata { TotalCount = 0, PageNumber = 1, ItemsPerPage = 20 },
             [
                 new HateoasLink(new Uri("/api/catalog/products?page=1&itemsPerPage=20", UriKind.Relative), "self", HttpMethod.GET),
                 new HateoasLink(new Uri("/api/catalog/categories", UriKind.Relative), "categories", HttpMethod.GET),
@@ -279,7 +280,7 @@ public class HateoasLinksTests
         ProductSummary summary = new(
             productId,
             "AMD Ryzen 9 7950X",
-            "CPU",
+            ProductCategory.CPU,
             549.99m,
             "AMD",
             false,

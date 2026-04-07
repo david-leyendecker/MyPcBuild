@@ -5,7 +5,7 @@
       <n-form-item-gi label="Memory Type">
         <n-select 
           v-model:value="localProduct.type"
-          :options="memoryTypeOptions"
+          :options="ramMemoryTypeOptions"
           :disabled="!editable"
         />
       </n-form-item-gi>
@@ -55,7 +55,8 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue';
 import { NForm, NFormItemGi, NGrid, NInput, NSelect } from 'naive-ui';
-import type { RamProductRequest, RamProductResponse, MemoryType } from '@/types/products';
+import type { RamProductRequest, RamProductResponse } from '@/types/products';
+import { ramMemoryTypeOptions } from '@/constants/enumOptions';
 import StorageCapacityInput from '@/components/ValueObjects/StorageCapacityInput.vue';
 import FrequencyInput from '@/components/ValueObjects/FrequencyInput.vue';
 import VoltageInput from '@/components/ValueObjects/VoltageInput.vue';
@@ -72,12 +73,6 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<{
   'update:modelValue': [value: Partial<RamProductRequest>]
 }>();
-
-const memoryTypeOptions = [
-  { label: 'DDR3', value: 'DDR3' as MemoryType },
-  { label: 'DDR4', value: 'DDR4' as MemoryType },
-  { label: 'DDR5', value: 'DDR5' as MemoryType }
-];
 
 const localProduct = ref<Partial<RamProductRequest>>({
   type: props.modelValue.type,

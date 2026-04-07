@@ -3,7 +3,7 @@
     <n-grid :cols="2" :x-gap="12">
       <!-- CPU Socket -->
       <n-form-item-gi label="CPU Socket" :span="2">
-        <n-select v-model:value="localProduct.socket" :options="socketOptions" placeholder="Select socket"
+        <n-select v-model:value="localProduct.socket" :options="cpuSocketOptions" placeholder="Select socket"
           :disabled="!editable" />
       </n-form-item-gi>
 
@@ -42,7 +42,8 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue';
 import { NForm, NFormItemGi, NGrid, NSelect, NInputNumber, NCheckbox } from 'naive-ui';
-import type { CpuProductRequest, CpuProductResponse, CpuSocket } from '@/types/products';
+import type { CpuProductRequest, CpuProductResponse } from '@/types/products';
+import { cpuSocketOptions } from '@/constants/enumOptions';
 import FrequencyInput from '@/components/ValueObjects/FrequencyInput.vue';
 import PowerInput from '@/components/ValueObjects/PowerInput.vue';
 
@@ -58,17 +59,6 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<{
   'update:modelValue': [value: Partial<CpuProductRequest>]
 }>();
-
-const socketOptions = [
-  { label: 'LGA1700', value: 'LGA1700' as CpuSocket },
-  { label: 'LGA1200', value: 'LGA1200' as CpuSocket },
-  { label: 'LGA1151', value: 'LGA1151' as CpuSocket },
-  { label: 'LGA2066', value: 'LGA2066' as CpuSocket },
-  { label: 'AM5', value: 'AM5' as CpuSocket },
-  { label: 'AM4', value: 'AM4' as CpuSocket },
-  { label: 'sTRX4', value: 'sTRX4' as CpuSocket },
-  { label: 'TR4', value: 'TR4' as CpuSocket }
-];
 
 const localProduct = ref<Partial<CpuProductRequest>>({
   socket: props.modelValue.socket,

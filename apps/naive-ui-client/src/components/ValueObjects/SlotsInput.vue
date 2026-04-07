@@ -84,15 +84,15 @@ const emit = defineEmits<{
   'update:modelValue': [value: Slot[]]
 }>();
 
-const categoryOptions = [
-  { label: 'CPU', value: 'CPU' },
-  { label: 'GPU', value: 'GPU' },
-  { label: 'Motherboard', value: 'Motherboard' },
-  { label: 'RAM', value: 'RAM' },
-  { label: 'Storage', value: 'Storage' },
-  { label: 'PowerSupply', value: 'PowerSupply' },
-  { label: 'Cooler', value: 'Cooler' },
-  { label: 'Case', value: 'Case' }
+const categoryOptions: { label: string; value: import('@/types/products').ProductCategory }[] = [
+  { label: 'CPU', value: 'cpu' },
+  { label: 'GPU', value: 'gpu' },
+  { label: 'Motherboard', value: 'motherboard' },
+  { label: 'RAM', value: 'ram' },
+  { label: 'Storage', value: 'storage' },
+  { label: 'Power Supply', value: 'powersupply' },
+  { label: 'Cooler', value: 'cooler' },
+  { label: 'Case', value: 'case' }
 ];
 
 const DEFAULT_POSITION = { x: 0, y: 0, z: 0 };
@@ -125,7 +125,7 @@ watch(
 function addSlot() {
   localSlots.value.push({
     name: '',
-    allowedCategory: 'CPU',
+    allowedCategory: 'cpu',
     relativePosition: { ...DEFAULT_POSITION },
     maxDimensions: { length: 50, width: 50, height: 20 },
     rotation: { ...DEFAULT_ROTATION },

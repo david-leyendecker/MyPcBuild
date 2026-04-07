@@ -8,9 +8,18 @@ public static class GetBuilds
 {
     public static IEndpointRouteBuilder MapGetBuildsEndpoint(this IEndpointRouteBuilder app)
     {
-        app.MapGet("/api/builds", async (IDocumentSession session, IHttpContextAccessor httpContextAccessor) =>
+        app.MapGet("/api/builds", async (
+            IDocumentSession session,
+            IHttpContextAccessor httpContextAccessor,
+            [AsParameters] QueryParameters queryParams) =>
         {
-            IReadOnlyList<Build> builds = await session.Query<Build>().ToListAsync();
+            IQueryable<Build> query = session.Query<Build>();
+            int totalCount = await query.CountAsync();
+
+            IReadOnlyList<Build> builds = await query
+                .Skip(queryParams.GetSkip())
+                .Take(queryParams.ItemsPerPage ?? 20)
+                .ToListAsync();
 
             string baseUrl = httpContextAccessor.GetBaseUrl();
 
@@ -25,8 +34,16 @@ public static class GetBuilds
                 ]
             )).ToList();
 
+            PaginationMetadata paginationMetadata = new()
+            {
+                TotalCount = totalCount,
+                PageNumber = queryParams.Page ?? 1,
+                ItemsPerPage = queryParams.ItemsPerPage ?? 20
+            };
+
             GetBuildsResponse response = new(
                 items,
+                paginationMetadata,
                 [
                     new HateoasLink(new Uri($"{baseUrl}/api/builds"), "self", Infrastructure.HttpMethod.GET),
                     new HateoasLink(new Uri($"{baseUrl}/api/builds"), "create-build", Infrastructure.HttpMethod.POST),
@@ -47,6 +64,7 @@ public static class GetBuilds
 
 public record GetBuildsResponse(
     IReadOnlyList<GetBuildsResponseItem> Items,
+    PaginationMetadata PaginationMetadata,
     List<HateoasLink> Links
 );
 
